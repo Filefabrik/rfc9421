@@ -1,0 +1,6 @@
+/composer.lock
+/vendor/
+/.docker/
+/.coverage/
+/.phpunit.cache/
+/.php-cs-fixer.cache
