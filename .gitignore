@@ -4,3 +4,4 @@
 /.coverage/
 /.phpunit.cache/
 /.php-cs-fixer.cache
+/_stuff/
