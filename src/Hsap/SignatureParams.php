@@ -11,7 +11,7 @@ use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 /**
  * Handles all relevant signatures for the header key "Signature-Input"
  */
-final class SignatureInput
+final class SignatureParams
 {
     private array $signatureParameters = [];
 

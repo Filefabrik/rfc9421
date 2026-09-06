@@ -7,15 +7,15 @@ namespace Filefabrik\HsapTest;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Hsap\SignatureInput;
+use Filefabrik\Hsap\SignatureParams;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(SignatureInput::class)]
-final class SignatureInputTest extends TestCase
+#[CoversClass(SignatureParams::class)]
+final class SignatureParamsTest extends TestCase
 {
     /**
-     * @covers \Filefabrik\Hsap\SignatureInput::getSignatureParameters
+     * @covers \Filefabrik\Hsap\SignatureParams::getSignatureParameters
      * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
@@ -23,10 +23,10 @@ final class SignatureInputTest extends TestCase
      */
     public function testGetSignatureParameters(): void
     {
-        $instance = new SignatureInput()->setHeaderName('testname')
-                                        ->setDerivedComponentName('@testname')
-                                        ->setHeaderName('content-test')
-                                        ->setDerivedComponentName('@test-derived-component')
+        $instance = new SignatureParams()->setHeaderName('testname')
+                                         ->setDerivedComponentName('@testname')
+                                         ->setHeaderName('content-test')
+                                         ->setDerivedComponentName('@test-derived-component')
         ;
 
         $this->assertSame(
@@ -38,12 +38,12 @@ final class SignatureInputTest extends TestCase
     /**
      * @return void
      * @throws AlreadySetException
-     * @covers \Filefabrik\Hsap\SignatureInput::exists
+     * @covers \Filefabrik\Hsap\SignatureParams::exists
      */
     public function testExists(): void
     {
-        $instance = new SignatureInput()->addIfNotExists('testname')
-                                        ->addIfNotExists('@testname')
+        $instance = new SignatureParams()->addIfNotExists('testname')
+                                         ->addIfNotExists('@testname')
         ;
 
         $this->assertTrue($instance->exists('testname'));
@@ -54,25 +54,25 @@ final class SignatureInputTest extends TestCase
     /**
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
-     * @covers \Filefabrik\Hsap\SignatureInput::setHeaderName
+     * @covers \Filefabrik\Hsap\SignatureParams::setHeaderName
      */
     public function testSetHeaderName(): void
     {
-        $set = new SignatureInput()->setHeaderName('testname');
-        $this->assertInstanceOf(SignatureInput::class, $set);
+        $set = new SignatureParams()->setHeaderName('testname');
+        $this->assertInstanceOf(SignatureParams::class, $set);
     }
 
     /**
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
-     * @covers \Filefabrik\Hsap\SignatureInput::setHeaderName
+     * @covers \Filefabrik\Hsap\SignatureParams::setHeaderName
      */
     public function testSetHeaderNameThrowsInvalidHeaderName(): void
     {
         $this->expectExceptionObject(
             new InvalidHeaderKeyException('Regular Header keys for signature does not start with "@"'),
         );
-        new SignatureInput()->setHeaderName('@testname');
+        new SignatureParams()->setHeaderName('@testname');
     }
 
     /**
@@ -83,8 +83,8 @@ final class SignatureInputTest extends TestCase
         $this->expectExceptionObject(
             new AlreadySetException('Signature-Input parameter "@testname" was set before and can not be set again.'),
         );
-        new SignatureInput()->addIfNotExists('@testname')
-                            ->addIfNotExists('@testname')
+        new SignatureParams()->addIfNotExists('@testname')
+                             ->addIfNotExists('@testname')
         ;
     }
 
@@ -96,8 +96,8 @@ final class SignatureInputTest extends TestCase
         $this->expectExceptionObject(
             new AlreadySetException('Signature-Input parameter "testname" was set before and can not be set again.'),
         );
-        new SignatureInput()->addIfNotExists('testname')
-                            ->addIfNotExists('testname')
+        new SignatureParams()->addIfNotExists('testname')
+                             ->addIfNotExists('testname')
         ;
     }
 
@@ -109,9 +109,9 @@ final class SignatureInputTest extends TestCase
         $this->expectExceptionObject(
             new AlreadySetException('Signature-Input parameter "testname" was set before and can not be set again.'),
         );
-        new SignatureInput()->addIfNotExists('testname')
-                            ->addIfNotExists('@testname')
-                            ->addIfNotExists('testname')
+        new SignatureParams()->addIfNotExists('testname')
+                             ->addIfNotExists('@testname')
+                             ->addIfNotExists('testname')
         ;
     }
 
@@ -121,8 +121,8 @@ final class SignatureInputTest extends TestCase
      */
     public function testSetDerivedComponentName(): void
     {
-        $set = new SignatureInput()->setDerivedComponentName('@testname');
-        $this->assertInstanceOf(SignatureInput::class, $set);
+        $set = new SignatureParams()->setDerivedComponentName('@testname');
+        $this->assertInstanceOf(SignatureParams::class, $set);
     }
 
     /**
@@ -132,7 +132,7 @@ final class SignatureInputTest extends TestCase
     public function testSetDerivedComponentNameThrows(): void
     {
         $this->expectExceptionObject(new InvalidDerivedKeyException('Derived component name must start with "@"'));
-        new SignatureInput()->setDerivedComponentName('testname');
+        new SignatureParams()->setDerivedComponentName('testname');
     }
 
     /**
@@ -144,8 +144,8 @@ final class SignatureInputTest extends TestCase
         $this->expectExceptionObject(
             new AlreadySetException('Signature-Input parameter "@testname" was set before and can not be set again.'),
         );
-        new SignatureInput()->setDerivedComponentName('@testname')
-                            ->setDerivedComponentName('@testname')
+        new SignatureParams()->setDerivedComponentName('@testname')
+                             ->setDerivedComponentName('@testname')
         ;
     }
 }
