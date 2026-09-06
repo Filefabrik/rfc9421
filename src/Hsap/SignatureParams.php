@@ -30,8 +30,6 @@ final class SignatureParams
         return $this->addIfNotExists($name);
     }
 
-    //
-
     /**
      * Derived component header key
      *
@@ -49,6 +47,10 @@ final class SignatureParams
         return $this;
     }
 
+    /**
+     * Check, already set before
+     *
+     */
     public function exists(string $name): bool
     {
         return in_array($name, $this->signatureParameters, true);
