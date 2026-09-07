@@ -1,0 +1,7 @@
+Name,Description,Reference
+sf,Strict Structured Field serialization,"[RFC 9421, Section 2.1.1]"
+key,Single key value of Dictionary Structured Fields,"[RFC 9421, Section 2.1.2]"
+bs,Byte Sequence wrapping indicator,"[RFC 9421, Section 2.1.3]"
+tr,Trailer,"[RFC 9421, Section 2.1.4]"
+req,Related request indicator,"[RFC 9421, Section 2.4]"
+name,Single named query parameter,"[RFC 9421, Section 2.2.8]"

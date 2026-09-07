@@ -1,0 +1,7 @@
+Name,Description,Reference
+alg,Explicitly declared signature algorithm,"[RFC 9421, Section 2.3]"
+created,Timestamp of signature creation,"[RFC 9421, Section 2.3]"
+expires,Timestamp of proposed signature expiration,"[RFC 9421, Section 2.3]"
+keyid,Key identifier for the signing and verification keys used to create this signature,"[RFC 9421, Section 2.3]"
+nonce,A single-use nonce value,"[RFC 9421, Section 2.3]"
+tag,An application-specific tag for a signature,"[RFC 9421, Section 2.3]"
