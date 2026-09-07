@@ -18,3 +18,12 @@ during header compilation it will create a string like this
 ```text
 sig1=("@method" "@authority" "@path" "content-type" "content-length");
 ```
+
+
+#### Under docs the CSV's for 
+* component-parameters
+* signature-algorithms
+* signature-metadata-parameters
+
+can be found
+https://www.iana.org/assignments/http-message-signature
