@@ -64,6 +64,23 @@ final class MetadataTest extends TestCase
         );
     }
 
+    /**
+     * @covers ::toString
+     * @return void
+     */
+    public function testToStringEmpty(): void
+    {
+        $stringified = Metadata::fromArray([
+
+        ])
+                               ->toString()
+        ;
+        $this->assertEquals(
+            '',
+            $stringified,
+        );
+    }
+
     public function testSetTag(): void
     {
         $this->assertEquals('my-tag', new Metadata()->setTag('my-tag')->tag);
