@@ -8,6 +8,7 @@ use BadMethodCallException;
 
 /**
  * The Signature-Input header also includes metadata parameters (after the semicolon):
+ *
  * @see https://datatracker.ietf.org/doc/html/rfc9421 [RFC 9421, Section 2.3]
  */
 final class Metadata
@@ -41,6 +42,8 @@ final class Metadata
     /**
      * The algorithm used to create the signature (e.g., rsa-pss-sha512)
      *
+     * @todo define possible algo's based up the current php installation capabilities
+     * @see  /docs/iana-rfc9421/signature-algorithms.csv
      * @var string|null
      */
     public private(set) string|null $alg = null;
