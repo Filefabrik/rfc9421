@@ -19,10 +19,21 @@ final class ContentDigestTest extends TestCase
 
     public function testGetHash(): void
     {
-        $hash = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getHash();
+        $hash = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getExplodedHash();
         $this->assertEquals(':tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:', $hash);
     }
 
+    public function testGetPhpAlgorithm(): void
+    {
+        $alg = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getPhpAlgorithm();
+        $this->assertEquals('sha256', $alg);
+
+    }
+    public function testGetRealHashedValue():void
+    {
+        $alg = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getRealHashedValue();
+        $this->assertEquals('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=', $alg);
+    }
     public function testGetDigestArray(): void
     {
         $digestArray = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getDigestArray();

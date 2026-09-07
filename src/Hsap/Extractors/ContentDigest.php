@@ -6,6 +6,7 @@ namespace Filefabrik\Hsap\Extractors;
 
 /**
  * Content digest extract the header request parameter "content-digest"
+ *
  * @todo verify emptyness
  */
 final class ContentDigest
@@ -27,6 +28,23 @@ final class ContentDigest
         $this->contentDigest = $contentDigest;
     }
 
+    /**
+     * Hashes are in lowercase, but have a `-` in their name.
+     * This is not what hash_algos() expects.
+     * $digestAlgorithm = str_replace( search: "-", replace: "", subject: $digestData[0] );
+     *
+     *
+     * @return string sha256
+     * @todo check the algorithm name has to be replaced
+     */
+    public function getPhpAlgorithm(): string
+    {
+        return str_replace(search: '-', replace: '', subject: $this->getAlgorithm());
+    }
+
+    /**
+     * @return string sha-256
+     */
     public function getAlgorithm(): string
     {
         return $this->getDigestArray()[0];
@@ -37,7 +55,22 @@ final class ContentDigest
         return explode(separator: '=', string: $this->contentDigest, limit: 2);
     }
 
-    public function getHash(): string
+    /**
+     * The hash is surrounded by `:` characters.
+     * $digestHash = str_replace( search: ":", replace: "", subject: $digestData[1] );
+     * :tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:
+     *
+     * @return string tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc= without the colons on start and the ending
+     */
+    public function getRealHashedValue(): string
+    {
+        return str_replace(search: ':', replace: '', subject: $this->getExplodedHash());
+    }
+
+    /**
+     * @return string
+     */
+    public function getExplodedHash(): string
     {
         return $this->getDigestArray()[1];
     }
