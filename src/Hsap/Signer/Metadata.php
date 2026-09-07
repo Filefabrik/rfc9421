@@ -14,6 +14,12 @@ use BadMethodCallException;
 final class Metadata
 {
     /**
+     * while to string make key value pairs quoted "
+     *
+     * @var string[]
+     */
+    public static array $propertiesToQuote = ['nonce', 'keyid', 'alg', 'tag'];
+    /**
      * UNIX timestamp when the signature was generated (recommended for replay protection)
      * Please use UTC Timezone
      *
@@ -77,6 +83,19 @@ final class Metadata
             throw new BadMethodCallException('Method not exists "'.$methodName.'($value)".');
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function toString(): string
+    {
+        $preprocess = [];
+        foreach ($this->toArray() as $key => $value) {
+            $preprocess[] = $key.'='.(in_array($key, self::$propertiesToQuote) ? '"'.$value.'"' : $value);
+        }
+
+        return implode(';', $preprocess);
     }
 
     /**

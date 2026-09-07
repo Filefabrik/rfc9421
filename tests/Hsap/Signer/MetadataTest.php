@@ -45,6 +45,25 @@ final class MetadataTest extends TestCase
         new Metadata()->set('crea', '');
     }
 
+    public function testToString(): void
+    {
+        $now         = new DateTime()->getTimestamp();
+        $stringified = Metadata::fromArray([
+            'created' => $now,
+            'expires' => $now,
+            'nonce'   => 'my-nonce',
+            'keyid'   => 'my-keyid',
+            'alg'     => 'my-alg',
+            'tag'     => 'my-tag',
+        ])
+                               ->toString()
+        ;
+        $this->assertEquals(
+            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-alg";tag="my-tag"',
+            $stringified,
+        );
+    }
+
     public function testSetTag(): void
     {
         $this->assertEquals('my-tag', new Metadata()->setTag('my-tag')->tag);
