@@ -8,11 +8,13 @@ use BadMethodCallException;
 
 /**
  * The Signature-Input header also includes metadata parameters (after the semicolon):
+ * @see https://datatracker.ietf.org/doc/html/rfc9421 [RFC 9421, Section 2.3]
  */
 final class Metadata
 {
     /**
      * UNIX timestamp when the signature was generated (recommended for replay protection)
+     * Please use UTC Timezone
      *
      * @var int|null
      */
