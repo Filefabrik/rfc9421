@@ -34,7 +34,7 @@ final class SigCompilerHelperTest extends TestCase
     public function testMakeSig1fromArray(): void
     {
         $this->assertEquals(
-            'sig1=("test" "@test" "try-out" "some-header");',
+            'sig1=("test" "@test" "try-out" "some-header")',
             SigCompilerHelper::makeSig1fromArray(['test', '@test', 'try-out', 'some-header']),
         );
     }
@@ -74,7 +74,7 @@ final class SigCompilerHelperTest extends TestCase
         ;
 
         $this->assertEquals(
-            'sig1=("test" "@test" "try-out" "some-header");',
+            'sig1=("test" "@test" "try-out" "some-header")',
             SigCompilerHelper::makeSig1fromSignatureParams($signatureParams),
         );
     }

@@ -44,11 +44,11 @@ final class SigCompilerHelper
 
     /**
      * @param array $params
-     *
-     * @return string sig1=("@method" "@authority" "@path" "content-type" "content-length");
+     * @todo during concat with Metadata to signature-params don't forget the trailing semicolon
+     * @return string sig1=("@method" "@authority" "@path" "content-type" "content-length")
      */
     public static function makeSig1fromArray(array $params): string
     {
-        return 'sig1=('.self::compileFromArray($params).');';
+        return 'sig1=('.self::compileFromArray($params).')';
     }
 }
