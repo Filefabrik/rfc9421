@@ -43,6 +43,9 @@ use UnexpectedValueException;
         default => $headerValueCorrespondingToHeaderName,
       };
  */
+/**
+ * todo closure processing
+ */
 final class PrepareComponents
 {
     /**
@@ -50,7 +53,7 @@ final class PrepareComponents
      *
      * @var array<Closure|callable|string>
      */
-    private static array $defaultMethodsStack = ['@method' => 'processAtMethod'];
+    private static array $defaultDerivedStack = ['@method' => 'processAtMethod', '@target-uri' => 'processTargetUri'];
 
     public function __construct(
         public private(set) readonly RequestInterface $message,
@@ -60,38 +63,38 @@ final class PrepareComponents
          *
          * @var array<Closure|callable|string>
          */
-        public private(set) ?array $methodStack = null,
+        public private(set) ?array $derivedMapper = null,
     ) {
     }
 
-    public static function getDefaultMethodsStack(): array
+    public static function getDefaultDerivedStack(): array
     {
-        return self::$defaultMethodsStack;
+        return self::$defaultDerivedStack;
     }
 
     /**
      * Todo setter has to be a type/format validator that is callable or closure
      * While having systemwide an own mapping dialect for your needs, set the method stack globally
      *
-     * @param array $defaultMethodsStack
+     * @param array $defaultDerivedStack
      *
      * @return void
      */
-    public static function setDefaultMethodsStack(array $defaultMethodsStack): void
+    public static function setDefaultDerivedStack(array $defaultDerivedStack): void
     {
-        self::$defaultMethodsStack = $defaultMethodsStack;
+        self::$defaultDerivedStack = $defaultDerivedStack;
     }
 
     /**
      * Configure later the MethodStack if need
      *
-     * @param array<Closure|callable|string>|null $methodStack
+     * @param array<Closure|callable|string>|null $derivedMapper
      *
      * @return $this
      */
-    public function setMethodStack(?array $methodStack): self
+    public function setDerivedMapper(?array $derivedMapper): self
     {
-        $this->methodStack = $methodStack;
+        $this->derivedMapper = $derivedMapper;
 
         return $this;
     }
@@ -116,11 +119,37 @@ final class PrepareComponents
      */
     private function getMethodStack(): array
     {
-        return $this->methodStack ??= self::$defaultMethodsStack;
+        return $this->derivedMapper ??= self::$defaultDerivedStack;
     }
 
+    /**
+     * extracting the "method" from header to use later as "@method"
+     *
+     * @return string
+     * @see 2.2.1. Method
+     */
     public function processAtMethod(): string
     {
         return strtoupper($this->message->getMethod());
     }
+
+    /**
+     * @return string
+     * @see 2.2.2. Target URI
+     */
+    public function processTargetUri(): string
+    {
+        $messageUri = clone $this->message->getUri();
+
+        $parts[] = $messageUri->getHost();
+        if ($path = $messageUri->getPath()) {
+            $parts[] = '/'.ltrim($path, '/');
+        }
+        if ($query = $messageUri->getQuery()) {
+            $parts[] = '?'.ltrim($query, '?');
+        }
+
+        return implode('', $parts);
+    }
+
 }

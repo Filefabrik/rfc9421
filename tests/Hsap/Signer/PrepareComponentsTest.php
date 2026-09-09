@@ -7,6 +7,7 @@ namespace Filefabrik\HsapTest\Signer;
 use BadMethodCallException;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
+use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\SignatureParams;
 use Filefabrik\Hsap\Signer\PrepareComponents;
 use GuzzleHttp\Psr7\Request;
@@ -20,7 +21,7 @@ final class PrepareComponentsTest extends TestCase
 {
     public function testSetDefaultMethodsStack(): void
     {
-        $orig = PrepareComponents::getDefaultMethodsStack();
+        $orig = PrepareComponents::getDefaultDerivedStack();
         $arr  = [
             '@method' => fn(RequestInterface $message) => str_replace(
                 't',
@@ -29,7 +30,7 @@ final class PrepareComponentsTest extends TestCase
             ),
 
         ];
-        PrepareComponents::setDefaultMethodsStack($arr);
+        PrepareComponents::setDefaultDerivedStack($arr);
         $r               = new Request('post', 'https://Test.com');
         $signatureParams = new SignatureParams();
 
@@ -39,7 +40,7 @@ final class PrepareComponentsTest extends TestCase
 
         $this->assertSame('PosB', $prepareInstance->processValue('@method'));
 
-        PrepareComponents::setDefaultMethodsStack($orig);
+        PrepareComponents::setDefaultDerivedStack($orig);
     }
 
     /**
@@ -58,7 +59,7 @@ final class PrepareComponentsTest extends TestCase
         $signatureParams->setDerivedComponentName('@method');
 
         $prepareInstance = new PrepareComponents($r, $signatureParams);
-        $prepareInstance->setMethodStack($arr);
+        $prepareInstance->setDerivedMapper($arr);
         $this->assertSame('Post', $prepareInstance->processValue('@method'));
     }
 
@@ -73,31 +74,62 @@ final class PrepareComponentsTest extends TestCase
         $this->expectExceptionObject(
             new BadMethodCallException('Method "12" not callable.'),
         );
-        $r               = new Request('post', 'https://Test.com');
+        $r               = new Request('post', 'https://Test.com/test&var=käse');
         $signatureParams = new SignatureParams();
 
         $prepareComponents          = new PrepareComponents($r, $signatureParams);
-        $messageStack               = PrepareComponents::getDefaultMethodsStack();
+        $messageStack               = PrepareComponents::getDefaultDerivedStack();
         $messageStack[' bullshit '] = 12;
-        $prepareComponents->setMethodStack($messageStack);
+        $prepareComponents->setDerivedMapper($messageStack);
 
         $prepareComponents->processValue(' bullshit ');
     }
 
     /**
+     * Overall Method to check the System
      * @covers ::processValue
+     *
+     * @return void
+     * @throws AlreadySetException
+     * @throws InvalidDerivedKeyException|InvalidHeaderKeyException
+     */
+    public function testProcessValue(): void
+    {
+        $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+        $signatureParams = new SignatureParams();
+        $signatureParams->setDerivedComponentName('@method')
+                        ->add('@target-uri')
+        ;
+
+        $prepareInstance = new PrepareComponents($r, $signatureParams);
+
+        $this->assertSame('POST', $prepareInstance->processValue('@method'));
+        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+    }
+
+    /**
+     * @covers ::processTargetUri
      * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      */
-    public function testProcessValue(): void
+    public function testProcessTargetUri(): void
     {
-        $r               = new Request('post', 'https://Test.com');
-        $signatureParams = new SignatureParams();
-        $signatureParams->setDerivedComponentName('@method');
+        $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
 
-        $prepareInstance = new PrepareComponents($r, $signatureParams);
+        $prepareInstance = new PrepareComponents($r, new SignatureParams());
 
+        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+    }
+
+    /**
+     * @covers ::processAtMethod()
+     * @return void
+     */
+    public function testProcessAtMethod(): void
+    {
+        $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+        $prepareInstance = new PrepareComponents($r, new SignatureParams());
         $this->assertSame('POST', $prepareInstance->processValue('@method'));
     }
 
