@@ -16,18 +16,31 @@ final class SignatureParams
     private array $signatureParameters = [];
 
     /**
-     * Regular header for the signature
+     * Adding in the wild
      *
+     * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
      */
-    public function setHeaderName(string $name): self
+    public function add(string $key): self
     {
-        if (str_starts_with($name, '@')) {
-            throw new InvalidHeaderKeyException('Regular Header keys for signature does not start with "@"');
+        return str_starts_with($key, '@') ? $this->setDerivedComponentName($key) : $this->setHeaderName($key);
+    }
+
+    /**
+     * Set a derived component key which has to be in the signature
+     *
+     * @throws InvalidDerivedKeyException
+     * @throws AlreadySetException
+     */
+    public function setDerivedComponentName(string $derivedComponentName): self
+    {
+        // ensure leading @
+        if (!str_starts_with($derivedComponentName, '@')) {
+            throw new InvalidDerivedKeyException('Derived component name must start with "@"');
         }
 
-        return $this->addIfNotExists($name);
+        return $this->addIfNotExists($derivedComponentName);
     }
 
     /**
@@ -49,7 +62,6 @@ final class SignatureParams
 
     /**
      * Check, already set before
-     *
      */
     public function exists(string $name): bool
     {
@@ -57,25 +69,24 @@ final class SignatureParams
     }
 
     /**
-     * Set a derived component key which has to be in the signature
+     * Regular header for the signature
      *
-     * @throws InvalidDerivedKeyException
+     * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
      */
-    public function setDerivedComponentName(string $derivedComponentName): self
+    public function setHeaderName(string $name): self
     {
-        // ensure leading @
-        if (!str_starts_with($derivedComponentName, '@')) {
-            throw new InvalidDerivedKeyException('Derived component name must start with "@"');
+        if (str_starts_with($name, '@')) {
+            throw new InvalidHeaderKeyException('Regular Header keys for signature does not start with "@"');
         }
 
-        return $this->addIfNotExists($derivedComponentName);
+        return $this->addIfNotExists($name);
     }
 
     /**
      * Getting the header parameter as a FiFo array. In this order the "signature-input" has to be written
      *
-     * @return array<string|int|float>
+     * @return string[]
      */
     public function getSignatureParameters(): array
     {

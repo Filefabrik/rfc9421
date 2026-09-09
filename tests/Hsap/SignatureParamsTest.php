@@ -15,6 +15,27 @@ use PHPUnit\Framework\TestCase;
 final class SignatureParamsTest extends TestCase
 {
     /**
+     * @covers \Filefabrik\Hsap\SignatureParams::add
+     * @return void
+     * @throws AlreadySetException
+     * @throws InvalidDerivedKeyException
+     * @throws InvalidHeaderKeyException
+     */
+    public function testAdd(): void
+    {
+        $instance = new SignatureParams()->add('testname')
+                                         ->add('@testname')
+                                         ->add('content-test')
+                                         ->add('@test-derived-component')
+        ;
+
+        $this->assertSame(
+            ['testname', '@testname', 'content-test', '@test-derived-component'],
+            $instance->getSignatureParameters(),
+        );
+    }
+
+    /**
      * @covers \Filefabrik\Hsap\SignatureParams::getSignatureParameters
      * @return void
      * @throws AlreadySetException
