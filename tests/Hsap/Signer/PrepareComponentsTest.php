@@ -19,7 +19,10 @@ use UnexpectedValueException;
 #[CoversClass(PrepareComponents::class)]
 final class PrepareComponentsTest extends TestCase
 {
-    public function testSetDefaultMethodsStack(): void
+    /**
+     * @covers ::setDefaultDerivedStack
+     * */
+    public function testSetDefaultDerivedStack(): void
     {
         $orig = PrepareComponents::getDefaultDerivedStack();
         $arr  = [
@@ -44,13 +47,12 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
-     * @covers ::processValue
+     * @covers ::setDerivedMapper
      * */
-    public function testSetClosure(): void
+    public function testSetDerivedMapper(): void
     {
         $arr = [
             '@method' => fn(RequestInterface $message) => ucfirst(strtolower($message->getMethod())),
-
         ];
 
         $r               = new Request('post', 'https://Test.com');
@@ -97,21 +99,19 @@ final class PrepareComponentsTest extends TestCase
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $signatureParams = new SignatureParams();
-        $signatureParams->setDerivedComponentName('@method')
-                        ->add('@target-uri')
-        ;
 
         $prepareInstance = new PrepareComponents($r, $signatureParams);
 
         $this->assertSame('POST', $prepareInstance->processValue('@method'));
         $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+        $this->assertSame('test.com', $prepareInstance->processValue('@authority'));
+        $this->assertSame('https', $prepareInstance->processValue('@scheme'));
+        $this->assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
     }
 
     /**
      * @covers ::processTargetUri
      * @return void
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
      */
     public function testProcessTargetUri(): void
     {
@@ -119,18 +119,69 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r, new SignatureParams());
 
-        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processTargetUri());
     }
 
     /**
-     * @covers ::processAtMethod()
+     * @covers ::processAtMethod
      * @return void
      */
     public function testProcessAtMethod(): void
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $prepareInstance = new PrepareComponents($r, new SignatureParams());
-        $this->assertSame('POST', $prepareInstance->processValue('@method'));
+        $this->assertSame('POST', $prepareInstance->processAtMethod());
+    }
+
+    /**
+     * @covers ::processAuthority
+     * @return void
+     */
+    public function testProcessAuthority(): void
+    {
+        $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+
+        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+
+        $this->assertSame('test.com', $prepareInstance->processAuthority());
+
+        $r = new Request('post', 'https://www.Test.com/var/pathy/?qer=var');
+
+        $this->assertSame('www.test.com', new PrepareComponents($r, new SignatureParams())->processAuthority());
+    }
+
+    /**
+     * @covers ::processScheme
+     * @return void
+     */
+    public function testProcessScheme(): void
+    {
+        $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+
+        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+
+        $this->assertSame('https', $prepareInstance->processScheme());
+
+        $r = new Request('post', 'http://www.Test.com/var/pathy/?qer=var');
+
+        $this->assertSame('http', new PrepareComponents($r, new SignatureParams())->processScheme());
+    }
+
+    /**
+     * @covers ::processPath
+     * @return void
+     */
+    public function testProcessPath(): void
+    {
+        $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+
+        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+
+        $this->assertSame('/var/pathy/', $prepareInstance->processPath());
+
+        $r = new Request('post', 'http://www.Test.com');
+
+        $this->assertSame('/', new PrepareComponents($r, new SignatureParams())->processPath());
     }
 
     /**
@@ -147,5 +198,18 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r, $signatureParams);
         $prepareInstance->processValue('@method_notset');
+    }
+
+    public function testProcessContentLength(): void
+    {
+        $r = new Request(
+            'post',
+            '',
+            body: '{"busy": true, "message": "Your call is very important to us"}',
+        );
+
+        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+
+        $this->assertSame(62, $prepareInstance->processContentLength());
     }
 }

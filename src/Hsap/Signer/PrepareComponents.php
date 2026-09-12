@@ -53,7 +53,16 @@ final class PrepareComponents
      *
      * @var array<Closure|callable|string>
      */
-    private static array $defaultDerivedStack = ['@method' => 'processAtMethod', '@target-uri' => 'processTargetUri'];
+    private static array $defaultDerivedStack = [
+        '@method'         => 'processAtMethod',
+        '@target-uri'     => 'processTargetUri',
+        '@authority'      => 'processAuthority',
+        '@scheme'         => 'processScheme',
+        '@request-target' => 'processHost',
+        '@path'           => 'processPath',
+        '@status'         => 'processStatus',
+        'content-length'  => 'processContentLength',
+    ];
 
     public function __construct(
         public private(set) readonly RequestInterface $message,
@@ -99,6 +108,11 @@ final class PrepareComponents
         return $this;
     }
 
+    /**
+     * @param $key
+     *
+     * @return int|string|float
+     */
     public function processValue($key): int|string|float
     {
         $callableMethod = $this->getMethodStack()[$key] ??
@@ -134,8 +148,10 @@ final class PrepareComponents
     }
 
     /**
+     * todo,needs more testing
+     *
      * @return string
-     * @see 2.2.2. Target URI
+     * @see 2.2.2. Target URI @target-uri
      */
     public function processTargetUri(): string
     {
@@ -152,4 +168,72 @@ final class PrepareComponents
         return implode('', $parts);
     }
 
+    /**
+     * @return string
+     * @see 2.2.3. Authority
+     */
+    public function processAuthority(): string
+    {
+        return $this->message->getUri()
+                             ->getHost()
+        ;
+    }
+
+    /**
+     * @return string
+     * @see 2.2.4. Scheme
+     */
+    public function processScheme(): string
+    {
+        return $this->message->getUri()
+                             ->getScheme()
+        ;
+    }
+
+    /*
+     * Todo More komplex as described in 2.2.5. Request Target
+     *
+     * @return void
+     *
+     *
+     * public function processRequestTarget()
+     * {
+     * }*/
+
+    /**
+     * @return string empty with /
+     * @see 2.2.6. Path
+     */
+    public function processPath(): string
+    {
+        $p = $this->message->getUri()
+                           ->getPath()
+        ;
+
+        return (!str_starts_with($p, '/')) ? '/'.$p : $p;
+    }
+    /*
+     * todo query 2.2.7. Query as it is more komplex
+     * todo 2.2.8. Query Parameters as it is more komplex
+     */
+    /*
+     * todo, the status can only be in the response, have a look what todo
+     *
+     * @return int
+
+    public function processStatusCode(): int
+    {
+    }   */
+
+    // todo 2.3. Signature Parameters über signature params preconfigured
+
+    // todo laaaater 2.5. Creating the Signature Base
+
+    /**
+     * @return int
+     */
+    public function processContentLength(): int
+    {
+        return strlen((string)$this->message->getBody());
+    }
 }
