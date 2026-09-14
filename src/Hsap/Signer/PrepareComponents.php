@@ -6,7 +6,6 @@ namespace Filefabrik\Hsap\Signer;
 
 use BadMethodCallException;
 use Closure;
-use Filefabrik\Hsap\SignatureParams;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -60,13 +59,12 @@ final class PrepareComponents
         '@scheme'         => 'processScheme',
         '@request-target' => 'processHost',
         '@path'           => 'processPath',
-        '@status'         => 'processStatus',
+        //  '@status'         => 'processStatus',
         'content-length'  => 'processContentLength',
     ];
 
     public function __construct(
         public private(set) readonly RequestInterface $message,
-        public private(set) readonly SignatureParams $signatureParams,
         /**
          * otherwise use the default stack
          *

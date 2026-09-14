@@ -39,7 +39,7 @@ final class PrepareComponentsTest extends TestCase
 
         $signatureParams->setDerivedComponentName('@method');
 
-        $prepareInstance = new PrepareComponents($r, $signatureParams);
+        $prepareInstance = new PrepareComponents($r);
 
         $this->assertSame('PosB', $prepareInstance->processValue('@method'));
 
@@ -60,7 +60,7 @@ final class PrepareComponentsTest extends TestCase
 
         $signatureParams->setDerivedComponentName('@method');
 
-        $prepareInstance = new PrepareComponents($r, $signatureParams);
+        $prepareInstance = new PrepareComponents($r);
         $prepareInstance->setDerivedMapper($arr);
         $this->assertSame('Post', $prepareInstance->processValue('@method'));
     }
@@ -79,7 +79,7 @@ final class PrepareComponentsTest extends TestCase
         $r               = new Request('post', 'https://Test.com/test&var=käse');
         $signatureParams = new SignatureParams();
 
-        $prepareComponents          = new PrepareComponents($r, $signatureParams);
+        $prepareComponents          = new PrepareComponents($r);
         $messageStack               = PrepareComponents::getDefaultDerivedStack();
         $messageStack[' bullshit '] = 12;
         $prepareComponents->setDerivedMapper($messageStack);
@@ -97,16 +97,21 @@ final class PrepareComponentsTest extends TestCase
      */
     public function testProcessValue(): void
     {
-        $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+        $r               = new Request(
+            'post',
+            'https://Test.com/var/pathy/?qer=var',
+            body: '{"busy": true, "message": "Your call is very important to us"}',
+        );
         $signatureParams = new SignatureParams();
 
-        $prepareInstance = new PrepareComponents($r, $signatureParams);
+        $prepareInstance = new PrepareComponents($r);
 
         $this->assertSame('POST', $prepareInstance->processValue('@method'));
         $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
         $this->assertSame('test.com', $prepareInstance->processValue('@authority'));
         $this->assertSame('https', $prepareInstance->processValue('@scheme'));
         $this->assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
+        $this->assertSame(62, $prepareInstance->processValue('content-length'));
     }
 
     /**
@@ -117,7 +122,7 @@ final class PrepareComponentsTest extends TestCase
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
 
-        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+        $prepareInstance = new PrepareComponents($r);
 
         $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processTargetUri());
     }
@@ -129,7 +134,7 @@ final class PrepareComponentsTest extends TestCase
     public function testProcessAtMethod(): void
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
-        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+        $prepareInstance = new PrepareComponents($r);
         $this->assertSame('POST', $prepareInstance->processAtMethod());
     }
 
@@ -141,13 +146,13 @@ final class PrepareComponentsTest extends TestCase
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
 
-        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+        $prepareInstance = new PrepareComponents($r);
 
         $this->assertSame('test.com', $prepareInstance->processAuthority());
 
         $r = new Request('post', 'https://www.Test.com/var/pathy/?qer=var');
 
-        $this->assertSame('www.test.com', new PrepareComponents($r, new SignatureParams())->processAuthority());
+        $this->assertSame('www.test.com', new PrepareComponents($r)->processAuthority());
     }
 
     /**
@@ -158,13 +163,13 @@ final class PrepareComponentsTest extends TestCase
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
 
-        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+        $prepareInstance = new PrepareComponents($r);
 
         $this->assertSame('https', $prepareInstance->processScheme());
 
         $r = new Request('post', 'http://www.Test.com/var/pathy/?qer=var');
 
-        $this->assertSame('http', new PrepareComponents($r, new SignatureParams())->processScheme());
+        $this->assertSame('http', new PrepareComponents($r)->processScheme());
     }
 
     /**
@@ -175,13 +180,13 @@ final class PrepareComponentsTest extends TestCase
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
 
-        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+        $prepareInstance = new PrepareComponents($r);
 
         $this->assertSame('/var/pathy/', $prepareInstance->processPath());
 
         $r = new Request('post', 'http://www.Test.com');
 
-        $this->assertSame('/', new PrepareComponents($r, new SignatureParams())->processPath());
+        $this->assertSame('/', new PrepareComponents($r)->processPath());
     }
 
     /**
@@ -193,10 +198,9 @@ final class PrepareComponentsTest extends TestCase
         $this->expectExceptionObject(
             new UnexpectedValueException('Method "@method_notset" not registered.'),
         );
-        $r               = new Request('post', 'https://Test.com');
-        $signatureParams = new SignatureParams();
+        $r = new Request('post', 'https://Test.com');
 
-        $prepareInstance = new PrepareComponents($r, $signatureParams);
+        $prepareInstance = new PrepareComponents($r);
         $prepareInstance->processValue('@method_notset');
     }
 
@@ -208,7 +212,7 @@ final class PrepareComponentsTest extends TestCase
             body: '{"busy": true, "message": "Your call is very important to us"}',
         );
 
-        $prepareInstance = new PrepareComponents($r, new SignatureParams());
+        $prepareInstance = new PrepareComponents($r);
 
         $this->assertSame(62, $prepareInstance->processContentLength());
     }
