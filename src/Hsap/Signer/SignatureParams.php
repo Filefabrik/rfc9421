@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Hsap;
+namespace Filefabrik\Hsap\Signer;
 
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\HsapTest;
+namespace Filefabrik\HsapTest\Signer;
 
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Hsap\SignatureParams;
+use Filefabrik\Hsap\Signer\SignatureParams;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 final class SignatureParamsTest extends TestCase
 {
     /**
-     * @covers \Filefabrik\Hsap\SignatureParams::add
+     * @covers \Filefabrik\Hsap\Signer\SignatureParams::add
      * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
@@ -36,7 +36,7 @@ final class SignatureParamsTest extends TestCase
     }
 
     /**
-     * @covers \Filefabrik\Hsap\SignatureParams::getSignatureParameters
+     * @covers \Filefabrik\Hsap\Signer\SignatureParams::getSignatureParameters
      * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
@@ -59,7 +59,7 @@ final class SignatureParamsTest extends TestCase
     /**
      * @return void
      * @throws AlreadySetException
-     * @covers \Filefabrik\Hsap\SignatureParams::exists
+     * @covers \Filefabrik\Hsap\Signer\SignatureParams::exists
      */
     public function testExists(): void
     {
@@ -75,7 +75,7 @@ final class SignatureParamsTest extends TestCase
     /**
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
-     * @covers \Filefabrik\Hsap\SignatureParams::setHeaderName
+     * @covers \Filefabrik\Hsap\Signer\SignatureParams::setHeaderName
      */
     public function testSetHeaderName(): void
     {
@@ -86,7 +86,7 @@ final class SignatureParamsTest extends TestCase
     /**
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
-     * @covers \Filefabrik\Hsap\SignatureParams::setHeaderName
+     * @covers \Filefabrik\Hsap\Signer\SignatureParams::setHeaderName
      */
     public function testSetHeaderNameThrowsInvalidHeaderName(): void
     {
