@@ -34,30 +34,12 @@ final class SigCompilerHelperTest extends TestCase
     public function testMakeSig1fromArray(): void
     {
         $this->assertEquals(
-            'sig1=("test" "@test" "try-out" "some-header")',
-            SigCompilerHelper::makeSig1fromArray(['test', '@test', 'try-out', 'some-header']),
+            'someSig=("test" "@test" "try-out" "some-header")',
+            SigCompilerHelper::makeSig1fromArray(['test', '@test', 'try-out', 'some-header'], 'someSig='),
         );
     }
 
-    /**
-     * @covers SigCompilerHelper::compileFromSignatureParams
-     * @throws InvalidHeaderKeyException
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
-     */
-    public function testCompileFromSignatureParams(): void
-    {
-        $signatureParams = new SignatureParams()->setHeaderName('test')
-                                                ->setDerivedComponentName('@test')
-                                                ->setHeaderName('try-out')
-                                                ->setHeaderName('some-header')
-        ;
 
-        $this->assertEquals(
-            '"test" "@test" "try-out" "some-header"',
-            SigCompilerHelper::compileFromSignatureParams($signatureParams),
-        );
-    }
 
     /**
      * @covers SigCompilerHelper::makeSig1fromSignatureParams
@@ -75,7 +57,7 @@ final class SigCompilerHelperTest extends TestCase
 
         $this->assertEquals(
             'sig1=("test" "@test" "try-out" "some-header")',
-            SigCompilerHelper::makeSig1fromSignatureParams($signatureParams),
+            new SigCompilerHelper($signatureParams, 'sig1=')->makeSig1fromSignatureParams(),
         );
     }
 }
