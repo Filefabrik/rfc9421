@@ -13,6 +13,11 @@ use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
  */
 final class SignatureParams
 {
+    /**
+     * This ordered array is important to collect the vars for signing and extracting
+     *
+     * @var string[]
+     */
     private array $signatureParameters = [];
 
     /**
