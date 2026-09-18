@@ -5,20 +5,16 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap\Signer;
 
 use BadMethodCallException;
+use Filefabrik\Hsap\Support\AbstractMetadata;
 
 /**
  * The Signature-Input header also includes metadata parameters (after the semicolon):
  *
  * @see https://datatracker.ietf.org/doc/html/rfc9421 [RFC 9421, Section 2.3]
  */
-final class Metadata
+final class Metadata extends AbstractMetadata
 {
-    /**
-     * while to string make key value pairs quoted "
-     *
-     * @var string[]
-     */
-    public static array $propertiesToQuote = ['nonce', 'keyid', 'alg', 'tag'];
+
     /**
      * UNIX timestamp when the signature was generated (recommended for replay protection)
      * Please use UTC Timezone

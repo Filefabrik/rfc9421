@@ -70,9 +70,7 @@ final class MetadataTest extends TestCase
      */
     public function testToStringEmpty(): void
     {
-        $stringified = Metadata::fromArray([
-
-        ])
+        $stringified = Metadata::fromArray([])
                                ->toString()
         ;
         $this->assertEquals(
