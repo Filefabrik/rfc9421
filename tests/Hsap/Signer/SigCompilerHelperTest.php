@@ -7,8 +7,8 @@ namespace Filefabrik\HsapTest\Signer;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Hsap\SignatureParams;
 use Filefabrik\Hsap\Signer\SigCompilerHelper;
+use Filefabrik\Hsap\Signer\SignatureParams;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -38,8 +38,6 @@ final class SigCompilerHelperTest extends TestCase
             SigCompilerHelper::makeSig1fromArray(['test', '@test', 'try-out', 'some-header'], 'someSig='),
         );
     }
-
-
 
     /**
      * @covers SigCompilerHelper::makeSig1fromSignatureParams

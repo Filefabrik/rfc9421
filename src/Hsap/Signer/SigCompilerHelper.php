@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Signer;
 
-use Filefabrik\Hsap\SignatureParams;
-
 /**
  * merges the signature params into sig1=("@method" "@authority" "@path" "content-type" "content-length")
  * todo make non-static methods
