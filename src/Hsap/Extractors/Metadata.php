@@ -16,9 +16,21 @@ final class Metadata extends AbstractMetadata
     {
     }
 
-    public static function extract(string $metadataString): array
+    /**
+     * for the moment a statical method
+     *
+     * @param string $metadataString
+     *
+     * @return self
+     */
+    public static function stringToMetadata(string $metadataString): self
     {
-        return new self($metadataString)->extractString();
+        $self = new self($metadataString);
+        foreach ($self->extractString() as $key => $value) {
+            $self->set($key, $value);
+        }
+
+        return $self;
     }
 
     /**

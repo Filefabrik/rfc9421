@@ -27,9 +27,9 @@ final class MetadataTest extends TestCase
             'tag'     => 'my-tag',
         ];
 
-        $res = Metadata::extract($string);
+        $res = Metadata::stringToMetadata($string);
 
-        $this->assertSame($res, $expectation);
+        $this->assertSame($res->toArray(), $expectation);
     }
 
     public function testExtractThrowParts(): void
@@ -39,7 +39,7 @@ final class MetadataTest extends TestCase
         $string =
             'created='.$now.';'.'expires='.$now.';'.'nonce=="my-nonce";keyid="my-keyid";alg="my-alg";tag="my-tag"';
 
-        Metadata::extract($string);
+        Metadata::stringToMetadata($string);
     }
 
     public function testExtractThrowDuplicate(): void
@@ -49,6 +49,6 @@ final class MetadataTest extends TestCase
         $string =
             'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-alg";tag="my-tag";nonce="my-nonce"';
 
-        Metadata::extract($string);
+        Metadata::stringToMetadata($string);
     }
 }
