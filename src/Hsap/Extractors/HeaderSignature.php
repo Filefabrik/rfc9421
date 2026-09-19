@@ -6,6 +6,9 @@ namespace Filefabrik\Hsap\Extractors;
 
 use Filefabrik\Hsap\Exceptions\SignatureExtractionException;
 
+/**
+ * extracting the full
+ */
 final class HeaderSignature
 {
     public private(set) array|null|SignatureExtractionException $extraction = null {
@@ -17,7 +20,6 @@ final class HeaderSignature
     }
 
     /**
-     *
      * @return string|null null on error
      */
     public function extractSignatureNameKey(): ?string
@@ -34,11 +36,7 @@ final class HeaderSignature
     {
         return $this->extraction instanceof SignatureExtractionException ? null : $this->extraction;
     }
-
-    public function isValid(): bool
-    {
-        return null !== $this->getValidExtraction();
-    }
+    
 
     /**
      *
@@ -68,12 +66,15 @@ final class HeaderSignature
             return $extracted;
         }
 
-        return new SignatureExtractionException('');
+        return new SignatureExtractionException(
+            sprintf('Can not extract signature parts. Needs 3 segments but has %s', $cnt),
+        );
     }
 
     public function extractSignatureString(): array
     {
-        preg_match('#^(.*?):(.*?):#', $this->signatureString, $matches);
+        // todo modify regex for strict format validation
+        preg_match('#^(.*?):(.*?):$#', $this->signatureString, $matches);
 
         return $matches;
     }
