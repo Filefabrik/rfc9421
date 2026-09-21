@@ -9,7 +9,7 @@ namespace Filefabrik\Hsap\Extractors;
  *
  * @todo verify emptyness
  */
-final class ContentDigest
+final readonly class ContentDigest
 {
     /*
     *  "content-digest": sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:
