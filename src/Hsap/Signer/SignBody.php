@@ -53,7 +53,11 @@ final readonly class SignBody
      */
     public function calculateSignature(): string
     {
-        return base64_encode(hash(algo: $this->algorithm, data: $this->body, binary: true));
+        return base64_encode($this->hash());
     }
 
+    public function hash(): string
+    {
+        return hash(algo: $this->algorithm, data: $this->body, binary: true);
+    }
 }
