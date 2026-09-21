@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\HsapTest\Extractors;
 
+use Filefabrik\Hsap\Exceptions\SignatureExtractionException;
 use Filefabrik\Hsap\Extractors\HeaderSignature;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -39,9 +40,11 @@ final class HeaderSignatureTest extends TestCase
      */
     public function testExtractSignatureNameNotFound(): void
     {
-        $headerKey               = 'Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s';
-        $headerSignatureInstance = new HeaderSignature($headerKey);
-        $this->assertNull($headerSignatureInstance->extractSignatureNameKey());
+        $this->expectExceptionObject(
+            new SignatureExtractionException('Can not extract signature parts. Needs 3 segments but has 0'),
+        );
+        $headerKey = 'Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s';
+        new HeaderSignature($headerKey)->extractSignatureNameKey();
     }
 
     /**
@@ -73,15 +76,16 @@ final class HeaderSignatureTest extends TestCase
      * @covers HeaderSignature::getSignatureValue
      * @return void
      */
-    public function testGetSignatureValueNull(): void
+    public function testGetSignatureValueThrow(): void
     {
-        $headerKey               = 'Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s';
-        $headerSignatureInstance = new HeaderSignature($headerKey);
-        $this->assertNull($headerSignatureInstance->getSignatureValue());
+        $this->expectExceptionObject(
+            new SignatureExtractionException('Can not extract signature parts. Needs 3 segments but has 0'),
+        );
+        $headerKey = 'Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s';
+        new HeaderSignature($headerKey)->getSignatureValue();
     }
 
-    
-    public function testExtractSignatureString()
+    public function testExtractSignatureString(): void
     {
         $headerKey               = 't:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s';
         $headerSignatureInstance = new HeaderSignature($headerKey);
