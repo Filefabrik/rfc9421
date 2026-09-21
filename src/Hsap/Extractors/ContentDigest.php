@@ -18,14 +18,12 @@ final class ContentDigest
     * //  The Base64 encoding may have multiple `=` at the end. So split this at the first `=`.
     * $digestData = explode( separator: "=", string: $digestString, limit: 2 );
      */
-    public private(set) string $contentDigest;
 
     /**
      * @param string $contentDigest
      */
-    public function __construct(string $contentDigest)
+    public function __construct(public private(set) string $contentDigest)
     {
-        $this->contentDigest = $contentDigest;
     }
 
     /**
@@ -56,13 +54,24 @@ final class ContentDigest
     }
 
     /**
+     * check we have 2 parts after splitting
+     * todo more clever extraction check
+     *
+     * @return bool
+     */
+    public function validateExtraction(): bool
+    {
+        return (2 === count($this->getDigestArray()));
+    }
+
+    /**
      * The hash is surrounded by `:` characters.
      * $digestHash = str_replace( search: ":", replace: "", subject: $digestData[1] );
      * :tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:
      *
      * @return string tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc= without the colons on start and the ending
      */
-    public function getRealHashedValue(): string
+    public function getRealBase64EncodedValue(): string
     {
         return str_replace(search: ':', replace: '', subject: $this->getExplodedHash());
     }
