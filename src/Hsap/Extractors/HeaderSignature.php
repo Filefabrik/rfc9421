@@ -7,11 +7,17 @@ namespace Filefabrik\Hsap\Extractors;
 use Filefabrik\Hsap\Exceptions\SignatureExtractionException;
 
 /**
- * extracting the full
+ * extracting the testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:
+ * extractSignatureNameKey()    testValue=
+ * getSignatureValue()          Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s
+ * todo testing or checking null value extractSignatureNameKey
  */
 final class HeaderSignature
 {
     public private(set) array|null|SignatureExtractionException $extraction = null {
+        /**
+         * @throws SignatureExtractionException
+         */
         get => $this->extraction ??= $this->getValidatedSignatureParts();
     }
 
@@ -20,23 +26,19 @@ final class HeaderSignature
     }
 
     /**
+     * todo check, it is possible without signature
+     *
      * @return string|null null on error
      */
     public function extractSignatureNameKey(): ?string
     {
-        if ($extracted = $this->getValidExtraction()) {
-            return $extracted[1];
-        }
-
-        // invalid
-        return null;
+        return $this->getValidExtraction()[1];
     }
 
     public function getValidExtraction(): null|array
     {
         return $this->extraction instanceof SignatureExtractionException ? null : $this->extraction;
     }
-    
 
     /**
      *
@@ -44,29 +46,26 @@ final class HeaderSignature
      */
     public function getSignatureValue(): ?string
     {
-        if ($extracted = $this->getValidExtraction()) {
-            return $extracted[2];
-        }
-
-        // invalid
-        return null;
+        return $this->getValidExtraction()[2];
     }
 
     /**
-     * checks we have the :crypted-code: ...between the double colons
+     * checks we have the :base64EncodedValue-code: ...between the double colons
      *
-     * @return array|SignatureExtractionException SignatureExtractionException on format missmatch
+     * @return array SignatureExtractionException on format missmatch
      *
+     * @throws SignatureExtractionException
      */
-    public function getValidatedSignatureParts(): SignatureExtractionException|array
+    public function getValidatedSignatureParts(): array
     {
         $extracted = $this->extractSignatureString();
         $cnt       = count($extracted);
+        //  extracted parts can be also have empty strings
         if (3 === $cnt) {
             return $extracted;
         }
 
-        return new SignatureExtractionException(
+        throw new SignatureExtractionException(
             sprintf('Can not extract signature parts. Needs 3 segments but has %s', $cnt),
         );
     }
