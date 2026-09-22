@@ -106,6 +106,24 @@ final class PrepareComponents
         return $this;
     }
 
+    public function setMappingValue(string $key, $callable): self
+    {
+        // init stack
+        $stack               = $this->getMethodStack();
+        $stack[$key]         = $callable;
+        $this->derivedMapper = $stack;
+
+        return $this;
+    }
+
+    /**
+     * @return array<Closure|callable|string>
+     */
+    private function getMethodStack(): array
+    {
+        return $this->derivedMapper ??= self::$defaultDerivedStack;
+    }
+
     /**
      * @param $key
      *
@@ -119,19 +137,14 @@ final class PrepareComponents
         if ($callableMethod instanceof Closure) {
             return $callableMethod($this->message);
         }
-        if (is_callable($callableMethod) || (is_string($callableMethod) && method_exists($this, $callableMethod))) {
+        if (is_string($callableMethod) && method_exists($this, $callableMethod)) {
             return $this->$callableMethod();
+        }
+        if (is_callable($callableMethod)) {
+            return $callableMethod();
         }
 
         throw new BadMethodCallException(sprintf('Method "%s" not callable.', $callableMethod));
-    }
-
-    /**
-     * @return array<Closure|callable|string>
-     */
-    private function getMethodStack(): array
-    {
-        return $this->derivedMapper ??= self::$defaultDerivedStack;
     }
 
     /**

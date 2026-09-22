@@ -34,7 +34,7 @@ final class HeaderSignature
      * @var array|null null on not set
      */
     public private(set) null|array $validSignedParameters  = null;
-    private bool $preparedVerifier = false;
+    private bool                   $preparedVerifier       = false;
     private ?HeaderSignatureInput  $signatureInputInstance = null;
 
     public function __construct(public private(set) readonly MessageInterface|RequestInterface $message)
@@ -56,18 +56,8 @@ final class HeaderSignature
         if (!$this->preparedVerifier) {
             $this->prepareVerify();
         }
+        $this->prepareSigningComponents();
 
-        // alle keys they have into rebuildable signing array
-        $signingComponents = $this->makeSigningParameters($this->signatureInputInstance->extractedComponents);
-
-        // check
-        if ($signingComponents->exists('content-digest') && !$this->validateContentDigest()) {
-            throw ContentDigestException::bodyTempered();
-        }
-        // no compile the signature array such as in singer
-        foreach ($signingComponents->getSignatureParameters() as $signingComponent) {
-            $this->configuration->withHeader($signingComponent);
-        }
         $this->configuration->setPublicPem($this->publicPem);
         $signer = new Signer(clone $this->message, $this->configuration);
 
@@ -94,7 +84,13 @@ final class HeaderSignature
         return $verified;
     }
 
-    public function prepareVerify()
+    /**
+     * First prepare some request datas
+     *
+     * @return void
+     * @throws VerifyHeaderSignatureException
+     */
+    public function prepareVerify(): void
     {
         if ($this->preparedVerifier) {
             throw new UnexpectedValueException('already prepared');
@@ -112,16 +108,7 @@ final class HeaderSignature
             throw VerifyHeaderSignatureException::keynameNotExtracted();
         }
 
-        // todo move parts somewhere
-        // extract all what was signed and get it from the header
-        $this->signatureInputInstance = $this->getSignaturInputInstance();
-        $this->configuration          = new SignerConfiguration(
-            metadata: Metadata::fromArray(
-                metadata: $this->signatureInputInstance->extractedMetadata->toArray(),
-            ),
-        );
-        // extracted signature key from the "signature"
-        $this->configuration->withSignatureKeyName($signatureKeyName);
+        $this->prepareConfiguration($signatureKeyName);
 
         // handling the Metadata Extractor
         // todo make methods to control the code execution from metadata such as isExpired
@@ -167,6 +154,26 @@ final class HeaderSignature
 
     }
 
+    /**
+     * @throws VerifyHeaderSignatureException
+     */
+    private function prepareConfiguration(string $signatureKeyName): void
+    {
+        // extract all what was signed and get it from the header
+        $this->signatureInputInstance = $this->getSignaturInputInstance();
+        $this->configuration          = new SignerConfiguration(
+            metadata: Metadata::fromArray(
+                metadata: $this->signatureInputInstance->extractedMetadata->toArray(),
+            ),
+        );
+        // extracted signature key from the "signature"
+        $this->configuration->withSignatureKeyName($signatureKeyName);
+    }
+
+    /**
+     * @return HeaderSignatureInput
+     * @throws VerifyHeaderSignatureException
+     */
     private function getSignaturInputInstance(): HeaderSignatureInput
     {
         $headerSignatureInstance = new HeaderSignatureInput(
@@ -179,21 +186,28 @@ final class HeaderSignature
         return $headerSignatureInstance;
     }
 
-    private function makeSigningParameters(array $extractedComponents): SignatureParams
+    /**
+     * extract which parameters must be use to validate the header data
+     *
+     * @return void
+     * @throws AlreadySetException
+     * @throws ContentDigestException
+     * @throws InvalidDerivedKeyException
+     * @throws InvalidHeaderKeyException
+     */
+    private function prepareSigningComponents(): void
     {
-        $signingParams = new SignatureParams();
+        // alle keys they have into rebuildable signing array
 
-        // try to rebuild the header parameters
-
-        foreach ($extractedComponents as $param) {
-            try {
-                $signingParams->add($param);
-            } catch (Exception$exception) {
-                // stop
-            }
+        $signingComponents = SignatureParams::fromArray($this->signatureInputInstance->extractedComponents);
+        // check
+        if ($signingComponents->exists('content-digest') && !$this->validateContentDigest()) {
+            throw ContentDigestException::bodyTempered();
         }
-
-        return $signingParams;
+        // no compile the signature array such as in singer
+        foreach ($signingComponents->getSignatureParameters() as $signingComponent) {
+            $this->configuration->withHeader($signingComponent);
+        }
     }
 
     /**

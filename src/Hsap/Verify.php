@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap;
 
+use Filefabrik\Hsap\Exceptions\AlreadySetException;
+use Filefabrik\Hsap\Exceptions\ContentDigestException;
+use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
+use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Hsap\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Hsap\Verify\HeaderSignature;
 use Psr\Http\Message\MessageInterface;
 
 final class Verify
 {
-    /**
-     * @var string|null
-     */
-    public private(set) ?string $signatureNameKey = null;
-
-    /**
-     * @var bool null not checked
-     */
-    public private(set) bool $validFormats = true;
+    public private(set) ?HeaderSignature $headerSignature = null {
+        get => $this->headerSignature ??= $this->getHeaderSignatureInstance();
+    }
 
     public function __construct(
         public private(set) readonly MessageInterface $message,
@@ -25,11 +24,31 @@ final class Verify
     ) {
     }
 
+    /**
+     * @throws InvalidHeaderKeyException
+     * @throws AlreadySetException
+     * @throws InvalidDerivedKeyException
+     * @throws ContentDigestException
+     * @throws VerifyHeaderSignatureException
+     */
     public function validate(): int
     {
-        $instance            = new HeaderSignature($this->message);
-        $instance->publicPem = $this->publicPem;
+        return $this->headerSignature->validate();
+    }
 
-        return $instance->validate();
+    /**
+     * @throws VerifyHeaderSignatureException
+     */
+    public function prepared(): void
+    {
+        $this->headerSignature->prepareVerify();
+    }
+
+    private function getHeaderSignatureInstance(): HeaderSignature
+    {
+        $i            = new HeaderSignature($this->message);
+        $i->publicPem = $this->publicPem;
+
+        return $i;
     }
 }

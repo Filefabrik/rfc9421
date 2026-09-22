@@ -20,6 +20,28 @@ final class SignatureParams
      */
     private array $signatureParameters = [];
 
+    public static function fromArray(array $params): self
+    {
+        return new self()->adds($params);
+    }
+
+    /**
+     * @param array $keys
+     *
+     * @return $this
+     * @throws AlreadySetException
+     * @throws InvalidDerivedKeyException
+     * @throws InvalidHeaderKeyException
+     */
+    public function adds(array $keys): self
+    {
+        foreach ($keys as $key) {
+            $this->add($key);
+        }
+
+        return $this;
+    }
+
     /**
      * Adding in the wild
      *

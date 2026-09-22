@@ -31,6 +31,12 @@ final class SignerConfiguration
     public private(set) bool $mustSignBody = true;
 
     /**
+     * Injecting callables
+     *
+     * @var array
+     */
+    public private(set) array $prepareComponentsMethods = [];
+    /**
      * Prefix the signature value
      *
      * @var string
@@ -113,7 +119,6 @@ final class SignerConfiguration
         return $this;
     }
 
-
     /**
      * Signing header Parameter
      *
@@ -133,4 +138,8 @@ final class SignerConfiguration
         return $this;
     }
 
+    public function withPrepareComponentsMethods($componentName, $callable)
+    {
+        $this->prepareComponentsMethods[$componentName] = $callable;
+    }
 }

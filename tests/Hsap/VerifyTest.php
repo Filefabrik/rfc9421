@@ -5,17 +5,32 @@ declare(strict_types=1);
 namespace Filefabrik\HsapTest;
 
 use DateTime;
+use Filefabrik\Hsap\Exceptions\AlreadySetException;
+use Filefabrik\Hsap\Exceptions\ContentDigestException;
+use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
+use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Hsap\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Hsap\Signer;
 use Filefabrik\Hsap\SignerConfiguration;
 use Filefabrik\Hsap\Verify;
 use Filefabrik\HsapTest\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\MessageInterface;
 
 #[CoversClass(\Filefabrik\Hsap\Verify::class)]
 final class VerifyTest extends TestCase
 {
+    /**
+     * @throws InvalidHeaderKeyException
+     * @throws InvalidDerivedKeyException
+     * @throws ContentDigestException
+     * @throws VerifyHeaderSignatureException
+     * @throws JsonException
+     * @throws AlreadySetException
+     */
     public function testValidate(): void
     {
         /**
@@ -29,7 +44,8 @@ final class VerifyTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SignerConfiguration();
         $configuration->withHeader('@method')
-                      ->withHeader('x-Origins-host')
+            //    ->withHeader('x-Origin-host')
+                      ->withHeader('@authority')
             /*
              * check duplicate content-digest
              * ->withHeader('content-digest')
@@ -56,10 +72,10 @@ final class VerifyTest extends TestCase
         $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
         $request    =
             new Request(
-                method: 'POST',
-                uri: 'https://test',
-                body: $bodyJson,
-                headers: ['x-origin-host' => 'mytest.com'],
+                method : 'POST',
+                uri    : 'https://test.com.com',
+                headers: ['x-origin-host' => 'test.com.com'],
+                body   : $bodyJson,
             );
 
         $signer        = new Signer($request, $configuration);
@@ -75,7 +91,7 @@ final class VerifyTest extends TestCase
             'public_key' => $configuration->getPublicPem(),
             'algorithm'  => 'sha512',
         ];
-        $this->assertEquals(1,openssl_verify(...$signerDatas));
+        $this->assertEquals(1, openssl_verify(...$signerDatas));
 
         /**
          * Now decrypt the Request
@@ -84,7 +100,18 @@ final class VerifyTest extends TestCase
         // first take the header and look for the signature and the signature-input
 
         $verifier = new Verify($signedRequest, $configuration->getPublicPem());
-        $this->assertEquals(1, $verifier->validate());
 
+        $verifier->prepared();
+
+        $cfg = $verifier->headerSignature->configuration;
+
+        if ($cfg->metadata->tag) {
+            $callable = fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host');
+
+            // for mastodon an own config für x-origin or something
+            $cfg->withPrepareComponentsMethods('@authority', $callable);
+        }
+
+        $this->assertEquals(1, $verifier->validate());
     }
 }
