@@ -55,6 +55,7 @@ final class SignatureParams
      */
     public function addIfNotExists(string $name): self
     {
+        $name = strtolower($name);
         if ($this->exists($name)) {
             throw new AlreadySetException(
                 sprintf('Signature-Input parameter "%s" was set before and can not be set again.', $name),
@@ -70,6 +71,8 @@ final class SignatureParams
      */
     public function exists(string $name): bool
     {
+        $name = strtolower($name);
+
         return in_array($name, $this->signatureParameters, true);
     }
 

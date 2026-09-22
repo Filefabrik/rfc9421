@@ -22,7 +22,7 @@ final class SignaturBase
     /**
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
      *
-     * @param array<string,string|int|float> $signatureLines
+     * @param array $signatureLines
      *
      * @return string
      */
@@ -87,7 +87,7 @@ final class SignaturBase
             // set the body digest into the header
             [$headerKey, $value] = new SignBody(
                 body     : (string)$this->message->getBody(),
-                algorithm: $this->configuration->bodySignatureAlgorithm ?? $this->configuration->metadata->alg,
+                algorithm: $this->configuration->metadata->alg,
             )->getContentDigestHeaderArray();
 
             /**

@@ -29,12 +29,6 @@ final class SignerConfiguration
      * @var bool
      */
     public private(set) bool $mustSignBody = true;
-    /**
-     * Algorithm is need if the $mustSignBody is true
-     *
-     * @var string|null $bodySignatureAlgorithm
-     */
-    public private(set) ?string $bodySignatureAlgorithm = null;
 
     /**
      * Prefix the signature value
@@ -119,15 +113,6 @@ final class SignerConfiguration
         return $this;
     }
 
-    /**
-     * todo sign the signature with
-     */
-    public function withBodySignatureAlgorithm(string $bodySignatureAlgorithm): self
-    {
-        $this->bodySignatureAlgorithm = $bodySignatureAlgorithm;
-
-        return $this;
-    }
 
     /**
      * Signing header Parameter

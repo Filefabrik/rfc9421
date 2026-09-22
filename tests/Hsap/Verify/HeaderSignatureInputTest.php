@@ -6,39 +6,86 @@ namespace Filefabrik\HsapTest\Verify;
 
 use Filefabrik\Hsap\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Hsap\Verify\HeaderSignatureInput;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 #[CoversClass(HeaderSignatureInput::class)]
 final class HeaderSignatureInputTest extends TestCase
 {
     public function testExtract(): void
     {
-        $sig                  = 'someSig=("test" "@test" "try-out" "some-header")';
+        $expectedComponents   = ['@method', 'content-digest'];
+        $expectedMetadata     = [
+            'created' => 1789749530,
+            'expires' => 1789756730,
+            'nonce'   => 'nonce-now',
+            'tag'     => 'mastodon',
+        ];
+        $sig                  =
+            'someSig=("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
-        $this->assertSame(['test', '@test', 'try-out', 'some-header'], $headerSignatureInput->extract());
+
+        //
+        $headerSignatureInput->extract();
+
+        $this->assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
+        $this->assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 
-    public function testExtractSignatureLies(): void
+    public function testExtractWithoutKey(): void
+    {
+        $expectedComponents   = ['@method', 'content-digest'];
+        $expectedMetadata     = [
+            'created' => 1789749530,
+            'expires' => 1789756730,
+            'nonce'   => 'nonce-now',
+            'tag'     => 'mastodon',
+        ];
+        $sig                  =
+            '("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
+        $headerSignatureInput = new HeaderSignatureInput($sig, '');
+
+        //
+        $headerSignatureInput->extract();
+
+        $this->assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
+        $this->assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
+    }
+
+    public function testExtractWithSigKeyThrowsException(): void
     {
         $this->expectExceptionObject(
             new VerifyHeaderSignatureException(
-                'Error during extracting the signatureKeyName from signature-input. Expects the keyname: "iamlieing=" in header: "someSig=("test" "@test" "try-out" "some-header")"',
+                'Error during extracting the signatureKeyName from signature-input. Expects the keyname: "someSig=" in header: "error=("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"',
             ),
         );
-        $sig = 'someSig=("test" "@test" "try-out" "some-header")';
-        new HeaderSignatureInput($sig, 'iamlieing=')->extract();
+        $sig                  =
+            'error=("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
+        $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
+        $headerSignatureInput->extract();
     }
 
-    public function testExtractSignatureEmptyKeyButNeeds(): void
+    public function testExtractMissingSignatureComponents(): void
     {
-        $this->expectExceptionObject(
-            new UnexpectedValueException(
-                'Unexpected start end of field.',
-            ),
-        );
-        $sig = 'someSig=("test" "@test" "try-out" "some-header")';
-        new HeaderSignatureInput($sig, '')->extract();
+        $this->expectExceptionObject(new InvalidArgumentException('missing components'));
+
+        $sig                  =
+            'someSig=();created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
+        $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
+
+        //
+        $headerSignatureInput->extract();
+    }
+    public function testExtractInvalidSignature(): void
+    {
+        $this->expectExceptionObject(new VerifyHeaderSignatureException('Invalid signature line ");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon""'));
+
+        $sig                  =
+            'someSig=);created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
+        $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
+
+        //
+        $headerSignatureInput->extract();
     }
 }

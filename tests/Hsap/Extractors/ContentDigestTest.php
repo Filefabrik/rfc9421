@@ -31,7 +31,7 @@ final class ContentDigestTest extends TestCase
     }
     public function testGetRealHashedValue():void
     {
-        $alg = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getRealHashedValue();
+        $alg = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getRealBase64EncodedValue();
         $this->assertEquals('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=', $alg);
     }
     public function testGetDigestArray(): void

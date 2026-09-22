@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap\Verify;
 
 use Exception;
+use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\ContentDigestException;
+use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Hsap\Extractors\ContentDigest;
@@ -15,6 +17,7 @@ use Filefabrik\Hsap\Signer\SignatureParams;
 use Filefabrik\Hsap\SignerConfiguration;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
+use UnexpectedValueException;
 
 /**
  * handles the full extracting/validation of the signature and signature-input
@@ -23,20 +26,79 @@ final class HeaderSignature
 {
     public private(set) ?string $signatureKeyName = null;
 
-    public ?string                    $publicPem     = null;
+    public ?string                           $publicPem     = null;
     public private(set) ?SignerConfiguration $configuration = null;
+    /**
+     * Only if verified successfully
+     *
+     * @var array|null null on not set
+     */
+    public private(set) null|array $validSignedParameters  = null;
+    private bool $preparedVerifier = false;
+    private ?HeaderSignatureInput  $signatureInputInstance = null;
 
     public function __construct(public private(set) readonly MessageInterface|RequestInterface $message)
     {
     }
 
     /**
-     * @throws VerifyHeaderSignatureException
+     * Main method to validate
+     *
+     * @return false|int
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
+     * @throws VerifyHeaderSignatureException
+     * @throws AlreadySetException
+     * @throws InvalidDerivedKeyException
      */
-    public function validate()
+    public function validate(): false|int
     {
+        if (!$this->preparedVerifier) {
+            $this->prepareVerify();
+        }
+
+        // alle keys they have into rebuildable signing array
+        $signingComponents = $this->makeSigningParameters($this->signatureInputInstance->extractedComponents);
+
+        // check
+        if ($signingComponents->exists('content-digest') && !$this->validateContentDigest()) {
+            throw ContentDigestException::bodyTempered();
+        }
+        // no compile the signature array such as in singer
+        foreach ($signingComponents->getSignatureParameters() as $signingComponent) {
+            $this->configuration->withHeader($signingComponent);
+        }
+        $this->configuration->setPublicPem($this->publicPem);
+        $signer = new Signer(clone $this->message, $this->configuration);
+
+        $signer->prepareSigning();
+
+        $sig         = $this->getHeaderSignatureDecodeBinary();
+        $signerDatas = [
+            'data'       => $signer->signingParametersString,
+            'signature'  => $sig,
+            'public_key' => $this->configuration->getPublicPem(),
+            'algorithm'  => 'sha512',
+        ];
+
+        // todo give back validated data
+
+        // now create the compare hash from publicPem
+        $verified = openssl_verify(...$signerDatas);
+
+        if ($verified) {
+            // getting back validated parameters non-tempered parameters
+            $this->validSignedParameters = $signer->signingParameters;
+        }
+
+        return $verified;
+    }
+
+    public function prepareVerify()
+    {
+        if ($this->preparedVerifier) {
+            throw new UnexpectedValueException('already prepared');
+        }
         // first stage we must have both signature and signature-input header
         if (!$this->getHeaderSignature()) {
             throw VerifyHeaderSignatureException::missingSignature();
@@ -52,10 +114,10 @@ final class HeaderSignature
 
         // todo move parts somewhere
         // extract all what was signed and get it from the header
-        $signatureInputInstance = $this->getSignaturInputInstance();
-        $this->configuration    = new SignerConfiguration(
+        $this->signatureInputInstance = $this->getSignaturInputInstance();
+        $this->configuration          = new SignerConfiguration(
             metadata: Metadata::fromArray(
-                metadata: $signatureInputInstance->extractedMetadata->toArray(),
+                metadata: $this->signatureInputInstance->extractedMetadata->toArray(),
             ),
         );
         // extracted signature key from the "signature"
@@ -64,37 +126,8 @@ final class HeaderSignature
         // handling the Metadata Extractor
         // todo make methods to control the code execution from metadata such as isExpired
 
-        // alle keys they have into rebuildable signing array
-        $signingComponents = $this->makeSigningParameters($signatureInputInstance->extractedComponents);
-
-        // todo setting of configuration
-        $this->configuration->withSignatureKeyName($signatureKeyName);
-
-        // check
-        if ($signingComponents->exists('content-digest') && !$this->validateContentDigest()) {
-            throw ContentDigestException::bodyTempered();
-        }
-        // no compile the signature array such as in singer
-        foreach ($signingComponents->getSignatureParameters() as $signingComponent) {
-            $this->configuration->withHeader($signingComponent);
-        }
-        $this->configuration->setPublicPem($this->publicPem);
-        $signer = new Signer(clone $this->message, $this->configuration);
-
-        $signer->prepareSigning();
-
-        $sig         = $this->getHeaderSignatureDecoded();
-        $signerDatas = [
-            'data'       => $signer->signingParametersString,
-            'signature'  => $sig,
-            'public_key' => $this->configuration->getPublicPem(),
-            'algorithm'  => 'sha512',
-        ];
-
-        // todo give back validated data
-
-        // now create the compare hash from publicPem
-        return openssl_verify(...$signerDatas);
+        // todo get back the configuration objects to modify config outside if need
+        $this->preparedVerifier = true;
     }
 
     /**
@@ -188,7 +221,12 @@ final class HeaderSignature
         return $instance->verify();
     }
 
-    private function getHeaderSignatureDecoded(): string
+    /**
+     * base_decoded signature to get binary
+     *
+     * @return string
+     */
+    private function getHeaderSignatureDecodeBinary(): string
     {
         return $this->signatureKeyName = new \Filefabrik\Hsap\Extractors\HeaderSignature(
             $this->getHeaderSignature(),

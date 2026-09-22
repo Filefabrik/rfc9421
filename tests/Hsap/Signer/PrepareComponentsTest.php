@@ -8,8 +8,8 @@ use BadMethodCallException;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Hsap\SignatureParams;
 use Filefabrik\Hsap\Signer\PrepareComponents;
+use Filefabrik\Hsap\Signer\SignatureParams;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -102,7 +102,6 @@ final class PrepareComponentsTest extends TestCase
             'https://Test.com/var/pathy/?qer=var',
             body: '{"busy": true, "message": "Your call is very important to us"}',
         );
-        $signatureParams = new SignatureParams();
 
         $prepareInstance = new PrepareComponents($r);
 
