@@ -37,7 +37,7 @@ final class VerifyTest extends TestCase
          *
          */
         $certInstance = new CertHelper('ec_brainpoolP512t1');
-
+        $algo         = 'sha512';
         /**
          * Prepare configuration
          */
@@ -53,7 +53,7 @@ final class VerifyTest extends TestCase
 
                       ->mustSignBody()
             //->withAlg('sha512')
-                      ->withAlg('sha256')
+                      ->withAlg($algo)
                       ->withCreated($currentDateTime)
                       ->withExpires($currentDateTime + 7200)
                       ->withTag('mastodon')
@@ -89,7 +89,7 @@ final class VerifyTest extends TestCase
             'data'       => $signer->signingParametersString,
             'signature'  => $decoded,
             'public_key' => $configuration->getPublicPem(),
-            'algorithm'  => 'sha512',
+            'algorithm'  => $algo,
         ];
         $this->assertEquals(1, openssl_verify(...$signerDatas));
 

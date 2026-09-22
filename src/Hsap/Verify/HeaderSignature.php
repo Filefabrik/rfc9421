@@ -61,10 +61,12 @@ final class HeaderSignature
         }
         $this->prepareSigningComponents();
 
-        $this->configuration->setPublicPem($this->publicPem);
-        $signer = new Signer(clone $this->message, $this->configuration);
+        if ($this->configuration->signatureParams->exists('content-digest') && !$this->validateContentDigest()) {
+            throw ContentDigestException::bodyTempered();
+        }
 
-        $signer->prepareSigning();
+        $this->configuration->setPublicPem($this->publicPem);
+        $signer = $this->getPrepearedSigner();
         // base_decoded signature to get binary
         $sig         = $this->headerSignatureExtractor->getBinarySignatureValue();
         $signerDatas = [
@@ -114,10 +116,6 @@ final class HeaderSignature
 
         $this->prepareConfiguration($signatureKeyName);
 
-        // handling the Metadata Extractor
-        // todo make methods to control the code execution from metadata such as isExpired
-
-        // todo get back the configuration objects to modify config outside if need
         $this->preparedVerifier = true;
     }
 
@@ -179,7 +177,6 @@ final class HeaderSignature
      *
      * @return void
      * @throws AlreadySetException
-     * @throws ContentDigestException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      */
@@ -188,10 +185,8 @@ final class HeaderSignature
         // alle keys they have into rebuildable signing array
 
         $signingComponents = SignatureParams::fromArray($this->signatureInputInstance->extractedComponents);
-        // check
-        if ($signingComponents->exists('content-digest') && !$this->validateContentDigest()) {
-            throw ContentDigestException::bodyTempered();
-        }
+        // todo, has nothing todo with configuration
+
         // no compile the signature array such as in singer
         foreach ($signingComponents->getSignatureParameters() as $signingComponent) {
             $this->configuration->withHeader($signingComponent);
@@ -221,6 +216,20 @@ final class HeaderSignature
         );
 
         return $instance->verify();
+    }
+
+    /**
+     * @throws InvalidDerivedKeyException
+     * @throws InvalidHeaderKeyException
+     * @throws AlreadySetException
+     */
+    private function getPrepearedSigner(): Signer
+    {
+        $signer = new Signer(clone $this->message, $this->configuration);
+
+        $signer->prepareSigning();
+
+        return $signer;
     }
 
 }
