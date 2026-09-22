@@ -2,12 +2,18 @@
 
 declare(strict_types=1);
 
-use Filefabrik\Hsap\CertHelper;
 use Filefabrik\Hsap\Signer;
 use Filefabrik\Hsap\SignerConfiguration;
+use Filefabrik\Hsap\Verify;
+use Filefabrik\HsapTest\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
+
+/**
+ *
+ */
+$certInstance = new CertHelper('ec_brainpoolP512t1');
 
 /**
  * Prepare configuration
@@ -21,45 +27,47 @@ $configuration->withHeader('@method')
      */
 
               ->mustSignBody()
-              ->withBodySignatureAlgorithm('sha256')
+            //  ->withBodySignatureAlgorithm('sha512')
+              ->withAlg('sha512')
               ->withCreated($currentDateTime)
               ->withExpires($currentDateTime + 7200)
               ->withTag('mastodon')
               ->withNonce('nonce-now')
+              ->withSignatureKeyName('testValue=')
+    // for signing needs private
+              ->setPrivatePem($certInstance->getPrivatPemContent())
+    // for verify needs public
+              ->setPublicPem($certInstance->getPublicPemContent())
 ;
 
 /**
  * Prepare the Request
  */
-$bodyParams = ['recipient' => 'Alex', 'amount' => 900000000];
+$bodyParams = ['recipient' => 'Alex', 'amount' => 900000000,'text'=>'fdawsfs'];
 $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
 $request    = new Request(method: 'POST', uri: 'https://test', body: $bodyJson);
 
-$signer     = new Signer($request, $configuration);
-$theRequest = $signer->sign();
+$signer        = new Signer($request, $configuration);
+$signedRequest = $signer->sign();
 
-$certInstance = new CertHelper('ec_brainpoolP512t1');
-
+/**
+ * for testing
+ */
+$decoded     = base64_decode($signer->base64_signature);
 $signerDatas = [
-    'data'       => $signer->stringToSign,
-    'signature'  => base64_decode($signer->base64_signature),
-    'public_key' => $certInstance->getPublicPemContent(),
+    'data'       => $signer->signingParametersString,
+    'signature'  => $decoded,
+    'public_key' => $configuration->getPublicPem(),
     'algorithm'  => 'sha512',
 ];
 
-$verified = openssl_verify(...$signerDatas);
-$t        =
-    'MIGEAkAcMVgwFZ8W1yFQvYrVmeH4wjJLUMJtvRs+AcZjkZqvaGsEOhYBVXAdU+kRv4V9MB+7yGvqQ/SkGhcdiHJP8gNPAkAMHoT63GF7Zf85Sp/TPHTwBd5uiaO127wrDNKjkS+UAHSt2ta9sTu6LmgvoMwZnD3p4izdpEbmbwgyB02V9Lo/';
-$t2       =
-    'MIGEAkBluTZ44gAF3hB45yItaIB+gmIgEDLYARctGcG6xhVsHTiWWOT2oXG19fWNFCjTAAI3fiMDuxIR1ZZmS1kiBv3UAkBthGWX4lR7wAsWWegssWM9z+rXlevCN4dc4aKjiAU5UbKaSdtKDKWFTN1aQv48OC8OLNn8uL8WNfBmoHvUN3tb';
-echo $verified;
+echo $incomingVerifiedRequest = openssl_verify(...$signerDatas);
 
-$signerDatas = [
-    'data'       => $signer->stringToSign,
-    'signature'  =>$t2,
-    'public_key' => $certInstance->getPublicPemContent(),
-    'algorithm'  => 'sha512',
-];
+/**
+ * Now decrypt the Request
+ */
 
-$verified = openssl_verify(...$signerDatas);
-echo $verified;
+// first take the header and look for the signature and the signature-input
+
+$verifier = new Verify($signedRequest, $configuration->getPublicPem());
+echo $verifier->validate();

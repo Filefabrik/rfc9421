@@ -41,10 +41,21 @@ final class HeaderSignature
     }
 
     /**
+     * todo check empty
      *
-     * @return string|null null on not found
+     * @return string
      */
-    public function getSignatureValue(): ?string
+    public function getBinarySignatureValue(): string
+    {
+        return base64_decode($this->getSignatureValue(), true);
+    }
+
+    /**
+     *  todo check empty
+     *
+     * @return string
+     */
+    public function getSignatureValue(): string
     {
         return $this->getValidExtraction()[2];
     }

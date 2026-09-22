@@ -35,7 +35,7 @@ final class Metadata extends AbstractMetadata
     {
         $preprocess = [];
         foreach ($this->toArray() as $key => $value) {
-            $preprocess[] = $key.'='.(in_array($key, static::$propertiesToQuote) ? '"'.$value.'"' : $value);
+            $preprocess[] = $key.'='.(in_array($key, static::$propertiesToQuote, true) ? '"'.$value.'"' : $value);
         }
 
         return implode(';', $preprocess);
