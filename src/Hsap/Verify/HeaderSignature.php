@@ -24,8 +24,6 @@ use UnexpectedValueException;
  */
 final class HeaderSignature
 {
-    public private(set) ?string $signatureKeyName = null;
-
     public ?string                           $publicPem     = null;
     public private(set) ?SignerConfiguration $configuration = null;
     /**
@@ -33,9 +31,14 @@ final class HeaderSignature
      *
      * @var array|null null on not set
      */
-    public private(set) null|array $validSignedParameters  = null;
-    private bool                   $preparedVerifier       = false;
-    private ?HeaderSignatureInput  $signatureInputInstance = null;
+    public private(set) null|array                                   $validSignedParameters    = null;
+    public private(set) ?\Filefabrik\Hsap\Extractors\HeaderSignature $headerSignatureExtractor = null {
+        get => $this->headerSignatureExtractor ??= new \Filefabrik\Hsap\Extractors\HeaderSignature(
+            $this->getHeaderSignature(),
+        );
+    }
+    private bool                                                     $preparedVerifier         = false;
+    private ?HeaderSignatureInput                                    $signatureInputInstance   = null;
 
     public function __construct(public private(set) readonly MessageInterface|RequestInterface $message)
     {
@@ -62,13 +65,13 @@ final class HeaderSignature
         $signer = new Signer(clone $this->message, $this->configuration);
 
         $signer->prepareSigning();
-
-        $sig         = $this->getHeaderSignatureDecodeBinary();
+        // base_decoded signature to get binary
+        $sig         = $this->headerSignatureExtractor->getBinarySignatureValue();
         $signerDatas = [
             'data'       => $signer->signingParametersString,
             'signature'  => $sig,
             'public_key' => $this->configuration->getPublicPem(),
-            'algorithm'  => 'sha512',
+            'algorithm'  => $this->configuration->metadata->alg,
         ];
 
         // todo give back validated data
@@ -103,7 +106,8 @@ final class HeaderSignature
             throw VerifyHeaderSignatureException::missingSignatureInput();
         }
         try {
-            $signatureKeyName = $this->getSignatureKeyName();
+            //* Extracts the "sig1=" from the 'sig1=("@method" "content-digest");created=1789634264;tag="mastodon"';
+            $signatureKeyName = $this->headerSignatureExtractor->extractSignatureNameKey();
         } catch (Exception) {
             throw VerifyHeaderSignatureException::keynameNotExtracted();
         }
@@ -138,23 +142,6 @@ final class HeaderSignature
     }
 
     /**
-     * todo to another class because of separation
-     * Extracts the "sig1=" from the 'sig1=("@method" "content-digest");created=1789634264;tag="mastodon"';
-     *
-     * @return string null on error
-     */
-    private function getSignatureKeyName(): string
-    {
-        return $this->signatureKeyName = new \Filefabrik\Hsap\Extractors\HeaderSignature(
-            $this->getHeaderSignature(),
-        )->extractSignatureNameKey();
-
-        // can be empty. or can be null
-        // so the signatur-input is also empty before the ()
-
-    }
-
-    /**
      * @throws VerifyHeaderSignatureException
      */
     private function prepareConfiguration(string $signatureKeyName): void
@@ -178,7 +165,8 @@ final class HeaderSignature
     {
         $headerSignatureInstance = new HeaderSignatureInput(
             headerSignatureInputValue: $this->getHeaderSignatureInput(),
-            signatureNameKey         : $this->getSignatureKeyName(),
+            signatureNameKey         : $this->headerSignatureExtractor
+                ->extractSignatureNameKey(),
         );
         // throws error
         $headerSignatureInstance->extract();
@@ -187,7 +175,7 @@ final class HeaderSignature
     }
 
     /**
-     * extract which parameters must be use to validate the header data
+     * extract which parameters must be used to validate the header data
      *
      * @return void
      * @throws AlreadySetException
@@ -233,18 +221,6 @@ final class HeaderSignature
         );
 
         return $instance->verify();
-    }
-
-    /**
-     * base_decoded signature to get binary
-     *
-     * @return string
-     */
-    private function getHeaderSignatureDecodeBinary(): string
-    {
-        return $this->signatureKeyName = new \Filefabrik\Hsap\Extractors\HeaderSignature(
-            $this->getHeaderSignature(),
-        )->getBinarySignatureValue();
     }
 
 }
