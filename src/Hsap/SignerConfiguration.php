@@ -9,6 +9,7 @@ use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\Signer\Metadata;
 use Filefabrik\Hsap\Signer\SignatureParams;
+use Filefabrik\Hsap\Support\PrepareComponentMethodsTrait;
 use Filefabrik\Hsap\Support\PrivatePemTrait;
 use Filefabrik\Hsap\Support\PublicPemTrait;
 
@@ -22,6 +23,11 @@ final class SignerConfiguration
     use PrivatePemTrait;
 
     /**
+     * simple helper to prepare some methods before executing
+     */
+    use PrepareComponentMethodsTrait;
+
+    /**
      * Flag has to sign the body and the sig must be in header
      *
      * @todo documentation
@@ -31,17 +37,11 @@ final class SignerConfiguration
     public private(set) bool $mustSignBody = true;
 
     /**
-     * Injecting callables
-     *
-     * @var array
-     */
-    public private(set) array $prepareComponentsMethods = [];
-    /**
      * Prefix the signature value
      *
-     * @var string
+     * @var string|null
      */
-    public private(set) string $signatureKeyName = 'sig1=';
+    public private(set) ?string $signatureKeyName = null;
 
     public function __construct(
         public private(set) readonly Metadata $metadata = new Metadata(),
@@ -138,8 +138,4 @@ final class SignerConfiguration
         return $this;
     }
 
-    public function withPrepareComponentsMethods($componentName, $callable)
-    {
-        $this->prepareComponentsMethods[$componentName] = $callable;
-    }
 }

@@ -42,6 +42,7 @@ final class HeaderSignatureInput
      */
     public function extract(): void
     {
+        // in future todo, if set keyname look out for the correct line
         $raw = $this->extractSignatureString();
 
         $this->signatureInput = SignaturInput::extract($raw);

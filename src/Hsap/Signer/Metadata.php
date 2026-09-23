@@ -13,7 +13,6 @@ use Filefabrik\Hsap\Support\AbstractMetadata;
  */
 final class Metadata extends AbstractMetadata
 {
-
     /**
      * @param array $metadata
      *
@@ -21,13 +20,18 @@ final class Metadata extends AbstractMetadata
      */
     public static function fromArray(array $metadata): self
     {
-        $self = new self();
+        return self::bindMetadata(new self(), $metadata);
+    }
+
+    public static function bindMetadata(self $instance, array $metadata): self
+    {
         foreach ($metadata as $key => $value) {
-            $self->set($key, $value);
+            $instance->set($key, $value);
         }
 
-        return $self;
+        return $instance;
     }
+
     /**
      * @return string
      */
@@ -35,7 +39,7 @@ final class Metadata extends AbstractMetadata
     {
         $preprocess = [];
         foreach ($this->toArray() as $key => $value) {
-            $preprocess[] = $key.'='.(in_array($key, static::$propertiesToQuote, true) ? '"'.$value.'"' : $value);
+            $preprocess[] = $key.'='.(in_array($key, self::$propertiesToQuote, true) ? '"'.$value.'"' : $value);
         }
 
         return implode(';', $preprocess);

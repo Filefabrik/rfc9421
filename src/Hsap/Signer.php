@@ -36,7 +36,7 @@ final class Signer
     public private(set) ?string $base64_signature = null {
         get => $this->base64_signature ?? throw new UnexpectedValueException('base64_signature not set before');
     }
-    private null|string              $signatureBase=null;
+    private null|string              $signatureBase = null;
 
     public function __construct(
         public private(set) RequestInterface $message,

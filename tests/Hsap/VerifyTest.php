@@ -36,8 +36,9 @@ final class VerifyTest extends TestCase
         /**
          *
          */
-        $certInstance = new CertHelper('ec_brainpoolP512t1');
-        $algo         = 'sha512';
+        $certInstance     = new CertHelper('ec_brainpoolP512t1');
+        $algo             = 'sha512';
+        $signatureKeyName = 'testing=';
         /**
          * Prepare configuration
          */
@@ -52,17 +53,18 @@ final class VerifyTest extends TestCase
              */
 
                       ->mustSignBody()
+
             //->withAlg('sha512')
                       ->withAlg($algo)
                       ->withCreated($currentDateTime)
                       ->withExpires($currentDateTime + 7200)
                       ->withTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName('testValue=')
+                      ->withSignatureKeyName($signatureKeyName)
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
             // for verify needs public
-                      ->setPublicPem($certInstance->getPublicPemContent())
+                     // ->setPublicPem($certInstance->getPublicPemContent())
         ;
 
         /**
@@ -88,7 +90,7 @@ final class VerifyTest extends TestCase
         $signerDatas = [
             'data'       => $signer->signingParametersString,
             'signature'  => $decoded,
-            'public_key' => $configuration->getPublicPem(),
+            'public_key' => $certInstance->getPublicPemContent(),
             'algorithm'  => $algo,
         ];
         $this->assertEquals(1, openssl_verify(...$signerDatas));
@@ -99,19 +101,73 @@ final class VerifyTest extends TestCase
 
         // first take the header and look for the signature and the signature-input
 
-        $verifier = new Verify($signedRequest, $configuration->getPublicPem());
+        $verifier = new Verify($signedRequest);
+        // optional
+        $signerConfiguration = $verifier->signerConfiguration;
+        //  ->withSignatureKeyName($signatureKeyName)
+        $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
 
-        $verifier->prepared();
+        /**
+         * now prepare the verify process
+         */
+        $verifier->prepareVerify();
 
-        $cfg = $verifier->headerSignature->configuration;
-
-        if ($cfg->metadata->tag) {
-            $callable = fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host');
-
+        /*
+         * Optional we have found a "tag" from sender.
+         * Maybe that let us know, that we handle derivedComponents with a special method
+         *
+         */
+        if ($signerConfiguration->metadata->tag) {
             // for mastodon an own config für x-origin or something
-            $cfg->withPrepareComponentsMethods('@authority', $callable);
+            $signerConfiguration->withPrepareComponentsMethods(
+                [
+                    ['@authority', fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),],
+                ],
+            );
         }
 
         $this->assertEquals(1, $verifier->validate());
+    }
+
+    public function testValidateThrowMissingSignature(): void
+    {
+        $this->expectExceptionObject(new VerifyHeaderSignatureException('Missing signature'));
+        $r = new Request(
+            method : 'POST',
+            uri    : 'https://test',
+            headers: [
+            ],
+        );
+        new Verify($r)->validate();
+    }
+
+    public function testValidateThrowMissingSignatureInput(): void
+    {
+        $this->expectExceptionObject(new VerifyHeaderSignatureException('Missing signature-input'));
+        $r = new Request(
+            method : 'POST',
+            uri    : 'https://test',
+            headers: [
+                'signature' => 'test=:crypt:',
+            ],
+        );
+        new Verify($r)->validate();
+    }
+
+    public function testValidateThrowHeaderKeyName(): void
+    {
+        $this->expectExceptionObject(
+            new VerifyHeaderSignatureException('Error during extracting the signatureKeyName'),
+        );
+        $r        = new Request(
+            method : 'POST',
+            uri    : 'https://test',
+            headers: [
+                'signature'       => 'crypt:',
+                'signature-input' => 'atmNotRelevant',
+            ],
+        );
+        $instance = new Verify($r);
+        $instance->validate();
     }
 }

@@ -47,13 +47,8 @@ final class SignaturBase
         $signatureLines = [];
 
         // todo prepare components with extra methods has to be separated
-        $components     = new PrepareComponents($this->message);
-
-        if ($this->configuration->prepareComponentsMethods) {
-            foreach ($this->configuration->prepareComponentsMethods as $componentName => $callable) {
-                $components->setMappingValue($componentName, $callable);
-            }
-        }
+        $components = new PrepareComponents($this->message);
+        $components->setMappingValues($this->configuration->prepareComponentsMethods);
 
         foreach ($this->configuration->signatureParams->getSignatureParameters() as $signatureParam) {
             $signatureLines[] = $this->createSignatureLine($signatureParam, $components);

@@ -106,6 +106,15 @@ final class PrepareComponents
         return $this;
     }
 
+    public function setMappingValues(array $values): self
+    {
+        foreach ($values as $componentName => $callable) {
+            $this->setMappingValue($componentName, $callable);
+        }
+
+        return $this;
+    }
+
     public function setMappingValue(string $key, $callable): self
     {
         // init stack
@@ -131,8 +140,11 @@ final class PrepareComponents
      */
     public function processValue($key): int|string|float
     {
-        $callableMethod = $this->getMethodStack()[$key] ??
+        if (!array_key_exists($key, $this->getMethodStack())) {
             throw new UnexpectedValueException(sprintf('Method "%s" not registered.', $key));
+        }
+
+        $callableMethod = $this->getMethodStack()[$key];
 
         if ($callableMethod instanceof Closure) {
             return $callableMethod($this->message);
