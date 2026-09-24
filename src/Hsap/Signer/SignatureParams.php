@@ -20,6 +20,13 @@ final class SignatureParams
      */
     private array $signatureParameters = [];
 
+    /**
+     * Set many components
+     *
+     * @throws InvalidDerivedKeyException
+     * @throws InvalidHeaderKeyException
+     * @throws AlreadySetException
+     */
     public static function fromArray(array $params): self
     {
         return new self()->adds($params);
