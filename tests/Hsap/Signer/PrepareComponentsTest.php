@@ -97,7 +97,7 @@ final class PrepareComponentsTest extends TestCase
      */
     public function testProcessValue(): void
     {
-        $r               = new Request(
+        $r = new Request(
             'post',
             'https://Test.com/var/pathy/?qer=var',
             body: '{"busy": true, "message": "Your call is very important to us"}',
@@ -201,6 +201,21 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->processValue('@method_notset');
+    }
+
+
+
+    public function testSetMappingValues()
+    {
+        $arr = [
+            '@methodsss' => fn(RequestInterface $message) => ucfirst(strtolower($message->getMethod())),
+        ];
+
+        $r = new Request('post', 'https://Test.com');
+
+        $prepareInstance = new PrepareComponents($r);
+        $prepareInstance->setMappingValues($arr);
+        $this->assertSame('Post', $prepareInstance->processValue('@methodsss'));
     }
 
     public function testProcessContentLength(): void
