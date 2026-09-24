@@ -109,7 +109,7 @@ final class PrepareComponents
     public function setMappingValues(array $values): self
     {
         foreach ($values as $componentName => $callable) {
-            $this->setMappingValue($componentName, $callable);
+            $this->setMappingValue(key: $componentName, callable: $callable);
         }
 
         return $this;
@@ -151,9 +151,6 @@ final class PrepareComponents
         }
         if (is_string($callableMethod) && method_exists($this, $callableMethod)) {
             return $this->$callableMethod();
-        }
-        if (is_callable($callableMethod)) {
-            return $callableMethod();
         }
 
         throw new BadMethodCallException(sprintf('Method "%s" not callable.', $callableMethod));
