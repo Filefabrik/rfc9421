@@ -53,13 +53,13 @@ final class MetadataTest extends TestCase
             'expires' => $now,
             'nonce'   => 'my-nonce',
             'keyid'   => 'my-keyid',
-            'alg'     => 'my-alg',
+            'alg'     => 'my-algorithm',
             'tag'     => 'my-tag',
         ])
                                ->toString()
         ;
         $this->assertEquals(
-            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-alg";tag="my-tag"',
+            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-algorithm";tag="my-tag"',
             $stringified,
         );
     }
