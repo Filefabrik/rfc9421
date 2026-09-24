@@ -13,6 +13,7 @@ final readonly class ContentDigest
 {
     public function __construct(
         public private(set) string $body,
+        // todo via alg.mapper
         public private(set) string $phpAlgorithm,
         public private(set) string $base64EncodedValue,
     ) {

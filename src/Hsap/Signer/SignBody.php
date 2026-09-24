@@ -24,6 +24,7 @@ final readonly class SignBody
 
     /**
      * Getting the Key Value pair for header array
+     *
      * @return array
      * @example [$headerKey, $headerValue] = new SignBody($body,'sha-512')->getContentDigestHeaderArray()
      */
@@ -36,7 +37,7 @@ final readonly class SignBody
      * This string will be present in the header "content-digest".
      * The Validator checks the integrity of the body that all parts of the body matches this hash"
      * If the Body was changed outside, the signature does not match and you can be sure, someone has "hacked" the request.
-     * todo So it is really important to add "content-digest" into the SignatureParams
+
      * todo modify algorithm for public
      *
      * @return string
@@ -56,6 +57,11 @@ final readonly class SignBody
         return base64_encode($this->hash());
     }
 
+    /**
+     * Todo configurable method
+     *
+     * @return string
+     */
     public function hash(): string
     {
         return hash(algo: $this->algorithm, data: $this->body, binary: true);

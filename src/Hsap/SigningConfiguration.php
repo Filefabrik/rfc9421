@@ -17,7 +17,7 @@ use Filefabrik\Hsap\Support\PublicPemTrait;
  * Signer Configuration can be configured at different position on your code, such as in a bootstrap file or something
  * Later the Signer Configuration can be used for the signing process in the SignerFactory
  */
-final class SignerConfiguration
+final class SigningConfiguration
 {
     use PublicPemTrait;
     use PrivatePemTrait;
@@ -95,9 +95,9 @@ final class SignerConfiguration
         return $this;
     }
 
-    public function withAlg(?string $alg): self
+    public function withAlgorithm(?string $algorithm): self
     {
-        $this->metadata->setAlg($alg);
+        $this->metadata->setAlg($algorithm);
 
         return $this;
     }

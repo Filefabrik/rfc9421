@@ -36,37 +36,37 @@ final class Signer
     public private(set) ?string $base64_signature = null {
         get => $this->base64_signature ?? throw new UnexpectedValueException('base64_signature not set before');
     }
-    private null|string              $signatureBase = null;
+    private null|string         $signatureBase    = null;
 
     public function __construct(
         public private(set) RequestInterface $message,
-        public private(set) readonly SignerConfiguration $configuration,
+        public private(set) readonly SigningConfiguration $signingConfiguration,
     ) {
     }
 
     /**
-     * @return MessageInterface
+     * Helper for verify
+     *
+     * @param RequestInterface     $message
+     * @param SigningConfiguration $signingConfiguration
+     *
+     * @return self
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      */
-    public function sign(): MessageInterface
-    {
-        // set up the content digest into rendering
-        if ($this->configuration->mustSignBody) {
-            $this->configuration->signatureParams->add('content-digest');
-        }
-        $this->prepareSigning();
+    public static function getPreparedSigning(
+        RequestInterface $message,
+        SigningConfiguration $signingConfiguration,
+    ): self {
+        $signer = new self(
+            message             : $message,
+            signingConfiguration: $signingConfiguration,
+        );
 
-        // last phase, crypt and base64_encode. get back header key value  sig1=:base64_signature:
-        $cryptedBaseSigString = $this->crypt($this->signingParametersString);
+        $signer->prepareSigning();
 
-        // setting the signature header into the request
-        $this->updateHeader('signature-input', $this->signatureBase)
-             ->updateHeader('signature', $cryptedBaseSigString)
-        ;
-
-        return $this->message;
+        return $signer;
     }
 
     /**
@@ -78,7 +78,7 @@ final class Signer
      */
     public function prepareSigning(): void
     {
-        $base = new SignaturBase($this->message, $this->configuration);
+        $base = new SignaturBase($this->message, $this->signingConfiguration);
 
         $this->signingParameters = $base->createSignatureLines();
 
@@ -97,7 +97,32 @@ final class Signer
     }
 
     /**
-     * generate the base signature
+     * @return MessageInterface
+     * @throws AlreadySetException
+     * @throws InvalidDerivedKeyException
+     * @throws InvalidHeaderKeyException
+     */
+    public function sign(): MessageInterface
+    {
+        // set up the content digest into rendering
+        if ($this->signingConfiguration->mustSignBody) {
+            $this->signingConfiguration->signatureParams->add('content-digest');
+        }
+        $this->prepareSigning();
+
+        // last phase, crypt and base64_encode. get back header key value  sig1=:base64_signature:
+        $cryptedBaseSigString = $this->crypt($this->signingParametersString);
+
+        // setting the signature header into the request
+        $this->updateHeader('signature-input', $this->signatureBase)
+             ->updateHeader('signature', $cryptedBaseSigString)
+        ;
+
+        return $this->message;
+    }
+
+    /**
+     * Generate the base signature
      *
      * @param $signingParametersString
      *
@@ -105,11 +130,12 @@ final class Signer
      */
     public function crypt($signingParametersString): string
     {
-        $private_key_resource = openssl_pkey_get_private($this->configuration->privatePem);
+        $private_key_resource = openssl_pkey_get_private($this->signingConfiguration->privatePem);
 
         $signature = '';
-
-        if (openssl_sign($signingParametersString, $signature, $private_key_resource, OPENSSL_ALGO_SHA512)) {
+        // todo mapper
+        $algo      = ('sha256' === $this->signingConfiguration->metadata->alg) ? OPENSSL_ALGO_SHA256 : OPENSSL_ALGO_SHA512;
+        if (openssl_sign($signingParametersString, $signature, $private_key_resource, $algo)) {
             $this->base64_signature = base64_encode($signature);
         } else {
             throw new UnexpectedValueException('Error signing data: '.openssl_error_string());
@@ -128,7 +154,7 @@ final class Signer
      */
     public function makeSignatureString(string $signature): string
     {
-        return sprintf($this->configuration->signatureKeyName.':%s:', $signature);
+        return sprintf($this->signingConfiguration->signatureKeyName.':%s:', $signature);
     }
 
     /**

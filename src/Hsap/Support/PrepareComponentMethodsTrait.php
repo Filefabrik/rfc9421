@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Support;
 
-use Filefabrik\Hsap\SignerConfiguration;
+use Filefabrik\Hsap\SigningConfiguration;
 
 trait PrepareComponentMethodsTrait
 {
@@ -20,10 +20,10 @@ trait PrepareComponentMethodsTrait
      *
      * @param array $methods
      *
-     * @return SignerConfiguration
+     * @return SigningConfiguration
      * @see
      */
-    public function withPrepareComponentsMethods(array $methods): SignerConfiguration
+    public function withPrepareComponentsMethods(array $methods): SigningConfiguration
     {
         foreach ($methods as $keyValueArray) {
             $this->withPrepareComponentsMethod(...$keyValueArray);

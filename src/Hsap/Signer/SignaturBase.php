@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Signer;
 
-use Filefabrik\Hsap\SignerConfiguration;
+use Filefabrik\Hsap\SigningConfiguration;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -15,7 +15,7 @@ final class SignaturBase
 {
     public function __construct(
         public private(set) RequestInterface $message,
-        public private(set) readonly SignerConfiguration $configuration,
+        public private(set) readonly SigningConfiguration $configuration,
     ) {
     }
 
@@ -103,7 +103,7 @@ final class SignaturBase
             return [$headerKey, $value];
         }
         throw new UnexpectedValueException(
-            'Expecting content-digest from configuration header but mustSignBody is false',
+            'Expecting content-digest from signingConfiguration header but mustSignBody is false',
         );
     }
 
