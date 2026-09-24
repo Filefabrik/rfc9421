@@ -48,6 +48,10 @@ final readonly class ContentDigest
         return $this->getDigestArray()[0];
     }
 
+    /**
+     * todo ...shiddy extractor
+     * @return array
+     */
     public function getDigestArray(): array
     {
         return explode(separator: '=', string: $this->contentDigest, limit: 2);

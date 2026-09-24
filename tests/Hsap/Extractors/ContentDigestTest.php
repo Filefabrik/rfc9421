@@ -39,4 +39,13 @@ final class ContentDigestTest extends TestCase
         $digestArray = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getDigestArray();
         $this->assertEquals(['sha-256', ':tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:'], $digestArray);
     }
+
+    /**
+     * @return void
+     */
+    public function testValidateExtraction(): void
+    {
+        $validation = new ContentDigest('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc:')->validateExtraction();
+        $this->assertFalse($validation);
+    }
 }
