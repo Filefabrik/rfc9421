@@ -71,7 +71,7 @@ final class SignatureParams
     {
         // ensure leading @
         if (!str_starts_with($derivedComponentName, '@')) {
-            throw new InvalidDerivedKeyException('Derived component name must start with "@"');
+            throw InvalidDerivedKeyException::invalidDerivedKey();
         }
 
         return $this->addIfNotExists($derivedComponentName);
@@ -86,9 +86,7 @@ final class SignatureParams
     {
         $name = strtolower($name);
         if ($this->exists($name)) {
-            throw new AlreadySetException(
-                sprintf('Signature-Input parameter "%s" was set before and can not be set again.', $name),
-            );
+            throw AlreadySetException::inputSignature($name);
         }
         $this->signatureParameters[] = $name;
 

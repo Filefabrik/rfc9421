@@ -9,9 +9,9 @@ use Psr\Http\Message\MessageInterface;
 /**
  * fixed methods to extract header lines from Message-Interface
  */
-final class HeaderHelper
+final readonly class HeaderHelper
 {
-    public function __construct(public private(set) readonly MessageInterface $message)
+    public function __construct(public private(set) MessageInterface $message)
     {
     }
 

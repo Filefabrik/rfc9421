@@ -8,7 +8,6 @@ use Filefabrik\Hsap\Exceptions\ContentDigestException;
 
 /**
  * handles the ContentDigest Verify Process
- * Todo separate testing
  */
 final class VerifyContentDigest
 {

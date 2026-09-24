@@ -6,6 +6,9 @@ namespace Filefabrik\Hsap\Exceptions;
 
 use Exception;
 
+/**
+ * @codeCoverageIgnore
+ */
 final class SignatureExtractionException extends Exception
 {
 
