@@ -9,13 +9,17 @@ use Filefabrik\Hsap\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Hsap\Extractors\HeaderSignature;
 use Filefabrik\Hsap\SigningConfiguration;
 
-final class PrepareSignatureKeyName
+/**
+ * extracts from the ['signature'=>']
+ */
+final readonly class PrepareSignatureKeyName
 {
     public function __construct(
         public private(set) SigningConfiguration $signingConfiguration,
         public private(set) ?HeaderSignature $headerSignatureExtractor = null,
     ) {
     }
+
     /**
      * Handling the signature key extraction process
      *
@@ -30,8 +34,10 @@ final class PrepareSignatureKeyName
                 // todo works if only one signature-input and only one signature
                 // todo check more then one
                 $signatureKeyName = $this->headerSignatureExtractor->extractSignatureNameKey();
+                // @codeCoverageIgnoreStart
             } catch (Exception) {
                 throw VerifyHeaderSignatureException::keynameNotExtracted();
+                // @codeCoverageIgnoreEnd
             }
             /**
              * extracted signature key from the "signature" which is the key for extracting the "components" and the "metadata"
