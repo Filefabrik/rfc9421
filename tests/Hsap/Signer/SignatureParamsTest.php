@@ -36,6 +36,20 @@ final class SignatureParamsTest extends TestCase
     }
 
     /**
+     * @covers \Filefabrik\Hsap\Signer\SignatureParams::fromArray
+     */
+    public function testFromArray(): void
+    {
+        $arr      = ['testname', '@test-derived-component', '@testname', 'content-test'];
+        $instance = SignatureParams::fromArray($arr);
+
+        $this->assertSame(
+            ['testname', '@test-derived-component', '@testname', 'content-test',],
+            $instance->getSignatureParameters(),
+        );
+    }
+
+    /**
      * @covers \Filefabrik\Hsap\Signer\SignatureParams::getSignatureParameters
      * @return void
      * @throws AlreadySetException
