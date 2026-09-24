@@ -16,14 +16,14 @@ final class MetadataTest extends TestCase
     {
         $now    = new DateTime()->getTimestamp();
         $string =
-            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-alg";tag="my-tag"';
+            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-algorithm";tag="my-tag"';
 
         $expectation = [
             'created' => $now,
             'expires' => $now,
             'nonce'   => 'my-nonce',
             'keyid'   => 'my-keyid',
-            'alg'     => 'my-alg',
+            'alg'     => 'my-algorithm',
             'tag'     => 'my-tag',
         ];
 
@@ -37,7 +37,7 @@ final class MetadataTest extends TestCase
         $this->expectExceptionObject(new \InvalidArgumentException('Invalid segment: nonce=="my-nonce". Expects "key=value"'));
         $now    = new DateTime()->getTimestamp();
         $string =
-            'created='.$now.';'.'expires='.$now.';'.'nonce=="my-nonce";keyid="my-keyid";alg="my-alg";tag="my-tag"';
+            'created='.$now.';'.'expires='.$now.';'.'nonce=="my-nonce";keyid="my-keyid";algorithm="my-algorithm";tag="my-tag"';
 
         Metadata::stringToMetadata($string);
     }
@@ -47,7 +47,7 @@ final class MetadataTest extends TestCase
         $this->expectExceptionObject(new \InvalidArgumentException('Key was already set before segment: nonce.'));
         $now    = new DateTime()->getTimestamp();
         $string =
-            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-alg";tag="my-tag";nonce="my-nonce"';
+            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";algorithm="my-algorithm";tag="my-tag";nonce="my-nonce"';
 
         Metadata::stringToMetadata($string);
     }
