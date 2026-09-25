@@ -15,4 +15,9 @@ final class ContentDigestException extends \Exception
     {
         return new self('Body was tempered');
     }
+
+    public static function hashAlgoNotSupported(string $alg): self
+    {
+        return new self(sprintf('Hash algorithm "%s" for the content-digest not supported.', $alg));
+    }
 }
