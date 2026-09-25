@@ -57,7 +57,7 @@ final class VerifyTest extends TestCase
                       ->mustSignBody()
 
             //->withAlg('sha512')
-                      ->withAlgorithm($algo)
+                      ->withSigningAlgorithm($algo)
                       ->withCreated($currentDateTime)
                       ->withExpires($currentDateTime + 7200)
                       ->withTag('mastodon')
@@ -131,7 +131,7 @@ final class VerifyTest extends TestCase
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
 
-        $this->assertEquals(1, $verifier->validate());
+        $this->assertEquals(1, $verifier->verifying());
     }
     /**
      * @throws InvalidHeaderKeyException
@@ -166,7 +166,7 @@ final class VerifyTest extends TestCase
                       ->mustSignBody(false)
 
             //->withAlg('sha512')
-                      ->withAlgorithm($algo)
+                      ->withSigningAlgorithm($algo)
                       ->withCreated($currentDateTime)
                       ->withExpires($currentDateTime + 7200)
                       ->withTag('mastodon')
@@ -240,7 +240,7 @@ final class VerifyTest extends TestCase
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
 
-        $this->assertEquals(1, $verifier->validate());
+        $this->assertEquals(1, $verifier->verifying());
     }
 
     public function testValidateThrowMissingSignature(): void
@@ -252,7 +252,7 @@ final class VerifyTest extends TestCase
             headers: [
             ],
         );
-        new Verify($r)->validate();
+        new Verify($r)->verifying();
     }
 
     public function testValidateThrowMissingSignatureInput(): void
@@ -265,7 +265,7 @@ final class VerifyTest extends TestCase
                 'signature' => 'test=:crypt:',
             ],
         );
-        new Verify($r)->validate();
+        new Verify($r)->verifying();
     }
 
     public function testValidateThrowHeaderKeyName(): void
@@ -282,7 +282,7 @@ final class VerifyTest extends TestCase
             ],
         );
         $instance = new Verify($r);
-        $instance->validate();
+        $instance->verifying();
     }
     /**
      * todo with tampered body
@@ -320,7 +320,7 @@ final class VerifyTest extends TestCase
                       ->mustSignBody()
 
             //->withAlg('sha512')
-                      ->withAlgorithm($algo)
+                      ->withSigningAlgorithm($algo)
                       ->withCreated($currentDateTime)
                       ->withExpires($currentDateTime + 7200)
                       ->withTag('mastodon')
@@ -394,6 +394,6 @@ final class VerifyTest extends TestCase
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
 
-        $this->assertEquals(false, $verifier->validate());
+        $this->assertEquals(false, $verifier->verifying());
     }
 }

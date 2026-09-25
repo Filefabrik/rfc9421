@@ -66,7 +66,7 @@ final class Verify
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      */
-    public function validate(): false|int
+    public function verifying(): false|int
     {
         if (!$this->preparedVerifier) {
             $this->prepareVerify();
@@ -191,15 +191,24 @@ final class Verify
     /**
      *
      * @return bool
+     * @throws ContentDigestException
      */
     private function validateContentDigest(): bool
     {
-        return new VerifyContentDigest(
+        $verifyInstance = new VerifyContentDigest(
             $this->headerHelper->getContentDigestLine(),
             (string)$this->message->getBody(),
-        )->verify();
-        // no validation of the body
+        );
+        if ($verified = $verifyInstance->verify()) {
+            // rebind the extracted php hash-algo
+            // later in verify process, during rebuild the content-digest the algo is needed
+            $this->signingConfiguration->setContentDigestHashAlgo(
+                contentDigestHashAlgo: $verifyInstance->contentDigestVerifier->phpAlgorithm,
+            );
+        }
 
+        // no validation of the body
+        return $verified;
     }
 
     /**
