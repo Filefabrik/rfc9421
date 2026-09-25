@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap;
 
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
+use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\Signer\Metadata;
 use Filefabrik\Hsap\Signer\SignatureParams;
+use Filefabrik\Hsap\Support\DigestAlgo;
 use Filefabrik\Hsap\Support\PrepareComponentMethodsTrait;
 use Filefabrik\Hsap\Support\PrivatePemTrait;
 use Filefabrik\Hsap\Support\PublicPemTrait;
@@ -42,6 +44,13 @@ final class SigningConfiguration
      * @var string|null
      */
     public private(set) ?string $signatureKeyName = null;
+
+    /**
+     * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
+     *
+     * @var string|null
+     */
+    public private(set) ?string $contentDigestHashAlgo = null;
 
     public function __construct(
         public private(set) readonly Metadata $metadata = new Metadata(),
@@ -95,7 +104,14 @@ final class SigningConfiguration
         return $this;
     }
 
-    public function withAlgorithm(?string $algorithm): self
+    /**
+     * Signing algorithm valid for metadata
+     *
+     * @param string|null $algorithm
+     *
+     * @return $this
+     */
+    public function withSigningAlgorithm(?string $algorithm): self
     {
         $this->metadata->setAlg($algorithm);
 
@@ -138,4 +154,26 @@ final class SigningConfiguration
         return $this;
     }
 
+    /**
+     * Hashing the content-digest|body
+     *
+     * @return string
+     */
+    public function getContentDigestHashAlgo(): string
+    {
+        return $this->contentDigestHashAlgo ??= 'sha256';
+    }
+
+    /**
+     * @param string|null $contentDigestHashAlgo
+     *
+     * @return self
+     * @throws ContentDigestException
+     */
+    public function setContentDigestHashAlgo(?string $contentDigestHashAlgo): self
+    {
+        $this->contentDigestHashAlgo = DigestAlgo::validateContentDigestHashAlgo($contentDigestHashAlgo);
+
+        return $this;
+    }
 }

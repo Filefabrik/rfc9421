@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Signer;
 
+use Filefabrik\Hsap\Exceptions\ContentDigestException;
+use Filefabrik\Hsap\Support\DigestAlgo;
+
 /**
  * After setting all relevant parameters/body sign the body for header["content-digest"]
  *
  * @todo check algos available
  */
-final readonly class SignBody
+final class SignBody
 {
     public function __construct(
-        public private(set) string $body,
-        /**
-         * todo handle internal php and public algo name IANA/RFC
-         */
-        public private(set) string $algorithm,
+        public private(set) readonly string $body,
+        public private(set) string $algorithm {
+            /**
+             * @throws ContentDigestException
+             */
+            set => $this->algorithm = DigestAlgo::validateContentDigestHashAlgo($value);
+        },
     ) {
     }
 

@@ -82,6 +82,7 @@ final class SignaturBase
 
     /**
      * Handle the body signing
+     * Todo create a extra config for the digest-hash
      *
      * @return array
      */
@@ -91,7 +92,7 @@ final class SignaturBase
             // set the body digest into the header
             [$headerKey, $value] = new SignBody(
                 body     : (string)$this->message->getBody(),
-                algorithm: $this->configuration->metadata->alg,
+                algorithm: $this->configuration->getContentDigestHashAlgo(),
             )->getContentDigestHeaderArray();
 
             /**
