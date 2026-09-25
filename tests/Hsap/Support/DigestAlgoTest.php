@@ -19,7 +19,8 @@ final class DigestAlgoTest extends TestCase
             ['sha256' => 'sha256'],
             ['sha-256' => 'sha256'],
             ['sha512' => 'sha512'],
-            ['sha-512' => 'sha512'],
+            ['sha-512' => 'sha512',],
+            [null => null],
         ];
     }
 
