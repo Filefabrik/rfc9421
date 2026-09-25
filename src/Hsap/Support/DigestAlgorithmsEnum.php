@@ -25,9 +25,7 @@ enum DigestAlgorithmsEnum: string
             return $key;
         }
 
-        return
-            array_find(self::cases(), fn($case) => $case->name === $key) ??
-            array_find(self::cases(), fn($case) => $case->value === $key);
+        return array_find(self::cases(), fn($case) => $case->name === $key || $case->value === $key);
     }
 
     /**
