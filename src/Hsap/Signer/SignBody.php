@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap\Signer;
 
 use Filefabrik\Hsap\Exceptions\ContentDigestException;
-use Filefabrik\Hsap\Support\DigestAlgo;
+use Filefabrik\Hsap\Support\DigestAlgorithmsEnum;
 
 /**
  * After setting all relevant parameters/body sign the body for header["content-digest"]
@@ -16,11 +16,11 @@ final class SignBody
 {
     public function __construct(
         public private(set) readonly string $body,
-        public private(set) string $algorithm {
+        public private(set) DigestAlgorithmsEnum|string $algorithm {
             /**
              * @throws ContentDigestException
              */
-            set => $this->algorithm = DigestAlgo::validateContentDigestHashAlgo($value);
+            set => $this->algorithm = DigestAlgorithmsEnum::isOwnTypeOrThrow($value);
         },
     ) {
     }
@@ -46,7 +46,7 @@ final class SignBody
      */
     public function getContentDigest(): string
     {
-        return $this->algorithm.'=:'.$this->calculateSignature().':';
+        return $this->algorithm->getDisplayAlgorithm().'=:'.$this->calculateSignature().':';
     }
 
     /**
@@ -66,6 +66,6 @@ final class SignBody
      */
     public function hash(): string
     {
-        return hash(algo: $this->algorithm, data: $this->body, binary: true);
+        return hash(algo: $this->algorithm->getPhpAlgorithm(), data: $this->body, binary: true);
     }
 }

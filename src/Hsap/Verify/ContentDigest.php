@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap\Verify;
 
 use Filefabrik\Hsap\Signer\SignBody;
+use Filefabrik\Hsap\Support\DigestAlgorithmsEnum;
 
 /**
  * Validate the content-digest against tempering
@@ -35,7 +36,7 @@ final readonly class ContentDigest
     {
         $reCalculatedSignature = new SignBody(
             body     : $this->body,
-            algorithm: $this->phpAlgorithm,
+            algorithm: DigestAlgorithmsEnum::isOwnTypeOrThrow($this->phpAlgorithm),
         )->calculateSignature();
 
         /**

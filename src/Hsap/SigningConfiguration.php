@@ -10,7 +10,7 @@ use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\Signer\Metadata;
 use Filefabrik\Hsap\Signer\SignatureParams;
-use Filefabrik\Hsap\Support\DigestAlgo;
+use Filefabrik\Hsap\Support\DigestAlgorithmsEnum;
 use Filefabrik\Hsap\Support\PrepareComponentMethodsTrait;
 use Filefabrik\Hsap\Support\PrivatePemTrait;
 use Filefabrik\Hsap\Support\PublicPemTrait;
@@ -48,9 +48,9 @@ final class SigningConfiguration
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      *
-     * @var string|null
+     * @var null|DigestAlgorithmsEnum
      */
-    public private(set) ?string $contentDigestHashAlgo = null;
+    public private(set) ?DigestAlgorithmsEnum $contentDigestHashAlgo = null;
 
     public function __construct(
         public private(set) readonly Metadata $metadata = new Metadata(),
@@ -157,22 +157,24 @@ final class SigningConfiguration
     /**
      * Hashing the content-digest|body
      *
-     * @return string
+     * @return DigestAlgorithmsEnum
+     * @throws ContentDigestException
      */
-    public function getContentDigestHashAlgo(): string
+    public function getContentDigestHashAlgo(): DigestAlgorithmsEnum
     {
-        return $this->contentDigestHashAlgo ??= 'sha256';
+        return $this->contentDigestHashAlgo ??= DigestAlgorithmsEnum::isOwnTypeOrThrow('sha256');
     }
 
     /**
-     * @param string|null $contentDigestHashAlgo
+     * @param string|DigestAlgorithmsEnum|null $contentDigestHashAlgo
      *
      * @return self
      * @throws ContentDigestException
      */
-    public function setContentDigestHashAlgo(?string $contentDigestHashAlgo): self
+    public function setContentDigestHashAlgo(null|string|DigestAlgorithmsEnum $contentDigestHashAlgo): self
     {
-        $this->contentDigestHashAlgo = DigestAlgo::validateContentDigestHashAlgo($contentDigestHashAlgo);
+        $this->contentDigestHashAlgo = null === $contentDigestHashAlgo ? null :
+            DigestAlgorithmsEnum::isOwnTypeOrThrow($contentDigestHashAlgo);
 
         return $this;
     }

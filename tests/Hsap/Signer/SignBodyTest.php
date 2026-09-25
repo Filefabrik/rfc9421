@@ -17,7 +17,7 @@ final class SignBodyTest extends TestCase
         $body = json_encode($arr);
         $sig  = new SignBody($body, 'sha512')->getContentDigest();
         $this->assertSame(
-            'sha512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
+            'sha-512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
             $sig,
         );
     }
@@ -41,7 +41,7 @@ final class SignBodyTest extends TestCase
         $this->assertSame(
             [
                 'content-digest',
-                'sha512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
+                'sha-512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
             ],
             $sig,
         );
