@@ -6,8 +6,14 @@ namespace Filefabrik\Hsap\Support;
 
 use Filefabrik\Hsap\Exceptions\ContentDigestException;
 
+/**
+ * Body Signer digest hash handler
+ */
 enum DigestAlgorithmsEnum: string
 {
+    /*
+     * case is the php algo, the string value is used for prefixing sha-256=:tFdB/EN.....=: or sha-512=:tFdB/EN.....=:
+     */
     case sha256 = 'sha-256';
     case sha512 = 'sha-512';
 
