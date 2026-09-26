@@ -196,8 +196,8 @@ final class Verify
     private function validateContentDigest(): bool
     {
         $verifyInstance = new VerifyContentDigest(
-            $this->headerHelper->getContentDigestLine(),
-            (string)$this->message->getBody(),
+            contentDigest: $this->headerHelper->getContentDigestLine(),
+            body         : (string)$this->message->getBody(),
         );
         if ($verified = $verifyInstance->verify()) {
             // rebind the extracted php hash-algo

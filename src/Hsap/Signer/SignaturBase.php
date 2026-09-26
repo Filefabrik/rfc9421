@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Signer;
 
+use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\SigningConfiguration;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
@@ -41,6 +42,7 @@ final class SignaturBase
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
      * @return array
+     * @throws ContentDigestException
      */
     public function createSignatureLines(): array
     {
@@ -65,6 +67,7 @@ final class SignaturBase
      * @param PrepareComponents $components
      *
      * @return array
+     * @throws ContentDigestException
      */
     private function createSignatureLine(string $signatureParam, PrepareComponents $components): array
     {
@@ -85,6 +88,7 @@ final class SignaturBase
      * Todo create a extra config for the digest-hash
      *
      * @return array
+     * @throws ContentDigestException
      */
     private function handleSignBody(): array
     {
