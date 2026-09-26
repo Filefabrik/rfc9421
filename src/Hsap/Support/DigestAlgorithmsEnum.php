@@ -11,6 +11,8 @@ use Filefabrik\Hsap\Exceptions\ContentDigestException;
  */
 enum DigestAlgorithmsEnum: string
 {
+    use EnumSupportTrait;
+
     /*
      * case is the php algo, the string value is used for prefixing sha-256=:tFdB/EN.....=: or sha-512=:tFdB/EN.....=:
      */
@@ -23,15 +25,6 @@ enum DigestAlgorithmsEnum: string
     public static function isOwnTypeOrThrow(self|string|null $key): self
     {
         return self::isOwnType($key) ?? throw ContentDigestException::hashAlgoNotSupported($key);
-    }
-
-    public static function isOwnType(self|string|null $key): ?self
-    {
-        if ($key instanceof self) {
-            return $key;
-        }
-
-        return array_find(self::cases(), fn($case) => $case->name === $key || $case->value === $key);
     }
 
     /**
