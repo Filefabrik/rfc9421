@@ -12,7 +12,7 @@ final class CertHelper
 
     public function getPrivatPemContent(): false|string
     {
-        $fname = $this->name.'-privat.pem';
+        $fname = $this->name.'-private.pem';
         $path  = $this->getDir().$fname;
 
         return $this->getFC($path);

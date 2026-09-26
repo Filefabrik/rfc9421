@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap;
 
+use Filefabrik\Hsap\Cryptography\SignatureRegistry;
+use Filefabrik\Hsap\Cryptography\SigningEnum;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
+use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Hsap\Exceptions\SignatureException;
 use Filefabrik\Hsap\Signer\SignaturBase;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -47,13 +51,7 @@ final class Signer
     /**
      * Helper for verify
      *
-     * @param RequestInterface     $message
-     * @param SigningConfiguration $signingConfiguration
-     *
-     * @return self
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
+     * @throws ContentDigestException
      */
     public static function getPreparedSigning(
         RequestInterface $message,
@@ -72,9 +70,7 @@ final class Signer
     /**
      * für das verify auch verwenden
      *
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
+     * @throws ContentDigestException
      */
     public function prepareSigning(): void
     {
@@ -97,10 +93,11 @@ final class Signer
     }
 
     /**
-     * @return MessageInterface
      * @throws AlreadySetException
+     * @throws ContentDigestException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
+     * @throws SignatureException
      */
     public function sign(): MessageInterface
     {
@@ -127,19 +124,17 @@ final class Signer
      * @param $signingParametersString
      *
      * @return string
+     * @throws SignatureException
      */
     public function crypt($signingParametersString): string
     {
-        $private_key_resource = openssl_pkey_get_private($this->signingConfiguration->privatePem);
+        $signature = SignatureRegistry::signing(
+            signingEnumInterface: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
+            signingDatas        : $signingParametersString,
+            privateKey          : $this->signingConfiguration->privatePem,
+        );
 
-        $signature = '';
-        // todo mapper
-        $algo      = ('sha256' === $this->signingConfiguration->metadata->alg) ? OPENSSL_ALGO_SHA256 : OPENSSL_ALGO_SHA512;
-        if (openssl_sign($signingParametersString, $signature, $private_key_resource, $algo)) {
-            $this->base64_signature = base64_encode($signature);
-        } else {
-            throw new UnexpectedValueException('Error signing data: '.openssl_error_string());
-        }
+        $this->base64_signature = base64_encode($signature);
 
         return $this->makeSignatureString($this->base64_signature);
     }

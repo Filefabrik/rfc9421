@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap;
 
+use Filefabrik\Hsap\Cryptography\SignatureRegistry;
+use Filefabrik\Hsap\Cryptography\SigningEnum;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
@@ -34,11 +36,11 @@ final class Verify
      */
     public private(set) ?Extractors\HeaderSignature $headerSignatureExtractor = null {
         get => $this->headerSignatureExtractor ??= new Extractors\HeaderSignature(
-            $this->headerHelper->getSignatureLine(),
+            signatureString: $this->headerHelper->getSignatureLine(),
         );
     }
     public private(set) ?HeaderHelper               $headerHelper             = null {
-        get => $this->headerHelper ??= new HeaderHelper($this->message);
+        get => $this->headerHelper ??= new HeaderHelper(message: $this->message);
     }
     private bool                                    $preparedVerifier         = false;
     private ?HeaderSignatureInput                   $signatureInputInstance   = null;
@@ -59,14 +61,14 @@ final class Verify
     /**
      * Main method to validate
      *
-     * @return false|int
+     * @return bool
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      * @throws VerifyHeaderSignatureException
      * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
+     * @throws InvalidDerivedKeyException|Exceptions\SignatureException
      */
-    public function verifying(): false|int
+    public function verifying(): bool
     {
         if (!$this->preparedVerifier) {
             $this->prepareVerify();
@@ -82,18 +84,14 @@ final class Verify
         $signer = $this->getSigner();
 
         // base_decoded signature to get binary
-        $sig         = $this->headerSignatureExtractor->getBinarySignatureValue();
-        $signerDatas = [
-            'data'       => $signer->signingParametersString,
-            'signature'  => $sig,
-            'public_key' => $this->signingConfiguration->getPublicPem(),
-            'algorithm'  => $this->signingConfiguration->metadata->alg,
-        ];
+        $sig = $this->headerSignatureExtractor->getBinarySignatureValue();
 
-        // todo give back validated data
-
-        // now create the compare hash from publicPem
-        $verified = openssl_verify(...$signerDatas);
+        $verified = SignatureRegistry::verifying(
+            signingEnum: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
+            data       : $signer->signingParametersString,
+            signature  : $sig,
+            publicKey  : $this->signingConfiguration->getPublicPem(),
+        );
 
         if ($verified) {
             // getting back validated parameters non-tempered parameters
@@ -215,6 +213,7 @@ final class Verify
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
+     * @throws ContentDigestException
      */
     private function getSigner(): Signer
     {

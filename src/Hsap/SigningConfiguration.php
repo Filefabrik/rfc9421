@@ -106,6 +106,7 @@ final class SigningConfiguration
 
     /**
      * Signing algorithm valid for metadata
+     * todo with interface
      *
      * @param string|null $algorithm
      *
