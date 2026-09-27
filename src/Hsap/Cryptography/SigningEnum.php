@@ -25,6 +25,10 @@ enum SigningEnum: string implements SigningEnumInterfaceAlias
      * 3.3.2. RSASSA-PKCS1-v1_5 Using SHA-256
      * rsa-v1_5-sha256
      *
+     * @see https://www.rfc-editor.org/rfc/rfc9421.html#name-rsassa-pkcs1-v1_5-using-sha
+     *
+     * Mastodon
+     * @see https://docs.joinmastodon.org/spec/security/#http-message-signatures
      */
     case rsa_v_1_5_sha_256 = 'rsa-v1_5-sha256';
     /* not in rfc */
