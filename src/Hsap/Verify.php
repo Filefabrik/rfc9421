@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap;
 
-use Filefabrik\Hsap\Cryptography\SignatureRegistry;
 use Filefabrik\Hsap\Cryptography\SigningEnum;
+use Filefabrik\Hsap\Cryptography\VerifyRegistry;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
@@ -86,7 +86,7 @@ final class Verify
         // base_decoded signature to get binary
         $sig = $this->headerSignatureExtractor->getBinarySignatureValue();
 
-        $verified = SignatureRegistry::verifying(
+        $verified = VerifyRegistry::verifying(
             signingEnum: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
             data       : $signer->signingParametersString,
             signature  : $sig,

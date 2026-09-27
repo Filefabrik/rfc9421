@@ -10,7 +10,7 @@ use Filefabrik\Hsap\Interfaces\SigningEnumInterface;
 use UnexpectedValueException;
 
 /**
- * Holds Signing and Verify Map
+ * Holds Signing-Algorithms and executes a SigningAlgorithm
  */
 final class SignatureRegistry
 {
@@ -20,13 +20,6 @@ final class SignatureRegistry
      * @var array
      */
     private static array $signing = [];
-
-    /**
-     * Map Verifying Methods
-     *
-     * @var array
-     */
-    private static array $verifying = [];
 
     /**
      * @throws SignatureException
@@ -50,25 +43,6 @@ final class SignatureRegistry
     /**
      * @throws SignatureException
      */
-    public static function registerVerifyingMethods(array $verifyingMethods): void
-    {
-        foreach ($verifyingMethods as $key => $verifyingMethod) {
-            self::registerVerifying(signingEnumTrait: $key, closure: $verifyingMethod);
-        }
-    }
-
-    /**
-     * @throws SignatureException
-     */
-    public static function registerVerifying(string|SigningEnum $signingEnumTrait, Closure $closure): void
-    {
-        self::$verifying[SigningEnum::isOwnTypeOrThrow($signingEnumTrait)
-                                    ->getName()] = $closure;
-    }
-
-    /**
-     * @throws SignatureException
-     */
     public static function signing(
         string|SigningEnumInterface $signingEnumInterface,
         string $signingDatas,
@@ -85,28 +59,6 @@ final class SignatureRegistry
         }
 
         throw new UnexpectedValueException('signing method for "'.$enum->getName().'" not callable.');
-    }
-
-    /**
-     * @throws SignatureException
-     */
-    public static function verifying(
-        string|SigningEnumInterface $signingEnum,
-        string $data,
-        string $signature,
-        string $publicKey,
-    ) {
-        $enum = SigningEnum::isOwnTypeOrThrow($signingEnum);
-
-        $method = self::$verifying[$enum->getName()] ?? throw new UnexpectedValueException(
-            'Verify-Method for "'.$enum->getName().'" not registered.',
-        );
-
-        if ($method instanceof Closure) {
-            return $method($data, $signature, $publicKey);
-        }
-
-        throw new UnexpectedValueException('verifying method for "'.$enum->getName().'" not callable.');
     }
 
 }
