@@ -108,11 +108,11 @@ final class SigningConfiguration
      * Signing algorithm valid for metadata
      * todo with interface
      *
-     * @param string|null $algorithm
+     * @param null|string $algorithm
      *
      * @return $this
      */
-    public function withSigningAlgorithm(?string $algorithm): self
+    public function withSigningAlgorithm(null|string $algorithm): self
     {
         $this->metadata->setAlg($algorithm);
 
