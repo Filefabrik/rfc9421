@@ -15,11 +15,23 @@ trait EnumSupportTrait
         return array_find(self::cases(), fn($case) => $case->name === $key || $case->value === $key);
     }
 
+    /**
+     * Interfaced Method
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
-    public function getValue(): string{
+
+    /**
+     * Interfaced Method
+     *
+     * @return string
+     */
+    public function getValue(): string
+    {
         return $this->value;
     }
 }
