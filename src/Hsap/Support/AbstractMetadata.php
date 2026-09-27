@@ -51,11 +51,10 @@ abstract class AbstractMetadata
      * The algorithm used to create the signature (e.g., rsa-pss-sha512)
      *
      * @todo define possible algo's based up the current php installation capabilities
-     * @todo make getter for the php algos
      * @see  /docs/iana-rfc9421/signature-algorithms.csv
-     * @var string|null
+     * @var null|string
      */
-    public private(set) string|null $alg = null;
+    public private(set) null|string $alg = null;
 
     /**
      * Application-specific identifier
