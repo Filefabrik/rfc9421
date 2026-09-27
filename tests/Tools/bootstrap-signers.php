@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Filefabrik\Hsap\Cryptography\SignatureRegistry;
 use Filefabrik\Hsap\Cryptography\SigningEnum;
+use Filefabrik\Hsap\Cryptography\VerifyRegistry;
 use phpseclib4\Crypt\RSA;
 
 require_once dirname(__DIR__, 2).'/vendor/autoload.php';
@@ -35,13 +36,13 @@ $signingRsa512 = function(string $signingDatas, $privateKeyPem) {
     ;
 };
 
-$signingMethods = [
+$signingMethodsRsaPhpSeclib4 = [
     SigningEnum::rsa_v_1_5_sha_256->name => $signingRsa256,
     SigningEnum::rsa_v_1_5_sha_384->name => $signingRsa384,
     SigningEnum::rsa_v_1_5_sha_512->name => $signingRsa512,
 ];
 
-SignatureRegistry::registerSigningMethods(signingMethods: $signingMethods);
+SignatureRegistry::registerSigningMethods(signingMethods: $signingMethodsRsaPhpSeclib4);
 
 /**
  * Verifier config
@@ -65,10 +66,10 @@ $verifyRsa512 = function(string $signingDatas, $signature, $publicKeyPem) {
     ;
 };
 
-$verifierMethods = [
+$verifierMethodsRsaPhpSeclib4 = [
     SigningEnum::rsa_v_1_5_sha_256->name => $verifyRsa256,
     SigningEnum::rsa_v_1_5_sha_384->name => $verifyRsa384,
     SigningEnum::rsa_v_1_5_sha_512->name => $verifyRsa512,
 ];
 
-SignatureRegistry::registerVerifyingMethods(verifyingMethods: $verifierMethods);
+VerifyRegistry::registerVerifyingMethods(verifyingMethods: $verifierMethodsRsaPhpSeclib4);
