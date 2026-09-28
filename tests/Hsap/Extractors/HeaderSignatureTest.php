@@ -93,4 +93,10 @@ final class HeaderSignatureTest extends TestCase
         $s = $headerSignatureInstance->extractSignatureString();
         self::assertEquals([], $s);
     }
+
+    public function testGetBinarySignatureValue()
+    {
+        //todo not clear, test deeper
+       $this->doesNotPerformAssertions();
+    }
 }

@@ -9,6 +9,7 @@ use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\Exceptions\SignatureException;
+use Filefabrik\Hsap\Interfaces\SigningEnumInterface;
 use Filefabrik\Hsap\Signer\Metadata;
 use Filefabrik\Hsap\Signer\SignatureParams;
 use Filefabrik\Hsap\Support\DigestAlgorithmsEnum;
@@ -107,14 +108,13 @@ final class SigningConfiguration
 
     /**
      * Signing algorithm valid for metadata
-     * todo with interface
      *
-     * @param null|string $algorithm
+     * @param null|string|SigningEnumInterface $algorithm
      *
      * @return $this
      * @throws SignatureException
      */
-    public function withSigningAlgorithm(null|string $algorithm): self
+    public function withSigningAlgorithm(null|string|SigningEnumInterface $algorithm): self
     {
         $this->metadata->setAlg($algorithm);
 
