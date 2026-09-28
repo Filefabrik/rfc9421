@@ -111,7 +111,7 @@ final class MetadataTest extends TestCase
 
     public function testSetAlg(): void
     {
-        $this->assertEquals(SigningEnum::ecdsa_p_5_sha_512, new Metadata()->setAlg('ecdsa_p_5_sha_512')->alg);
+        $this->assertEquals(SigningEnum::ecdsa_p_512_sha_512, new Metadata()->setAlg('ecdsa_p_512_sha_512')->alg);
     }
 
     public function testSetNonce(): void

@@ -24,7 +24,7 @@ final class SigningEnumTest extends TestCase
             [SigningEnum::hmac_sha_512],
             [SigningEnum::ecdsa_p_256_sha_256],
             [SigningEnum::ecdsa_p_384_sha_384],
-            [SigningEnum::ecdsa_p_5_sha_512],
+            [SigningEnum::ecdsa_p_512_sha_512],
             [SigningEnum::ed25519],
             ['rsa_pss_sha512', SigningEnum::rsa_pss_sha512],
             ['rsa_v_1_5_sha_256', SigningEnum::rsa_v_1_5_sha_256],
@@ -35,7 +35,7 @@ final class SigningEnumTest extends TestCase
             ['hmac_sha_512', SigningEnum::hmac_sha_512],
             ['ecdsa_p_256_sha_256', SigningEnum::ecdsa_p_256_sha_256],
             ['ecdsa_p_384_sha_384', SigningEnum::ecdsa_p_384_sha_384],
-            ['ecdsa_p_5_sha_512', SigningEnum::ecdsa_p_5_sha_512],
+            ['ecdsa_p_512_sha_512', SigningEnum::ecdsa_p_512_sha_512],
             ['ed25519', SigningEnum::ed25519],
 
             ['rsa-pss-sha512', SigningEnum::rsa_pss_sha512],
@@ -47,7 +47,7 @@ final class SigningEnumTest extends TestCase
             ['hmac-sha512', SigningEnum::hmac_sha_512],
             ['ecdsa-p256-sha256', SigningEnum::ecdsa_p_256_sha_256],
             ['ecdsa-p384-sha384', SigningEnum::ecdsa_p_384_sha_384],
-            ['ecdsa-p5sha512', SigningEnum::ecdsa_p_5_sha_512],
+            ['ecdsa-p512-sha512', SigningEnum::ecdsa_p_512_sha_512],
             ['ed25519', SigningEnum::ed25519],
 
         ];
@@ -67,12 +67,12 @@ final class SigningEnumTest extends TestCase
 
     public function testGetName(): void
     {
-        $this->assertSame('ecdsa_p_5_sha_512', SigningEnum::ecdsa_p_5_sha_512->getName());
+        $this->assertSame('ecdsa_p_512_sha_512', SigningEnum::ecdsa_p_512_sha_512->getName());
     }
 
     public function testGetValue(): void
     {
-        $this->assertSame('ecdsa-p5sha512', SigningEnum::ecdsa_p_5_sha_512->getValue());
+        $this->assertSame('ecdsa-p512-sha512', SigningEnum::ecdsa_p_512_sha_512->getValue());
     }
 
     public function testCount(): void

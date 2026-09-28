@@ -56,7 +56,7 @@ enum SigningEnum: string implements SigningEnumInterfaceAlias
     case ecdsa_p_384_sha_384 = 'ecdsa-p384-sha384';
 
     /* not in rfc */
-    case ecdsa_p_5_sha_512 = 'ecdsa-p5sha512';
+    case ecdsa_p_512_sha_512 = 'ecdsa-p512-sha512';
     /**
      * 3.3.6. EdDSA Using Curve edwards25519
      * ed25519
