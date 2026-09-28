@@ -16,14 +16,14 @@ final class MetadataTest extends TestCase
     {
         $now    = new DateTime()->getTimestamp();
         $string =
-            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-algorithm";tag="my-tag"';
+            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="hmac_sha_512";tag="my-tag"';
 
         $expectation = [
             'created' => $now,
             'expires' => $now,
             'nonce'   => 'my-nonce',
             'keyid'   => 'my-keyid',
-            'alg'     => 'my-algorithm',
+            'alg'     => 'hmac-sha512',
             'tag'     => 'my-tag',
         ];
 

@@ -6,6 +6,7 @@ namespace Filefabrik\HsapTest\Signer;
 
 use BadMethodCallException;
 use DateTime;
+use Filefabrik\Hsap\Cryptography\SigningEnum;
 use Filefabrik\Hsap\Signer\Metadata;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,7 +24,7 @@ final class MetadataTest extends TestCase
                     'expires' => new DateTime()->getTimestamp(),
                     'nonce'   => 'my-nonce',
                     'keyid'   => 'my-keyid',
-                    'alg'     => 'my-alg',
+                    'alg'     => 'hmac-sha512',
                     'tag'     => 'my-tag',
                 ],
             'set without dates' =>
@@ -31,7 +32,7 @@ final class MetadataTest extends TestCase
 
                     'nonce' => 'my-nonce',
                     'keyid' => 'my-keyid',
-                    'alg'   => 'my-alg',
+                    'alg'   => 'hmac-sha512',
                     'tag'   => 'my-tag',
                 ],
         ];
@@ -53,13 +54,13 @@ final class MetadataTest extends TestCase
             'expires' => $now,
             'nonce'   => 'my-nonce',
             'keyid'   => 'my-keyid',
-            'alg'     => 'my-algorithm',
+            'alg'     => 'hmac_sha_512',
             'tag'     => 'my-tag',
         ])
                                ->toString()
         ;
         $this->assertEquals(
-            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="my-algorithm";tag="my-tag"',
+            'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="hmac-sha512";tag="my-tag"',
             $stringified,
         );
     }
@@ -110,7 +111,7 @@ final class MetadataTest extends TestCase
 
     public function testSetAlg(): void
     {
-        $this->assertEquals('my-algo', new Metadata()->setAlg('my-algo')->alg);
+        $this->assertEquals(SigningEnum::ecdsa_p_5_sha_512, new Metadata()->setAlg('ecdsa_p_5_sha_512')->alg);
     }
 
     public function testSetNonce(): void
