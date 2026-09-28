@@ -8,6 +8,7 @@ use Filefabrik\Hsap\Exceptions\AlreadySetException;
 use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Hsap\Exceptions\SignatureException;
 use Filefabrik\Hsap\Signer\Metadata;
 use Filefabrik\Hsap\Signer\SignatureParams;
 use Filefabrik\Hsap\Support\DigestAlgorithmsEnum;
@@ -111,6 +112,7 @@ final class SigningConfiguration
      * @param null|string $algorithm
      *
      * @return $this
+     * @throws SignatureException
      */
     public function withSigningAlgorithm(null|string $algorithm): self
     {
