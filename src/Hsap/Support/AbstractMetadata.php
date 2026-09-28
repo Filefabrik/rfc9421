@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap\Support;
 
 use BadMethodCallException;
+use Filefabrik\Hsap\Cryptography\SigningEnumsRegistry;
+use Filefabrik\Hsap\Exceptions\SignatureException;
+use Filefabrik\Hsap\Interfaces\SigningEnumInterface;
 
 abstract class AbstractMetadata
 {
@@ -52,9 +55,9 @@ abstract class AbstractMetadata
      *
      * @todo define possible algo's based up the current php installation capabilities
      * @see  /docs/iana-rfc9421/signature-algorithms.csv
-     * @var null|string
+     * @var null|SigningEnumInterface
      */
-    public private(set) null|string $alg = null;
+    public private(set) null|SigningEnumInterface $alg = null;
 
     /**
      * Application-specific identifier
@@ -91,7 +94,7 @@ abstract class AbstractMetadata
             $metadata['keyid'] = $this->keyid;
         }
         if ($this->alg) {
-            $metadata['alg'] = $this->alg;
+            $metadata['alg'] = $this->alg->getValue();
         }
         if ($this->tag) {
             $metadata['tag'] = $this->tag;
@@ -128,9 +131,12 @@ abstract class AbstractMetadata
         return $this;
     }
 
-    public function setAlg(?string $alg): static
+    /**
+     * @throws SignatureException
+     */
+    public function setAlg(string|SigningEnumInterface $alg): static
     {
-        $this->alg = $alg;
+        $this->alg = SigningEnumsRegistry::findEnumOrThrow($alg);
 
         return $this;
     }
