@@ -36,9 +36,9 @@ final class VerifyTest extends TestCase
     public static function withSigningMethods(): array
     {
         return [
-            [SigningEnum::rsa_v_1_5_sha_256->name, 'rsa256'],
-            [SigningEnum::rsa_v_1_5_sha_384->name, 'rsa384'],
-            [SigningEnum::rsa_v_1_5_sha_512->name, 'rsa512'],
+            [SigningEnum::rsa_v_1_5_sha_256->name, 'rsa'],
+            [SigningEnum::rsa_v_1_5_sha_384->name, 'rsa'],
+            [SigningEnum::rsa_v_1_5_sha_512->name, 'rsa'],
         ];
     }
 
