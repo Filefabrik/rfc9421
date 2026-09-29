@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Cryptography;
 
-use Filefabrik\Hsap\Exceptions\SignatureException;
-use Filefabrik\Hsap\Interfaces\SigningEnumInterface;
 use Filefabrik\Hsap\Interfaces\SigningEnumInterface as SigningEnumInterfaceAlias;
 use Filefabrik\Hsap\Support\EnumSupportTrait;
 
@@ -63,11 +61,4 @@ enum SigningEnum: string implements SigningEnumInterfaceAlias
      */
     case ed25519 = 'ed25519';
 
-    /**
-     * @throws SignatureException
-     */
-    public static function isOwnTypeOrThrow(SigningEnumInterface|string|null $key): SigningEnumInterface
-    {
-        return self::isOwnType($key) ?? throw SignatureException::signatureEnumNotFound($key);
-    }
 }
