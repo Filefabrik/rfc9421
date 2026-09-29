@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Filefabrik\HsapTest\Verify;
+
+use Filefabrik\Hsap\Verify\ContentDigest;
+use Filefabrik\Hsap\Verify\VerifyContentDigest;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(VerifyContentDigest::class)]
+final class VerifyContentDigestTest extends TestCase
+{
+    public function testVerify(): void
+    {
+        $CD   = 'sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:';
+        $body = '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}';
+
+        $verify = new VerifyContentDigest($CD, $body);
+        $this->assertTrue($verify->verify());
+    }
+
+    public function testVerifyFalse(): void
+    {
+        $CD   = 'sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:';
+        $body = '{"recipient":"Alex","amount":900000000,"text":"fdawsfsWRONG"}';
+
+        $verify = new VerifyContentDigest($CD, $body);
+        $this->assertFalse($verify->verify());
+    }
+
+    public function testPrepare(): void
+    {
+        $CD   = 'sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:';
+        $body = '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}';
+
+        $verify   = new VerifyContentDigest($CD, $body);
+        $prepared = $verify->prepare();
+
+        self::assertEquals(
+            new ContentDigest(
+                $body,
+                'sha512',
+                'ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==',
+            ),
+            $prepared,
+        );
+    }
+}

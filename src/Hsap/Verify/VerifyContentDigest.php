@@ -26,7 +26,7 @@ final class VerifyContentDigest
 
     /**
      * Re-Hash the Body-Hash from the header
-     * * 'content-digest'  => 'sha512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
+     * * 'content-digest'  => 'sha-512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
      *
      * @throws ContentDigestException
      */
