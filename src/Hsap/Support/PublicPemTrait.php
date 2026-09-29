@@ -6,6 +6,9 @@ namespace Filefabrik\Hsap\Support;
 
 use UnexpectedValueException;
 
+/**
+ * @codeCoverageIgnore
+ */
 trait PublicPemTrait
 {
     public private(set) ?string $publicPem = null;

@@ -6,6 +6,9 @@ namespace Filefabrik\Hsap\Support;
 
 use Filefabrik\Hsap\SigningConfiguration;
 
+/**
+ * @codeCoverageIgnore
+ */
 trait PrepareComponentMethodsTrait
 {
     /**
