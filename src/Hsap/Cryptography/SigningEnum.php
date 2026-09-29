@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap\Cryptography;
 
 use Filefabrik\Hsap\Interfaces\SigningEnumInterface as SigningEnumInterfaceAlias;
-use Filefabrik\Hsap\Support\EnumSupportTrait;
 
 /**
  * keys are snake cased, value as in @see https://www.rfc-editor.org/rfc/rfc9421.html
  */
 enum SigningEnum: string implements SigningEnumInterfaceAlias
 {
-    use EnumSupportTrait;
 
+    use SigningTrait;
     /**
      * 3.3.1. RSASSA-PSS Using SHA-512
      * rsa-pss-sha512
