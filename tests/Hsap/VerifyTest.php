@@ -158,7 +158,6 @@ final class VerifyTest extends TestCase
          *
          */
         $certInstance = new CertHelper($cert);
-        //       $algo             = 'sha512';
 
         $signatureKeyName = 'testing=';
         /**
