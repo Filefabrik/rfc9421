@@ -47,4 +47,17 @@ final class VerifyContentDigestTest extends TestCase
             $prepared,
         );
     }
+    /*
+     * todo testing extraction error
+
+        public function testPrepareWrongFormat(): void
+        {
+            $this->expectExceptionObject(new ContentDigestException('Wrong content digest format'));
+            $CD   = ':ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:';
+            $body = '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}';
+
+            $verify = new VerifyContentDigest($CD, $body);
+            $verify->prepare();
+        }
+    */
 }
