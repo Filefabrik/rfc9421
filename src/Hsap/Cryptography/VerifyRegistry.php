@@ -52,13 +52,13 @@ final class VerifyRegistry
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnum);
 
         $method = self::$verifying[$enum->getName()] ?? throw new UnexpectedValueException(
-            'Verify-Method for "'.$enum->getName().'" not registered.',
+            sprintf('Verify-Method for "%s" not registered.', $enum->getName()),
         );
 
         if ($method instanceof Closure) {
             return $method($data, $signature, $publicKey);
         }
 
-        throw new UnexpectedValueException('verifying method for "'.$enum->getName().'" not callable.');
+        throw new UnexpectedValueException(sprintf('Verify-Method for "%s" not callable.', $enum->getName()));
     }
 }
