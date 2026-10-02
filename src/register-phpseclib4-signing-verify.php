@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filefabrik\Hsap\Cryptography\SignatureRegistry;
 use Filefabrik\Hsap\Cryptography\SigningEnum;
 use Filefabrik\Hsap\Cryptography\VerifyRegistry;
+use phpseclib4\Crypt\EC;
 use phpseclib4\Crypt\RSA;
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
@@ -62,6 +63,12 @@ $signingMethodsRsaPhpSeclib4 = [
     SigningEnum::hmac_sha_512->name      => function(string $signingDatas, $privateKeyPem) {
         return hash_hmac('sha512', $signingDatas, $privateKeyPem, true);
     },
+    //phpseclib4
+    SigningEnum::ed25519->name           => function(string $signingDatas, $privateKeyPem) {
+        return EC::loadPrivateKey($privateKeyPem)
+                 ->sign($signingDatas)
+        ;
+    },
 ];
 
 SignatureRegistry::registerSigningMethods(signingMethods: $signingMethodsRsaPhpSeclib4);
@@ -114,6 +121,12 @@ $verifierMethodsRsaPhpSeclib4 = [
     // native php
     SigningEnum::hmac_sha_512->name      => function(string $signingDatas, $signature, $publicKeyPem) {
         return hash_equals(hash_hmac('sha512', $signingDatas, $publicKeyPem, true), $signature);
+    },
+    //phpseclib4
+    SigningEnum::ed25519->name           => function(string $signingDatas, $signature, $publicKeyPem) {
+        return EC::loadPublicKey($publicKeyPem)
+                 ->verify($signingDatas, $signature)
+        ;
     },
 ];
 
