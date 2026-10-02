@@ -17,29 +17,40 @@ require_once dirname(__DIR__, 2).'/vendor/autoload.php';
 /**
  * signer config
  */
-$signingRsa256 = function(string $signingDatas, $privateKeyPem) {
-    return RSA::loadPrivateKey($privateKeyPem)
-              ->withHash('sha256')
-              ->sign($signingDatas)
-    ;
-};
-$signingRsa384 = function(string $signingDatas, $privateKeyPem) {
-    return RSA::loadPrivateKey($privateKeyPem)
-              ->withHash('sha384')
-              ->sign($signingDatas)
-    ;
-};
-$signingRsa512 = function(string $signingDatas, $privateKeyPem) {
+$signingRsaPSSSha512 = function(string $signingDatas, $privateKeyPem) {
     return RSA::loadPrivateKey($privateKeyPem)
               ->withHash('sha512')
+              ->withPadding(RSA::SIGNATURE_PSS)
+              ->sign($signingDatas)
+    ;
+};
+$signingRsaPKCS1256  = function(string $signingDatas, $privateKeyPem) {
+    return RSA::loadPrivateKey($privateKeyPem)
+              ->withHash('sha256')
+              ->withPadding(RSA::SIGNATURE_PKCS1)
+              ->sign($signingDatas)
+    ;
+};
+$signingRsaPKCS1384  = function(string $signingDatas, $privateKeyPem) {
+    return RSA::loadPrivateKey($privateKeyPem)
+              ->withHash('sha384')
+              ->withPadding(RSA::SIGNATURE_PKCS1)
+              ->sign($signingDatas)
+    ;
+};
+$signingRsaPKCS1512  = function(string $signingDatas, $privateKeyPem) {
+    return RSA::loadPrivateKey($privateKeyPem)
+              ->withHash('sha512')
+              ->withPadding(RSA::SIGNATURE_PKCS1)
               ->sign($signingDatas)
     ;
 };
 
 $signingMethodsRsaPhpSeclib4 = [
-    SigningEnum::rsa_v_1_5_sha_256->name => $signingRsa256,
-    SigningEnum::rsa_v_1_5_sha_384->name => $signingRsa384,
-    SigningEnum::rsa_v_1_5_sha_512->name => $signingRsa512,
+    SigningEnum::rsa_pss_sha512->name    => $signingRsaPSSSha512,
+    SigningEnum::rsa_v_1_5_sha_256->name => $signingRsaPKCS1256,
+    SigningEnum::rsa_v_1_5_sha_384->name => $signingRsaPKCS1384,
+    SigningEnum::rsa_v_1_5_sha_512->name => $signingRsaPKCS1512,
 ];
 
 SignatureRegistry::registerSigningMethods(signingMethods: $signingMethodsRsaPhpSeclib4);
@@ -47,29 +58,41 @@ SignatureRegistry::registerSigningMethods(signingMethods: $signingMethodsRsaPhpS
 /**
  * Verifier config
  */
-$verifyRsa256 = function(string $signingDatas, $signature, $publicKeyPem) {
-    return RSA::loadPublicKey($publicKeyPem)
-              ->withHash('sha256')
-              ->verify($signingDatas, $signature)
-    ;
-};
-$verifyRsa384 = function(string $signingDatas, $signature, $publicKeyPem) {
-    return RSA::loadPublicKey($publicKeyPem)
-              ->withHash('sha384')
-              ->verify($signingDatas, $signature)
-    ;
-};
-$verifyRsa512 = function(string $signingDatas, $signature, $publicKeyPem) {
+$verifyRsaPSSSha512 = function(string $signingDatas, $signature, $publicKeyPem) {
     return RSA::loadPublicKey($publicKeyPem)
               ->withHash('sha512')
+              ->withPadding(RSA::SIGNATURE_PSS)
+              ->verify($signingDatas, $signature)
+    ;
+};
+
+$verifyRsaPKCS1256 = function(string $signingDatas, $signature, $publicKeyPem) {
+    return RSA::loadPublicKey($publicKeyPem)
+              ->withHash('sha256')
+              ->withPadding(RSA::SIGNATURE_PKCS1)
+              ->verify($signingDatas, $signature)
+    ;
+};
+$verifyRsaPKCS1384 = function(string $signingDatas, $signature, $publicKeyPem) {
+    return RSA::loadPublicKey($publicKeyPem)
+              ->withHash('sha384')
+              ->withPadding(RSA::SIGNATURE_PKCS1)
+              ->verify($signingDatas, $signature)
+    ;
+};
+$verifyRsaPKCS1512 = function(string $signingDatas, $signature, $publicKeyPem) {
+    return RSA::loadPublicKey($publicKeyPem)
+              ->withHash('sha512')
+              ->withPadding(RSA::SIGNATURE_PKCS1)
               ->verify($signingDatas, $signature)
     ;
 };
 
 $verifierMethodsRsaPhpSeclib4 = [
-    SigningEnum::rsa_v_1_5_sha_256->name => $verifyRsa256,
-    SigningEnum::rsa_v_1_5_sha_384->name => $verifyRsa384,
-    SigningEnum::rsa_v_1_5_sha_512->name => $verifyRsa512,
+    SigningEnum::rsa_pss_sha512->name    => $verifyRsaPSSSha512,
+    SigningEnum::rsa_v_1_5_sha_256->name => $verifyRsaPKCS1256,
+    SigningEnum::rsa_v_1_5_sha_384->name => $verifyRsaPKCS1384,
+    SigningEnum::rsa_v_1_5_sha_512->name => $verifyRsaPKCS1512,
 ];
 
 VerifyRegistry::registerVerifyingMethods(verifyingMethods: $verifierMethodsRsaPhpSeclib4);
