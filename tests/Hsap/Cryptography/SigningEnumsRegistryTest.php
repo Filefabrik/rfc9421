@@ -27,8 +27,8 @@ final class SigningEnumsRegistryTest extends TestCase
     public function testFindEnumOrThrowThrows(): void
     {
         $this->assertSame(
-            SigningEnum::ecdsa_p_512_sha_512,
-            SigningEnumsRegistry::findEnumOrThrow(SigningEnum::ecdsa_p_512_sha_512),
+            SigningEnum::ecdsa_p_384_sha_384,
+            SigningEnumsRegistry::findEnumOrThrow(SigningEnum::ecdsa_p_384_sha_384),
         );
     }
 

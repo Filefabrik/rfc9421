@@ -100,8 +100,8 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         $this->assertNull($i->metadata->alg);
-        $i->withSigningAlgorithm(SigningEnum::ecdsa_p_512_sha_512);
-        $this->assertSame(SigningEnum::ecdsa_p_512_sha_512, $i->metadata->alg);
+        $i->withSigningAlgorithm(SigningEnum::rsa_pss_sha512);
+        $this->assertSame(SigningEnum::rsa_pss_sha512, $i->metadata->alg);
         $i->withSigningAlgorithm('ecdsa-p256-sha256');
         $this->assertSame(SigningEnum::ecdsa_p_256_sha_256, $i->metadata->alg);
     }

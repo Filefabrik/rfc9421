@@ -39,6 +39,7 @@ final class VerifyTest extends TestCase
             [SigningEnum::rsa_v_1_5_sha_256->name, 'rsa'],
             [SigningEnum::rsa_v_1_5_sha_384->name, 'rsa'],
             [SigningEnum::rsa_v_1_5_sha_512->name, 'rsa'],
+            [SigningEnum::rsa_pss_sha512->name, 'rsa'],
         ];
     }
 
