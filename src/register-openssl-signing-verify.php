@@ -93,7 +93,14 @@ $signings = [
     },
     // php native openssl
     SigningEnum::ed25519->name             => function(string $signingDatas, $privateKeyPem): string {
-        return sodium_crypto_sign_detached($signingDatas, $privateKeyPem);
+        $signature = '';
+        $secretKey = openssl_pkey_get_private($privateKeyPem);
+
+        if (!openssl_sign($signingDatas, $signature, $secretKey, 0)) {
+            throw new RuntimeException('Signing failed: '.openssl_error_string());
+        }
+
+        return $signature;
     },
 
 ];
@@ -166,7 +173,7 @@ $verifying = [
     },
     // php native openssl
     SigningEnum::ed25519->name             => function(string $signingDatas, $signature, $publicKeyPem): bool {
-        return sodium_crypto_sign_verify_detached($signature, $signingDatas, $publicKeyPem);
+        return 0 < openssl_verify($signingDatas, $signature, openssl_pkey_get_public($publicKeyPem), 0);
     },
 ];
 

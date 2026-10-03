@@ -74,6 +74,6 @@ final class SigningEnumTest extends TestCase
 
     public function testCount(): void
     {
-        $this->assertCount(11, SigningEnum::cases());
+        $this->assertCount(10, SigningEnum::cases());
     }
 }
