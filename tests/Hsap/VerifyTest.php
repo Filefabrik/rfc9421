@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\HsapTest;
 
+use BadMethodCallException;
 use DateTime;
 use Filefabrik\Hsap\Cryptography\SigningEnum;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
@@ -73,9 +74,9 @@ final class VerifyTest extends TestCase
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration();
-        $configuration->withHeader('@method')
+        $configuration->signHeader('@method')
             //    ->withHeader('x-Origin-host')
-                      ->withHeader('@authority')
+                      ->signHeader('@authority')
             /*
              * check duplicate content-digest
              * ->withHeader('content-digest')
@@ -105,6 +106,16 @@ final class VerifyTest extends TestCase
             headers: ['x-origin-host' => 'target-host.com'],
             body   : $bodyJson,
         );
+        /**
+         * todo only with library Openssl test
+         */
+        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
+            $this->expectExceptionObject(
+                new BadMethodCallException(
+                    'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
+                ),
+            );
+        }
 
         $signer        = new Signer($request, $configuration);
         $signedRequest = $signer->sign();
@@ -172,24 +183,18 @@ final class VerifyTest extends TestCase
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration();
-        $configuration->withHeader('@method')
-            //    ->withHeader('x-Origin-host')
-                      ->withHeader('@authority')
-            /*
-             * check duplicate content-digest
-             * ->withHeader('content-digest')
-             */
+        $configuration->signHeader('@method')
+
+                      ->signHeader('@authority')
 
                       ->mustSignBody(false)
-
-            //->withAlg('sha512')
                       ->withSigningAlgorithm($signingAlgo)
                       ->withCreated($currentDateTime)
                       ->withExpires($currentDateTime + 7200)
                       ->withTag('mastodon')
                       ->withNonce('nonce-now')
                       ->withSignatureKeyName($signatureKeyName)
-            // for signing needs private
+
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
@@ -205,7 +210,19 @@ final class VerifyTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer        = new Signer($request, $configuration);
+        $signer = new Signer($request, $configuration);
+
+        /**
+         * todo only with library Openssl test
+         */
+        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
+            $this->expectExceptionObject(
+                new BadMethodCallException(
+                    'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
+                ),
+            );
+        }
+
         $signedRequest = $signer->sign();
 
         /**
@@ -315,9 +332,9 @@ final class VerifyTest extends TestCase
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration();
-        $configuration->withHeader('@method')
+        $configuration->signHeader('@method')
             //    ->withHeader('x-Origin-host')
-                      ->withHeader('@authority')
+                      ->signHeader('@authority')
             /*
              * check duplicate content-digest
              * ->withHeader('content-digest')
@@ -347,7 +364,16 @@ final class VerifyTest extends TestCase
             headers: ['x-origin-host' => 'target-host.com'],
             body   : $bodyJson,
         );
-
+        /**
+         * todo only with library Openssl test
+         */
+        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
+            $this->expectExceptionObject(
+                new BadMethodCallException(
+                    'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
+                ),
+            );
+        }
         $signer        = new Signer($request, $configuration);
         $signedRequest = $signer->sign();
 

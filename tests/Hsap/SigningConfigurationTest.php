@@ -47,11 +47,11 @@ final class SigningConfigurationTest extends TestCase
         $this->assertSame($dt, $i->metadata->created);
     }
 
-    public function testWithHeader(): void
+    public function testSignHeader(): void
     {
         $i = new SigningConfiguration();
         $this->assertEmpty($i->signatureParams->getSignatureParameters());
-        $i->withHeader('foo', 'bar');
+        $i->signHeader('foo', 'bar');
         $this->assertSame(['foo', 'bar'], $i->signatureParams->getSignatureParameters());
     }
 

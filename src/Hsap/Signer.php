@@ -12,7 +12,6 @@ use Filefabrik\Hsap\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\Exceptions\SignatureException;
 use Filefabrik\Hsap\Signer\SignaturBase;
-use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -99,7 +98,7 @@ final class Signer
      * @throws InvalidHeaderKeyException
      * @throws SignatureException
      */
-    public function sign(): MessageInterface
+    public function sign(): RequestInterface
     {
         // set up the content digest into rendering
         if ($this->signingConfiguration->mustSignBody) {

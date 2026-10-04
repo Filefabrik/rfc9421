@@ -10,28 +10,49 @@ use Filefabrik\HsapTest\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
+/**
+ * use openssl (native php extension) which so preconfigured
+ * if you need another library oar need some modifications, build your own
+ */
+require_once dirname(__DIR__).'/src/register-openssl-signing-verify.php';
+/**
+ * use phpseclib4 library which is preconfigured
+ * if you need another library oar need some modifications, build your own
+ */
+#require_once dirname(__DIR__).'/src/register-phpseclib4-signing-verify.php';
 
-require_once dirname(__DIR__).'/tests/Tools/bootstrap-signers.php';
-
-$certInstance = new CertHelper('rsa512');
-$signerAlgo   = SigningEnum::rsa_v_1_5_sha_512->name;
+/**
+ * request against local cli spinned webserver to handle internally the requests
+ */
+require_once dirname(__DIR__).'/tests/Webserver/server.php';
+/**
+ * for testing purposes
+ */
+$certInstance = new CertHelper('rsa');
+#$certInstance = new CertHelper('hmac');
+#$certInstance = new CertHelper('ed25519');
+$targetUrl = 'http://localhost:8001/mastodon';
 /**
  * Prepare signingConfiguration
  */
 $currentDateTime = new DateTime()->getTimestamp();
-$configuration   = new SigningConfiguration();
-$configuration->withHeader('@method')
-              ->withHeader('x-Origins-host')
-              ->withSigningAlgorithm($signerAlgo)
-              ->withCreated($currentDateTime)
-              ->withExpires($currentDateTime + 7200)
-              ->withTag('mastodon')
-              ->withNonce('nonce-now')
-    // content digest signer
-    //  ->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha256)
-              ->withSignatureKeyName('testValue=')
+
+$signingConfiguration = new SigningConfiguration()
+    ->signHeader('@method')
+    ->signHeader('x-Origins-host')
+    ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+    #   ->withSigningAlgorithm(SigningEnum::ed25519)
+    #->withSigningAlgorithm(SigningEnum::rsa_pss_sha512)
+    ->withCreated($currentDateTime)
+    ->withExpires($currentDateTime + 7200)
+    ->withTag('mastodon')
+    ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+    ->withNonce('nonce-now')
+    ->setContentDigestHashAlgo('sha512')
+    // content digest signer key
+    ->withSignatureKeyName('testValue=')
     // for signing needs private
-              ->setPrivatePem($certInstance->getPrivatPemContent())
+    ->setPrivatePem($certInstance->getPrivatPemContent())
 ;
 
 /**
@@ -41,21 +62,55 @@ $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'fdawsfs'
 $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
 $request    = new Request(
     method : 'POST',
-    uri    : 'https://test',
+    uri    : $targetUrl,
     headers: ['x-origin-host' => 'mytest.com'],
     body   : $bodyJson,
 );
 
-$signer        = new Signer($request, $configuration);
+$signer        = new Signer(message: $request, signingConfiguration: $signingConfiguration);
 $signedRequest = $signer->sign();
+/**
+ * working with local server
+ */
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+$response = new \GuzzleHttp\Client()->send($signedRequest);
 
 /**
  * Now decrypt the Request
  */
-$verifierConfiguration = new SigningConfiguration()->setPublicPem(publicPem: $certInstance->getPublicPemContent());
+$verifierConfiguration = new SigningConfiguration();
 
 /**
  * Verify the generated request from above(receiver-side)
  */
 $verifier = new Verify(message: $signedRequest, signingConfiguration: $verifierConfiguration);
-echo $verifier->verifying();
+/**
+ * Prepare the verify to extract for mastodon the sender public pem location
+ */
+$verifier->prepareVerify();
+/**
+ * with the keyId you should be able to download the public pem
+ */
+$keyId = $verifierConfiguration->metadata->keyid;
+
+if ($keyId) {
+    $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
+
+    /*
+     * // when using mastodon it does not request in the metadata the signature algorithm
+     * The only supported algorithm is still RSASSA-PKCS1-v1_5 Using SHA-256
+     */
+    /*
+     * $verifierConfiguration->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256);
+     */
+    /*
+     *  todo check for mastodon
+     * $verifierConfiguration->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha256);
+     */
+
+    $res = $verifier->verifying();
+    echo $res, "\n";
+
+    return;
+}
+echo 'missing key id/PEm';

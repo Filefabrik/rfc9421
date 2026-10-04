@@ -177,7 +177,7 @@ final class Verify
 
         // no compile the signature array such as in singer
         foreach ($signingComponents->getSignatureParameters() as $signingComponent) {
-            $this->signingConfiguration->withHeader($signingComponent);
+            $this->signingConfiguration->signHeader($signingComponent);
         }
 
         /**

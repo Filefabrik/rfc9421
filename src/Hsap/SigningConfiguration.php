@@ -148,7 +148,7 @@ final class SigningConfiguration
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      */
-    public function withHeader(...$headerKeys): self
+    public function signHeader(...$headerKeys): self
     {
         foreach ($headerKeys as $headerKey) {
             $this->signatureParams->add($headerKey);
