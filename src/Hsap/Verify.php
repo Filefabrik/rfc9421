@@ -217,10 +217,14 @@ final class Verify
      */
     private function getSigner(): Signer
     {
-        return Signer::getPreparedSigning(
+        $signer = new Signer(
             message             : clone $this->message,
             signingConfiguration: $this->signingConfiguration,
         );
+
+        $signer->prepareSigning();
+
+        return $signer;
     }
 
 }

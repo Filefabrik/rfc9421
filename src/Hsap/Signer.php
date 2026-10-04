@@ -33,62 +33,12 @@ final class Signer
         get => $this->signingParametersString ?? throw new UnexpectedValueException('not set before');
     }
 
-    /**
-     * @var string|null
-     */
-    public private(set) ?string $base64_signature = null {
-        get => $this->base64_signature ?? throw new UnexpectedValueException('base64_signature not set before');
-    }
-    private null|string         $signatureBase    = null;
+    private null|string $signatureBase = null;
 
     public function __construct(
         public private(set) RequestInterface $message,
         public private(set) readonly SigningConfiguration $signingConfiguration,
     ) {
-    }
-
-    /**
-     * Helper for verify
-     *
-     * @throws ContentDigestException
-     */
-    public static function getPreparedSigning(
-        RequestInterface $message,
-        SigningConfiguration $signingConfiguration,
-    ): self {
-        $signer = new self(
-            message             : $message,
-            signingConfiguration: $signingConfiguration,
-        );
-
-        $signer->prepareSigning();
-
-        return $signer;
-    }
-
-    /**
-     * für das verify auch verwenden
-     *
-     * @throws ContentDigestException
-     */
-    public function prepareSigning(): void
-    {
-        $base = new SignaturBase($this->message, $this->signingConfiguration);
-
-        $this->signingParameters = $base->createSignatureLines();
-
-        // rebind because the header maybe changed in signature base class
-        $this->message = $base->message;
-
-        // setting the last header before we are signing the "SignatureSigns"
-        $this->signatureBase = $base->makeSignatureInput();
-
-        // now set the signature-params ONLY into the signature-base line.
-        $this->signingParameters [] = ['@signature-params', $this->signatureBase];
-
-        // makes the array of signingParameters to a string. The string kann be base64EncodedValue
-        // keep the $this->signingParametersString public readable. maybe for testing and other stuff
-        $this->signingParametersString = SignaturBase::compileSignatureInputToString($this->signingParameters);
     }
 
     /**
@@ -118,6 +68,31 @@ final class Signer
     }
 
     /**
+     * für das verify auch verwenden
+     *
+     * @throws ContentDigestException|InvalidHeaderKeyException
+     */
+    public function prepareSigning(): void
+    {
+        $base = new SignaturBase($this->message, $this->signingConfiguration);
+
+        $this->signingParameters = $base->createSignatureLines();
+
+        // rebind because the header maybe changed in signature base class
+        $this->message = $base->message;
+
+        // setting the last header before we are signing the "SignatureSigns"
+        $this->signatureBase = $base->makeSignatureInput();
+
+        // now set the signature-params ONLY into the signature-base line.
+        $this->signingParameters [] = ['@signature-params', $this->signatureBase];
+
+        // makes the array of signingParameters to a string. The string kann be base64EncodedValue
+        // keep the $this->signingParametersString public readable. maybe for testing and other stuff
+        $this->signingParametersString = SignaturBase::compileSignatureInputToString($this->signingParameters);
+    }
+
+    /**
      * Generate the base signature
      *
      * @param $signingParametersString
@@ -133,9 +108,7 @@ final class Signer
             privateKey          : $this->signingConfiguration->privatePem,
         );
 
-        $this->base64_signature = base64_encode($signature);
-
-        return $this->makeSignatureString($this->base64_signature);
+        return $this->makeSignatureString(base64_encode($signature));
     }
 
     /**
