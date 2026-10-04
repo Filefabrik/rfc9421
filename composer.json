@@ -1,53 +1,57 @@
 {
-    "$schema": "https://getcomposer.org/schema.json",
-    "name": "filefabrik/hsap",
-    "description": "Create and validate RFC 9421 HTTP Signatures for ActivityPub.",
-    "homepage": "https://filefabrik.com/rfc9421-http-signatures-activity-pub",
-    "license": "proprietary",
-    "version": "0.1.0",
-    "keywords": [
-        "activity pub",
-        "ActivityPub",
-        "HTTP Signatures",
-        "RFC 9421"
-    ],
-    "authors": [
-        {
-            "name": "RT Filefabrik",
-            "email": "hsap@filefabrik.com",
-            "homepage": "https://filefabrik.com",
-            "role": "Developer"
-        }
-    ],
-    "minimum-stability": "dev",
-    "type": "library",
-    "autoload": {
-        "psr-4": {
-            "Filefabrik\\Hsap\\": "src/Hsap"
-        }
-    },
-    "funding": [],
-    "autoload-dev": {
-        "psr-4": {
-            "Filefabrik\\HsapTest\\": "tests/Hsap"
-        }
-    },
-    "require": {
-        "php": "^8.4",
-        "psr/http-message": "^2.0",
-        "psr/log": "^3.0",
-        "ext-openssl": "*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "*",
-        "friendsofphp/php-cs-fixer": "^v3.95.24",
-        "phpstan/phpstan": "^2.2.13"
-    },
-    "readme": "",
-    "prefer-stable": true,
-    "time": "",
-    "support": {},
-    "config": {
-        "allow-plugins": {}
+  "$schema": "https://getcomposer.org/schema.json",
+  "name": "filefabrik/rfc9421",
+  "description": "Create and validate RFC 9421 HTTP Signatures for ActivityPub.",
+  "homepage": "https://filefabrik.com/rfc9421-http-signatures-activity-pub",
+  "license": "proprietary",
+  "version": "0.0.1",
+  "keywords": [
+    "activity pub",
+    "ActivityPub",
+    "HTTP Signatures",
+    "RFC9421"
+  ],
+  "authors": [
+    {
+      "name": "RT Filefabrik",
+      "email": "hsap@filefabrik.com",
+      "homepage": "https://filefabrik.com",
+      "role": "Developer"
     }
+  ],
+  "minimum-stability": "dev",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Filefabrik\\Hsap\\": "src/Hsap"
+    }
+  },
+
+  "autoload-dev": {
+    "psr-4": {
+      "Filefabrik\\HsapTest\\": "tests/Hsap",
+      "Filefabrik\\HsapTest\\Tools\\": "tests/Tools"
+    }
+  },
+  "require": {
+    "php": "^8.4",
+    "psr/http-message": "^2.0",
+    "ext-openssl": "*",
+    "ext-gmp": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "friendsofphp/php-cs-fixer": "^v3.95.24",
+    "phpstan/phpstan": "^2.2.13",
+    "guzzlehttp/guzzle": "^8.2.0",
+    "paragonie/easy-ecc": "^v1.3.1",
+    "phpseclib/phpseclib": "~4.0"
+  },
+  "readme": "",
+  "prefer-stable": true,
+  "time": "",
+  "support": {},
+  "config": {
+    "allow-plugins": {}
+  }
 }

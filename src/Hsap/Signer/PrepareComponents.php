@@ -211,7 +211,7 @@ final class PrepareComponents
     }
 
     /*
-     * Todo More komplex as described in 2.2.5. Request Target
+     * Todo More complex as described in 2.2.5. Request Target
      *
      * @return void
      *
@@ -234,7 +234,7 @@ final class PrepareComponents
     }
     /*
      * todo query 2.2.7. Query as it is more komplex
-     * todo 2.2.8. Query Parameters as it is more komplex
+     * todo 2.2.8. Query Parameters as it is more complex
      */
     /*
      * todo, the status can only be in the response, have a look what todo
@@ -246,8 +246,6 @@ final class PrepareComponents
     }   */
 
     // todo 2.3. Signature Parameters über signature params preconfigured
-
-    // todo laaaater 2.5. Creating the Signature Base
 
     /**
      * @return int
