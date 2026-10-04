@@ -111,6 +111,20 @@ if ($keyId) {
     $res = $verifier->verifying();
     echo $res, "\n";
 
+    /**
+     * After successfully verifying you have access to verified header
+     */
+
+    if ($res) {
+        $params = $verifier->validSignedParameters;
+
+        /*
+         * Also the $metadata are verified
+         */
+        $metadata = $verifier->signingConfiguration->metadata;
+        // in example: check created oar expire
+    }
+
     return;
 }
 echo 'missing key id/PEm';
