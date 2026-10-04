@@ -304,7 +304,6 @@ Per default the following Algorithms are implemented as RFC9421 describes
 * hmac-sha512
 * ecdsa-p256-sha256
 * ecdsa-p384-sha384
-* ecdsa-p5sha512
 * ed25519
 
 ### Need other Signing Algorithms? No Problem!
