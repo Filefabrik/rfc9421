@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\HsapTest\Verify;
 
+use Filefabrik\Hsap\Exceptions\ContentDigestException;
 use Filefabrik\Hsap\Verify\ContentDigest;
 use Filefabrik\Hsap\Verify\VerifyContentDigest;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,6 +29,16 @@ final class VerifyContentDigestTest extends TestCase
 
         $verify = new VerifyContentDigest($CD, $body);
         $this->assertFalse($verify->verify());
+    }
+
+    public function testVerifyThrowsFormatIssue(): void
+    {
+        $this->expectExceptionObject(new ContentDigestException('Wrong content digest format'));
+        $CD   = '';
+        $body = '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}';
+
+        $verify = new VerifyContentDigest($CD, $body);
+        $verify->prepare();
     }
 
     public function testPrepare(): void

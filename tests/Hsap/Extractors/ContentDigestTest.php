@@ -11,6 +11,16 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ContentDigest::class)]
 final class ContentDigestTest extends TestCase
 {
+    /**
+     * @covers \Filefabrik\Hsap\Extractors\ContentDigest::validateExtraction
+     * @return void
+     */
+    public function testvalidateExtractionFalse()
+    {
+        $this->assertFalse(new ContentDigest('bullshit')->validateExtraction());
+
+    }
+
     public function testGetAlgorithm(): void
     {
         $alg = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getAlgorithm();
@@ -27,13 +37,14 @@ final class ContentDigestTest extends TestCase
     {
         $alg = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getPhpAlgorithm();
         $this->assertEquals('sha256', $alg);
-
     }
-    public function testGetRealHashedValue():void
+
+    public function testGetRealHashedValue(): void
     {
         $alg = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getRealBase64EncodedValue();
         $this->assertEquals('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=', $alg);
     }
+
     public function testGetDigestArray(): void
     {
         $digestArray = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getDigestArray();
