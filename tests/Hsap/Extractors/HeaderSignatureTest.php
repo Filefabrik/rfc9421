@@ -94,9 +94,40 @@ final class HeaderSignatureTest extends TestCase
         self::assertEquals([], $s);
     }
 
-    public function testGetBinarySignatureValue()
+    public function testGetBinarySignatureValue(): void
     {
         //todo not clear, test deeper
-       $this->doesNotPerformAssertions();
+        // hmac 256
+        $headerKey = 'testValue=:Q94UwavaMSqUpe1f1G5cmDTXj9wQYFp39lmKZ9YPUv4=:';
+
+        $baseEncoded             = base64_decode('Q94UwavaMSqUpe1f1G5cmDTXj9wQYFp39lmKZ9YPUv4=');
+        $headerSignatureInstance = new HeaderSignature($headerKey);
+
+        $res = $headerSignatureInstance->getBinarySignatureValue();
+
+        $this->assertSame(
+            $baseEncoded,
+            $res,
+        );
+    }
+
+    /**
+     * @covers HeaderSignature::getBinarySignatureValue
+     * @return void
+     * @throws SignatureExtractionException
+     */
+    public function testGetBinarySignatureValueThrow(): void
+    {
+        $this->expectExceptionObject(
+            new SignatureExtractionException(
+                'Can not base_decode64 the signature value "Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s"',
+            ),
+        );
+
+        $headerKey = 'testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
+
+        $headerSignatureInstance = new HeaderSignature($headerKey);
+
+        $headerSignatureInstance->getBinarySignatureValue();
     }
 }

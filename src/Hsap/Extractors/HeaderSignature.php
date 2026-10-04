@@ -42,12 +42,21 @@ final class HeaderSignature
 
     /**
      * todo check empty
+
      *
      * @return string
+     * @throws SignatureExtractionException
      */
     public function getBinarySignatureValue(): string
     {
-        return base64_decode($this->getSignatureValue(), true);
+        $encoded = base64_decode($this->getSignatureValue(), true);
+        if (false === $encoded) {
+            throw new SignatureExtractionException(
+                sprintf('Can not base_decode64 the signature value "%s"', $this->getSignatureValue()),
+            );
+        }
+
+        return $encoded;
     }
 
     /**

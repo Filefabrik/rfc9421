@@ -28,8 +28,8 @@ require_once dirname(__DIR__).'/tests/Webserver/server.php';
 /**
  * for testing purposes
  */
-$certInstance = new CertHelper('rsa');
-#$certInstance = new CertHelper('hmac');
+#$certInstance = new CertHelper('rsa');
+$certInstance = new CertHelper('hmac');
 #$certInstance = new CertHelper('ed25519');
 $targetUrl = 'http://localhost:8001/mastodon';
 /**
@@ -39,10 +39,11 @@ $currentDateTime = new DateTime()->getTimestamp();
 
 $signingConfiguration = new SigningConfiguration()
     ->signHeader('@method')
-    ->signHeader('x-Origins-host')
+    ->signHeader('x-Origin-host')
     ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
     #   ->withSigningAlgorithm(SigningEnum::ed25519)
     #->withSigningAlgorithm(SigningEnum::rsa_pss_sha512)
+        ->withSigningAlgorithm(SigningEnum::hmac_sha_256)
     ->withCreated($currentDateTime)
     ->withExpires($currentDateTime + 7200)
     ->withTag('mastodon')
@@ -123,6 +124,11 @@ if ($keyId) {
          */
         $metadata = $verifier->signingConfiguration->metadata;
         // in example: check created oar expire
+
+        if ($metadata->created) {
+            // ...
+        }
+        $body = (string)$verifier->message->getBody();
     }
 
     return;
