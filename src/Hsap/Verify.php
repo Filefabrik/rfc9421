@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap;
 
+use BadMethodCallException;
 use Filefabrik\Hsap\Cryptography\SigningEnum;
 use Filefabrik\Hsap\Cryptography\VerifyRegistry;
 use Filefabrik\Hsap\Exceptions\AlreadySetException;
@@ -19,7 +20,6 @@ use Filefabrik\Hsap\Verify\PrepareSignatureKeyName;
 use Filefabrik\Hsap\Verify\VerifyContentDigest;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
-use UnexpectedValueException;
 
 final class Verify
 {
@@ -110,7 +110,7 @@ final class Verify
     public function prepareVerify(): void
     {
         if ($this->preparedVerifier) {
-            throw new UnexpectedValueException('already prepared');
+            throw new BadMethodCallException('already prepared');
         }
         // first stage we must have both signature and signature-input header
         if (!$this->headerHelper->getSignatureLine()) {

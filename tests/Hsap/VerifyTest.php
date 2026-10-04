@@ -160,6 +160,107 @@ final class VerifyTest extends TestCase
         $this->assertEquals(1, $verifier->verifying());
     }
 
+    #[DataProvider('withSigningMethods')]
+    public function testPrepareVerifyTwiceThrow($signingAlgo, $cert): void
+    {
+        $this->expectExceptionObject(new BadMethodCallException('already prepared'));
+        $certInstance = new CertHelper($cert);
+
+        $signatureKeyName = 'testing=';
+        /**
+         * Prepare signingConfiguration
+         */
+        $currentDateTime = new DateTime()->getTimestamp();
+        $configuration   = new SigningConfiguration();
+        $configuration->signHeader('@method')
+            //    ->withHeader('x-Origin-host')
+                      ->signHeader('@authority')
+            /*
+             * check duplicate content-digest
+             * ->withHeader('content-digest')
+             */
+
+                      ->mustSignBody()
+
+            //->withAlg('sha512')
+                      ->withSigningAlgorithm($signingAlgo)
+                      ->withCreated($currentDateTime)
+                      ->withExpires($currentDateTime + 7200)
+                      ->withTag('mastodon')
+                      ->withNonce('nonce-now')
+                      ->withSignatureKeyName($signatureKeyName)
+            // for signing needs private
+                      ->setPrivatePem($certInstance->getPrivatPemContent())
+        ;
+
+        /**
+         * Prepare the Request
+         */
+        $bodyParams = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];
+        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
+        $request    = new Request(
+            method : 'POST',
+            uri    : 'https://target-host.com',
+            headers: ['x-origin-host' => 'target-host.com'],
+            body   : $bodyJson,
+        );
+        /**
+         * todo only with library Openssl test
+         */
+        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
+            $this->expectExceptionObject(
+                new BadMethodCallException(
+                    'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
+                ),
+            );
+        }
+
+        $signer        = new Signer($request, $configuration);
+        $signedRequest = $signer->sign();
+
+        /**
+         * Now decrypt the Request
+         */
+        /**
+         * optional we prepare a method that we inject if we need this
+         */
+        $mastodonVerifierMethods = [
+            ['@authority', fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),],
+        ];
+
+        $tamperedRequest = clone $signedRequest;
+        $tamperedBody    = $bodyParams;
+        #$tamperedBody['mod'] = 'hasModiefied';
+        $tamperedRequest = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
+        $verifier        = new Verify($tamperedRequest);
+
+        // optional before preparing verify and verifying
+        $signerConfiguration = $verifier->signingConfiguration;
+        //  ->withSignatureKeyName($signatureKeyName)
+        // for verify needs public
+        $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
+
+        /**
+         * now prepare the verify process
+         */
+        $verifier->prepareVerify();
+        /**
+         * prepareVerify is public so it can be re-run. there is an prevention
+         */
+        $verifier->prepareVerify();
+        /*
+         * Optional we have found a "tag" from sender.
+         * Maybe that let us know, that we handle derivedComponents with a special method
+         *
+         */
+        if ($signerConfiguration->metadata->tag) {
+            // for mastodon an own config für x-origin or something
+            $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
+        }
+
+        $this->assertEquals(1, $verifier->verifying());
+    }
+
     /**
      * @throws AlreadySetException
      * @throws ContentDigestException
@@ -184,9 +285,7 @@ final class VerifyTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration();
         $configuration->signHeader('@method')
-
                       ->signHeader('@authority')
-
                       ->mustSignBody(false)
                       ->withSigningAlgorithm($signingAlgo)
                       ->withCreated($currentDateTime)
@@ -194,7 +293,6 @@ final class VerifyTest extends TestCase
                       ->withTag('mastodon')
                       ->withNonce('nonce-now')
                       ->withSignatureKeyName($signatureKeyName)
-
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
