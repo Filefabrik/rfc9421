@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Cryptography;
 
-use Closure;
 use Filefabrik\Hsap\Exceptions\SignatureException;
 use Filefabrik\Hsap\Interfaces\SigningEnumInterface;
 use UnexpectedValueException;
@@ -14,30 +13,20 @@ use UnexpectedValueException;
  */
 final class VerifyRegistry
 {
+    use SharedRegistryTrait;
+
     /**
      * Map Verifying Methods
      *
      * @var array
      */
-    private static array $verifying = [];
+    private static array $stack = [];
 
     /**
-     * @throws SignatureException
+     * @codeCoverageIgnore
      */
-    public static function registerVerifyingMethods(array $verifyingMethods): void
+    private function __construct()
     {
-        foreach ($verifyingMethods as $key => $verifyingMethod) {
-            self::registerVerifying(signingEnumTrait: $key, closure: $verifyingMethod);
-        }
-    }
-
-    /**
-     * @throws SignatureException
-     */
-    public static function registerVerifying(string|SigningEnum $signingEnumTrait, Closure $closure): void
-    {
-        self::$verifying[SigningEnum::isOwnTypeOrThrow($signingEnumTrait)
-                                    ->getName()] = $closure;
     }
 
     /**
@@ -51,14 +40,10 @@ final class VerifyRegistry
     ) {
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnum);
 
-        $method = self::$verifying[$enum->getName()] ?? throw new UnexpectedValueException(
-            sprintf('Verify-Method for "%s" not registered.', $enum->getName()),
+        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValueException(
+            sprintf('Verify method for "%s" not registered.', $enum->getName()),
         );
 
-        if ($method instanceof Closure) {
-            return $method($data, $signature, $publicKey);
-        }
-
-        throw new UnexpectedValueException(sprintf('Verify-Method for "%s" not callable.', $enum->getName()));
+        return $method($data, $signature, $publicKey);
     }
 }

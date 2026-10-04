@@ -71,7 +71,7 @@ $signingMethodsRsaPhpSeclib4 = [
     },
 ];
 
-SignatureRegistry::registerSigningMethods(signingMethods: $signingMethodsRsaPhpSeclib4);
+SignatureRegistry::registerMethods(methods: $signingMethodsRsaPhpSeclib4);
 
 /**
  * Verifier config
@@ -130,4 +130,4 @@ $verifierMethodsRsaPhpSeclib4 = [
     },
 ];
 
-VerifyRegistry::registerVerifyingMethods(verifyingMethods: $verifierMethodsRsaPhpSeclib4);
+VerifyRegistry::registerMethods(methods: $verifierMethodsRsaPhpSeclib4);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Hsap\Cryptography;
 
-use Closure;
 use Filefabrik\Hsap\Exceptions\SignatureException;
 use Filefabrik\Hsap\Interfaces\SigningEnumInterface;
 use UnexpectedValueException;
@@ -14,30 +13,22 @@ use UnexpectedValueException;
  */
 final class SignatureRegistry
 {
+    use SharedRegistryTrait;
+
     /**
      * Map signing Methods
      *
      * @var array
      */
-    private static array $signing = [];
+    private static array $stack = [];
 
     /**
-     * @throws SignatureException
+     * only static class
+     *
+     * @codeCoverageIgnore
      */
-    public static function registerSigningMethods(array $signingMethods): void
+    private function __construct()
     {
-        foreach ($signingMethods as $key => $signingMethod) {
-            self::registerSigning(signingEnumTrait: $key, closure: $signingMethod);
-        }
-    }
-
-    /**
-     * @throws SignatureException
-     */
-    public static function registerSigning(string|SigningEnum $signingEnumTrait, Closure $closure): void
-    {
-        self::$signing[SigningEnum::isOwnTypeOrThrow($signingEnumTrait)
-                                  ->getName()] = $closure;
     }
 
     /**
@@ -50,15 +41,12 @@ final class SignatureRegistry
     ) {
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnumInterface);
 
-        $method = self::$signing[$signingEnumInterface->getName()] ?? throw new UnexpectedValueException(
-            'Signing-Method for "'.$signingEnumInterface->getName().'" not registered.',
+        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValueException(
+            sprintf('Signing method for "%s" not registered.', $enum->getName()),
         );
-        // closure
-        if ($method instanceof Closure) {
-            return $method($signingDatas, $privateKey);
-        }
 
-        throw new UnexpectedValueException('signing method for "'.$enum->getName().'" not callable.');
+        // closure
+        return $method($signingDatas, $privateKey);
     }
 
 }

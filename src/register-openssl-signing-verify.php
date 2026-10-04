@@ -105,7 +105,7 @@ $signings = [
 
 ];
 
-SignatureRegistry::registerSigningMethods($signings);
+SignatureRegistry::registerMethods(methods: $signings);
 
 $verifying = [
     // php native openssl
@@ -177,4 +177,4 @@ $verifying = [
     },
 ];
 
-VerifyRegistry::registerVerifyingMethods($verifying);
+VerifyRegistry::registerMethods(methods: $verifying);

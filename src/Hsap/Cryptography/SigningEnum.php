@@ -8,6 +8,8 @@ use Filefabrik\Hsap\Interfaces\SigningEnumInterface as SigningEnumInterfaceAlias
 
 /**
  * keys are snake cased, value as in @see https://www.rfc-editor.org/rfc/rfc9421.html
+ *
+ * @codeCoverageIgnore
  */
 enum SigningEnum: string implements SigningEnumInterfaceAlias
 {
