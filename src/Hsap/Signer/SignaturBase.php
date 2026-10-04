@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Hsap\Signer;
 
 use Filefabrik\Hsap\Exceptions\ContentDigestException;
+use Filefabrik\Hsap\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Hsap\SigningConfiguration;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
@@ -43,6 +44,7 @@ final class SignaturBase
      *
      * @return array
      * @throws ContentDigestException
+     * @throws InvalidHeaderKeyException
      */
     public function createSignatureLines(): array
     {
@@ -68,6 +70,7 @@ final class SignaturBase
      *
      * @return array
      * @throws ContentDigestException
+     * @throws InvalidHeaderKeyException
      */
     private function createSignatureLine(string $signatureParam, PrepareComponents $components): array
     {
@@ -80,7 +83,8 @@ final class SignaturBase
             // special processing for preconfigured @ components
             [$signatureParam, $components->processValue($signatureParam)] :
             // regular. todo make content-length also with a special "processing" value
-            [$signatureParam, $this->message->getHeaderLine($signatureParam)];
+            // todo, if an header not exists, then must throw during
+            $this->checkExistingHeader($signatureParam);
     }
 
     /**
@@ -113,6 +117,22 @@ final class SignaturBase
     }
 
     /**
+     * Header Key must exist
+     *
+     * @param string $signatureParam
+     *
+     * @return array
+     * @throws InvalidHeaderKeyException
+     */
+    private function checkExistingHeader(string $signatureParam): array
+    {
+        if ($this->message->hasHeader($signatureParam)) {
+            return [$signatureParam, $this->message->getHeaderLine($signatureParam)];
+        }
+        throw InvalidHeaderKeyException::headerNotExists($signatureParam);
+    }
+
+    /**
      * Concat the signatureKey with the components part in braces with the Metadata
      * Signature-Input: sig1=("@method" "@authority" "@path" "content-type" "content-length");created=1618884475;keyid="test-key"
      *
@@ -121,8 +141,8 @@ final class SignaturBase
     public function makeSignatureInput(): string
     {
         $headerString = new SigCompilerHelper(
-            $this->configuration->signatureParams,
-            $this->configuration->signatureKeyName,
+            signatureParams : $this->configuration->signatureParams,
+            signatureKeyName: $this->configuration->signatureKeyName,
         )->makeSig1fromSignatureParams();
 
         $metadataString = $this->configuration->metadata->toString();
