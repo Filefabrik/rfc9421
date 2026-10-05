@@ -8,6 +8,7 @@ use Filefabrik\Hsap\SigningConfiguration;
 use Filefabrik\Hsap\Verify;
 use Filefabrik\HsapTest\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\MessageInterface;
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
 /**
@@ -50,6 +51,15 @@ $signingConfiguration = new SigningConfiguration()
     ->setPrivatePem($certInstance->getPrivatPemContent())
 ;
 
+/**
+ * Modify derived components generation if needed.
+ *
+ * don't forget to use thís prepared component in the verifier
+ */
+$signingConfiguration->withPrepareComponentsMethod(
+    componentName: '@authority',
+    callable     : fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),
+);
 /**
  * Prepare the Request
  */
