@@ -22,14 +22,10 @@ require_once dirname(__DIR__).'/src/register-openssl-signing-verify.php';
 #require_once dirname(__DIR__).'/src/register-phpseclib4-signing-verify.php';
 
 /**
- * request against local cli spinned webserver to handle internally the requests
+ * for testing purposes we use a own cert-loader
  */
-require_once dirname(__DIR__).'/tests/Webserver/server.php';
-/**
- * for testing purposes
- */
-#$certInstance = new CertHelper('rsa');
-$certInstance = new CertHelper('hmac');
+$certInstance = new CertHelper('rsa');
+#$certInstance = new CertHelper('hmac');
 #$certInstance = new CertHelper('ed25519');
 $targetUrl = 'http://localhost:8001/mastodon';
 /**
@@ -41,9 +37,7 @@ $signingConfiguration = new SigningConfiguration()
     ->signHeader('@method')
     ->signHeader('x-Origin-host')
     ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-    #   ->withSigningAlgorithm(SigningEnum::ed25519)
-    #->withSigningAlgorithm(SigningEnum::rsa_pss_sha512)
-        ->withSigningAlgorithm(SigningEnum::hmac_sha_256)
+    // ->withSigningAlgorithm(SigningEnum::hmac_sha_256)
     ->withCreated($currentDateTime)
     ->withExpires($currentDateTime + 7200)
     ->withTag('mastodon')
@@ -73,9 +67,10 @@ $signedRequest = $signer->sign();
 /**
  * working with local server
  */
-/** @noinspection PhpFullyQualifiedNameUsageInspection */
-$response = new \GuzzleHttp\Client()->send($signedRequest);
-
+/**
+ * @noinspection \PhpFullyQualifiedNameUsageInspection
+ * $response = new \GuzzleHttp\Client()->send($signedRequest);
+ */
 /**
  * Now decrypt the Request
  */
@@ -110,7 +105,7 @@ if ($keyId) {
      */
 
     $res = $verifier->verifying();
-    echo $res, "\n";
+    echo 'verify result: ', $res, "\n";
 
     /**
      * After successfully verifying you have access to verified header
@@ -123,7 +118,7 @@ if ($keyId) {
          * Also the $metadata are verified
          */
         $metadata = $verifier->signingConfiguration->metadata;
-        // in example: check created oar expire
+        // in example: check created or expire
 
         if ($metadata->created) {
             // ...
