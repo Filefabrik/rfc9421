@@ -11,6 +11,7 @@ use phpseclib4\Crypt\RSA;
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
 /**
+ * todo: not fully implemented and mixed with OpenSSL
  * Sender-Side
  * https://toolv.com/en/app/rsa-key-generator
  */
