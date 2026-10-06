@@ -13,8 +13,6 @@ PHP RFC9421 HTTP Message Signing and Verify
 * change|set|extend your own signing algorithms via interface
 * switch between php cryptography as your project need
 
-
-
 ## Getting started
 
 ### Install with composer
@@ -22,6 +20,11 @@ PHP RFC9421 HTTP Message Signing and Verify
 ```shell
 composer install filefabrik/rfc9421
 ```
+
+### Example
+
+For getting directly results in your code, have a look into `./examples/signer.php` there is a full example of signing
+and verifying with Rfc9421.
 
 ### Signing Request Example
 
@@ -59,6 +62,7 @@ $request    = new Request(
 
 ?>
 ```
+
 Looks quite a normal request. Now, let us have a look for the Signer-Configuration.
 
 **Full example of request signer**
@@ -110,7 +114,6 @@ _That's All_
 * prepare the request in the Verifier
 * Getting the Public Key from the Sender and configure some parts if need
 * Verify
-
 
 ## Explained signing configuration
 
@@ -328,7 +331,6 @@ require_once dirname(__DIR__).'/src/register-phpseclib4-signing-verify.php';
 
 mastodon https://docs.joinmastodon.org/spec/security/ uses 3.3.2. RSASSA-PKCS1-v1_5 Using SHA-256
 
-
 ## Docs and other References
 
 RFC9421 https://www.rfc-editor.org/info/rfc9421
@@ -346,7 +348,7 @@ https://www.iana.org/assignments/http-message-signature
 
 Testing http signatures: https://httpsig.org/
 
-To create Certs have a look into  ./tests/generators/ there are some generators you can modify as you need if you need
+To create Certs have a look into ./tests/generators/ there are some generators you can modify as you need if you need
 
 or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local terminal
 

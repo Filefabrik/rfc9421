@@ -23,8 +23,10 @@ $methods  = [
 ?>
 ```
 
-Perhaps you have set a header like `X-Original-Host` which holds your real authority. Then you change the "generation"
-for the `@authority` to: `fn(RequestInterface $message) => $message->getHeaderLine('X-Original-Host')`
+Perhaps you have set a header like `X-Original-Host` which holds your real authority.
+Then you change the "generation" for the `@authority`
+to:
+`fn(RequestInterface $message) => $message->getHeaderLine('X-Original-Host')`
 
 ### per SigningConfiguration ()
 
