@@ -26,7 +26,6 @@
       "Filefabrik\\Rfc9421\\": "src/Rfc9421"
     }
   },
-
   "autoload-dev": {
     "psr-4": {
       "Filefabrik\\Rfc9421Test\\": "tests/Rfc9421",
@@ -36,8 +35,7 @@
   "require": {
     "php": "^8.4",
     "psr/http-message": "^2.0",
-    "ext-openssl": "*",
-    "ext-gmp": "*"
+    "ext-openssl": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "*",
