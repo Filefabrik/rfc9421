@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\HsapTest\Tools;
+namespace Filefabrik\Rfc9421Test\Tools;
 
 final class CertHelper
 {

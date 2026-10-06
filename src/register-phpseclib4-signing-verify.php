@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Filefabrik\Hsap\Cryptography\SignatureRegistry;
-use Filefabrik\Hsap\Cryptography\SigningEnum;
-use Filefabrik\Hsap\Cryptography\VerifyRegistry;
+use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
+use Filefabrik\Rfc9421\Cryptography\SigningEnum;
+use Filefabrik\Rfc9421\Cryptography\VerifyRegistry;
 use phpseclib4\Crypt\EC;
 use phpseclib4\Crypt\RSA;
 

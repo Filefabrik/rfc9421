@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Filefabrik\Hsap\Cryptography\SigningEnum;
-use Filefabrik\Hsap\Signer;
-use Filefabrik\Hsap\SigningConfiguration;
-use Filefabrik\Hsap\Verify;
-use Filefabrik\HsapTest\Tools\CertHelper;
+use Filefabrik\Rfc9421\Cryptography\SigningEnum;
+use Filefabrik\Rfc9421\Signer;
+use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\Verify;
+use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\MessageInterface;
 

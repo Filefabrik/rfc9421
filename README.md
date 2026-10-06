@@ -116,7 +116,7 @@ _That's All_
 
 ```php
 <?php 
-use Filefabrik\Hsap\SigningConfiguration;
+use Filefabrik\Rfc9421\SigningConfiguration;
 
 $configuration   = new SigningConfiguration();
 ?>

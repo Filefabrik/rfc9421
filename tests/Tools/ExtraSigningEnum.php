@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\HsapTest\Tools;
+namespace Filefabrik\Rfc9421Test\Tools;
 
-use Filefabrik\Hsap\Cryptography\SigningTrait;
-use Filefabrik\Hsap\Interfaces\SigningEnumInterface;
+use Filefabrik\Rfc9421\Cryptography\SigningTrait;
+use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 
 /**
  * Testing extra Signing Enum Class

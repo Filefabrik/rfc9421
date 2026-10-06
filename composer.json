@@ -23,14 +23,14 @@
   "type": "library",
   "autoload": {
     "psr-4": {
-      "Filefabrik\\Hsap\\": "src/Hsap"
+      "Filefabrik\\Rfc9421\\": "src/Rfc9421"
     }
   },
 
   "autoload-dev": {
     "psr-4": {
-      "Filefabrik\\HsapTest\\": "tests/Hsap",
-      "Filefabrik\\HsapTest\\Tools\\": "tests/Tools"
+      "Filefabrik\\Rfc9421Test\\": "tests/Rfc9421",
+      "Filefabrik\\Rfc9421Test\\Tools\\": "tests/Tools"
     }
   },
   "require": {
