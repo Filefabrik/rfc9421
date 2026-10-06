@@ -42,8 +42,8 @@ final class Verify
     public private(set) ?HeaderHelper               $headerHelper             = null {
         get => $this->headerHelper ??= new HeaderHelper(message: $this->message);
     }
-    private bool                                    $preparedVerifier         = false;
-    private ?HeaderSignatureInput                   $signatureInputInstance   = null;
+    private bool                             $preparedVerifier         = false;
+    private ?HeaderSignatureInput            $signatureInputInstance   = null;
 
     public function __construct(
         public private(set) readonly MessageInterface|RequestInterface $message,
@@ -66,7 +66,7 @@ final class Verify
      * @throws InvalidHeaderKeyException
      * @throws VerifyHeaderSignatureException
      * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException|Exceptions\SignatureException
+     * @throws InvalidDerivedKeyException|Exceptions\SignatureException|Exceptions\SignatureExtractionException
      */
     public function verifying(): bool
     {

@@ -50,6 +50,7 @@ final readonly class ContentDigest
 
     /**
      * todo ...shiddy extractor
+     *
      * @return array
      */
     public function getDigestArray(): array

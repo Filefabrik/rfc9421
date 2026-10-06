@@ -6,7 +6,6 @@ namespace Filefabrik\Rfc9421\Support;
 
 trait EnumSupportTrait
 {
-
     public static function isOwnType(self|string|null $key): ?static
     {
         if ($key instanceof self) {

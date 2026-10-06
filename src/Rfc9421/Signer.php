@@ -23,7 +23,7 @@ final class Signer
     /**
      * Data for signing the relevant header data
      *
-     * @var array
+     * @var array<string,string>
      */
     public private(set) array $signingParameters = [];
     /**

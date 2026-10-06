@@ -6,6 +6,7 @@ namespace Filefabrik\Rfc9421\Cryptography;
 
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
+use InvalidArgumentException;
 
 /**
  * During receive a signature input with perhaps own not known signing algo you are able to use also or exclusively your own naming
@@ -27,11 +28,11 @@ final class SigningEnumsRegistry
 
                 return;
             }
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('The class "%s" does not have the interface "%s"', $enumClass, $ifClass),
             );
         }
-        throw new \InvalidArgumentException(sprintf('class "%s" does not exist', $enumClass));
+        throw new InvalidArgumentException(sprintf('class "%s" does not exist', $enumClass));
     }
 
     /**

@@ -16,6 +16,7 @@ $signings = [
         }
         $signature = '';
 
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
         openssl_sign(
             $signingDatas,
             $signature,
@@ -116,6 +117,7 @@ $verifying = [
             );
         }
 
+        /** @noinspection PhpMethodParametersCountMismatchInspection */
         return 0 < openssl_verify(
             $signingDatas,
             $signature,

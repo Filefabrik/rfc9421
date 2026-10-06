@@ -42,7 +42,6 @@ final class HeaderSignature
 
     /**
      * todo check empty
-
      *
      * @return string
      * @throws SignatureExtractionException
