@@ -26,7 +26,7 @@ final class Verify
     /**
      * Only if verified successfully
      *
-     * @var array|null null on not set
+     * @var array<string,string>|null null on not set
      */
     public private(set) null|array $validSignedParameters = null;
     /**
@@ -42,19 +42,17 @@ final class Verify
     public private(set) ?HeaderHelper               $headerHelper             = null {
         get => $this->headerHelper ??= new HeaderHelper(message: $this->message);
     }
-    private bool                             $preparedVerifier         = false;
-    private ?HeaderSignatureInput            $signatureInputInstance   = null;
+    private bool                                    $preparedVerifier         = false;
+    private ?HeaderSignatureInput                   $signatureInputInstance   = null;
 
     public function __construct(
         public private(set) readonly MessageInterface|RequestInterface $message,
         /**
          * On first step "Prepare" the extracted Configuration how to handle the own signing of the received request to check the "signature" and the "body" hash
          *
-         * @var SigningConfiguration|null
+         * @var SigningConfiguration
          */
-        public private(set) ?SigningConfiguration $signingConfiguration = null {
-            get => $this->signingConfiguration ??= new SigningConfiguration();
-        },
+        public private(set) readonly SigningConfiguration $signingConfiguration = new SigningConfiguration(),
     ) {
     }
 

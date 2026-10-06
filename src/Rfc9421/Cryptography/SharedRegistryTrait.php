@@ -15,7 +15,10 @@ trait SharedRegistryTrait
     }
 
     /**
-     * @throws SignatureException
+     *
+     * @param array<string,Closure> $methods
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public static function registerMethods(array $methods): void
     {

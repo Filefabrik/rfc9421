@@ -18,12 +18,13 @@ final class VerifyRegistry
     /**
      * Map Verifying Methods
      *
-     * @var array
+     * @var callable[]
      */
     private static array $stack = [];
 
     /**
      * @codeCoverageIgnore
+     * @noinspection PhpUnused
      */
     private function __construct()
     {
@@ -37,7 +38,7 @@ final class VerifyRegistry
         string $data,
         string $signature,
         string $publicKey,
-    ) {
+    ): bool {
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnum);
 
         $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValueException(

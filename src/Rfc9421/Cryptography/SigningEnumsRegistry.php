@@ -46,6 +46,6 @@ final class SigningEnumsRegistry
                 return $fEnum;
             }
         }
-        throw SignatureException::signatureEnumNotFound($enum);
+        throw SignatureException::signatureEnumNotFound(is_string($enum) ? $enum : $enum->getName());
     }
 }

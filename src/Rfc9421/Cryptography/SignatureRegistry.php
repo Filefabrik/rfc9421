@@ -18,7 +18,7 @@ final class SignatureRegistry
     /**
      * Map signing Methods
      *
-     * @var array
+     * @var array<callable>
      */
     private static array $stack = [];
 
@@ -26,6 +26,7 @@ final class SignatureRegistry
      * only static class
      *
      * @codeCoverageIgnore
+     * @noinspection PhpUnused
      */
     private function __construct()
     {
@@ -38,7 +39,7 @@ final class SignatureRegistry
         string|SigningEnumInterface $signingEnumInterface,
         string $signingDatas,
         string $privateKey,
-    ) {
+    ): string {
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnumInterface);
 
         $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValueException(
