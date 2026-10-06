@@ -359,3 +359,4 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
     * 2.2.5. Request Target
     * 2.2.7. Query
     * 2.4. Signing Request Components in a Response Message
+* check https://github.com/bakame-php/http-structured-fields
