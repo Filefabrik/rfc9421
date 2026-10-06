@@ -52,7 +52,7 @@ Let us have a look at the most relevant parameters when sending a Message (reque
 First, you have to create your regular Request-Object. If you have already a Request-Object, you have nothing todo with
 it.
 
-What we have to do, we let your prepared Request running through die FilefabrikHSAP-Signer
+What we have to do, we let your prepared Request running through die filefabrik/rfc9421 Signer
 
 _typical request object_
 
@@ -282,7 +282,7 @@ todo: show example in tests directory how to implement
 
 ## PHP Signing libraries
 
-This Hsap-Library is shipped without a Cryptography library. So you are able to use an in your project existing signing
+This RFC9421-Library is shipped without a Cryptography library. So you are able to use an in your project existing signing
 library. For fresh Projects, pick a singing library as your need.
 
 To use a preconfigured and tested signing and verifying Configuration please use require_once command somewhere before
