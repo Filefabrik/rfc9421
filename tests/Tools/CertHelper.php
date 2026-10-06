@@ -6,13 +6,13 @@ namespace Filefabrik\Rfc9421Test\Tools;
 
 use UnexpectedValueException;
 
-final class CertHelper
+final readonly class CertHelper
 {
     public function __construct(public private(set) string $name)
     {
     }
 
-    public function getPrivatPemContent(): false|string
+    public function getPrivatPemContent(): string
     {
         $fname = $this->name.'-private.pem';
         $path  = $this->getDir().$fname;
@@ -25,13 +25,13 @@ final class CertHelper
         return dirname(__DIR__, 2).'/tests/Keys/';
     }
 
-    private function getFC($path): string
+    private function getFC(string $path): string
     {
         return is_string($fc = file_get_contents($path)) ? $fc :
             throw new UnexpectedValueException('pem file not found at '.$path);
     }
 
-    public function getPublicPemContent(): false|string
+    public function getPublicPemContent(): string
     {
         $fname = $this->name.'-public.pem';
         $path  = $this->getDir().$fname;
