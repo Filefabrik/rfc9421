@@ -4,15 +4,15 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 ## Features
 
-* ✅ RFC 9421 Signing and Verification 
-* ✅ PHP-8.4|PHP-8.5
-* ✅ CodeCoverage 100%
-* ✅ easy to use.
-* ✅ integrate the signer and verifier into existing projects
-* ✅ Use Guzzle or Laravel or other PSR-7 compatible libraries
-* ✅ encapsulated processing
-* ✅ change|set|extend your own signing algorithms via interface
-* ✅ switch between php cryptography as your project need
+✅ RFC 9421 Signing and Verification 
+✅ PHP-8.4|PHP-8.5
+✅ CodeCoverage 100%
+✅ easy to use.
+✅ integrate the signer and verifier into existing projects
+✅ Use Guzzle or Laravel or other PSR-7 compatible libraries
+✅ encapsulated processing
+✅ change|set|extend your own signing algorithms via interface
+✅ switch between php cryptography as your project need
 
 ## Getting started
 
