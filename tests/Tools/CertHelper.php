@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Tools;
 
+use UnexpectedValueException;
+
 final class CertHelper
 {
     public function __construct(public private(set) string $name)
@@ -23,9 +25,10 @@ final class CertHelper
         return dirname(__DIR__, 2).'/tests/Keys/';
     }
 
-    private function getFC($path): false|string
+    private function getFC($path): string
     {
-        return file_get_contents($path);
+        return is_string($fc = file_get_contents($path)) ? $fc :
+            throw new UnexpectedValueException('pem file not found at '.$path);
     }
 
     public function getPublicPemContent(): false|string
