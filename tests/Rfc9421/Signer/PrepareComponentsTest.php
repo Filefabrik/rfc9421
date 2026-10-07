@@ -20,7 +20,7 @@ use UnexpectedValueException;
 final class PrepareComponentsTest extends TestCase
 {
     /**
-     * @covers ::setDefaultDerivedStack
+     * @covers PrepareComponents::setDefaultDerivedStack
      * */
     public function testSetDefaultDerivedStack(): void
     {
@@ -47,7 +47,7 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
-     * @covers ::setDerivedMapper
+     * @covers PrepareComponents::setDerivedMapper
      * */
     public function testSetDerivedMapper(): void
     {
@@ -66,7 +66,7 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
-     * @covers ::processValue
+     * @covers PrepareComponents::processValue
      * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
@@ -76,11 +76,10 @@ final class PrepareComponentsTest extends TestCase
         $this->expectExceptionObject(
             new BadMethodCallException('Method "12" not callable.'),
         );
-        $r               = new Request('post', 'https://Test.com/test&var=käse');
-        $signatureParams = new SignatureParams();
+        $r = new Request('post', 'https://Test.com/test&var=käse');
 
-        $prepareComponents          = new PrepareComponents($r);
-        $messageStack               = PrepareComponents::getDefaultDerivedStack();
+        $prepareComponents = new PrepareComponents($r);
+        $messageStack      = PrepareComponents::getDefaultDerivedStack();
         // todo never allow a number only closure or string
         $messageStack[' bullshit '] = 12;
         $prepareComponents->setDerivedMapper($messageStack);
@@ -90,7 +89,8 @@ final class PrepareComponentsTest extends TestCase
 
     /**
      * Overall Method to check the System
-     * @covers ::processValue
+     *
+     * @covers PrepareComponents::processValue
      *
      * @return void
      * @throws AlreadySetException
@@ -115,7 +115,7 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
-     * @covers ::processTargetUri
+     * @covers PrepareComponents::processTargetUri
      * @return void
      */
     public function testProcessTargetUri(): void
@@ -128,7 +128,7 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
-     * @covers ::processAtMethod
+     * @covers PrepareComponents::processAtMethod
      * @return void
      */
     public function testProcessAtMethod(): void
@@ -203,8 +203,6 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->processValue('@method_notset');
     }
-
-
 
     public function testSetMappingValues()
     {
