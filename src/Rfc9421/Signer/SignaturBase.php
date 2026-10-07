@@ -24,9 +24,7 @@ final class SignaturBase
     /**
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
      *
-     * @param array $signatureLines
      *
-     * @return string
      */
     public static function compileSignatureInputToString(array $signatureLines): string
     {
@@ -42,7 +40,6 @@ final class SignaturBase
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
-     * @return array
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      */
@@ -65,10 +62,7 @@ final class SignaturBase
     /**
      * Handle the preparation of a signature-base array/line(key, value)
      *
-     * @param string            $signatureParam
-     * @param PrepareComponents $components
      *
-     * @return array
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      */
@@ -91,7 +85,6 @@ final class SignaturBase
      * Handle the body signing
      * Todo create a extra config for the digest-hash
      *
-     * @return array
      * @throws ContentDigestException
      */
     private function handleSignBody(): array
@@ -111,6 +104,7 @@ final class SignaturBase
             // later to compile
             return [$headerKey, $value];
         }
+
         throw new UnexpectedValueException(
             'Expecting content-digest from signingConfiguration header but mustSignBody is false',
         );
@@ -119,9 +113,7 @@ final class SignaturBase
     /**
      * Header Key must exist
      *
-     * @param string $signatureParam
      *
-     * @return array
      * @throws InvalidHeaderKeyException
      */
     private function checkExistingHeader(string $signatureParam): array
@@ -129,14 +121,13 @@ final class SignaturBase
         if ($this->message->hasHeader($signatureParam)) {
             return [$signatureParam, $this->message->getHeaderLine($signatureParam)];
         }
+
         throw InvalidHeaderKeyException::headerNotExists($signatureParam);
     }
 
     /**
      * Concat the signatureKey with the components part in braces with the Metadata
      * Signature-Input: sig1=("@method" "@authority" "@path" "content-type" "content-length");created=1618884475;keyid="test-key"
-     *
-     * @return string
      */
     public function makeSignatureInput(): string
     {

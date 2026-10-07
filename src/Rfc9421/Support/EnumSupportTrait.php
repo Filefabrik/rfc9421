@@ -12,13 +12,11 @@ trait EnumSupportTrait
             return $key;
         }
 
-        return array_find(self::cases(), fn($case) => $case->name === $key || $case->value === $key);
+        return array_find(self::cases(), fn($case): bool => $case->name === $key || $case->value === $key);
     }
 
     /**
      * Interfaced Method
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -27,8 +25,6 @@ trait EnumSupportTrait
 
     /**
      * Interfaced Method
-     *
-     * @return string
      */
     public function getValue(): string
     {

@@ -17,9 +17,7 @@ final class SignatureRegistryTest extends TestCase
     {
         SignatureRegistry::registerMethod(
             SigningEnum::ed25519,
-            function(string $signingDatas, string $privateKeyPem): string {
-                return 'isSigned';
-            },
+            fn(string $signingDatas, string $privateKeyPem): string => 'isSigned',
         );
 
         $this->assertSame('isSigned', SignatureRegistry::signing(SigningEnum::ed25519, '', ''));
@@ -31,9 +29,7 @@ final class SignatureRegistryTest extends TestCase
         SignatureRegistry::registerMethods(
             [
                 SigningEnum::ed25519->name =>
-                    function(string $signingDatas, string $privateKeyPem): string {
-                        return 'isSigned';
-                    },
+                    fn(string $signingDatas, string $privateKeyPem): string => 'isSigned',
             ],
         );
     }
@@ -43,9 +39,7 @@ final class SignatureRegistryTest extends TestCase
         $this->expectNotToPerformAssertions();
         SignatureRegistry::registerMethod(
             SigningEnum::ed25519,
-            function(string $signingDatas, string $privateKeyPem): string {
-                return 'isSigned';
-            },
+            fn(string $signingDatas, string $privateKeyPem): string => 'isSigned',
         );
     }
 

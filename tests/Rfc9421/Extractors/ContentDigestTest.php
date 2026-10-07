@@ -12,10 +12,7 @@ use PHPUnit\Framework\TestCase;
 #[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Extractors\ContentDigest::class, 'validateExtraction')]
 final class ContentDigestTest extends TestCase
 {
-    /**
-     * @return void
-     */
-    public function testvalidateExtractionFalse()
+    public function testvalidateExtractionFalse(): void
     {
         $this->assertFalse(new ContentDigest('bullshit')->validateExtraction());
 

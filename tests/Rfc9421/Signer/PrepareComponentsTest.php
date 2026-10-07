@@ -28,7 +28,7 @@ final class PrepareComponentsTest extends TestCase
     {
         $orig = PrepareComponents::getDefaultDerivedStack();
         $arr  = [
-            '@method' => fn(RequestInterface $message) => str_replace(
+            '@method' => fn(RequestInterface $message): string => str_replace(
                 't',
                 'B',
                 ucfirst(strtolower($message->getMethod())),
@@ -51,7 +51,7 @@ final class PrepareComponentsTest extends TestCase
     public function testSetDerivedMapper(): void
     {
         $arr = [
-            '@method' => fn(RequestInterface $message) => ucfirst(strtolower($message->getMethod())),
+            '@method' => fn(RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
         ];
 
         $r               = new Request('post', 'https://Test.com');
@@ -78,7 +78,7 @@ final class PrepareComponentsTest extends TestCase
         $prepareComponents = new PrepareComponents($r);
         $messageStack      = PrepareComponents::getDefaultDerivedStack();
         // todo never allow a number only closure or string
-        $messageStack[' bullshit '] = 12;
+        $messageStack[' bullshit '] = '12';
         $prepareComponents->setDerivedMapper($messageStack);
 
         $prepareComponents->processValue(' bullshit ');
@@ -178,7 +178,7 @@ final class PrepareComponentsTest extends TestCase
     public function testSetMappingValues(): void
     {
         $arr = [
-            '@methodsss' => fn(RequestInterface $message) => ucfirst(strtolower($message->getMethod())),
+            '@methodsss' => fn(RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
         ];
 
         $r = new Request('post', 'https://Test.com');

@@ -33,9 +33,7 @@ final class SignatureParams
     }
 
     /**
-     * @param array $keys
      *
-     * @return $this
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
@@ -88,6 +86,7 @@ final class SignatureParams
         if ($this->exists($name)) {
             throw AlreadySetException::inputSignature($name);
         }
+
         $this->signatureParameters[] = $name;
 
         return $this;

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AlreadySetException::class)]
 final class AlreadySetExceptionTest extends TestCase
 {
-    public function testInputSignature()
+    public function testInputSignature(): void
     {
         $this->expectExceptionObject(
             new AlreadySetException(

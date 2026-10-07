@@ -88,8 +88,6 @@ final class PrepareComponents
      * While having systemwide an own mapping dialect for your needs, set the method stack globally
      *
      * @param array{string:string|Closure} $defaultDerivedStack
-     *
-     * @return void
      */
     public static function setDefaultDerivedStack(array $defaultDerivedStack): void
     {
@@ -100,8 +98,6 @@ final class PrepareComponents
      * Configure later the MethodStack if need
      *
      * @param array<Closure|callable|string>|null $derivedMapper
-     *
-     * @return $this
      */
     public function setDerivedMapper(?array $derivedMapper): self
     {
@@ -112,8 +108,6 @@ final class PrepareComponents
 
     /**
      * @param array{string:string|Closure} $values
-     *
-     * @return $this
      */
     public function setMappingValues(array $values): self
     {
@@ -142,12 +136,7 @@ final class PrepareComponents
         return $this->derivedMapper ??= self::$defaultDerivedStack;
     }
 
-    /**
-     * @param $key
-     *
-     * @return int|string|float
-     */
-    public function processValue($key): int|string|float
+    public function processValue(string $key): int|string|float
     {
         if (!array_key_exists($key, $this->getMethodStack())) {
             throw new UnexpectedValueException(sprintf('Method "%s" not registered.', $key));
@@ -158,7 +147,8 @@ final class PrepareComponents
         if ($callableMethod instanceof Closure) {
             return $callableMethod($this->message);
         }
-        if (is_string($callableMethod) && method_exists($this, $callableMethod)) {
+
+        if (method_exists($this, $callableMethod)) {
             return $this->$callableMethod();
         }
 
@@ -168,7 +158,6 @@ final class PrepareComponents
     /**
      * extracting the "method" from header to use later as "@method"
      *
-     * @return string
      * @see 2.2.1. Method
      */
     public function processAtMethod(): string
@@ -179,7 +168,6 @@ final class PrepareComponents
     /**
      * todo,needs more testing
      *
-     * @return string
      * @see 2.2.2. Target URI @target-uri
      */
     public function processTargetUri(): string
@@ -190,6 +178,7 @@ final class PrepareComponents
         if ($path = $messageUri->getPath()) {
             $parts[] = '/'.ltrim($path, '/');
         }
+
         if ($query = $messageUri->getQuery()) {
             $parts[] = '?'.ltrim($query, '?');
         }
@@ -198,7 +187,6 @@ final class PrepareComponents
     }
 
     /**
-     * @return string
      * @see 2.2.3. Authority
      */
     public function processAuthority(): string
@@ -209,7 +197,6 @@ final class PrepareComponents
     }
 
     /**
-     * @return string
      * @see 2.2.4. Scheme
      */
     public function processScheme(): string
@@ -241,24 +228,20 @@ final class PrepareComponents
 
         return (!str_starts_with($p, '/')) ? '/'.$p : $p;
     }
+
     /*
      * todo query 2.2.7. Query as it is more komplex
      * todo 2.2.8. Query Parameters as it is more complex
      */
     /*
-     * todo, the status can only be in the response, have a look what todo
-     *
-     * @return int
+         * todo, the status can only be in the response, have a look what todo
+         *
+         * @return int
 
-    public function processStatusCode(): int
-    {
-    }   */
-
+        public function processStatusCode(): int
+        {
+        }   */
     // todo 2.3. Signature Parameters über signature params preconfigured
-
-    /**
-     * @return int
-     */
     public function processContentLength(): int
     {
         return strlen((string)$this->message->getBody());

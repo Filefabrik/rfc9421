@@ -23,7 +23,6 @@ final readonly class PrepareSignatureKeyName
     /**
      * Handling the signature key validatedSignatureParts process
      *
-     * @return void
      * @throws VerifyHeaderSignatureException
      */
     public function prepare(): void
@@ -39,6 +38,7 @@ final readonly class PrepareSignatureKeyName
                 throw VerifyHeaderSignatureException::keynameNotExtracted();
                 // @codeCoverageIgnoreEnd
             }
+
             /**
              * extracted signature key from the "signature" which is the key for extracting the "components" and the "metadata"
              * todo maybe decide we are using an signature key name if there are more then one signatures

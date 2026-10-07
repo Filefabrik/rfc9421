@@ -95,6 +95,7 @@ final class SignaturBaseTest extends TestCase
 
         $sc = new SigningConfiguration();
         $sc->signHeader('not-existing');
+
         $r = new Request('POST', '', ['x-wrong-name' => 'hm']);
         $i = new SignaturBase($r, $sc);
         $i->createSignatureLines();

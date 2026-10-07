@@ -35,22 +35,16 @@ final class SigningConfiguration
      * Flag has to sign the body and the sig must be in header
      *
      * @todo documentation
-     *
-     * @var bool
      */
     public private(set) bool $mustSignBody = true;
 
     /**
      * Prefix the signature value
-     *
-     * @var string|null
      */
     public private(set) ?string $signatureKeyName = null;
 
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
-     *
-     * @var null|DigestAlgorithmsEnum
      */
     public private(set) ?DigestAlgorithmsEnum $contentDigestHashAlgo = null;
 
@@ -68,11 +62,6 @@ final class SigningConfiguration
         return $this;
     }
 
-    /**
-     * @param string $signatureKey
-     *
-     * @return $this
-     */
     public function withSignatureKeyName(string $signatureKey): self
     {
         $this->signatureKeyName = $signatureKey;
@@ -80,11 +69,6 @@ final class SigningConfiguration
         return $this;
     }
 
-    /**
-     * @param int|null $expires
-     *
-     * @return self
-     */
     public function withExpires(?int $expires): self
     {
         $this->metadata->setExpires($expires);
@@ -109,9 +93,7 @@ final class SigningConfiguration
     /**
      * Signing algorithm valid for metadata
      *
-     * @param null|string|SigningEnumInterface $algorithm
      *
-     * @return $this
      * @throws SignatureException
      */
     public function withSigningAlgorithm(null|string|SigningEnumInterface $algorithm): self
@@ -143,7 +125,6 @@ final class SigningConfiguration
      *
      * @param string[] $headerKeys
      *
-     * @return self
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
@@ -160,7 +141,6 @@ final class SigningConfiguration
     /**
      * Hashing the content-digest|body
      *
-     * @return DigestAlgorithmsEnum
      * @throws ContentDigestException
      */
     public function getContentDigestHashAlgo(): DigestAlgorithmsEnum
@@ -169,9 +149,6 @@ final class SigningConfiguration
     }
 
     /**
-     * @param string|DigestAlgorithmsEnum|null $contentDigestHashAlgo
-     *
-     * @return self
      * @throws ContentDigestException
      */
     public function setContentDigestHashAlgo(null|string|DigestAlgorithmsEnum $contentDigestHashAlgo): self

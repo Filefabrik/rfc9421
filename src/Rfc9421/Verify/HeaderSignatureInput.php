@@ -16,16 +16,14 @@ use InvalidArgumentException;
 final class HeaderSignatureInput
 {
     public private(set) null|SignaturInput $signatureInput = null;
+
     /**
      * only if validatedSignatureParts was successfully
-     *
-     * @var array|null
      */
     public private(set) null|array $extractedComponents = [];
+
     /**
      * only if validatedSignatureParts was successfully
-     *
-     * @var Metadata|null
      */
     public private(set) null|Metadata $extractedMetadata = null;
 
@@ -61,7 +59,6 @@ final class HeaderSignatureInput
     /**
      * Prepare the Signature-input from request to split the (component) and the metadata
      *
-     * @return string
      * @throws VerifyHeaderSignatureException
      */
     private function extractSignatureString(): string
@@ -73,12 +70,11 @@ final class HeaderSignatureInput
                     $this->headerSignatureInputValue,
                 );
             }
-            $raw = substr($this->headerSignatureInputValue, strlen($this->signatureNameKey));
-        } else {
-            $raw = $this->headerSignatureInputValue;
+
+            return substr($this->headerSignatureInputValue, strlen($this->signatureNameKey));
         }
 
-        return $raw;
+        return $this->headerSignatureInputValue;
     }
 
 }

@@ -17,12 +17,8 @@ final class VerifyRegistryTest extends TestCase
         $this->expectNotToPerformAssertions();
         VerifyRegistry::registerMethods([
             SigningEnum::rsa_pss_sha512->name    =>
-                function(string $signingDatas, $signature, $publicKeyPem): bool {
-                    return true;
-                },
-            SigningEnum::rsa_v_1_5_sha_256->name => function(string $signingDatas, $signature, $publicKeyPem): bool {
-                return false;
-            },
+                fn(string $signingDatas, $signature, $publicKeyPem): bool => true,
+            SigningEnum::rsa_v_1_5_sha_256->name => fn(string $signingDatas, $signature, $publicKeyPem): bool => false,
         ]);
     }
 
@@ -31,9 +27,7 @@ final class VerifyRegistryTest extends TestCase
         $this->expectNotToPerformAssertions();
         VerifyRegistry::registerMethod(
             SigningEnum::rsa_pss_sha512->name,
-            function(string $signingDatas, $signature, $publicKeyPem): bool {
-                return true;
-            },
+            fn(string $signingDatas, $signature, $publicKeyPem): bool => true,
         );
     }
 
@@ -41,12 +35,8 @@ final class VerifyRegistryTest extends TestCase
     {
         VerifyRegistry::registerMethods([
             SigningEnum::rsa_pss_sha512->name    =>
-                function(string $signingDatas, $signature, $publicKeyPem): bool {
-                    return true;
-                },
-            SigningEnum::rsa_v_1_5_sha_256->name => function(string $signingDatas, $signature, $publicKeyPem): bool {
-                return false;
-            },
+                fn(string $signingDatas, $signature, $publicKeyPem): bool => true,
+            SigningEnum::rsa_v_1_5_sha_256->name => fn(string $signingDatas, $signature, $publicKeyPem): bool => false,
         ]);
         $this->assertTrue(VerifyRegistry::verifying(SigningEnum::rsa_pss_sha512, '', '', ''));
         $this->assertFalse(VerifyRegistry::verifying(SigningEnum::rsa_v_1_5_sha_256, '', '', ''));

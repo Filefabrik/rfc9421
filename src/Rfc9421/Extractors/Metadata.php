@@ -20,9 +20,7 @@ final class Metadata extends AbstractMetadata
     /**
      * for the moment a statical method
      *
-     * @param string $metadataString
      *
-     * @return self
      */
     public static function stringToMetadata(string $metadataString): self
     {
@@ -34,9 +32,6 @@ final class Metadata extends AbstractMetadata
         return $self;
     }
 
-    /**
-     * @return array
-     */
     private function extractString(): array
     {
         $segments = [];
@@ -58,6 +53,7 @@ final class Metadata extends AbstractMetadata
         if (2 === count($parts)) {
             return [$parts[0], $parts[1]];
         }
+
         throw new InvalidArgumentException(sprintf('Invalid segment: %s. Expects "key=value"', $segment));
     }
 

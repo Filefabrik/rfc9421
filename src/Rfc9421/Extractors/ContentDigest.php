@@ -12,15 +12,11 @@ namespace Filefabrik\Rfc9421\Extractors;
 final readonly class ContentDigest
 {
     /*
-    *  "content-digest": sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:
-    * //  The format is content-digest => <algorithm>=:<base64 encoded hash>:
-    * $digestString = $headers["content-digest"];
-    * //  The Base64 encoding may have multiple `=` at the end. So split this at the first `=`.
-    * $digestData = explode( separator: "=", string: $digestString, limit: 2 );
-     */
-
-    /**
-     * @param string $contentDigest
+     *  "content-digest": sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:
+     * //  The format is content-digest => <algorithm>=:<base64 encoded hash>:
+     * $digestString = $headers["content-digest"];
+     * //  The Base64 encoding may have multiple `=` at the end. So split this at the first `=`.
+     * $digestData = explode( separator: "=", string: $digestString, limit: 2 );
      */
     public function __construct(public private(set) string $contentDigest)
     {
@@ -61,8 +57,6 @@ final readonly class ContentDigest
     /**
      * check we have 2 parts after splitting
      * todo more clever validatedSignatureParts check
-     *
-     * @return bool
      */
     public function validateExtraction(): bool
     {
@@ -81,9 +75,6 @@ final readonly class ContentDigest
         return str_replace(search: ':', replace: '', subject: $this->getExplodedHash());
     }
 
-    /**
-     * @return string
-     */
     public function getExplodedHash(): string
     {
         return $this->getDigestArray()[1];

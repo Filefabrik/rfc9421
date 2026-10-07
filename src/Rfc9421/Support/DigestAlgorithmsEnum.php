@@ -24,7 +24,7 @@ enum DigestAlgorithmsEnum: string
      */
     public static function isOwnTypeOrThrow(self|string|null $key): self
     {
-        if ($res = self::isOwnType($key)) {
+        if (($res = self::isOwnType($key)) instanceof self) {
             return $res;
         }
 
@@ -34,8 +34,6 @@ enum DigestAlgorithmsEnum: string
 
     /**
      * used in php hash
-     *
-     * @return string
      */
     public function getPhpAlgorithm(): string
     {
@@ -44,8 +42,6 @@ enum DigestAlgorithmsEnum: string
 
     /**
      * used in signature
-     *
-     * @return string
      */
     public function getDisplayAlgorithm(): string
     {

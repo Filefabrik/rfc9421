@@ -24,45 +24,38 @@ abstract class AbstractMetadata
      * @var string[]
      */
     protected static array $decodeToInt = ['created', 'expires'];
+
     /**
      * UNIX timestamp when the signature was generated (recommended for replay protection)
      * Please use UTC Timezone
-     *
-     * @var int|null
      */
     public private(set) int|null $created = null;
+
     /**
      * UNIX timestamp after which the signature should be rejected
-     *
-     * @var int|null
      */
     public private(set) int|null $expires = null;
+
     /**
      * A random unique value to prevent replay attacks
-     *
-     * @var string|null
      */
     public private(set) string|null $nonce = null;
 
     /**
      * Identifier for the key used (helps the server find the right public key)
-     *
-     * @var string|null
      */
     public private(set) string|null $keyid = null;
+
     /**
      * The algorithm used to create the signature (e.g., rsa-pss-sha512)
      *
      * @todo define possible algo's based up the current php installation capabilities
      * @see  /docs/iana-rfc9421/signature-algorithms.csv
-     * @var null|SigningEnumInterface
      */
     public private(set) null|SigningEnumInterface $alg = null;
 
     /**
      * Application-specific identifier
-     *
-     * @var string|null
      */
     public private(set) string|null $tag = null;
 
@@ -84,18 +77,23 @@ abstract class AbstractMetadata
         if ($this->created) {
             $metadata['created'] = $this->created;
         }
+
         if ($this->expires) {
             $metadata['expires'] = $this->expires;
         }
+
         if ($this->nonce) {
             $metadata['nonce'] = $this->nonce;
         }
+
         if ($this->keyid) {
             $metadata['keyid'] = $this->keyid;
         }
-        if ($this->alg) {
+
+        if ($this->alg instanceof \Filefabrik\Rfc9421\Interfaces\SigningEnumInterface) {
             $metadata['alg'] = $this->alg->getValue();
         }
+
         if ($this->tag) {
             $metadata['tag'] = $this->tag;
         }

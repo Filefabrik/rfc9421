@@ -28,10 +28,12 @@ final class SigningEnumsRegistry
 
                 return;
             }
+
             throw new InvalidArgumentException(
                 sprintf('The class "%s" does not have the interface "%s"', $enumClass, $ifClass),
             );
         }
+
         throw new InvalidArgumentException(sprintf('class "%s" does not exist', $enumClass));
     }
 
@@ -46,6 +48,7 @@ final class SigningEnumsRegistry
                 return $fEnum;
             }
         }
+
         throw SignatureException::signatureEnumNotFound(is_string($enum) ? $enum : $enum->getName());
     }
 }

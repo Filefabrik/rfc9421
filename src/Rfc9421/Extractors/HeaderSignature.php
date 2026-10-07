@@ -46,7 +46,6 @@ final class HeaderSignature
     /**
      * todo check empty
      *
-     * @return string
      * @throws SignatureExtractionException
      */
     public function getBinarySignatureValue(): string
@@ -63,8 +62,6 @@ final class HeaderSignature
 
     /**
      *  todo check empty
-     *
-     * @return string
      */
     public function getSignatureValue(): string
     {

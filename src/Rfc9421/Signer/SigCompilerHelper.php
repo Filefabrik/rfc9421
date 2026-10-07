@@ -27,9 +27,6 @@ final readonly class SigCompilerHelper
     }
 
     /**
-     * @param array  $params
-     * @param string $signatureKeyName
-     *
      * @return string sig1=("@method" "@authority" "@path" "content-type" "content-length")
      * @todo during concat with Metadata to signature-params don't forget the trailing semicolon
      */
@@ -42,9 +39,7 @@ final readonly class SigCompilerHelper
     /**
      * simple helper
      *
-     * @param string $string
      *
-     * @return string
      */
     public static function wrapBraces(string $string): string
     {
@@ -52,8 +47,6 @@ final readonly class SigCompilerHelper
     }
 
     /**
-     * @param array $params
-     *
      * @return string "@method" "@authority" "@path" "content-type" "content-length"
      */
     public static function compileFromArray(array $params): string

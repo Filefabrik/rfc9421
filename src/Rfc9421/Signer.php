@@ -26,6 +26,7 @@ final class Signer
      * @var array<string,string>
      */
     public private(set) array $signingParameters = [];
+
     /**
      * @var string|null null throws an error
      */
@@ -54,6 +55,7 @@ final class Signer
         if ($this->signingConfiguration->mustSignBody) {
             $this->signingConfiguration->signatureParams->add('content-digest');
         }
+
         $this->prepareSigning();
 
         // last phase, crypt and base64_encode. get back header key value  sig1=:base64_signature:
@@ -95,10 +97,8 @@ final class Signer
     /**
      * Generate the base signature
      *
-     * @param $signingParametersString
      *
-     * @return string
-     * @throws SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function crypt($signingParametersString): string
     {
@@ -114,7 +114,6 @@ final class Signer
     /**
      * The base64EncodedValue signature-value
      *
-     * @param string $signature
      *
      * @return string $signatureKeyName:$signature:
      *
@@ -126,13 +125,8 @@ final class Signer
 
     /**
      * internal helper to rebind the changed request object(messageInterface) to $this->message
-     *
-     * @param string $name
-     * @param        $value
-     *
-     * @return self
-     */
-    private function updateHeader(string $name, $value): self
+       */
+    private function updateHeader(string $name, ?string $value): self
     {
         $this->message = $this->message->withHeader($name, $value);
 

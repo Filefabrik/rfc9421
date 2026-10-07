@@ -38,7 +38,7 @@ final class SigningEnumsRegistryTest extends TestCase
         SigningEnumsRegistry::addEnumClass(ExtraSigningEnum::class);
     }
 
-    public function testAddEnumClassThrowInterface()
+    public function testAddEnumClassThrowInterface(): void
     {
         $this->expectExceptionObject(
             new \InvalidArgumentException(
@@ -48,7 +48,7 @@ final class SigningEnumsRegistryTest extends TestCase
         SigningEnumsRegistry::addEnumClass(WrongInterfaceEnum::class);
     }
 
-    public function testAddEnumClassThrowNoExists()
+    public function testAddEnumClassThrowNoExists(): void
     {
         $this->expectExceptionObject(
             new \InvalidArgumentException(

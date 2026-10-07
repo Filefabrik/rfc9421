@@ -77,6 +77,7 @@ final class HeaderSignatureInputTest extends TestCase
         //
         $headerSignatureInput->extract();
     }
+
     public function testExtractInvalidSignature(): void
     {
         $this->expectExceptionObject(new VerifyHeaderSignatureException('Invalid signature line ");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon""'));

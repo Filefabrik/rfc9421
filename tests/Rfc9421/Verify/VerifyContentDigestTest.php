@@ -58,6 +58,7 @@ final class VerifyContentDigestTest extends TestCase
             $prepared,
         );
     }
+
     /*
      * todo testing validatedSignatureParts error
 

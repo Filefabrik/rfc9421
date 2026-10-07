@@ -15,8 +15,6 @@ final class Metadata extends AbstractMetadata
 {
     /**
      * @param array{string:int|string|null} $metadata
-     *
-     * @return static
      */
     public static function fromArray(array $metadata): self
     {
@@ -24,10 +22,8 @@ final class Metadata extends AbstractMetadata
     }
 
     /**
-     * @param \Filefabrik\Rfc9421\Signer\Metadata $instance
      * @param array{string:int|string|null}                               $metadata
      *
-     * @return self
      */
     public static function bindMetadata(self $instance, array $metadata): self
     {
@@ -38,9 +34,6 @@ final class Metadata extends AbstractMetadata
         return $instance;
     }
 
-    /**
-     * @return string
-     */
     public function toString(): string
     {
         $preprocess = [];

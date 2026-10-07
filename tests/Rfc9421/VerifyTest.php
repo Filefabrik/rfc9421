@@ -61,7 +61,7 @@ final class VerifyTest extends TestCase
      *
      */
     #[DataProvider('withSigningMethods')]
-    public function testValidate($signingAlgo, $cert): void
+    public function testValidate(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
     {
         /**
          *
@@ -127,7 +127,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority', fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),],
+            ['@authority', fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
         ];
 
         $tamperedRequest = clone $signedRequest;
@@ -161,7 +161,7 @@ final class VerifyTest extends TestCase
     }
 
     #[DataProvider('withSigningMethods')]
-    public function testPrepareVerifyTwiceThrow($signingAlgo, $cert): void
+    public function testPrepareVerifyTwiceThrow(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
     {
         $this->expectExceptionObject(new BadMethodCallException('already prepared'));
         $certInstance = new CertHelper($cert);
@@ -225,7 +225,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority', fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),],
+            ['@authority', fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
         ];
 
         $tamperedRequest = clone $signedRequest;
@@ -271,7 +271,7 @@ final class VerifyTest extends TestCase
      * @throws VerifyHeaderSignatureException
      */
     #[DataProvider('withSigningMethods')]
-    public function testValidateWithoutBody($signingAlgo, $cert): void
+    public function testValidateWithoutBody(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
     {
         /**
          *
@@ -330,7 +330,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority', fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),],
+            ['@authority', fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
         ];
 
         $tamperedRequest     = clone $signedRequest;
@@ -404,6 +404,7 @@ final class VerifyTest extends TestCase
         $instance = new Verify($r);
         $instance->verifying();
     }
+
     /**
      * todo with tampered body
      */
@@ -417,7 +418,7 @@ final class VerifyTest extends TestCase
      * @throws VerifyHeaderSignatureException
      */
     #[DataProvider('withSigningMethods')]
-    public function testValidateTemperedBody($signingAlgo, $cert): void
+    public function testValidateTemperedBody(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
     {
         /**
          *
@@ -472,6 +473,7 @@ final class VerifyTest extends TestCase
                 ),
             );
         }
+
         $signer        = new Signer($request, $configuration);
         $signedRequest = $signer->sign();
 
@@ -482,7 +484,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority', fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),],
+            ['@authority', fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
         ];
 
         $tamperedRequest     = clone $signedRequest;

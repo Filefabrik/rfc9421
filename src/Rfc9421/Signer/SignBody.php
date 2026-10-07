@@ -26,7 +26,6 @@ final class SignBody
     /**
      * Getting the Key Value pair for header array
      *
-     * @return array
      * @example [$headerKey, $headerValue] = new SignBody($body,'sha512')->getContentDigestHeaderArray()
      */
     public function getContentDigestHeaderArray(): array
@@ -38,8 +37,6 @@ final class SignBody
      * This string will be present in the header "content-digest".
      * The Validator checks the integrity of the body that all parts of the body matches this hash"
      * If the Body was changed outside, the signature does not match and you can be sure, someone has "hacked" the request.
-     *
-     * @return string
      */
     public function getContentDigest(): string
     {
@@ -48,8 +45,6 @@ final class SignBody
 
     /**
      * Calculate the whole message body and encode with base64 for proper chars
-     *
-     * @return string
      */
     public function calculateSignature(): string
     {
@@ -58,8 +53,6 @@ final class SignBody
 
     /**
      * Create the hash
-     *
-     * @return string
      */
     public function hash(): string
     {

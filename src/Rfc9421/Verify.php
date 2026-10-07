@@ -29,20 +29,22 @@ final class Verify
      * @var array<string,string>|null null on not set
      */
     public private(set) null|array $validSignedParameters = null;
+
     /**
      * Extracting the signature and split into parts
-     *
-     * @var Extractors\HeaderSignature|null
      */
     public private(set) ?Extractors\HeaderSignature $headerSignatureExtractor = null {
         get => $this->headerSignatureExtractor ??= new Extractors\HeaderSignature(
             signatureString: $this->headerHelper->getSignatureLine(),
         );
     }
+
     public private(set) ?HeaderHelper               $headerHelper             = null {
         get => $this->headerHelper ??= new HeaderHelper(message: $this->message);
     }
+
     private bool                                    $preparedVerifier         = false;
+
     private ?HeaderSignatureInput                   $signatureInputInstance   = null;
 
     public function __construct(
@@ -59,7 +61,6 @@ final class Verify
     /**
      * Main method to validate
      *
-     * @return bool
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      * @throws VerifyHeaderSignatureException
@@ -102,7 +103,6 @@ final class Verify
     /**
      * First prepare some request datas
      *
-     * @return void
      * @throws VerifyHeaderSignatureException
      */
     public function prepareVerify(): void
@@ -110,10 +110,12 @@ final class Verify
         if ($this->preparedVerifier) {
             throw new BadMethodCallException('already prepared');
         }
+
         // first stage we must have both signature and signature-input header
         if (!$this->headerHelper->getSignatureLine()) {
             throw VerifyHeaderSignatureException::missingSignature();
         }
+
         if (!$this->headerHelper->getSignatureInputLine()) {
             throw VerifyHeaderSignatureException::missingSignatureInput();
         }
@@ -143,7 +145,6 @@ final class Verify
     }
 
     /**
-     * @return HeaderSignatureInput
      * @throws VerifyHeaderSignatureException
      */
     private function getSignaturInputInstance(): HeaderSignatureInput
@@ -161,7 +162,6 @@ final class Verify
     /**
      * Extract which "Components" must be used to validate the header data
      *
-     * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
@@ -186,7 +186,6 @@ final class Verify
 
     /**
      *
-     * @return bool
      * @throws ContentDigestException
      */
     private function validateContentDigest(): bool
