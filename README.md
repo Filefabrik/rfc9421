@@ -10,6 +10,10 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 ✅ CodeCoverage 100%
 
+✅ Dependencies for live usage
+
+    PSR-7 "psr/http-message"
+
 ✅ easy to use.
 
 ✅ integrate the signer and verifier into existing projects
@@ -21,6 +25,11 @@ PHP RFC9421 HTTP Message Signing and Verify
 ✅ change|set|extend your own signing algorithms via interface
 
 ✅ switch between php cryptography as your project need
+
+## Release
+
+The package is still on the developer instance while the final touches are being made before its first release. Would
+you like to take a look at the code in advance? If so, please open a ticket.
 
 ## Getting started
 
@@ -143,7 +152,14 @@ valid and not tempered/fixed/hacked from somewhere
 <?php 
 
 $signingConfiguration->signHeader('@method')
-    ->signHeader('x-Origin-host')
+    ->signHeader('x-Origin-host');
+?>
+```
+or:
+```php
+<?php 
+
+$signingConfiguration->signHeader('@method','x-Origin-host');
 ?>
 ```
 
@@ -167,9 +183,26 @@ not modified.
 
 ```php
 <?php 
-$signingConfiguration->setContentDigestHashAlgo('sha-256')
+use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
+
+$signingConfiguration->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha512);
 ?>
 ```
+other forms of writings are also valid:
+```php
+<?php 
+ 
+$signingConfiguration->setContentDigestHashAlgo('sha256');
+// or
+$signingConfiguration->setContentDigestHashAlgo('sha-256');
+// or 
+$signingConfiguration->setContentDigestHashAlgo('sha512');
+// or
+$signingConfiguration->setContentDigestHashAlgo('sha-512');
+?>
+```
+
+
 
 ### Private Key Pem (required)
 
@@ -282,8 +315,9 @@ todo: show example in tests directory how to implement
 
 ## PHP Signing libraries
 
-This RFC9421-Library is shipped without a Cryptography library. So you are able to use an in your project existing signing
-library. For fresh Projects, pick a singing library as your need.
+This RFC9421-Library is shipped without a Cryptography library. So you are able to use an in your project existing
+signing
+library. For fresh Projects, pick a singing library as you need.
 
 To use a preconfigured and tested signing and verifying Configuration please use require_once command somewhere before
 signing oar verifying something.

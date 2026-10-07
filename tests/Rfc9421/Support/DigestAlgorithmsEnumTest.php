@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(DigestAlgorithmsEnum::class)]
 final class DigestAlgorithmsEnumTest extends TestCase
 {
+    /**
+     * @return array[]
+     */
     public static function validDigestAlgorithms(): array
     {
         return [
@@ -42,6 +45,28 @@ final class DigestAlgorithmsEnumTest extends TestCase
             $datas[1],
             DigestAlgorithmsEnum::isOwnTypeOrThrow($datas[0]),
         );
+    }
+
+    /**
+     * @throws ContentDigestException
+     */
+    public function testIsOwnTypeOrThrowOnNull(): void
+    {
+        $this->expectExceptionObject(
+            new ContentDigestException('Hash algorithm "" for the content-digest not supported.'),
+        );
+        DigestAlgorithmsEnum::isOwnTypeOrThrow(null);
+    }
+
+    /**
+     * @throws ContentDigestException
+     */
+    public function testIsOwnTypeOrThrowOnNotKnownString(): void
+    {
+        $this->expectExceptionObject(
+            new ContentDigestException('Hash algorithm "never mind" for the content-digest not supported.'),
+        );
+        DigestAlgorithmsEnum::isOwnTypeOrThrow('never mind');
     }
 
     /**
