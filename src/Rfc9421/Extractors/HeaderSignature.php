@@ -14,11 +14,14 @@ use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
  */
 final class HeaderSignature
 {
-    public private(set) array|null|SignatureExtractionException $extraction = null {
+    /**
+     * @var array<string>|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException|null
+     */
+    public private(set) array|null|SignatureExtractionException $validatedSignatureParts = null {
         /**
          * @throws SignatureExtractionException
          */
-        get => $this->extraction ??= $this->getValidatedSignatureParts();
+        get => $this->validatedSignatureParts ??= $this->getValidatedSignatureParts();
     }
 
     public function __construct(public private(set) readonly string $signatureString)
@@ -37,7 +40,7 @@ final class HeaderSignature
 
     public function getValidExtraction(): null|array
     {
-        return $this->extraction instanceof SignatureExtractionException ? null : $this->extraction;
+        return $this->validatedSignatureParts instanceof SignatureExtractionException ? null : $this->validatedSignatureParts;
     }
 
     /**
@@ -71,7 +74,7 @@ final class HeaderSignature
     /**
      * checks we have the :base64EncodedValue-code: ...between the double colons
      *
-     * @return array SignatureExtractionException on format missmatch
+     * @return array<string> SignatureExtractionException on format missmatch
      *
      * @throws SignatureExtractionException
      */
@@ -89,6 +92,9 @@ final class HeaderSignature
         );
     }
 
+    /**
+     * @return array<string>
+     */
     public function extractSignatureString(): array
     {
         // todo modify regex for strict format validation

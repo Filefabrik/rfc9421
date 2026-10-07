@@ -21,7 +21,7 @@ final readonly class PrepareSignatureKeyName
     }
 
     /**
-     * Handling the signature key extraction process
+     * Handling the signature key validatedSignatureParts process
      *
      * @return void
      * @throws VerifyHeaderSignatureException

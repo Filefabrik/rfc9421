@@ -17,13 +17,13 @@ final class HeaderSignatureInput
 {
     public private(set) null|SignaturInput $signatureInput = null;
     /**
-     * only if extraction was successfully
+     * only if validatedSignatureParts was successfully
      *
      * @var array|null
      */
     public private(set) null|array $extractedComponents = [];
     /**
-     * only if extraction was successfully
+     * only if validatedSignatureParts was successfully
      *
      * @var Metadata|null
      */

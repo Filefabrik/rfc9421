@@ -72,6 +72,7 @@ $signingMethodsRsaPhpSeclib4 = [
     },
 ];
 
+/** @noinspection PhpUnhandledExceptionInspection */
 SignatureRegistry::registerMethods(methods: $signingMethodsRsaPhpSeclib4);
 
 /**
@@ -131,4 +132,5 @@ $verifierMethodsRsaPhpSeclib4 = [
     },
 ];
 
+/** @noinspection PhpUnhandledExceptionInspection */
 VerifyRegistry::registerMethods(methods: $verifierMethodsRsaPhpSeclib4);

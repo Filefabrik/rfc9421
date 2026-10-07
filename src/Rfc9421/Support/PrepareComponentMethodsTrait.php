@@ -14,16 +14,15 @@ trait PrepareComponentMethodsTrait
     /**
      * Injecting callables
      *
-     * @var array
+     * @var array{string:Closure}
      */
     public private(set) array $prepareComponentsMethods = [];
 
     /**
      * Modify the generation methods
      *
-     * @param array $methods
+     * @param array{string|Closure} $methods
      *
-     * @return SigningConfiguration
      * @see
      */
     public function withPrepareComponentsMethods(array $methods): SigningConfiguration
@@ -35,7 +34,7 @@ trait PrepareComponentMethodsTrait
         return $this;
     }
 
-    public function withPrepareComponentsMethod($componentName, $callable): self
+    public function withPrepareComponentsMethod(string $componentName, callable $callable): self
     {
         $this->prepareComponentsMethods[$componentName] = $callable;
 

@@ -48,6 +48,7 @@ final class VerifyContentDigest
 
     /**
      * @return bool true if valid
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
     public function verify(): bool
     {

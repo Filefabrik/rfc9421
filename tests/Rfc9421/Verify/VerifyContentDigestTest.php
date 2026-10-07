@@ -59,7 +59,7 @@ final class VerifyContentDigestTest extends TestCase
         );
     }
     /*
-     * todo testing extraction error
+     * todo testing validatedSignatureParts error
 
         public function testPrepareWrongFormat(): void
         {

@@ -106,6 +106,7 @@ $signings = [
 
 ];
 
+/** @noinspection PhpUnhandledExceptionInspection */
 SignatureRegistry::registerMethods(methods: $signings);
 
 $verifying = [
@@ -179,4 +180,5 @@ $verifying = [
     },
 ];
 
+/** @noinspection PhpUnhandledExceptionInspection */
 VerifyRegistry::registerMethods(methods: $verifying);

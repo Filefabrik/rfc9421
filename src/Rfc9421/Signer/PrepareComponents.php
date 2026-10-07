@@ -44,13 +44,14 @@ use UnexpectedValueException;
  */
 /**
  * todo closure processing
+ * @phpstan-type defaultStack array{'@method': 'processAtMethod', '@target-uri': 'processTargetUri', '@authority': 'processAuthority', '@scheme': 'processScheme', '@request-target': 'processHost', '@path': 'processPath', content-length: 'processContentLength'}
  */
 final class PrepareComponents
 {
     /**
      * for different components there can be different methods to prepare the values(upper-case lower-case )
      *
-     * @var array<Closure|callable|string>
+     * @phpstan-var defaultStack
      */
     private static array $defaultDerivedStack = [
         '@method'         => 'processAtMethod',
@@ -68,12 +69,15 @@ final class PrepareComponents
         /**
          * otherwise use the default stack
          *
-         * @var array<Closure|callable|string>
+         * @var array{string:string|Closure}
          */
         public private(set) ?array $derivedMapper = null,
     ) {
     }
 
+    /**
+     * @return defaultStack
+     */
     public static function getDefaultDerivedStack(): array
     {
         return self::$defaultDerivedStack;
@@ -83,7 +87,7 @@ final class PrepareComponents
      * Todo setter has to be a type/format validator that is callable or closure
      * While having systemwide an own mapping dialect for your needs, set the method stack globally
      *
-     * @param array $defaultDerivedStack
+     * @param array{string:string|Closure} $defaultDerivedStack
      *
      * @return void
      */
@@ -106,6 +110,11 @@ final class PrepareComponents
         return $this;
     }
 
+    /**
+     * @param array{string:string|Closure} $values
+     *
+     * @return $this
+     */
     public function setMappingValues(array $values): self
     {
         foreach ($values as $componentName => $callable) {
@@ -115,7 +124,7 @@ final class PrepareComponents
         return $this;
     }
 
-    public function setMappingValue(string $key, $callable): self
+    public function setMappingValue(string $key, Closure|string $callable): self
     {
         // init stack
         $stack               = $this->getMethodStack();
@@ -126,7 +135,7 @@ final class PrepareComponents
     }
 
     /**
-     * @return array<Closure|callable|string>
+     * @return array{string:Closure|string}|defaultStack
      */
     private function getMethodStack(): array
     {

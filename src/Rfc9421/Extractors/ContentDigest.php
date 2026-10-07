@@ -51,7 +51,7 @@ final readonly class ContentDigest
     /**
      * todo ...shiddy extractor
      *
-     * @return array
+     * @return array<string>
      */
     public function getDigestArray(): array
     {
@@ -60,7 +60,7 @@ final readonly class ContentDigest
 
     /**
      * check we have 2 parts after splitting
-     * todo more clever extraction check
+     * todo more clever validatedSignatureParts check
      *
      * @return bool
      */

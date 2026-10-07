@@ -81,6 +81,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareComponents          = new PrepareComponents($r);
         $messageStack               = PrepareComponents::getDefaultDerivedStack();
+        // todo never allow a number only closure or string
         $messageStack[' bullshit '] = 12;
         $prepareComponents->setDerivedMapper($messageStack);
 

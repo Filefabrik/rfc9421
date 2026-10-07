@@ -26,6 +26,9 @@ final class SignaturInput
     {
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public static function extract(string $signatureLine): self
     {
         $instance = new self($signatureLine);

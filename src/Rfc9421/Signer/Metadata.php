@@ -14,7 +14,7 @@ use Filefabrik\Rfc9421\Support\AbstractMetadata;
 final class Metadata extends AbstractMetadata
 {
     /**
-     * @param array $metadata
+     * @param array{string:int|string|null} $metadata
      *
      * @return static
      */
@@ -23,6 +23,12 @@ final class Metadata extends AbstractMetadata
         return self::bindMetadata(new self(), $metadata);
     }
 
+    /**
+     * @param \Filefabrik\Rfc9421\Signer\Metadata $instance
+     * @param array{string:int|string|null}                               $metadata
+     *
+     * @return self
+     */
     public static function bindMetadata(self $instance, array $metadata): self
     {
         foreach ($metadata as $key => $value) {

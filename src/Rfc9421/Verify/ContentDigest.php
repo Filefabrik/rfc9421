@@ -31,6 +31,9 @@ final readonly class ContentDigest
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function verify(): bool
     {
         $reCalculatedSignature = new SignBody(
