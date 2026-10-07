@@ -27,6 +27,8 @@ final readonly class SigCompilerHelper
     }
 
     /**
+     * @param string[] $params
+     *
      * @return string sig1=("@method" "@authority" "@path" "content-type" "content-length")
      * @todo during concat with Metadata to signature-params don't forget the trailing semicolon
      */
@@ -47,6 +49,8 @@ final readonly class SigCompilerHelper
     }
 
     /**
+     * @param string[] $params
+     *
      * @return string "@method" "@authority" "@path" "content-type" "content-length"
      */
     public static function compileFromArray(array $params): string
