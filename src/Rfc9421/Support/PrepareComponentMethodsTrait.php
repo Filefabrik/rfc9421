@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Support;
 
+use Closure;
 use Filefabrik\Rfc9421\SigningConfiguration;
 
 /**
@@ -14,7 +15,7 @@ trait PrepareComponentMethodsTrait
     /**
      * Injecting callables
      *
-     * @var array{string:Closure}
+     * @var array{string: Closure}
      */
     public private(set) array $prepareComponentsMethods = [];
 

@@ -38,13 +38,14 @@ use UnexpectedValueException;
         // fucking use ever. Please don’t do this. It is too annoying to
         // even think about.
         '@query-param' => $parsedAndEncodedQueryParameters,
-        // Default is a HTTP field name.
+        // Default is an HTTP field name.
         default => $headerValueCorrespondingToHeaderName,
       };
  */
 /**
  * todo closure processing
  * @phpstan-type defaultStack array{'@method': 'processAtMethod', '@target-uri': 'processTargetUri', '@authority': 'processAuthority', '@scheme': 'processScheme', '@request-target': 'processHost', '@path': 'processPath', content-length: 'processContentLength'}
+ * @phpstan-type entry array{string: Closure|string}
  */
 final class PrepareComponents
 {
@@ -87,7 +88,7 @@ final class PrepareComponents
      * Todo setter has to be a type/format validator that is callable or closure
      * While having systemwide an own mapping dialect for your needs, set the method stack globally
      *
-     * @param array{string:string|Closure} $defaultDerivedStack
+     * @param entry|defaultStack $defaultDerivedStack
      */
     public static function setDefaultDerivedStack(array $defaultDerivedStack): void
     {
@@ -97,7 +98,7 @@ final class PrepareComponents
     /**
      * Configure later the MethodStack if need
      *
-     * @param array<Closure|callable|string>|null $derivedMapper
+     * @param array{string:Closure|string}|null $derivedMapper
      */
     public function setDerivedMapper(?array $derivedMapper): self
     {
@@ -136,7 +137,7 @@ final class PrepareComponents
         return $this->derivedMapper ??= self::$defaultDerivedStack;
     }
 
-    public function processValue(string $key): int|string|float
+    public function processValue(string $key): int|string
     {
         if (!array_key_exists($key, $this->getMethodStack())) {
             throw new UnexpectedValueException(sprintf('Method "%s" not registered.', $key));
@@ -173,13 +174,13 @@ final class PrepareComponents
     public function processTargetUri(): string
     {
         $messageUri = clone $this->message->getUri();
-
-        $parts[] = $messageUri->getHost();
-        if ($path = $messageUri->getPath()) {
+        $parts      = [];
+        $parts[]    = $messageUri->getHost();
+        if ('' !== ($path = $messageUri->getPath())) {
             $parts[] = '/'.ltrim($path, '/');
         }
 
-        if ($query = $messageUri->getQuery()) {
+        if ('' !== ($query = $messageUri->getQuery())) {
             $parts[] = '?'.ltrim($query, '?');
         }
 

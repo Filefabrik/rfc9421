@@ -24,7 +24,9 @@ final class SignaturBase
     /**
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
      *
+     * @param array<array{string,string|int}> $signatureLines
      *
+     * @return string
      */
     public static function compileSignatureInputToString(array $signatureLines): string
     {
@@ -40,8 +42,9 @@ final class SignaturBase
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
-     * @throws ContentDigestException
-     * @throws InvalidHeaderKeyException
+     * @return list<array{string,string|int}>
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
     public function createSignatureLines(): array
     {
@@ -62,7 +65,7 @@ final class SignaturBase
     /**
      * Handle the preparation of a signature-base array/line(key, value)
      *
-     *
+     * @return array{string,string|int}
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      */
@@ -85,6 +88,7 @@ final class SignaturBase
      * Handle the body signing
      * Todo create a extra config for the digest-hash
      *
+     * @return array{string,string}
      * @throws ContentDigestException
      */
     private function handleSignBody(): array
@@ -113,7 +117,7 @@ final class SignaturBase
     /**
      * Header Key must exist
      *
-     *
+     * @return array{string,string|int}
      * @throws InvalidHeaderKeyException
      */
     private function checkExistingHeader(string $signatureParam): array
@@ -133,7 +137,7 @@ final class SignaturBase
     {
         $headerString = new SigCompilerHelper(
             signatureParams : $this->configuration->signatureParams,
-            signatureKeyName: $this->configuration->signatureKeyName,
+            signatureKeyName: $this->configuration->signatureKeyName ?? '',
         )->makeSig1fromSignatureParams();
 
         $metadataString = $this->configuration->metadata->toString();
