@@ -15,10 +15,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SigCompilerHelper::class)]
 final class SigCompilerHelperTest extends TestCase
 {
-    /**
-     * @covers SigCompilerHelper::compileFromArray
-     * @return void
-     */
     public function testCompileFromArray(): void
     {
         $this->assertEquals(
@@ -27,10 +23,6 @@ final class SigCompilerHelperTest extends TestCase
         );
     }
 
-    /**
-     * @covers SigCompilerHelper::makeSig1fromArray
-     * @return void
-     */
     public function testMakeSig1fromArray(): void
     {
         $this->assertEquals(
@@ -40,7 +32,6 @@ final class SigCompilerHelperTest extends TestCase
     }
 
     /**
-     * @covers SigCompilerHelper::makeSig1fromSignatureParams
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException

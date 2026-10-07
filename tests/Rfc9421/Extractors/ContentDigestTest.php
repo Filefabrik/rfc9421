@@ -9,10 +9,10 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ContentDigest::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Extractors\ContentDigest::class, 'validateExtraction')]
 final class ContentDigestTest extends TestCase
 {
     /**
-     * @covers \Filefabrik\Rfc9421\Extractors\ContentDigest::validateExtraction
      * @return void
      */
     public function testvalidateExtractionFalse()
@@ -51,9 +51,6 @@ final class ContentDigestTest extends TestCase
         $this->assertEquals(['sha-256', ':tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:'], $digestArray);
     }
 
-    /**
-     * @return void
-     */
     public function testValidateExtraction(): void
     {
         $validation = new ContentDigest('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc:')->validateExtraction();

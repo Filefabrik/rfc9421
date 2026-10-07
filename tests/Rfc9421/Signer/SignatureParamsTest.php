@@ -12,11 +12,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SignatureParams::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignatureParams::class, 'add')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignatureParams::class, 'fromArray')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignatureParams::class, 'getSignatureParameters')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignatureParams::class, 'exists')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignatureParams::class, 'setHeaderName')]
 final class SignatureParamsTest extends TestCase
 {
     /**
-     * @covers \Filefabrik\Rfc9421\Signer\SignatureParams::add
-     * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
@@ -35,9 +38,6 @@ final class SignatureParamsTest extends TestCase
         );
     }
 
-    /**
-     * @covers \Filefabrik\Rfc9421\Signer\SignatureParams::fromArray
-     */
     public function testFromArray(): void
     {
         $arr      = ['testname', '@test-derived-component', '@testname', 'content-test'];
@@ -50,8 +50,6 @@ final class SignatureParamsTest extends TestCase
     }
 
     /**
-     * @covers \Filefabrik\Rfc9421\Signer\SignatureParams::getSignatureParameters
-     * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
@@ -71,9 +69,7 @@ final class SignatureParamsTest extends TestCase
     }
 
     /**
-     * @return void
      * @throws AlreadySetException
-     * @covers \Filefabrik\Rfc9421\Signer\SignatureParams::exists
      */
     public function testExists(): void
     {
@@ -89,7 +85,6 @@ final class SignatureParamsTest extends TestCase
     /**
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
-     * @covers \Filefabrik\Rfc9421\Signer\SignatureParams::setHeaderName
      */
     public function testSetHeaderName(): void
     {
@@ -100,7 +95,6 @@ final class SignatureParamsTest extends TestCase
     /**
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
-     * @covers \Filefabrik\Rfc9421\Signer\SignatureParams::setHeaderName
      */
     public function testSetHeaderNameThrowsInvalidHeaderName(): void
     {

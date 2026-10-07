@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Metadata::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(Metadata::class,'toString')]
 final class MetadataTest extends TestCase
 {
     public static function dataProviderToArray(): array
@@ -65,10 +66,6 @@ final class MetadataTest extends TestCase
         );
     }
 
-    /**
-     * @covers ::toString
-     * @return void
-     */
     public function testToStringEmpty(): void
     {
         $stringified = Metadata::fromArray([])

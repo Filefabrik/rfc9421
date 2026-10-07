@@ -9,12 +9,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Components::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Extractors\Components::class, 'toArray')]
 final class ComponentsTest extends TestCase
 {
-    /**
-     * @covers \Filefabrik\Rfc9421\Extractors\Components::toArray
-     * @return void
-     */
     public function testToArray(): void
     {
         $input = '"content-length" "@query-param" "example-dict"';

@@ -12,16 +12,18 @@ use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SignatureParams;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
 #[CoversClass(PrepareComponents::class)]
+#[CoversMethod(PrepareComponents::class, 'processAuthority')]
+#[CoversMethod(PrepareComponents::class, 'processScheme')]
+#[CoversMethod(PrepareComponents::class, 'processPath')]
+#[CoversMethod(PrepareComponents::class, 'processValue')]
 final class PrepareComponentsTest extends TestCase
 {
-    /**
-     * @covers PrepareComponents::setDefaultDerivedStack
-     * */
     public function testSetDefaultDerivedStack(): void
     {
         $orig = PrepareComponents::getDefaultDerivedStack();
@@ -46,9 +48,6 @@ final class PrepareComponentsTest extends TestCase
         PrepareComponents::setDefaultDerivedStack($orig);
     }
 
-    /**
-     * @covers PrepareComponents::setDerivedMapper
-     * */
     public function testSetDerivedMapper(): void
     {
         $arr = [
@@ -66,8 +65,6 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
-     * @covers PrepareComponents::processValue
-     * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      */
@@ -90,9 +87,7 @@ final class PrepareComponentsTest extends TestCase
     /**
      * Overall Method to check the System
      *
-     * @covers PrepareComponents::processValue
      *
-     * @return void
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException|InvalidHeaderKeyException
      */
@@ -114,10 +109,6 @@ final class PrepareComponentsTest extends TestCase
         $this->assertSame(62, $prepareInstance->processValue('content-length'));
     }
 
-    /**
-     * @covers PrepareComponents::processTargetUri
-     * @return void
-     */
     public function testProcessTargetUri(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -127,10 +118,6 @@ final class PrepareComponentsTest extends TestCase
         $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processTargetUri());
     }
 
-    /**
-     * @covers PrepareComponents::processAtMethod
-     * @return void
-     */
     public function testProcessAtMethod(): void
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -138,10 +125,6 @@ final class PrepareComponentsTest extends TestCase
         $this->assertSame('POST', $prepareInstance->processAtMethod());
     }
 
-    /**
-     * @covers ::processAuthority
-     * @return void
-     */
     public function testProcessAuthority(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -155,10 +138,6 @@ final class PrepareComponentsTest extends TestCase
         $this->assertSame('www.test.com', new PrepareComponents($r)->processAuthority());
     }
 
-    /**
-     * @covers ::processScheme
-     * @return void
-     */
     public function testProcessScheme(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -172,10 +151,6 @@ final class PrepareComponentsTest extends TestCase
         $this->assertSame('http', new PrepareComponents($r)->processScheme());
     }
 
-    /**
-     * @covers ::processPath
-     * @return void
-     */
     public function testProcessPath(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -189,10 +164,6 @@ final class PrepareComponentsTest extends TestCase
         $this->assertSame('/', new PrepareComponents($r)->processPath());
     }
 
-    /**
-     * @covers ::processValue
-     * @return void
-     */
     public function testProcessValueNotCallable(): void
     {
         $this->expectExceptionObject(
@@ -204,7 +175,7 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance->processValue('@method_notset');
     }
 
-    public function testSetMappingValues()
+    public function testSetMappingValues(): void
     {
         $arr = [
             '@methodsss' => fn(RequestInterface $message) => ucfirst(strtolower($message->getMethod())),

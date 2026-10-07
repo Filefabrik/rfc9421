@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
 #[CoversClass(\Filefabrik\Rfc9421\Signer\SignaturBase::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignaturBase::class, 'handleSignBody')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignaturBase::class, 'createSignatureLine')]
 final class SignaturBaseTest extends TestCase
 {
     public function testCreateSignatureLines(): void
@@ -32,8 +34,6 @@ final class SignaturBaseTest extends TestCase
     }
 
     /**
-     * @covers \Filefabrik\Rfc9421\Signer\SignaturBase::handleSignBody
-     * @return void
      * @throws AlreadySetException
      * @throws ContentDigestException
      * @throws InvalidDerivedKeyException
@@ -55,8 +55,6 @@ final class SignaturBaseTest extends TestCase
     }
 
     /**
-     * @covers \Filefabrik\Rfc9421\Signer\SignaturBase::handleSignBody
-     * @return void
      * @throws AlreadySetException
      * @throws ContentDigestException
      * @throws InvalidDerivedKeyException
@@ -82,8 +80,6 @@ final class SignaturBaseTest extends TestCase
     }
 
     /**
-     * @covers \Filefabrik\Rfc9421\Signer\SignaturBase::createSignatureLine
-     * @return void
      * @throws AlreadySetException
      * @throws ContentDigestException
      * @throws InvalidDerivedKeyException

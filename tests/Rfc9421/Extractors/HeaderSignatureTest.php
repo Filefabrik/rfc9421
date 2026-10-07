@@ -12,10 +12,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(HeaderSignature::class)]
 final class HeaderSignatureTest extends TestCase
 {
-    /**
-     * @covers HeaderSignature::extractSignatureNameKey
-     * @return void
-     */
     public function testExtractSignatureName(): void
     {
         $headerKey               = 'testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
@@ -23,10 +19,6 @@ final class HeaderSignatureTest extends TestCase
         $this->assertSame('testValue=', $headerSignatureInstance->extractSignatureNameKey());
     }
 
-    /**
-     * @covers HeaderSignature::extractSignatureNameKey
-     * @return void
-     */
     public function testExtractSignatureNameEmpty(): void
     {
         $headerKey               = ':Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
@@ -34,10 +26,6 @@ final class HeaderSignatureTest extends TestCase
         $this->assertSame('', $headerSignatureInstance->extractSignatureNameKey());
     }
 
-    /**
-     * @covers HeaderSignature::extractSignatureNameKey
-     * @return void
-     */
     public function testExtractSignatureNameNotFound(): void
     {
         $this->expectExceptionObject(
@@ -47,10 +35,6 @@ final class HeaderSignatureTest extends TestCase
         new HeaderSignature($headerKey)->extractSignatureNameKey();
     }
 
-    /**
-     * @covers HeaderSignature::getSignatureValue
-     * @return void
-     */
     public function testGetSignatureValue(): void
     {
         $headerKey               = 'testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
@@ -61,10 +45,6 @@ final class HeaderSignatureTest extends TestCase
         );
     }
 
-    /**
-     * @covers HeaderSignature::getSignatureValue
-     * @return void
-     */
     public function testGetSignatureValueEmpty(): void
     {
         $headerKey               = 'testValue=::';
@@ -72,10 +52,6 @@ final class HeaderSignatureTest extends TestCase
         $this->assertSame('', $headerSignatureInstance->getSignatureValue());
     }
 
-    /**
-     * @covers HeaderSignature::getSignatureValue
-     * @return void
-     */
     public function testGetSignatureValueThrow(): void
     {
         $this->expectExceptionObject(
@@ -112,8 +88,6 @@ final class HeaderSignatureTest extends TestCase
     }
 
     /**
-     * @covers HeaderSignature::getBinarySignatureValue
-     * @return void
      * @throws SignatureExtractionException
      */
     public function testGetBinarySignatureValueThrow(): void
