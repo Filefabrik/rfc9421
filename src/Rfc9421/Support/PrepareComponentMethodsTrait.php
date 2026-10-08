@@ -17,7 +17,7 @@ trait PrepareComponentMethodsTrait
      *
      * @var array{string: Closure}
      */
-    public private(set) array $prepareComponentsMethods = [];
+    private(set) array $prepareComponentsMethods = [];
 
     /**
      * Modify the generation methods

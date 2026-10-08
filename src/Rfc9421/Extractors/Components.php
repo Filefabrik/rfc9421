@@ -14,7 +14,7 @@ final readonly class Components
     /**
      * @param string $componentsString "content-length" "@query-param" "example-dict"
      */
-    public function __construct(public private(set) string $componentsString)
+    public function __construct(private(set) string $componentsString)
     {
     }
 

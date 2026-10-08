@@ -13,8 +13,8 @@ use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 final class SignBody
 {
     public function __construct(
-        public private(set) readonly string $body,
-        public private(set) DigestAlgorithmsEnum|string $algorithm {
+        private(set) readonly string $body,
+        private(set) DigestAlgorithmsEnum|string $algorithm {
             /**
              * @throws ContentDigestException
              */

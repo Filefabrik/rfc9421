@@ -15,8 +15,8 @@ use Filefabrik\Rfc9421\SigningConfiguration;
 final readonly class PrepareSignatureKeyName
 {
     public function __construct(
-        public private(set) SigningConfiguration $signingConfiguration,
-        public private(set) ?HeaderSignature $headerSignatureExtractor = null,
+        private(set) SigningConfiguration $signingConfiguration,
+        private(set) ?HeaderSignature $headerSignatureExtractor = null,
     ) {
     }
 

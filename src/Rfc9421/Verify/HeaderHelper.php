@@ -11,7 +11,7 @@ use Psr\Http\Message\MessageInterface;
  */
 final readonly class HeaderHelper
 {
-    public function __construct(public private(set) MessageInterface $message)
+    public function __construct(private(set) MessageInterface $message)
     {
     }
 

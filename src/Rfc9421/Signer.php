@@ -25,20 +25,20 @@ final class Signer
      *
      * @var array<string,string>
      */
-    public private(set) array $signingParameters = [];
+    private(set) array $signingParameters = [];
 
     /**
      * @var string|null null throws an error
      */
-    public private(set) ?string $signingParametersString = null {
+    private(set) ?string $signingParametersString = null {
         get => $this->signingParametersString ?? throw new UnexpectedValueException('not set before');
     }
 
     private null|string $signatureBase = null;
 
     public function __construct(
-        public private(set) RequestInterface $message,
-        public private(set) readonly SigningConfiguration $signingConfiguration,
+        private(set) RequestInterface $message,
+        private(set) readonly SigningConfiguration $signingConfiguration,
     ) {
     }
 

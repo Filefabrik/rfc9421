@@ -15,21 +15,21 @@ use InvalidArgumentException;
  */
 final class HeaderSignatureInput
 {
-    public private(set) null|SignaturInput $signatureInput = null;
+    private(set) null|SignaturInput $signatureInput = null;
 
     /**
      * only if validatedSignatureParts was successfully
      */
-    public private(set) null|array $extractedComponents = [];
+    private(set) null|array $extractedComponents = [];
 
     /**
      * only if validatedSignatureParts was successfully
      */
-    public private(set) null|Metadata $extractedMetadata = null;
+    private(set) null|Metadata $extractedMetadata = null;
 
     public function __construct(
-        public private(set) readonly string $headerSignatureInputValue,
-        public private(set) readonly string $signatureNameKey,
+        private(set) readonly string $headerSignatureInputValue,
+        private(set) readonly string $signatureNameKey,
     ) {
     }
 
@@ -45,13 +45,14 @@ final class HeaderSignatureInput
 
         $this->signatureInput = SignaturInput::extract($raw);
 
-        if (!$this->signatureInput->components) {
+        // empty components
+        if (null === $this->signatureInput->components || '' === $this->signatureInput->components) {
             throw new InvalidArgumentException('missing components');
         }
 
         $this->extractedComponents = new Components($this->signatureInput->components)->toArray();
 
-        if ($this->signatureInput->metadata) {
+        if (null !== $this->signatureInput->metadata) {
             $this->extractedMetadata = Metadata::stringToMetadata($this->signatureInput->metadata);
         }
     }
@@ -63,7 +64,7 @@ final class HeaderSignatureInput
      */
     private function extractSignatureString(): string
     {
-        if ($this->signatureNameKey) {
+        if ('' !== $this->signatureNameKey) {
             if (!str_starts_with($this->headerSignatureInputValue, $this->signatureNameKey)) {
                 throw VerifyHeaderSignatureException::invalidSignatureKeyName(
                     $this->signatureNameKey,

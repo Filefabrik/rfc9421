@@ -66,13 +66,13 @@ final class PrepareComponents
     ];
 
     public function __construct(
-        public private(set) readonly RequestInterface $message,
+        private(set) readonly RequestInterface $message,
         /**
          * otherwise use the default stack
          *
          * @var array{string:string|Closure}
          */
-        public private(set) ?array $derivedMapper = null,
+        private(set) ?array $derivedMapper = null,
     ) {
     }
 

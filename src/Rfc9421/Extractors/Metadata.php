@@ -13,7 +13,7 @@ use InvalidArgumentException;
  */
 final class Metadata extends AbstractMetadata
 {
-    public function __construct(public private(set) readonly string $metadataString)
+    public function __construct(private(set) readonly string $metadataString)
     {
     }
 

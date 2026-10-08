@@ -11,8 +11,8 @@ namespace Filefabrik\Rfc9421\Signer;
 final readonly class SigCompilerHelper
 {
     public function __construct(
-        public private(set) SignatureParams $signatureParams,
-        public private(set) string $signatureKeyName,
+        private(set) SignatureParams $signatureParams,
+        private(set) string $signatureKeyName,
     ) {
     }
 

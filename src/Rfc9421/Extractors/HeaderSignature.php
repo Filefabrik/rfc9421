@@ -17,14 +17,14 @@ final class HeaderSignature
     /**
      * @var array{non-falsy-string,string,string}|non-empty-array<string>|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException|null
      */
-    public private(set) array|null|SignatureExtractionException $validatedSignatureParts = null {
+    private(set) array|null|SignatureExtractionException $validatedSignatureParts = null {
         /**
          * @throws SignatureExtractionException
          */
         get => $this->validatedSignatureParts ??= $this->getValidatedSignatureParts();
     }
 
-    public function __construct(public private(set) readonly string $signatureString)
+    public function __construct(private(set) readonly string $signatureString)
     {
     }
 

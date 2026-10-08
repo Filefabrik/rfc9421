@@ -16,8 +16,8 @@ use UnexpectedValueException;
 final class SignaturBase
 {
     public function __construct(
-        public private(set) RequestInterface $message,
-        public private(set) readonly SigningConfiguration $configuration,
+        private(set) RequestInterface $message,
+        private(set) readonly SigningConfiguration $configuration,
     ) {
     }
 
@@ -25,8 +25,6 @@ final class SignaturBase
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
      *
      * @param array<array{string,string|int}> $signatureLines
-     *
-     * @return string
      */
     public static function compileSignatureInputToString(array $signatureLines): string
     {

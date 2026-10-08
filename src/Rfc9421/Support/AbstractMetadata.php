@@ -29,22 +29,22 @@ abstract class AbstractMetadata
      * UNIX timestamp when the signature was generated (recommended for replay protection)
      * Please use UTC Timezone
      */
-    public private(set) int|null $created = null;
+    private(set) int|null $created = null;
 
     /**
      * UNIX timestamp after which the signature should be rejected
      */
-    public private(set) int|null $expires = null;
+    private(set) int|null $expires = null;
 
     /**
      * A random unique value to prevent replay attacks
      */
-    public private(set) string|null $nonce = null;
+    private(set) string|null $nonce = null;
 
     /**
      * Identifier for the key used (helps the server find the right public key)
      */
-    public private(set) string|null $keyid = null;
+    private(set) string|null $keyid = null;
 
     /**
      * The algorithm used to create the signature (e.g., rsa-pss-sha512)
@@ -52,12 +52,12 @@ abstract class AbstractMetadata
      * @todo define possible algo's based up the current php installation capabilities
      * @see  /docs/iana-rfc9421/signature-algorithms.csv
      */
-    public private(set) null|SigningEnumInterface $alg = null;
+    private(set) null|SigningEnumInterface $alg = null;
 
     /**
      * Application-specific identifier
      */
-    public private(set) string|null $tag = null;
+    private(set) string|null $tag = null;
 
     public function set(string $key, int|string|null $value): static
     {
@@ -74,27 +74,27 @@ abstract class AbstractMetadata
     public function toArray(): array
     {
         $metadata = [];
-        if ($this->created) {
+        if (null!==$this->created) {
             $metadata['created'] = $this->created;
         }
 
-        if ($this->expires) {
+        if (null!==$this->expires) {
             $metadata['expires'] = $this->expires;
         }
 
-        if ($this->nonce) {
+        if (null!==$this->nonce) {
             $metadata['nonce'] = $this->nonce;
         }
 
-        if ($this->keyid) {
+        if (null!==$this->keyid) {
             $metadata['keyid'] = $this->keyid;
         }
 
-        if ($this->alg instanceof \Filefabrik\Rfc9421\Interfaces\SigningEnumInterface) {
+        if ($this->alg instanceof SigningEnumInterface) {
             $metadata['alg'] = $this->alg->getValue();
         }
 
-        if ($this->tag) {
+        if (null!==$this->tag) {
             $metadata['tag'] = $this->tag;
         }
 

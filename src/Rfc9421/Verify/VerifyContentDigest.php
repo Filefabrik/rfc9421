@@ -11,7 +11,7 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
  */
 final class VerifyContentDigest
 {
-    public private(set) ?ContentDigest $contentDigestVerifier = null {
+    private(set) ?ContentDigest $contentDigestVerifier = null {
         /**
          * @throws ContentDigestException
          */
@@ -19,8 +19,8 @@ final class VerifyContentDigest
     }
 
     public function __construct(
-        public private(set) readonly string $contentDigest,
-        public private(set) readonly string $body,
+        private(set) readonly string $contentDigest,
+        private(set) readonly string $body,
     ) {
     }
 

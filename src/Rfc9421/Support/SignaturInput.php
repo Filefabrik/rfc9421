@@ -16,11 +16,11 @@ use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
  */
 final class SignaturInput
 {
-    public private(set) ?string $signatureKeyName = null;
+    private(set) ?string $signatureKeyName = null;
 
-    public private(set) ?string $components       = null;
+    private(set) ?string $components       = null;
 
-    public private(set) ?string $metadata         = null;
+    private(set) ?string $metadata         = null;
 
     private bool $valid = true;
 

@@ -28,18 +28,18 @@ final class Verify
      *
      * @var array<string,string>|null null on not set
      */
-    public private(set) null|array $validSignedParameters = null;
+    private(set) null|array $validSignedParameters = null;
 
     /**
      * Extracting the signature and split into parts
      */
-    public private(set) ?Extractors\HeaderSignature $headerSignatureExtractor = null {
+    private(set) ?Extractors\HeaderSignature $headerSignatureExtractor = null {
         get => $this->headerSignatureExtractor ??= new Extractors\HeaderSignature(
             signatureString: $this->headerHelper->getSignatureLine(),
         );
     }
 
-    public private(set) ?HeaderHelper               $headerHelper             = null {
+    private(set) ?HeaderHelper               $headerHelper             = null {
         get => $this->headerHelper ??= new HeaderHelper(message: $this->message);
     }
 
@@ -48,13 +48,13 @@ final class Verify
     private ?HeaderSignatureInput                   $signatureInputInstance   = null;
 
     public function __construct(
-        public private(set) readonly MessageInterface|RequestInterface $message,
+        private(set) readonly MessageInterface|RequestInterface $message,
         /**
          * On first step "Prepare" the extracted Configuration how to handle the own signing of the received request to check the "signature" and the "body" hash
          *
          * @var SigningConfiguration
          */
-        public private(set) readonly SigningConfiguration $signingConfiguration = new SigningConfiguration(),
+        private(set) readonly SigningConfiguration $signingConfiguration = new SigningConfiguration(),
     ) {
     }
 

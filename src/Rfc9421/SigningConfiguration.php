@@ -36,21 +36,21 @@ final class SigningConfiguration
      *
      * @todo documentation
      */
-    public private(set) bool $mustSignBody = true;
+    private(set) bool $mustSignBody = true;
 
     /**
      * Prefix the signature value
      */
-    public private(set) ?string $signatureKeyName = null;
+    private(set) ?string $signatureKeyName = null;
 
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      */
-    public private(set) ?DigestAlgorithmsEnum $contentDigestHashAlgo = null;
+    private(set) ?DigestAlgorithmsEnum $contentDigestHashAlgo = null;
 
     public function __construct(
-        public private(set) readonly Metadata $metadata = new Metadata(),
-        public private(set) readonly SignatureParams $signatureParams = new SignatureParams(),
+        private(set) readonly Metadata $metadata = new Metadata(),
+        private(set) readonly SignatureParams $signatureParams = new SignatureParams(),
     ) {
     }
 

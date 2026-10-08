@@ -11,7 +11,7 @@ use UnexpectedValueException;
  */
 trait PublicPemTrait
 {
-    public private(set) ?string $publicPem = null;
+    private(set) ?string $publicPem = null;
 
     public function getPublicPem(): string
     {

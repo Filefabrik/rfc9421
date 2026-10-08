@@ -18,7 +18,7 @@ final readonly class ContentDigest
      * //  The Base64 encoding may have multiple `=` at the end. So split this at the first `=`.
      * $digestData = explode( separator: "=", string: $digestString, limit: 2 );
      */
-    public function __construct(public private(set) string $contentDigest)
+    public function __construct(private(set) string $contentDigest)
     {
     }
 

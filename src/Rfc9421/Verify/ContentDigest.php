@@ -13,9 +13,9 @@ use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 final readonly class ContentDigest
 {
     public function __construct(
-        public private(set) string $body,
-        public private(set) string $phpAlgorithm,
-        public private(set) string $base64EncodedValue,
+        private(set) string $body,
+        private(set) string $phpAlgorithm,
+        private(set) string $base64EncodedValue,
     ) {
     }
 
