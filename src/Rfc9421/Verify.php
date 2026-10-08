@@ -19,6 +19,7 @@ use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\Verify\PrepareSignatureKeyName;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
 use Psr\Http\Message\RequestInterface;
+use UnexpectedValueException;
 
 final class Verify
 {
@@ -33,9 +34,12 @@ final class Verify
      * Extracting the signature and split into parts
      */
     private(set) ?Extractors\HeaderSignature $headerSignatureExtractor = null;
-    private(set) ?HeaderHelper               $headerHelper             = null;
-    private bool                             $preparedVerifier         = false;
-    private ?HeaderSignatureInput            $signatureInputInstance   = null;
+
+    private(set) ?HeaderHelper $headerHelper = null;
+
+    private bool $preparedVerifier = false;
+
+    private ?HeaderSignatureInput $signatureInputInstance = null;
 
     public function __construct(
         private(set) readonly RequestInterface $message,
@@ -86,7 +90,9 @@ final class Verify
 
         if ($verified) {
             // getting back validated parameters non-tempered parameters
-            $this->validSignedParameters = $signer->signingParameters->toArray();
+            $this->validSignedParameters = $signer->signingParameters?->toArray() ?? throw new UnexpectedValueException(
+                'Signed Parameters not set',
+            );
         }
 
         return $verified;
@@ -111,6 +117,7 @@ final class Verify
         ) {
             throw VerifyHeaderSignatureException::missingSignature();
         }
+
         // empty
         if (
             '' === $this->getHeaderHelper()

@@ -41,13 +41,8 @@ final class SignBody
      */
     public function getContentDigest(): string
     {
-        return $this->getDigestAlgorithmsEnum()
-                    ->getDisplayAlgorithm().'=:'.$this->calculateSignature().':';
-    }
-
-    public function getDigestAlgorithmsEnum(): DigestAlgorithmsEnum
-    {
-        return $this->algorithm;
+        return $this->algorithm
+                ->getDisplayAlgorithm().'=:'.$this->calculateSignature().':';
     }
 
     /**
@@ -63,10 +58,11 @@ final class SignBody
      */
     public function hash(): string
     {
-        return hash(algo  : $this->getDigestAlgorithmsEnum()
-                                 ->getPhpAlgorithm(),
-                    data  : $this->body,
-                    binary: true,
+        return hash(
+            algo  : $this->algorithm
+                ->getPhpAlgorithm(),
+            data  : $this->body,
+            binary: true,
         );
     }
 }

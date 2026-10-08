@@ -14,7 +14,9 @@ use Filefabrik\Rfc9421\Support\AbstractMetadata;
 final class Metadata extends AbstractMetadata
 {
     /**
-     * @param array{string:int|string|null} $metadata
+     * @param array{string:int|string} $metadata
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public static function fromArray(array $metadata): self
     {
@@ -22,8 +24,9 @@ final class Metadata extends AbstractMetadata
     }
 
     /**
-     * @param array{string:int|string|null} $metadata
+     * @param array{string:int|string} $metadata
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public static function bindMetadata(self $instance, array $metadata): self
     {

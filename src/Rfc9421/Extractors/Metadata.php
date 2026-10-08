@@ -52,8 +52,6 @@ final class Metadata extends AbstractMetadata
     }
 
     /**
-     * @param string $segment
-     *
      * @return array{string,string}
      */
     private function extractPart(string $segment): array

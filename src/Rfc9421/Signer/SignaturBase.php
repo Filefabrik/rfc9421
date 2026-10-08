@@ -64,7 +64,6 @@ final class SignaturBase
     /**
      * Handle the preparation of a signature-base array/line(key, value)
      *
-     * @return array{string,string}
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      */

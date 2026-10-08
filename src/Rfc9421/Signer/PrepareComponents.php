@@ -110,17 +110,17 @@ final class PrepareComponents
              *
              * @see 2.2.1. Method
              */
-            '@method'         => fn(RequestInterface $message) => strtoupper($message->getMethod()),
-            '@target-uri'     => fn(RequestInterface $message) => self::processTargetUriClosure($message),
+            '@method'         => fn(RequestInterface $message): string => strtoupper($message->getMethod()),
+            '@target-uri'     => self::processTargetUriClosure(...),
             /**
              * @see 2.2.3. Authority
              */
-            '@authority'      => fn(RequestInterface $message) => $message->getUri()
+            '@authority'      => fn(RequestInterface $message): string => $message->getUri()
                                                                           ->getHost(),
             /**
              * @see 2.2.4. Scheme
              */
-            '@scheme'         => fn(RequestInterface $message) => $message->getUri()
+            '@scheme'         => fn(RequestInterface $message): string => $message->getUri()
                 /** * Todo More complex as described in 2.2.5. Request Target**/ ->getScheme(),
             '@request-target' => fn(MessageInterface $message) => throw new BadMethodCallException(
                 '@request-target not implemented',
@@ -128,9 +128,9 @@ final class PrepareComponents
             /**
              * @see 2.2.6. Path
              **/
-            '@path'           => fn(RequestInterface $message) => self::processPathClosure($message),
+            '@path'           => self::processPathClosure(...),
             //  '@status'         => 'processStatus',
-            'content-length'  => fn(RequestInterface $message) => strlen((string)$message->getBody()),
+            'content-length'  => fn(RequestInterface $message): int => strlen((string)$message->getBody()),
         ];
     }
 

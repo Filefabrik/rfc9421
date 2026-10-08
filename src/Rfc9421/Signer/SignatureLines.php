@@ -26,7 +26,7 @@ final class SignatureLines
     }
 
     /**
-     * @return list<array{string,string}>
+     * @return list<array{string,string|int}>
      */
     public function toArray(): array
     {
