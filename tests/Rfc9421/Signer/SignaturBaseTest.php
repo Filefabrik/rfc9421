@@ -11,6 +11,8 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\SignaturBase;
+use Filefabrik\Rfc9421\Signer\SignatureLine;
+use Filefabrik\Rfc9421\Signer\SignatureLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -31,7 +33,12 @@ final class SignaturBaseTest extends TestCase
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new SignaturBase($r, $sc);
-        $this->assertEquals([['not-existing', 'hm'], ['@method', 'POST']], $i->createSignatureLines());
+
+        $arr = $i->createSignatureLines()
+                 ->toArray()
+        ;
+
+        self::assertEquals([['not-existing', 'hm'], ['@method', 'POST']], $arr);
     }
 
     /**
@@ -50,9 +57,15 @@ final class SignaturBaseTest extends TestCase
         $r     = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i     = new SignaturBase($r, $sc);
         $lines = $i->createSignatureLines();
-        $this->assertEquals(['not-existing', 'hm'], $lines[0]);
-        $this->assertEquals(['@method', 'POST'], $lines[1]);
-        $this->assertEquals('content-digest', $lines[2][0]);
+        $this->assertEquals(
+            new SignatureLine('not-existing', 'hm'),
+            $lines->getLineNumber(0),
+        );
+        self::assertEquals(
+            new SignatureLine('@method', 'POST'),
+            $lines->getLineNumber(1),
+        );
+        self::assertEquals('content-digest', $lines->getLineNumber(2)->key);
     }
 
     /**
@@ -128,7 +141,9 @@ final class SignaturBaseTest extends TestCase
 
     public function testCompileSignatureInputToString(): void
     {
-        $res = SignaturBase::compileSignatureInputToString([['header-key', 'the-value']]);
+        $sls = new SignatureLines()->addEntry('header-key', 'the-value');
+
+        $res = SignaturBase::compileSignatureInputToString($sls);
 
         $this->assertEquals('"header-key": the-value', $res);
     }

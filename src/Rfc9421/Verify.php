@@ -86,7 +86,7 @@ final class Verify
 
         if ($verified) {
             // getting back validated parameters non-tempered parameters
-            $this->validSignedParameters = $signer->signingParameters;
+            $this->validSignedParameters = $signer->signingParameters->toArray();
         }
 
         return $verified;

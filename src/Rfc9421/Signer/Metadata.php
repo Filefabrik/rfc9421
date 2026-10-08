@@ -22,7 +22,7 @@ final class Metadata extends AbstractMetadata
     }
 
     /**
-     * @param array{string:int|string|null}                               $metadata
+     * @param array{string:int|string|null} $metadata
      *
      */
     public static function bindMetadata(self $instance, array $metadata): self

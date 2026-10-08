@@ -63,6 +63,10 @@ final class SignBody
      */
     public function hash(): string
     {
-        return hash(algo: $this->getDigestAlgorithmsEnum()->getPhpAlgorithm(), data: $this->body, binary: true);
+        return hash(algo  : $this->getDigestAlgorithmsEnum()
+                                 ->getPhpAlgorithm(),
+                    data  : $this->body,
+                    binary: true,
+        );
     }
 }

@@ -56,14 +56,14 @@ final class PrepareComponents
         /**
          * otherwise use the default stack
          *
-         * @var array{string,Closure}
+         * @var array{string:Closure}
          */
         private(set) ?array $methodStack = null,
     ) {
     }
 
     /**
-     * @param array{string,Closure} $values
+     * @param array{string:Closure} $values
      */
     public function setMappingValues(array $values): self
     {
@@ -95,7 +95,7 @@ final class PrepareComponents
     }
 
     /**
-     * @return array{string,Closure}
+     * @return array{string:Closure}
      */
     public static function defaultMapperClosure(): array
     {
@@ -110,17 +110,17 @@ final class PrepareComponents
              *
              * @see 2.2.1. Method
              */
-            '@method'         => fn(MessageInterface $message) => strtoupper($message->getMethod()),
-            '@target-uri'     => fn(MessageInterface $message) => self::processTargetUriClosure($message),
+            '@method'         => fn(RequestInterface $message) => strtoupper($message->getMethod()),
+            '@target-uri'     => fn(RequestInterface $message) => self::processTargetUriClosure($message),
             /**
              * @see 2.2.3. Authority
              */
-            '@authority'      => fn(MessageInterface $message) => $message->getUri()
+            '@authority'      => fn(RequestInterface $message) => $message->getUri()
                                                                           ->getHost(),
             /**
              * @see 2.2.4. Scheme
              */
-            '@scheme'         => fn(MessageInterface $message) => $message->getUri()
+            '@scheme'         => fn(RequestInterface $message) => $message->getUri()
                 /** * Todo More complex as described in 2.2.5. Request Target**/ ->getScheme(),
             '@request-target' => fn(MessageInterface $message) => throw new BadMethodCallException(
                 '@request-target not implemented',
@@ -128,9 +128,9 @@ final class PrepareComponents
             /**
              * @see 2.2.6. Path
              **/
-            '@path'           => fn(MessageInterface $message) => self::processPathClosure($message),
+            '@path'           => fn(RequestInterface $message) => self::processPathClosure($message),
             //  '@status'         => 'processStatus',
-            'content-length'  => fn(MessageInterface $message) => strlen((string)$message->getBody()),
+            'content-length'  => fn(RequestInterface $message) => strlen((string)$message->getBody()),
         ];
     }
 
@@ -139,7 +139,7 @@ final class PrepareComponents
      *
      * @see 2.2.2. Target URI @target-uri
      */
-    public static function processTargetUriClosure(MessageInterface $message): string
+    public static function processTargetUriClosure(RequestInterface $message): string
     {
         $messageUri = clone $message->getUri();
         $parts      = [];
@@ -159,7 +159,7 @@ final class PrepareComponents
      * @return string empty with /
      * @see 2.2.6. Path
      */
-    public static function processPathClosure(MessageInterface $message): string
+    public static function processPathClosure(RequestInterface $message): string
     {
         $p = $message->getUri()
                      ->getPath()

@@ -24,13 +24,13 @@ final class SignaturBase
     /**
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
      *
-     * @param array<array{string,string|int}> $signatureLines
+
      */
-    public static function compileSignatureInputToString(array $signatureLines): string
+    public static function compileSignatureInputToString(SignatureLines $signatureLines): string
     {
         $cArray = [];
-        foreach ($signatureLines as [$key, $value]) {
-            $cArray[] = sprintf('"%s": %s', $key, $value);
+        foreach ($signatureLines->lines as $signatureLine) {
+            $cArray[] = sprintf('"%s": %s', $signatureLine->key, $signatureLine->value);
         }
 
         // this is what to sign with private key
@@ -40,13 +40,12 @@ final class SignaturBase
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
-     * @return array{array{string,string}}
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
-    public function createSignatureLines(): array
+    public function createSignatureLines(): SignatureLines
     {
-        $signatureLines = [];
+        $signatureLines = new SignatureLines();
 
         // todo prepare components with extra methods has to be separated
         $components = new PrepareComponents($this->message);
@@ -55,7 +54,7 @@ final class SignaturBase
         }
 
         foreach ($this->configuration->signatureParams->getSignatureParameters() as $signatureParam) {
-            $signatureLines[] = $this->createSignatureLine($signatureParam, $components);
+            $signatureLines->add($this->createSignatureLine($signatureParam, $components));
         }
 
         // at least
@@ -69,16 +68,16 @@ final class SignaturBase
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      */
-    private function createSignatureLine(string $signatureParam, PrepareComponents $components): array
+    private function createSignatureLine(string $signatureParam, PrepareComponents $components): SignatureLine
     {
         if ('content-digest' === $signatureParam) {
-            return $this->handleSignBody();
+            return new SignatureLine(...$this->handleSignBody());
         }
 
         // getting the value from header
         return str_starts_with($signatureParam, '@') ?
             // special processing for preconfigured @ components
-            [$signatureParam, $components->processValue($signatureParam)] :
+            new SignatureLine($signatureParam, $components->processValue($signatureParam)) :
             // regular. todo make content-length also with a special "processing" value
             // todo, if an header not exists, then must throw during
             $this->checkExistingHeader($signatureParam);
@@ -117,13 +116,12 @@ final class SignaturBase
     /**
      * Header Key must exist
      *
-     * @return array{string,string|int}
      * @throws InvalidHeaderKeyException
      */
-    private function checkExistingHeader(string $signatureParam): array
+    private function checkExistingHeader(string $signatureParam): SignatureLine
     {
         if ($this->message->hasHeader($signatureParam)) {
-            return [$signatureParam, $this->message->getHeaderLine($signatureParam)];
+            return new SignatureLine($signatureParam, $this->message->getHeaderLine($signatureParam));
         }
 
         throw InvalidHeaderKeyException::headerNotExists($signatureParam);

@@ -12,6 +12,8 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Signer\SignaturBase;
+use Filefabrik\Rfc9421\Signer\SignatureLine;
+use Filefabrik\Rfc9421\Signer\SignatureLines;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -23,9 +25,9 @@ final class Signer
     /**
      * Data for signing the relevant header data
      *
-     * @var array{array{string,string}}|array{}
+
      */
-    private(set) array $signingParameters = [];
+    private(set) null|SignatureLines $signingParameters =null;
 
     /**
      * @var string|null null throws an error
@@ -85,7 +87,7 @@ final class Signer
         $this->signatureBase = $base->makeSignatureInput();
 
         // now set the signature-params ONLY into the signature-base line.
-        $this->signingParameters [] = ['@signature-params', $this->signatureBase];
+        $this->signingParameters ->add(new SignatureLine('@signature-params', $this->signatureBase));
 
         // makes the array of signingParameters to a string. The string kann be base64EncodedValue
         // keep the $this->signingParametersString public readable. maybe for testing and other stuff

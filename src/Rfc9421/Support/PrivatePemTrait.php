@@ -30,6 +30,7 @@ trait PrivatePemTrait
         if (null === $this->privatePem || '' === $this->privatePem) {
             throw new UnexpectedValueException('PrivatePem is null');
         }
+
         return $this->privatePem;
     }
 }
