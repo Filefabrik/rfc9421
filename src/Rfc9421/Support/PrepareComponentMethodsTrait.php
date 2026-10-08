@@ -40,4 +40,12 @@ trait PrepareComponentMethodsTrait
 
         return $this;
     }
+
+    /**
+     * @return array<string,Closure>|null
+     */
+    public function getHasPrepareComponentsMethod(): ?array
+    {
+        return $this->prepareComponentsMethods ?? null;
+    }
 }

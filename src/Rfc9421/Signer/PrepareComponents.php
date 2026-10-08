@@ -109,7 +109,7 @@ final class PrepareComponents
     }
 
     /**
-     * @param array{string,string|Closure} $values
+     * @param array{string,Closure} $values
      */
     public function setMappingValues(array $values): self
     {
