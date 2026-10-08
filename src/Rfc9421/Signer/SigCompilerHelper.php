@@ -40,8 +40,6 @@ final readonly class SigCompilerHelper
 
     /**
      * simple helper
-     *
-     *
      */
     public static function wrapBraces(string $string): string
     {

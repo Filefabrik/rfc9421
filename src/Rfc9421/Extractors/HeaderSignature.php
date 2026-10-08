@@ -15,7 +15,7 @@ use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 final class HeaderSignature
 {
     /**
-     * @var array<string>|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException|null
+     * @var array{non-falsy-string,string,string}|non-empty-array<string>|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException|null
      */
     public private(set) array|null|SignatureExtractionException $validatedSignatureParts = null {
         /**
@@ -31,16 +31,21 @@ final class HeaderSignature
     /**
      * todo check, it is possible without signature
      *
-     * @return string|null null on error
+     * @return string null on error
      */
-    public function extractSignatureNameKey(): ?string
+    public function extractSignatureNameKey(): string
     {
-        return $this->getValidExtraction()[1];
+        // todo validate against null value
+        return $this->getValidExtraction()[1] ?? '';
     }
 
+    /**
+     * @return array{non-falsy-string,string,string}|non-empty-array<string>|null
+     */
     public function getValidExtraction(): null|array
     {
-        return $this->validatedSignatureParts instanceof SignatureExtractionException ? null : $this->validatedSignatureParts;
+        return $this->validatedSignatureParts instanceof SignatureExtractionException ? null :
+            $this->validatedSignatureParts;
     }
 
     /**
@@ -61,17 +66,17 @@ final class HeaderSignature
     }
 
     /**
-     *  todo check empty
+     *  todo check empty ore null or exception
      */
     public function getSignatureValue(): string
     {
-        return $this->getValidExtraction()[2];
+        return $this->getValidExtraction()[2] ?? '';
     }
 
     /**
      * checks we have the :base64EncodedValue-code: ...between the double colons
      *
-     * @return array<string> SignatureExtractionException on format missmatch
+     * @return array{0:non-falsy-string,1:string,2:string}|non-empty-array<string> SignatureExtractionException on format missmatch
      *
      * @throws SignatureExtractionException
      */
@@ -90,10 +95,11 @@ final class HeaderSignature
     }
 
     /**
-     * @return array<string>
+     * @return array{non-falsy-string,string,string}|string[]
      */
     public function extractSignatureString(): array
     {
+        $matches = [];
         // todo modify regex for strict format validation
         preg_match('#^(.*?):(.*?):$#', $this->signatureString, $matches);
 

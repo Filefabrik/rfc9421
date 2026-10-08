@@ -88,7 +88,7 @@ final class PrepareComponents
      * Todo setter has to be a type/format validator that is callable or closure
      * While having systemwide an own mapping dialect for your needs, set the method stack globally
      *
-     * @param entry|defaultStack $defaultDerivedStack
+     * @param defaultStack $defaultDerivedStack
      */
     public static function setDefaultDerivedStack(array $defaultDerivedStack): void
     {
