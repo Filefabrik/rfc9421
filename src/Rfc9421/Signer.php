@@ -11,9 +11,9 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
-use Filefabrik\Rfc9421\Signer\SignaturBase;
-use Filefabrik\Rfc9421\Signer\SignatureLine;
-use Filefabrik\Rfc9421\Signer\SignatureLines;
+use Filefabrik\Rfc9421\Signer\Signatures\Base;
+use Filefabrik\Rfc9421\Signer\Signatures\Line;
+use Filefabrik\Rfc9421\Signer\Signatures\Lines;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -25,7 +25,7 @@ final class Signer
     /**
      * Data for signing the relevant header data
      */
-    private(set) null|SignatureLines $signingParameters = null;
+    private(set) null|Lines $signingParameters = null;
 
     /**
      * @var string|null null throws an error
@@ -74,7 +74,7 @@ final class Signer
      */
     public function prepareSigning(): void
     {
-        $base = new SignaturBase($this->message, $this->signingConfiguration);
+        $base = new Base($this->message, $this->signingConfiguration);
 
         $this->signingParameters = $base->createSignatureLines();
 
@@ -85,11 +85,11 @@ final class Signer
         $this->signatureBase = $base->makeSignatureInput();
 
         // now set the signature-params ONLY into the signature-base line.
-        $this->signingParameters->add(new SignatureLine('@signature-params', $this->signatureBase));
+        $this->signingParameters->add(new Line('@signature-params', $this->signatureBase));
 
         // makes the array of signingParameters to a string. The string kann be base64EncodedValue
         // keep the $this->signingParametersString public readable. maybe for testing and other stuff
-        $this->signingParametersString = SignaturBase::compileSignatureInputToString($this->signingParameters);
+        $this->signingParametersString = Base::compileSignatureInputToString($this->signingParameters);
     }
 
     /**

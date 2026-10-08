@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Signer;
+namespace Filefabrik\Rfc9421\Signer\Signatures;
 
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Signer\PrepareComponents;
+use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
+use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
@@ -13,7 +16,7 @@ use UnexpectedValueException;
 /**
  * Handling the signature base params
  */
-final class SignaturBase
+final class Base
 {
     public function __construct(
         private(set) RequestInterface $message,
@@ -26,7 +29,7 @@ final class SignaturBase
      *
 
      */
-    public static function compileSignatureInputToString(SignatureLines $signatureLines): string
+    public static function compileSignatureInputToString(Lines $signatureLines): string
     {
         $cArray = [];
         foreach ($signatureLines->lines as $signatureLine) {
@@ -43,9 +46,9 @@ final class SignaturBase
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
-    public function createSignatureLines(): SignatureLines
+    public function createSignatureLines(): Lines
     {
-        $signatureLines = new SignatureLines();
+        $signatureLines = new Lines();
 
         // todo prepare components with extra methods has to be separated
         $components = new PrepareComponents($this->message);
@@ -67,16 +70,16 @@ final class SignaturBase
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      */
-    private function createSignatureLine(string $signatureParam, PrepareComponents $components): SignatureLine
+    private function createSignatureLine(string $signatureParam, PrepareComponents $components): Line
     {
         if ('content-digest' === $signatureParam) {
-            return new SignatureLine(...$this->handleSignBody());
+            return new Line(...$this->handleSignBody());
         }
 
         // getting the value from header
         return str_starts_with($signatureParam, '@') ?
             // special processing for preconfigured @ components
-            new SignatureLine($signatureParam, $components->processValue($signatureParam)) :
+            new Line($signatureParam, $components->processValue($signatureParam)) :
             // regular. todo make content-length also with a special "processing" value
             // todo, if an header not exists, then must throw during
             $this->checkExistingHeader($signatureParam);
@@ -117,10 +120,10 @@ final class SignaturBase
      *
      * @throws InvalidHeaderKeyException
      */
-    private function checkExistingHeader(string $signatureParam): SignatureLine
+    private function checkExistingHeader(string $signatureParam): Line
     {
         if ($this->message->hasHeader($signatureParam)) {
-            return new SignatureLine($signatureParam, $this->message->getHeaderLine($signatureParam));
+            return new Line($signatureParam, $this->message->getHeaderLine($signatureParam));
         }
 
         throw InvalidHeaderKeyException::headerNotExists($signatureParam);

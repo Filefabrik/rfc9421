@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421Test\Signer;
+namespace Filefabrik\Rfc9421Test\Signer\Signatures;
 
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
@@ -10,9 +10,9 @@ use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Rfc9421\Signer\SignaturBase;
-use Filefabrik\Rfc9421\Signer\SignatureLine;
-use Filefabrik\Rfc9421\Signer\SignatureLines;
+use Filefabrik\Rfc9421\Signer\Signatures\Base;
+use Filefabrik\Rfc9421\Signer\Signatures\Line;
+use Filefabrik\Rfc9421\Signer\Signatures\Lines;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -20,10 +20,10 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
-#[CoversClass(SignaturBase::class)]
-#[CoversMethod(SignaturBase::class, 'handleSignBody')]
-#[CoversMethod(SignaturBase::class, 'createSignatureLine')]
-final class SignaturBaseTest extends TestCase
+#[CoversClass(Base::class)]
+#[CoversMethod(Base::class, 'handleSignBody')]
+#[CoversMethod(Base::class, 'createSignatureLine')]
+final class BaseTest extends TestCase
 {
     public function testCreateSignatureLines(): void
     {
@@ -32,7 +32,7 @@ final class SignaturBaseTest extends TestCase
            ->signHeader('@method')
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
-        $i = new SignaturBase($r, $sc);
+        $i = new Base($r, $sc);
 
         $arr = $i->createSignatureLines()
                  ->toArray()
@@ -55,14 +55,14 @@ final class SignaturBaseTest extends TestCase
            ->signHeader('content-digest')
         ;
         $r     = new Request('post', '', ['noT-exIsting' => 'hm']);
-        $i     = new SignaturBase($r, $sc);
+        $i     = new Base($r, $sc);
         $lines = $i->createSignatureLines();
         $this->assertEquals(
-            new SignatureLine('not-existing', 'hm'),
+            new Line('not-existing', 'hm'),
             $lines->getLineNumber(0),
         );
         self::assertEquals(
-            new SignatureLine('@method', 'POST'),
+            new Line('@method', 'POST'),
             $lines->getLineNumber(1),
         );
         self::assertEquals('content-digest', $lines->getLineNumber(2)->key);
@@ -89,7 +89,7 @@ final class SignaturBaseTest extends TestCase
            ->mustSignBody(false)
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
-        $i = new SignaturBase($r, $sc);
+        $i = new Base($r, $sc);
         $i->createSignatureLines();
     }
 
@@ -111,7 +111,7 @@ final class SignaturBaseTest extends TestCase
         $sc->signHeader('not-existing');
 
         $r = new Request('POST', '', ['x-wrong-name' => 'hm']);
-        $i = new SignaturBase($r, $sc);
+        $i = new Base($r, $sc);
         $i->createSignatureLines();
     }
 
@@ -131,7 +131,7 @@ final class SignaturBaseTest extends TestCase
            ->withSignatureKeyName('')
         ;
         $r   = new Request('POST', '', ['stupid-header' => 'hm']);
-        $i   = new SignaturBase($r, $sc);
+        $i   = new Base($r, $sc);
         $res = $i->makeSignatureInput();
         self::assertEquals(
             '("stupid-header" "@method");created='.$created.';alg="'.SigningEnum::rsa_v_1_5_sha_256->getValue().'"',
@@ -141,9 +141,9 @@ final class SignaturBaseTest extends TestCase
 
     public function testCompileSignatureInputToString(): void
     {
-        $sls = new SignatureLines()->addEntry('header-key', 'the-value');
+        $sls = new Lines()->addEntry('header-key', 'the-value');
 
-        $res = SignaturBase::compileSignatureInputToString($sls);
+        $res = Base::compileSignatureInputToString($sls);
 
         $this->assertEquals('"header-key": the-value', $res);
     }
