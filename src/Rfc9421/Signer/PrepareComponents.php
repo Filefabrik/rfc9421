@@ -6,9 +6,9 @@ namespace Filefabrik\Rfc9421\Signer;
 
 use BadMethodCallException;
 use Closure;
+use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
-use UnexpectedValueException;
 
 /**
  * Specific Request Headers has to be prepared
@@ -58,80 +58,8 @@ final class PrepareComponents
          *
          * @var array{string:Closure}
          */
-        private(set) ?array $methodStack = null,
+        private(set) ?PreparedMethods $methodStack = null,
     ) {
-    }
-
-    /**
-     * @param array{string:Closure} $values
-     */
-    public function setMappingValues(array $values): self
-    {
-        foreach ($values as $componentName => $callable) {
-            $this->setMappingValue(key: $componentName, callable: $callable);
-        }
-
-        return $this;
-    }
-
-    public function setMappingValue(string $key, Closure $callable): self
-    {
-        // init stack
-        $stack             = $this->getMethodStack();
-        $stack[$key]       = $callable;
-        $this->methodStack = $stack;
-
-        return $this;
-    }
-
-    /**
-     * use default is nothing was overridden
-     *
-     * @return array{string:Closure}
-     */
-    private function getMethodStack(): array
-    {
-        return $this->methodStack ??= self::defaultMapperClosure();
-    }
-
-    /**
-     * @return array{string:Closure}
-     */
-    public static function defaultMapperClosure(): array
-    {
-        /**
-         * for different components there can be different methods to prepare the values(upper-case lower-case )
-         *
-
-         */
-        return [
-            /**
-             * extracting the "method" from header to use later as "@method"
-             *
-             * @see 2.2.1. Method
-             */
-            '@method'         => fn(RequestInterface $message): string => strtoupper($message->getMethod()),
-            '@target-uri'     => self::processTargetUriClosure(...),
-            /**
-             * @see 2.2.3. Authority
-             */
-            '@authority'      => fn(RequestInterface $message): string => $message->getUri()
-                                                                          ->getHost(),
-            /**
-             * @see 2.2.4. Scheme
-             */
-            '@scheme'         => fn(RequestInterface $message): string => $message->getUri()
-                /** * Todo More complex as described in 2.2.5. Request Target**/ ->getScheme(),
-            '@request-target' => fn(MessageInterface $message) => throw new BadMethodCallException(
-                '@request-target not implemented',
-            ),
-            /**
-             * @see 2.2.6. Path
-             **/
-            '@path'           => self::processPathClosure(...),
-            //  '@status'         => 'processStatus',
-            'content-length'  => fn(RequestInterface $message): int => strlen((string)$message->getBody()),
-        ];
     }
 
     /**
@@ -168,14 +96,81 @@ final class PrepareComponents
         return (!str_starts_with($p, '/')) ? '/'.$p : $p;
     }
 
+    /**
+     * @param array{string:Closure} $values
+     */
+    public function addMappingValues(array $values): self
+    {
+        $this->getMethodStack()
+             ->adds($values)
+        ;
+
+        return $this;
+    }
+
+    /**
+     * use default is nothing was overridden
+     *
+
+     */
+    private function getMethodStack(): PreparedMethods
+    {
+        return $this->methodStack ??= new PreparedMethods()->adds(self::defaultMapperClosure());
+    }
+
+    /**
+     * @return array{string:Closure}
+     */
+    public static function defaultMapperClosure(): array
+    {
+        /**
+         * for different components there can be different methods to prepare the values(upper-case lower-case )
+         *
+
+         */
+        return [
+            /**
+             * extracting the "method" from header to use later as "@method"
+             *
+             * @see 2.2.1. Method
+             */
+            '@method'         => fn(RequestInterface $message): string => strtoupper($message->getMethod()),
+            '@target-uri'     => self::processTargetUriClosure(...),
+            /**
+             * @see 2.2.3. Authority
+             */
+            '@authority'      => fn(RequestInterface $message): string => $message->getUri()
+                                                                                  ->getHost(),
+            /**
+             * @see 2.2.4. Scheme
+             */
+            '@scheme'         => fn(RequestInterface $message): string => $message->getUri()
+                /** * Todo More complex as described in 2.2.5. Request Target**/ ->getScheme(),
+            '@request-target' => fn(MessageInterface $message) => throw new BadMethodCallException(
+                '@request-target not implemented',
+            ),
+            /**
+             * @see 2.2.6. Path
+             **/
+            '@path'           => self::processPathClosure(...),
+            //  '@status'         => 'processStatus',
+            'content-length'  => fn(RequestInterface $message): int => strlen((string)$message->getBody()),
+        ];
+    }
+
+    public function setPreparedMethods(PreparedMethods $preparedMethods): self
+    {
+        $this->methodStack = $preparedMethods;
+
+        return $this;
+    }
+
     public function processValue(string $key): int|string
     {
-        if (!array_key_exists($key, $this->getMethodStack())) {
-            throw new UnexpectedValueException(sprintf('Method "%s" not registered.', $key));
-        }
-
-        return $this->getMethodStack()[$key]($this->message)
-        ;
+        return $this->getMethodStack()
+                    ->getMethod($key)(
+            $this->message,
+        );
     }
 
     /*

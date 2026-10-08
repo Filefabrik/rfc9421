@@ -32,7 +32,7 @@ final class SignatureParamsTest extends TestCase
                                          ->add('@test-derived-component')
         ;
 
-        $this->assertSame(
+        self::assertSame(
             ['testname', '@testname', 'content-test', '@test-derived-component'],
             $instance->getSignatureParameters(),
         );
@@ -43,7 +43,7 @@ final class SignatureParamsTest extends TestCase
         $arr      = ['testname', '@test-derived-component', '@testname', 'content-test'];
         $instance = SignatureParams::fromArray($arr);
 
-        $this->assertSame(
+        self::assertSame(
             ['testname', '@test-derived-component', '@testname', 'content-test',],
             $instance->getSignatureParameters(),
         );
@@ -62,7 +62,7 @@ final class SignatureParamsTest extends TestCase
                                          ->setDerivedComponentName('@test-derived-component')
         ;
 
-        $this->assertSame(
+        self::assertSame(
             ['testname', '@testname', 'content-test', '@test-derived-component'],
             $instance->getSignatureParameters(),
         );
@@ -77,9 +77,9 @@ final class SignatureParamsTest extends TestCase
                                          ->addIfNotExists('@testname')
         ;
 
-        $this->assertTrue($instance->exists('testname'));
-        $this->assertTrue($instance->exists('@testname'));
-        $this->assertFalse($instance->exists('-testname'));
+        self::assertTrue($instance->exists('testname'));
+        self::assertTrue($instance->exists('@testname'));
+        self::assertFalse($instance->exists('-testname'));
     }
 
     /**
@@ -89,7 +89,7 @@ final class SignatureParamsTest extends TestCase
     public function testSetHeaderName(): void
     {
         $set = new SignatureParams()->setHeaderName('testname');
-        $this->assertInstanceOf(SignatureParams::class, $set);
+        self::assertInstanceOf(SignatureParams::class, $set);
     }
 
     /**
@@ -151,7 +151,7 @@ final class SignatureParamsTest extends TestCase
     public function testSetDerivedComponentName(): void
     {
         $set = new SignatureParams()->setDerivedComponentName('@testname');
-        $this->assertInstanceOf(SignatureParams::class, $set);
+        self::assertInstanceOf(SignatureParams::class, $set);
     }
 
     /**

@@ -28,9 +28,9 @@ final class SignaturInputTest extends TestCase
         $s        = '("@method" "content-digest")';
         $instance = SignaturInput::extract($s);
 
-        $this->assertSame('', $instance->signatureKeyName);
-        $this->assertSame('"@method" "content-digest"', $instance->components);
-        $this->assertSame('', $instance->metadata);
+        self::assertSame('', $instance->signatureKeyName);
+        self::assertSame('"@method" "content-digest"', $instance->components);
+        self::assertSame('', $instance->metadata);
     }
 
     public function testExtractingWithoutMetadataNaked(): void
@@ -39,9 +39,9 @@ final class SignaturInputTest extends TestCase
             'testValue=("@method" "content-digest");created=1789634264;expires=1789641464;nonce="nonce-now";tag="mastodon"';
         $instance = SignaturInput::extract($s);
 
-        $this->assertSame('testValue=', $instance->signatureKeyName);
-        $this->assertSame('"@method" "content-digest"', $instance->components);
-        $this->assertSame(
+        self::assertSame('testValue=', $instance->signatureKeyName);
+        self::assertSame('"@method" "content-digest"', $instance->components);
+        self::assertSame(
             'created=1789634264;expires=1789641464;nonce="nonce-now";tag="mastodon"',
             $instance->metadata,
         );
@@ -51,8 +51,8 @@ final class SignaturInputTest extends TestCase
     {
         $s        = 'testValue=("@method" "content-digest");';
         $instance = SignaturInput::extract($s);
-        $this->assertSame('testValue=', $instance->signatureKeyName);
-        $this->assertSame('"@method" "content-digest"', $instance->components);
-        $this->assertSame('', $instance->metadata);
+        self::assertSame('testValue=', $instance->signatureKeyName);
+        self::assertSame('"@method" "content-digest"', $instance->components);
+        self::assertSame('', $instance->metadata);
     }
 }

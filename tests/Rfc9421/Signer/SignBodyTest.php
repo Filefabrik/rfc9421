@@ -16,7 +16,7 @@ final class SignBodyTest extends TestCase
         $arr  = ['recipient' => 'Alex', 'amount' => 900000000];
         $body = json_encode($arr);
         $sig  = new SignBody($body, 'sha512')->getContentDigest();
-        $this->assertSame(
+        self::assertSame(
             'sha-512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
             $sig,
         );
@@ -27,7 +27,7 @@ final class SignBodyTest extends TestCase
         $arr  = ['recipient' => 'Alex', 'amount' => 900000000];
         $body = json_encode($arr);
         $sig  = new SignBody($body, 'sha512')->calculateSignature();
-        $this->assertSame(
+        self::assertSame(
             'PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==',
             $sig,
         );
@@ -38,7 +38,7 @@ final class SignBodyTest extends TestCase
         $arr  = ['recipient' => 'Alex', 'amount' => 900000000];
         $body = json_encode($arr);
         $sig  = new SignBody($body, 'sha512')->getContentDigestHeaderArray();
-        $this->assertSame(
+        self::assertSame(
             [
                 'content-digest',
                 'sha-512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',

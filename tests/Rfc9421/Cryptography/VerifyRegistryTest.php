@@ -38,7 +38,7 @@ final class VerifyRegistryTest extends TestCase
                 fn(string $signingDatas, $signature, $publicKeyPem): bool => true,
             SigningEnum::rsa_v_1_5_sha_256->name => fn(string $signingDatas, $signature, $publicKeyPem): bool => false,
         ]);
-        $this->assertTrue(VerifyRegistry::verifying(SigningEnum::rsa_pss_sha512, '', '', ''));
-        $this->assertFalse(VerifyRegistry::verifying(SigningEnum::rsa_v_1_5_sha_256, '', '', ''));
+        self::assertTrue(VerifyRegistry::verifying(SigningEnum::rsa_pss_sha512, '', '', ''));
+        self::assertFalse(VerifyRegistry::verifying(SigningEnum::rsa_v_1_5_sha_256, '', '', ''));
     }
 }

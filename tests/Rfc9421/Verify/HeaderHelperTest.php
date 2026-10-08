@@ -15,7 +15,7 @@ final class HeaderHelperTest extends TestCase
     public function testGetSignatureLine(): void
     {
         $r = new Request(method: 'Post', uri: '', headers: ['signature' => 'my-signature']);
-        $this->assertSame(
+        self::assertSame(
             'my-signature',
             new HeaderHelper($r)->getSignatureLine(),
         );
@@ -24,7 +24,7 @@ final class HeaderHelperTest extends TestCase
     public function testGetSignatureInputLine(): void
     {
         $r = new Request(method: 'Post', uri: '', headers: ['signature-input' => 'my-signature-input']);
-        $this->assertSame(
+        self::assertSame(
             'my-signature-input',
             new HeaderHelper($r)->getSignatureInputLine(),
         );
@@ -33,7 +33,7 @@ final class HeaderHelperTest extends TestCase
     public function testGetContentDigestLine(): void
     {
         $r = new Request(method: 'Post', uri: '', headers: ['content-digest' => 'my-content-digest']);
-        $this->assertSame(
+        self::assertSame(
             'my-content-digest',
             new HeaderHelper($r)->getContentDigestLine(),
         );

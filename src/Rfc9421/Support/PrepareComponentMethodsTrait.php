@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Support;
 
 use Closure;
+use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 
 /**
@@ -12,12 +13,7 @@ use Filefabrik\Rfc9421\SigningConfiguration;
  */
 trait PrepareComponentMethodsTrait
 {
-    /**
-     * Injecting callables
-     *
-     * @var array{string, Closure}|array<void>
-     */
-    private(set) array $prepareComponentsMethods = [];
+    private(set) ?PreparedMethods $preparedMethods = null;
 
     /**
      * Modify the generation methods
@@ -27,25 +23,26 @@ trait PrepareComponentMethodsTrait
      */
     public function withPrepareComponentsMethods(array $methods): SigningConfiguration
     {
-        foreach ($methods as [$key, $closure]) {
-            $this->withPrepareComponentsMethod($key, $closure);
-        }
+        $this->getPreparedMethods()
+             ->adds($methods)
+        ;
 
         return $this;
+    }
+
+    public function getPreparedMethods(): PreparedMethods
+    {
+        return $this->preparedMethods ??=  new PreparedMethods()->adds(PrepareComponents::defaultMapperClosure());
     }
 
     public function withPrepareComponentsMethod(string $componentName, callable $callable): self
     {
-        $this->prepareComponentsMethods[$componentName] = $callable;
+        $this->getPreparedMethods()
+             ->add($componentName, $callable)
+        ;
 
         return $this;
     }
 
-    /**
-     * @return array{string:Closure}|null
-     */
-    public function getHasPrepareComponentsMethod(): ?array
-    {
-        return $this->prepareComponentsMethods ?? null;
-    }
+
 }

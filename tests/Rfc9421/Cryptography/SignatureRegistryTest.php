@@ -20,7 +20,7 @@ final class SignatureRegistryTest extends TestCase
             fn(string $signingDatas, string $privateKeyPem): string => 'isSigned',
         );
 
-        $this->assertSame('isSigned', SignatureRegistry::signing(SigningEnum::ed25519, '', ''));
+        self::assertSame('isSigned', SignatureRegistry::signing(SigningEnum::ed25519, '', ''));
     }
 
     public function testRegisterSigningMethods(): void

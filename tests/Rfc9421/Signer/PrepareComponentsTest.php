@@ -31,12 +31,12 @@ final class PrepareComponentsTest extends TestCase
         ];
 
         $prepareInstance = new PrepareComponents(new Request('post', 'https://Test.com'));
-        $prepareInstance->setMappingValues($arr);
+        $prepareInstance->addMappingValues($arr);
         $signatureParams = new SignatureParams();
 
         $signatureParams->setDerivedComponentName('@method');
 
-        $this->assertSame('PosB', $prepareInstance->processValue('@method'));
+        self::assertSame('PosB', $prepareInstance->processValue('@method'));
     }
 
     public function testSetDerivedMapper(): void
@@ -51,8 +51,8 @@ final class PrepareComponentsTest extends TestCase
         $signatureParams->setDerivedComponentName('@method');
 
         $prepareInstance = new PrepareComponents($r);
-        $prepareInstance->setMappingValues($arr);
-        $this->assertSame('Post', $prepareInstance->processValue('@method'));
+        $prepareInstance->addMappingValues($arr);
+        self::assertSame('Post', $prepareInstance->processValue('@method'));
     }
 
     /**
@@ -70,7 +70,7 @@ final class PrepareComponentsTest extends TestCase
         $messageStack      = PrepareComponents::defaultMapperClosure();
         // todo never allow a number only closure or string
         $messageStack[' bullshit '] = '12';
-        $prepareComponents->setMappingValues($messageStack);
+        $prepareComponents->addMappingValues($messageStack);
 
         $prepareComponents->processValue(' bullshit ');
     }
@@ -92,12 +92,12 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('POST', $prepareInstance->processValue('@method'));
-        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
-        $this->assertSame('test.com', $prepareInstance->processValue('@authority'));
-        $this->assertSame('https', $prepareInstance->processValue('@scheme'));
-        $this->assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
-        $this->assertSame(62, $prepareInstance->processValue('content-length'));
+        self::assertSame('POST', $prepareInstance->processValue('@method'));
+        self::assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+        self::assertSame('test.com', $prepareInstance->processValue('@authority'));
+        self::assertSame('https', $prepareInstance->processValue('@scheme'));
+        self::assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
+        self::assertSame(62, $prepareInstance->processValue('content-length'));
     }
 
     public function testProcessTargetUri(): void
@@ -106,14 +106,14 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+        self::assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
     }
 
     public function testProcessAtMethod(): void
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $prepareInstance = new PrepareComponents($r);
-        $this->assertSame('POST', $prepareInstance->processValue('@method'));
+        self::assertSame('POST', $prepareInstance->processValue('@method'));
     }
 
     public function testProcessAuthority(): void
@@ -122,11 +122,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('test.com', $prepareInstance->processValue('@authority'));
+        self::assertSame('test.com', $prepareInstance->processValue('@authority'));
 
         $r = new Request('post', 'https://www.Test.com/var/pathy/?qer=var');
 
-        $this->assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority'));
+        self::assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority'));
     }
 
     public function testProcessScheme(): void
@@ -135,11 +135,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('https', $prepareInstance->processValue('@scheme'));
+        self::assertSame('https', $prepareInstance->processValue('@scheme'));
 
         $r = new Request('post', 'http://www.Test.com/var/pathy/?qer=var');
 
-        $this->assertSame('http', new PrepareComponents($r)->processValue('@scheme'));
+        self::assertSame('http', new PrepareComponents($r)->processValue('@scheme'));
     }
 
     public function testProcessPath(): void
@@ -148,11 +148,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
+        self::assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
 
         $r = new Request('post', 'http://www.Test.com');
 
-        $this->assertSame('/', new PrepareComponents($r)->processValue('@path'));
+        self::assertSame('/', new PrepareComponents($r)->processValue('@path'));
     }
 
     public function testProcessValueNotCallable(): void
@@ -175,8 +175,8 @@ final class PrepareComponentsTest extends TestCase
         $r = new Request('post', 'https://Test.com');
 
         $prepareInstance = new PrepareComponents($r);
-        $prepareInstance->setMappingValues($arr);
-        $this->assertSame('Post', $prepareInstance->processValue('@methodsss'));
+        $prepareInstance->addMappingValues($arr);
+        self::assertSame('Post', $prepareInstance->processValue('@methodsss'));
     }
 
     public function testProcessContentLength(): void
@@ -189,6 +189,6 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame(62, $prepareInstance->processValue('content-length'));
+        self::assertSame(62, $prepareInstance->processValue('content-length'));
     }
 }

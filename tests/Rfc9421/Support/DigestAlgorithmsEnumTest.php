@@ -41,7 +41,7 @@ final class DigestAlgorithmsEnumTest extends TestCase
     #[DataProvider('validDigestAlgorithms')]
     public function testIsOwnTypeOrThrow(...$datas): void
     {
-        $this->assertSame(
+        self::assertSame(
             $datas[1],
             DigestAlgorithmsEnum::isOwnTypeOrThrow($datas[0]),
         );
@@ -74,7 +74,7 @@ final class DigestAlgorithmsEnumTest extends TestCase
     #[DataProvider('validDigestAlgorithms')]
     public function testIsOwnType(...$datas): void
     {
-        $this->assertSame(
+        self::assertSame(
             $datas[1],
             DigestAlgorithmsEnum::isOwnType($datas[0]),
         );
@@ -85,7 +85,7 @@ final class DigestAlgorithmsEnumTest extends TestCase
     #[DataProvider('invalidDigestAlgorithms')]
     public function testIsOwnTypeNull(...$datas): void
     {
-        $this->assertSame(
+        self::assertSame(
             null,
             DigestAlgorithmsEnum::isOwnType($datas[0]),
         );
@@ -93,13 +93,13 @@ final class DigestAlgorithmsEnumTest extends TestCase
 
     public function testGetDisplayAlgorithm(): void
     {
-        $this->assertSame('sha-256', DigestAlgorithmsEnum::sha256->getDisplayAlgorithm());
-        $this->assertSame('sha-512', DigestAlgorithmsEnum::sha512->getDisplayAlgorithm());
+        self::assertSame('sha-256', DigestAlgorithmsEnum::sha256->getDisplayAlgorithm());
+        self::assertSame('sha-512', DigestAlgorithmsEnum::sha512->getDisplayAlgorithm());
     }
 
     public function testGetPhpAlgorithm(): void
     {
-        $this->assertSame('sha256', DigestAlgorithmsEnum::sha256->getPhpAlgorithm());
-        $this->assertSame('sha512', DigestAlgorithmsEnum::sha512->getPhpAlgorithm());
+        self::assertSame('sha256', DigestAlgorithmsEnum::sha256->getPhpAlgorithm());
+        self::assertSame('sha512', DigestAlgorithmsEnum::sha512->getPhpAlgorithm());
     }
 }

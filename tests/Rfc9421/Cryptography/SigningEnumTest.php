@@ -53,27 +53,27 @@ final class SigningEnumTest extends TestCase
     #[DataProvider('dataSigningEnums')]
     public function testIsOwnTypeOrThrow(\Filefabrik\Rfc9421\Cryptography\SigningEnum|string $signingEnum, ?\Filefabrik\Rfc9421\Cryptography\SigningEnum $exp = null): void
     {
-        $this->assertSame($exp ?? $signingEnum, SigningEnum::isOwnTypeOrThrow($signingEnum));
+        self::assertSame($exp ?? $signingEnum, SigningEnum::isOwnTypeOrThrow($signingEnum));
     }
 
     #[DataProvider('dataSigningEnums')]
     public function testIsOwnType(\Filefabrik\Rfc9421\Cryptography\SigningEnum|string $signingEnum, ?\Filefabrik\Rfc9421\Cryptography\SigningEnum $exp = null): void
     {
-        $this->assertSame($exp ?? $signingEnum, SigningEnum::isOwnType($signingEnum));
+        self::assertSame($exp ?? $signingEnum, SigningEnum::isOwnType($signingEnum));
     }
 
     public function testGetName(): void
     {
-        $this->assertSame('ecdsa_p_256_sha_256', SigningEnum::ecdsa_p_256_sha_256->getName());
+        self::assertSame('ecdsa_p_256_sha_256', SigningEnum::ecdsa_p_256_sha_256->getName());
     }
 
     public function testGetValue(): void
     {
-        $this->assertSame('ecdsa-p256-sha256', SigningEnum::ecdsa_p_256_sha_256->getValue());
+        self::assertSame('ecdsa-p256-sha256', SigningEnum::ecdsa_p_256_sha_256->getValue());
     }
 
     public function testCount(): void
     {
-        $this->assertCount(10, SigningEnum::cases());
+        self::assertCount(10, SigningEnum::cases());
     }
 }

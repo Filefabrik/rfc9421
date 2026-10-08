@@ -7,11 +7,6 @@ namespace Filefabrik\Rfc9421Test;
 use BadMethodCallException;
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
-use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Signer;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -19,7 +14,6 @@ use Filefabrik\Rfc9421\Verify;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Utils;
-use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -50,16 +44,6 @@ final class VerifyTest extends TestCase
         ];
     }
 
-    /**
-     * @throws AlreadySetException
-     * @throws ContentDigestException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws JsonException
-     * @throws VerifyHeaderSignatureException
-     * @throws SignatureException
-     *
-     */
     #[DataProvider('withSigningMethods')]
     public function testValidate(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
     {
@@ -127,7 +111,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority', fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
+            ['@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
         ];
 
         $tamperedRequest = clone $signedRequest;
@@ -157,7 +141,7 @@ final class VerifyTest extends TestCase
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
 
-        $this->assertEquals(1, $verifier->verifying());
+        self::assertEquals(1, $verifier->verifying());
     }
 
     #[DataProvider('withSigningMethods')]
@@ -260,18 +244,9 @@ final class VerifyTest extends TestCase
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
 
-        $this->assertEquals(1, $verifier->verifying());
+        self::assertEquals(1, $verifier->verifying());
     }
 
-    /**
-     * @throws AlreadySetException
-     * @throws ContentDigestException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws JsonException
-     * @throws SignatureException
-     * @throws VerifyHeaderSignatureException
-     */
     #[DataProvider('withSigningMethods')]
     public function testValidateWithoutBody(
         string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo,
@@ -334,7 +309,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority', fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
+            '@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
         $tamperedRequest     = clone $signedRequest;
@@ -364,7 +339,7 @@ final class VerifyTest extends TestCase
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
 
-        $this->assertEquals(1, $verifier->verifying());
+        self::assertEquals(1, $verifier->verifying());
     }
 
     public function testValidateThrowMissingSignature(): void
@@ -412,15 +387,7 @@ final class VerifyTest extends TestCase
     /**
      * todo with tampered body
      */
-    /**
-     * @throws AlreadySetException
-     * @throws ContentDigestException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws JsonException
-     * @throws SignatureException
-     * @throws VerifyHeaderSignatureException
-     */
+
     #[DataProvider('withSigningMethods')]
     public function testValidateTemperedBody(
         string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo,
@@ -490,7 +457,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority', fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
+            '@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
         $tamperedRequest     = clone $signedRequest;
@@ -520,6 +487,6 @@ final class VerifyTest extends TestCase
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
 
-        $this->assertEquals(false, $verifier->verifying());
+        self::assertFalse($verifier->verifying());
     }
 }

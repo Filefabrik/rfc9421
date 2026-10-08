@@ -24,7 +24,7 @@ final class ContentDigestTest extends TestCase
         )
                                                        ->verify()
         ;
-        $this->assertTrue($res);
+        self::assertTrue($res);
     }
 
 }

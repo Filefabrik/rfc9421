@@ -69,7 +69,7 @@ final class SignerTest extends TestCase
         );
 
         $signer = new Signer(message: $request, signingConfiguration: $signingConfiguration);
-        $this->assertInstanceOf(Request::class, $signer->sign());
+        self::assertInstanceOf(Request::class, $signer->sign());
     }
 
 }

@@ -57,7 +57,7 @@ final class BaseTest extends TestCase
         $r     = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i     = new Base($r, $sc);
         $lines = $i->createSignatureLines();
-        $this->assertEquals(
+        self::assertEquals(
             new Line('not-existing', 'hm'),
             $lines->getLineNumber(0),
         );
@@ -145,7 +145,7 @@ final class BaseTest extends TestCase
 
         $res = Base::compileSignatureInputToString($sls);
 
-        $this->assertEquals('"header-key": the-value', $res);
+        self::assertEquals('"header-key": the-value', $res);
     }
 
 }

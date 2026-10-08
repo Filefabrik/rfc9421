@@ -29,7 +29,7 @@ final class MetadataTest extends TestCase
 
         $res = Metadata::stringToMetadata($string);
 
-        $this->assertSame($res->toArray(), $expectation);
+        self::assertSame($res->toArray(), $expectation);
     }
 
     public function testExtractThrowParts(): void
@@ -59,7 +59,7 @@ final class MetadataTest extends TestCase
         $now     = new DateTime()->getTimestamp();
         $string  = 'created=;'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";tag="my-tag"';
         $created = Metadata::stringToMetadata($string)->created;
-        $this->assertEquals(0, $created);
+        self::assertEquals(0, $created);
     }
 
     public function testExtractZeroCreated(): void
@@ -67,7 +67,7 @@ final class MetadataTest extends TestCase
         $now     = new DateTime()->getTimestamp();
         $string  = 'created=0;'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";tag="my-tag"';
         $created = Metadata::stringToMetadata($string)->created;
-        $this->assertEquals(0, $created);
+        self::assertEquals(0, $created);
     }
 
 }

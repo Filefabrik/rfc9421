@@ -29,8 +29,8 @@ final class HeaderSignatureInputTest extends TestCase
         //
         $headerSignatureInput->extract();
 
-        $this->assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
-        $this->assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
+        self::assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
+        self::assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 
     public function testExtractWithoutKey(): void
@@ -49,8 +49,8 @@ final class HeaderSignatureInputTest extends TestCase
         //
         $headerSignatureInput->extract();
 
-        $this->assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
-        $this->assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
+        self::assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
+        self::assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 
     public function testExtractWithSigKeyThrowsException(): void

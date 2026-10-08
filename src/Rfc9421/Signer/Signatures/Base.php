@@ -52,8 +52,9 @@ final class Base
 
         // todo prepare components with extra methods has to be separated
         $components = new PrepareComponents($this->message);
-        if (null !== ($preparedComponentMethods = $this->configuration->getHasPrepareComponentsMethod())) {
-            $components->setMappingValues($preparedComponentMethods);
+
+        if (null !== ($preparedComponentMethods = $this->configuration->preparedMethods)) {
+            $components->setPreparedMethods($preparedComponentMethods);
         }
 
         foreach ($this->configuration->signatureParams->getSignatureParameters() as $signatureParam) {

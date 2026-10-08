@@ -16,14 +16,14 @@ final class HeaderSignatureTest extends TestCase
     {
         $headerKey               = 'testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
         $headerSignatureInstance = new HeaderSignature($headerKey);
-        $this->assertSame('testValue=', $headerSignatureInstance->extractSignatureNameKey());
+        self::assertSame('testValue=', $headerSignatureInstance->extractSignatureNameKey());
     }
 
     public function testExtractSignatureNameEmpty(): void
     {
         $headerKey               = ':Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
         $headerSignatureInstance = new HeaderSignature($headerKey);
-        $this->assertSame('', $headerSignatureInstance->extractSignatureNameKey());
+        self::assertSame('', $headerSignatureInstance->extractSignatureNameKey());
     }
 
     public function testExtractSignatureNameNotFound(): void
@@ -39,7 +39,7 @@ final class HeaderSignatureTest extends TestCase
     {
         $headerKey               = 'testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
         $headerSignatureInstance = new HeaderSignature($headerKey);
-        $this->assertSame(
+        self::assertSame(
             'Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s',
             $headerSignatureInstance->getSignatureValue(),
         );
@@ -49,7 +49,7 @@ final class HeaderSignatureTest extends TestCase
     {
         $headerKey               = 'testValue=::';
         $headerSignatureInstance = new HeaderSignature($headerKey);
-        $this->assertSame('', $headerSignatureInstance->getSignatureValue());
+        self::assertSame('', $headerSignatureInstance->getSignatureValue());
     }
 
     public function testGetSignatureValueThrow(): void
@@ -81,7 +81,7 @@ final class HeaderSignatureTest extends TestCase
 
         $res = $headerSignatureInstance->getBinarySignatureValue();
 
-        $this->assertSame(
+        self::assertSame(
             $baseEncoded,
             $res,
         );

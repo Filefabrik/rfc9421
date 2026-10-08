@@ -15,7 +15,7 @@ final class UnquoteHelperTest extends TestCase
     public function testUnquote(): void
     {
         $input = '"content-length"';
-        $this->assertSame('content-length', UnquoteHelper::unquote($input));
+        self::assertSame('content-length', UnquoteHelper::unquote($input));
     }
 
     public function testUnquoteMissingThrow(): void

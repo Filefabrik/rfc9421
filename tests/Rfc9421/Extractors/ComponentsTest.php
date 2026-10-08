@@ -17,7 +17,7 @@ final class ComponentsTest extends TestCase
         $input = '"content-length" "@query-param" "example-dict"';
 
         $result = new Components($input)->toArray();
-        $this->assertSame(['content-length', '@query-param', 'example-dict'], $result);
+        self::assertSame(['content-length', '@query-param', 'example-dict'], $result);
     }
 
 }

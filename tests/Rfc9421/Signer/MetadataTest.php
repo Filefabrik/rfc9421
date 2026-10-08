@@ -60,7 +60,7 @@ final class MetadataTest extends TestCase
         ])
                                ->toString()
         ;
-        $this->assertEquals(
+        self::assertEquals(
             'created='.$now.';'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";alg="hmac-sha512";tag="my-tag"',
             $stringified,
         );
@@ -71,7 +71,7 @@ final class MetadataTest extends TestCase
         $stringified = Metadata::fromArray([])
                                ->toString()
         ;
-        $this->assertEquals(
+        self::assertEquals(
             '',
             $stringified,
         );
@@ -79,13 +79,13 @@ final class MetadataTest extends TestCase
 
     public function testSetTag(): void
     {
-        $this->assertEquals('my-tag', new Metadata()->setTag('my-tag')->tag);
+        self::assertEquals('my-tag', new Metadata()->setTag('my-tag')->tag);
     }
 
     #[DataProvider('dataProviderToArray')]
     public function testToArray(...$datas): void
     {
-        $this->assertSame(
+        self::assertSame(
             $datas,
             Metadata::fromArray($datas)
                     ->toArray(),
@@ -96,28 +96,28 @@ final class MetadataTest extends TestCase
     {
         $ts = new DateTime()->getTimestamp();
 
-        $this->assertEquals($ts, new Metadata()->setExpires($ts)->expires);
+        self::assertEquals($ts, new Metadata()->setExpires($ts)->expires);
     }
 
     public function testSetCreated(): void
     {
         $ts = new DateTime()->getTimestamp();
 
-        $this->assertEquals($ts, new Metadata()->setCreated($ts)->created);
+        self::assertEquals($ts, new Metadata()->setCreated($ts)->created);
     }
 
     public function testSetAlg(): void
     {
-        $this->assertEquals(SigningEnum::ecdsa_p_384_sha_384, new Metadata()->setAlg('ecdsa_p_384_sha_384')->alg);
+        self::assertEquals(SigningEnum::ecdsa_p_384_sha_384, new Metadata()->setAlg('ecdsa_p_384_sha_384')->alg);
     }
 
     public function testSetNonce(): void
     {
-        $this->assertEquals('my-nonce', new Metadata()->setNonce('my-nonce')->nonce);
+        self::assertEquals('my-nonce', new Metadata()->setNonce('my-nonce')->nonce);
     }
 
     public function testSetKeyid(): void
     {
-        $this->assertEquals('my-keyid', new Metadata()->setKeyid('my-keyid')->keyid);
+        self::assertEquals('my-keyid', new Metadata()->setKeyid('my-keyid')->keyid);
     }
 }

@@ -16,93 +16,93 @@ final class SigningConfigurationTest extends TestCase
     public function testWithTag(): void
     {
         $i = new SigningConfiguration();
-        $this->assertSame('tagname', $i->withTag('tagname')->metadata->tag);
+        self::assertSame('tagname', $i->withTag('tagname')->metadata->tag);
         $i->withTag(null);
-        $this->assertNull($i->metadata->tag);
+        self::assertNull($i->metadata->tag);
     }
 
     public function testMustSignBody(): void
     {
         $i = new SigningConfiguration();
-        $this->assertTrue($i->mustSignBody);
+        self::assertTrue($i->mustSignBody);
         $i->mustSignBody(false);
-        $this->assertFalse($i->mustSignBody);
+        self::assertFalse($i->mustSignBody);
     }
 
     public function testGetContentDigestHashAlgo(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->contentDigestHashAlgo);
-        $this->assertSame(DigestAlgorithmsEnum::sha256, $i->getContentDigestHashAlgo());
+        self::assertNull($i->contentDigestHashAlgo);
+        self::assertSame(DigestAlgorithmsEnum::sha256, $i->getContentDigestHashAlgo());
         $i->setContentDigestHashAlgo('sha-512');
-        $this->assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestHashAlgo);
+        self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestHashAlgo);
     }
 
     public function testWithCreated(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->metadata->created);
+        self::assertNull($i->metadata->created);
         $dt = 123456;
         $i->withCreated($dt);
-        $this->assertSame($dt, $i->metadata->created);
+        self::assertSame($dt, $i->metadata->created);
     }
 
     public function testSignHeader(): void
     {
         $i = new SigningConfiguration();
-        $this->assertEmpty($i->signatureParams->getSignatureParameters());
+        self::assertEmpty($i->signatureParams->getSignatureParameters());
         $i->signHeader('foo', 'bar');
-        $this->assertSame(['foo', 'bar'], $i->signatureParams->getSignatureParameters());
+        self::assertSame(['foo', 'bar'], $i->signatureParams->getSignatureParameters());
     }
 
     public function testSetContentDigestHashAlgo(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->contentDigestHashAlgo);
+        self::assertNull($i->contentDigestHashAlgo);
         $i->setContentDigestHashAlgo('sha-512');
-        $this->assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestHashAlgo);
+        self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestHashAlgo);
     }
 
     public function testWithSignatureKeyName(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->signatureKeyName);
+        self::assertNull($i->signatureKeyName);
         $i->withSignatureKeyName('keyname=');
-        $this->assertSame('keyname=', $i->signatureKeyName);
+        self::assertSame('keyname=', $i->signatureKeyName);
     }
 
     public function testWithExpires(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->metadata->expires);
+        self::assertNull($i->metadata->expires);
         $dt = 123456;
         $i->withExpires($dt);
-        $this->assertSame($dt, $i->metadata->expires);
+        self::assertSame($dt, $i->metadata->expires);
     }
 
     public function testWithNonce(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->metadata->nonce);
+        self::assertNull($i->metadata->nonce);
         $i->withNonce('foo');
-        $this->assertSame('foo', $i->metadata->nonce);
+        self::assertSame('foo', $i->metadata->nonce);
     }
 
     public function testWithKeyid(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->metadata->keyid);
+        self::assertNull($i->metadata->keyid);
         $i->withKeyid('foo');
-        $this->assertSame('foo', $i->metadata->keyid);
+        self::assertSame('foo', $i->metadata->keyid);
     }
 
     public function testWithSigningAlgorithm(): void
     {
         $i = new SigningConfiguration();
-        $this->assertNull($i->metadata->alg);
+        self::assertNull($i->metadata->alg);
         $i->withSigningAlgorithm(SigningEnum::rsa_pss_sha512);
-        $this->assertSame(SigningEnum::rsa_pss_sha512, $i->metadata->alg);
+        self::assertSame(SigningEnum::rsa_pss_sha512, $i->metadata->alg);
         $i->withSigningAlgorithm('ecdsa-p256-sha256');
-        $this->assertSame(SigningEnum::ecdsa_p_256_sha_256, $i->metadata->alg);
+        self::assertSame(SigningEnum::ecdsa_p_256_sha_256, $i->metadata->alg);
     }
 }

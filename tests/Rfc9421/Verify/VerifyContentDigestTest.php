@@ -19,7 +19,7 @@ final class VerifyContentDigestTest extends TestCase
         $body = '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}';
 
         $verify = new VerifyContentDigest($CD, $body);
-        $this->assertTrue($verify->verify());
+        self::assertTrue($verify->verify());
     }
 
     public function testVerifyFalse(): void
@@ -28,7 +28,7 @@ final class VerifyContentDigestTest extends TestCase
         $body = '{"recipient":"Alex","amount":900000000,"text":"fdawsfsWRONG"}';
 
         $verify = new VerifyContentDigest($CD, $body);
-        $this->assertFalse($verify->verify());
+        self::assertFalse($verify->verify());
     }
 
     public function testVerifyThrowsFormatIssue(): void

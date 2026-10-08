@@ -25,7 +25,7 @@ final class PrepareSignatureKeyNameTest extends TestCase
 
         $instance->prepare();
 
-        $this->assertSame('testValue=', $sc->signatureKeyName);
+        self::assertSame('testValue=', $sc->signatureKeyName);
     }
 
     public function testPrepareWithoutSignatureKeyExtraction(): void
@@ -40,7 +40,7 @@ final class PrepareSignatureKeyNameTest extends TestCase
 
         $instance->prepare();
 
-        $this->assertSame('katze=', $sc->signatureKeyName);
+        self::assertSame('katze=', $sc->signatureKeyName);
     }  public function testPrepareThrow(): void
 {
     $sc  = new SigningConfiguration();
@@ -53,6 +53,6 @@ final class PrepareSignatureKeyNameTest extends TestCase
 
     $instance->prepare();
 
-    $this->assertSame('', $sc->signatureKeyName);
+    self::assertSame('', $sc->signatureKeyName);
 }
 }
