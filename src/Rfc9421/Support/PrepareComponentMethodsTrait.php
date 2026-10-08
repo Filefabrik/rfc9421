@@ -22,7 +22,7 @@ trait PrepareComponentMethodsTrait
     /**
      * Modify the generation methods
      *
-     * @param array{string,Closure} $methods
+     * @param array{array{string,Closure}} $methods
      *
      */
     public function withPrepareComponentsMethods(array $methods): SigningConfiguration

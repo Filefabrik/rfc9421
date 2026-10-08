@@ -14,12 +14,13 @@ use Filefabrik\Rfc9421\Signer\SignaturBase;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
-#[CoversClass(\Filefabrik\Rfc9421\Signer\SignaturBase::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignaturBase::class, 'handleSignBody')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Signer\SignaturBase::class, 'createSignatureLine')]
+#[CoversClass(SignaturBase::class)]
+#[CoversMethod(SignaturBase::class, 'handleSignBody')]
+#[CoversMethod(SignaturBase::class, 'createSignatureLine')]
 final class SignaturBaseTest extends TestCase
 {
     public function testCreateSignatureLines(): void
@@ -101,6 +102,12 @@ final class SignaturBaseTest extends TestCase
         $i->createSignatureLines();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     */
     public function testMakeSignatureInput(): void
     {
         $sc      = new SigningConfiguration();
@@ -113,7 +120,7 @@ final class SignaturBaseTest extends TestCase
         $r   = new Request('POST', '', ['stupid-header' => 'hm']);
         $i   = new SignaturBase($r, $sc);
         $res = $i->makeSignatureInput();
-        $this->assertEquals(
+        self::assertEquals(
             '("stupid-header" "@method");created='.$created.';alg="'.SigningEnum::rsa_v_1_5_sha_256->getValue().'"',
             $res,
         );

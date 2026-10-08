@@ -11,17 +11,31 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
  */
 final class VerifyContentDigest
 {
-    private(set) ?ContentDigest $contentDigestVerifier = null {
-        /**
-         * @throws ContentDigestException
-         */
-        get => $this->contentDigestVerifier ??= $this->prepare();
-    }
+    private(set) ?ContentDigest $contentDigestVerifier = null;
 
     public function __construct(
         private(set) readonly string $contentDigest,
         private(set) readonly string $body,
     ) {
+    }
+
+    /**
+     * @return bool true if valid
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function verify(): bool
+    {
+        return $this->getContentDigestVerifier()
+                    ->verify()
+        ;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function getContentDigestVerifier(): ContentDigest
+    {
+        return $this->contentDigestVerifier ??= $this->prepare();
     }
 
     /**
@@ -44,14 +58,5 @@ final class VerifyContentDigest
             body                  : $this->body,
             contentDigestExtractor: $contentDigestExtractor,
         );
-    }
-
-    /**
-     * @return bool true if valid
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     */
-    public function verify(): bool
-    {
-        return $this->contentDigestVerifier->verify();
     }
 }

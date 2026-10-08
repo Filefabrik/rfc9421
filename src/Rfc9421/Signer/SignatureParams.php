@@ -23,6 +23,8 @@ final class SignatureParams
     /**
      * Set many components
      *
+     * @param string[] $params
+     *
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
@@ -33,6 +35,7 @@ final class SignatureParams
     }
 
     /**
+     * @param string[] $keys
      *
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException

@@ -18,7 +18,6 @@ use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\Verify\PrepareSignatureKeyName;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
-use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 
 final class Verify
@@ -33,22 +32,13 @@ final class Verify
     /**
      * Extracting the signature and split into parts
      */
-    private(set) ?Extractors\HeaderSignature $headerSignatureExtractor = null {
-        get => $this->headerSignatureExtractor ??= new Extractors\HeaderSignature(
-            signatureString: $this->headerHelper->getSignatureLine(),
-        );
-    }
-
-    private(set) ?HeaderHelper               $headerHelper             = null {
-        get => $this->headerHelper ??= new HeaderHelper(message: $this->message);
-    }
-
-    private bool                                    $preparedVerifier         = false;
-
-    private ?HeaderSignatureInput                   $signatureInputInstance   = null;
+    private(set) ?Extractors\HeaderSignature $headerSignatureExtractor = null;
+    private(set) ?HeaderHelper               $headerHelper             = null;
+    private bool                             $preparedVerifier         = false;
+    private ?HeaderSignatureInput            $signatureInputInstance   = null;
 
     public function __construct(
-        private(set) readonly MessageInterface|RequestInterface $message,
+        private(set) readonly RequestInterface $message,
         /**
          * On first step "Prepare" the extracted Configuration how to handle the own signing of the received request to check the "signature" and the "body" hash
          *
@@ -83,7 +73,9 @@ final class Verify
         $signer = $this->getSigner();
 
         // base_decoded signature to get binary
-        $sig = $this->headerSignatureExtractor->getBinarySignatureValue();
+        $sig = $this->getHeaderSignatureExtractor()
+                    ->getBinarySignatureValue()
+        ;
 
         $verified = VerifyRegistry::verifying(
             signingEnum: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
@@ -104,6 +96,7 @@ final class Verify
      * First prepare some request datas
      *
      * @throws VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function prepareVerify(): void
     {
@@ -112,11 +105,17 @@ final class Verify
         }
 
         // first stage we must have both signature and signature-input header
-        if (!$this->headerHelper->getSignatureLine()) {
+        if (
+            '' === $this->getHeaderHelper()
+                        ->getSignatureLine()
+        ) {
             throw VerifyHeaderSignatureException::missingSignature();
         }
-
-        if (!$this->headerHelper->getSignatureInputLine()) {
+        // empty
+        if (
+            '' === $this->getHeaderHelper()
+                        ->getSignatureInputLine()
+        ) {
             throw VerifyHeaderSignatureException::missingSignatureInput();
         }
 
@@ -125,7 +124,7 @@ final class Verify
          */
         new PrepareSignatureKeyName(
             signingConfiguration    : $this->signingConfiguration,
-            headerSignatureExtractor: $this->headerSignatureExtractor,
+            headerSignatureExtractor: $this->getHeaderSignatureExtractor(),
         )->prepare();
         /*
          * now prepare the signer configuration which is need for re-compile the request
@@ -144,13 +143,27 @@ final class Verify
         $this->preparedVerifier = true;
     }
 
+    public function getHeaderHelper(): HeaderHelper
+    {
+        return $this->headerHelper ??= new HeaderHelper(message: $this->message);
+    }
+
+    public function getHeaderSignatureExtractor(): Extractors\HeaderSignature
+    {
+        return $this->headerSignatureExtractor ??= new Extractors\HeaderSignature(
+            signatureString: $this->getHeaderHelper()
+                                  ->getSignatureLine(),
+        );
+    }
+
     /**
-     * @throws VerifyHeaderSignatureException
+     * @throws VerifyHeaderSignatureException|\Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     private function getSignaturInputInstance(): HeaderSignatureInput
     {
         $headerSignatureInstance = new HeaderSignatureInput(
-            headerSignatureInputValue: $this->headerHelper->getSignatureInputLine(),
+            headerSignatureInputValue: $this->getHeaderHelper()
+                                            ->getSignatureInputLine(),
             signatureNameKey         : $this->signingConfiguration->signatureKeyName,
         );
         // throws error
@@ -191,14 +204,15 @@ final class Verify
     private function validateContentDigest(): bool
     {
         $verifyInstance = new VerifyContentDigest(
-            contentDigest: $this->headerHelper->getContentDigestLine(),
+            contentDigest: $this->getHeaderHelper()
+                                ->getContentDigestLine(),
             body         : (string)$this->message->getBody(),
         );
         if ($verified = $verifyInstance->verify()) {
             // rebind the extracted php hash-algo
             // later in verify process, during rebuild the content-digest the algo is needed
             $this->signingConfiguration->setContentDigestHashAlgo(
-                contentDigestHashAlgo: $verifyInstance->contentDigestVerifier->phpAlgorithm,
+                contentDigestHashAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
             );
         }
 

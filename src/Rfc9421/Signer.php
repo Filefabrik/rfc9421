@@ -97,15 +97,14 @@ final class Signer
     /**
      * Generate the base signature
      *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
-    public function crypt($signingParametersString): string
+    public function crypt(string $signingParametersString): string
     {
         $signature = SignatureRegistry::signing(
             signingEnumInterface: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
             signingDatas        : $signingParametersString,
-            privateKey          : $this->signingConfiguration->privatePem,
+            privateKey          : $this->signingConfiguration->getPrivatePemOrThrow(),
         );
 
         return $this->makeSignatureString(base64_encode($signature));
@@ -125,10 +124,10 @@ final class Signer
 
     /**
      * internal helper to rebind the changed request object(messageInterface) to $this->message
-       */
+     */
     private function updateHeader(string $name, ?string $value): self
     {
-        $this->message = $this->message->withHeader($name, $value);
+        $this->message = $this->message->withHeader($name, $value ?? '');
 
         return $this;
     }

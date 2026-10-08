@@ -152,7 +152,7 @@ final class VerifyTest extends TestCase
          * Maybe that let us know, that we handle derivedComponents with a special method
          *
          */
-        if ($signerConfiguration->metadata->tag) {
+        if (null !== $signerConfiguration->metadata->tag) {
             // for mastodon an own config für x-origin or something
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
@@ -161,8 +161,10 @@ final class VerifyTest extends TestCase
     }
 
     #[DataProvider('withSigningMethods')]
-    public function testPrepareVerifyTwiceThrow(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
-    {
+    public function testPrepareVerifyTwiceThrow(
+        string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo,
+        string $cert,
+    ): void {
         $this->expectExceptionObject(new BadMethodCallException('already prepared'));
         $certInstance = new CertHelper($cert);
 
@@ -271,8 +273,10 @@ final class VerifyTest extends TestCase
      * @throws VerifyHeaderSignatureException
      */
     #[DataProvider('withSigningMethods')]
-    public function testValidateWithoutBody(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
-    {
+    public function testValidateWithoutBody(
+        string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo,
+        string $cert,
+    ): void {
         /**
          *
          */
@@ -355,7 +359,7 @@ final class VerifyTest extends TestCase
          * Maybe that let us know, that we handle derivedComponents with a special method
          *
          */
-        if ($signerConfiguration->metadata->tag) {
+        if (null !== $signerConfiguration->metadata->tag) {
             // for mastodon an own config für x-origin or something
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
@@ -418,8 +422,10 @@ final class VerifyTest extends TestCase
      * @throws VerifyHeaderSignatureException
      */
     #[DataProvider('withSigningMethods')]
-    public function testValidateTemperedBody(string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo, string $cert): void
-    {
+    public function testValidateTemperedBody(
+        string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo,
+        string $cert,
+    ): void {
         /**
          *
          */
@@ -509,7 +515,7 @@ final class VerifyTest extends TestCase
          * Maybe that let us know, that we handle derivedComponents with a special method
          *
          */
-        if ($signerConfiguration->metadata->tag) {
+        if (null !== $signerConfiguration->metadata->tag) {
             // for mastodon an own config für x-origin or something
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }

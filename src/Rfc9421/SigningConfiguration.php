@@ -96,7 +96,7 @@ final class SigningConfiguration
      *
      * @throws SignatureException
      */
-    public function withSigningAlgorithm(null|string|SigningEnumInterface $algorithm): self
+    public function withSigningAlgorithm(string|SigningEnumInterface $algorithm): self
     {
         $this->metadata->setAlg($algorithm);
 
@@ -123,7 +123,7 @@ final class SigningConfiguration
     /**
      * Signing header Parameter
      *
-     * @param string[] $headerKeys
+     * @param array{string} $headerKeys
      *
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
