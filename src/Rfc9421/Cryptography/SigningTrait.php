@@ -20,7 +20,12 @@ trait SigningTrait
      */
     public static function isOwnTypeOrThrow(SigningEnumInterface|string|null $key): SigningEnumInterface
     {
-        return self::isOwnType($key) ?? throw SignatureException::signatureEnumNotFound($key);
+        $found = self::isOwnType($key);
+        if ($found instanceof SigningEnumInterface) {
+            return $found;
+        }
+        /** @var string|null $key phpstan error*/
+        throw SignatureException::signatureEnumNotFound($key);
     }
 
 }

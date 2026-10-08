@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Support;
 
+use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
+
 trait EnumSupportTrait
 {
-    public static function isOwnType(self|string|null $key): ?static
+    public static function isOwnType(self|SigningEnumInterface|string|null $key): ?static
     {
         if ($key instanceof self) {
             return $key;

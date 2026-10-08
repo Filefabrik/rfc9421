@@ -79,7 +79,7 @@ final class Verify
 
         $verified = VerifyRegistry::verifying(
             signingEnum: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
-            data       : $signer->signingParametersString,
+            data       : $signer->getSigningParametersStringOrThrow(),
             signature  : $sig,
             publicKey  : $this->signingConfiguration->getPublicPem(),
         );

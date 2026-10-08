@@ -40,7 +40,7 @@ final class SignaturBase
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
-     * @return list<array{string,string|int}>
+     * @return array{array{string,string}}
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
@@ -63,7 +63,7 @@ final class SignaturBase
     /**
      * Handle the preparation of a signature-base array/line(key, value)
      *
-     * @return array{string,string|int}
+     * @return array{string,string}
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
      */

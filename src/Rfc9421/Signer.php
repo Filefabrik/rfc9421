@@ -23,16 +23,14 @@ final class Signer
     /**
      * Data for signing the relevant header data
      *
-     * @var array<string,string>
+     * @var array{array{string,string}}|array{}
      */
     private(set) array $signingParameters = [];
 
     /**
      * @var string|null null throws an error
      */
-    private(set) ?string $signingParametersString = null {
-        get => $this->signingParametersString ?? throw new UnexpectedValueException('not set before');
-    }
+    private(set) ?string $signingParametersString = null;
 
     private null|string $signatureBase = null;
 
@@ -59,7 +57,7 @@ final class Signer
         $this->prepareSigning();
 
         // last phase, crypt and base64_encode. get back header key value  sig1=:base64_signature:
-        $cryptedBaseSigString = $this->crypt($this->signingParametersString);
+        $cryptedBaseSigString = $this->crypt(signingParametersString: $this->getSigningParametersStringOrThrow());
 
         // setting the signature header into the request
         $this->updateHeader('signature-input', $this->signatureBase)
@@ -120,6 +118,13 @@ final class Signer
     public function makeSignatureString(string $signature): string
     {
         return sprintf($this->signingConfiguration->signatureKeyName.':%s:', $signature);
+    }
+
+    public function getSigningParametersStringOrThrow(): string
+    {
+        return $this->signingParametersString ?? throw new UnexpectedValueException(
+            'signing parameter string was not set before',
+        );
     }
 
     /**

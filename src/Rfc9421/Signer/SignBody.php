@@ -14,7 +14,7 @@ final class SignBody
 {
     public function __construct(
         private(set) readonly string $body,
-        private(set) DigestAlgorithmsEnum|string $algorithm {
+        private DigestAlgorithmsEnum|string $algorithm {
             /**
              * @throws ContentDigestException
              */
@@ -26,6 +26,7 @@ final class SignBody
     /**
      * Getting the Key Value pair for header array
      *
+     * @return array{string,string}
      * @example [$headerKey, $headerValue] = new SignBody($body,'sha512')->getContentDigestHeaderArray()
      */
     public function getContentDigestHeaderArray(): array
@@ -40,7 +41,13 @@ final class SignBody
      */
     public function getContentDigest(): string
     {
-        return $this->algorithm->getDisplayAlgorithm().'=:'.$this->calculateSignature().':';
+        return $this->getDigestAlgorithmsEnum()
+                    ->getDisplayAlgorithm().'=:'.$this->calculateSignature().':';
+    }
+
+    public function getDigestAlgorithmsEnum(): DigestAlgorithmsEnum
+    {
+        return $this->algorithm;
     }
 
     /**
@@ -56,6 +63,6 @@ final class SignBody
      */
     public function hash(): string
     {
-        return hash(algo: $this->algorithm->getPhpAlgorithm(), data: $this->body, binary: true);
+        return hash(algo: $this->getDigestAlgorithmsEnum()->getPhpAlgorithm(), data: $this->body, binary: true);
     }
 }

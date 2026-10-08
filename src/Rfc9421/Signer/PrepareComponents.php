@@ -109,7 +109,7 @@ final class PrepareComponents
     }
 
     /**
-     * @param array{string:string|Closure} $values
+     * @param array{string,string|Closure} $values
      */
     public function setMappingValues(array $values): self
     {
@@ -120,7 +120,7 @@ final class PrepareComponents
         return $this;
     }
 
-    public function setMappingValue(string $key, Closure|string $callable): self
+    public function setMappingValue(string $key, Closure $callable): self
     {
         // init stack
         $stack               = $this->getMethodStack();
