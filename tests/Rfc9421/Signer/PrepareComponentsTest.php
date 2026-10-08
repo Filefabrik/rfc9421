@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Signer;
 
-use BadMethodCallException;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
@@ -12,22 +11,17 @@ use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SignatureParams;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
+use TypeError;
 use UnexpectedValueException;
 
 #[CoversClass(PrepareComponents::class)]
-#[CoversMethod(PrepareComponents::class, 'processAuthority')]
-#[CoversMethod(PrepareComponents::class, 'processScheme')]
-#[CoversMethod(PrepareComponents::class, 'processPath')]
-#[CoversMethod(PrepareComponents::class, 'processValue')]
 final class PrepareComponentsTest extends TestCase
 {
     public function testSetDefaultDerivedStack(): void
     {
-        $orig = PrepareComponents::getDefaultDerivedStack();
-        $arr  = [
+        $arr = [
             '@method' => fn(RequestInterface $message): string => str_replace(
                 't',
                 'B',
@@ -35,17 +29,14 @@ final class PrepareComponentsTest extends TestCase
             ),
 
         ];
-        PrepareComponents::setDefaultDerivedStack($arr);
-        $r               = new Request('post', 'https://Test.com');
+
+        $prepareInstance = new PrepareComponents(new Request('post', 'https://Test.com'));
+        $prepareInstance->setMappingValues($arr);
         $signatureParams = new SignatureParams();
 
         $signatureParams->setDerivedComponentName('@method');
 
-        $prepareInstance = new PrepareComponents($r);
-
         $this->assertSame('PosB', $prepareInstance->processValue('@method'));
-
-        PrepareComponents::setDefaultDerivedStack($orig);
     }
 
     public function testSetDerivedMapper(): void
@@ -60,7 +51,7 @@ final class PrepareComponentsTest extends TestCase
         $signatureParams->setDerivedComponentName('@method');
 
         $prepareInstance = new PrepareComponents($r);
-        $prepareInstance->setDerivedMapper($arr);
+        $prepareInstance->setMappingValues($arr);
         $this->assertSame('Post', $prepareInstance->processValue('@method'));
     }
 
@@ -70,16 +61,16 @@ final class PrepareComponentsTest extends TestCase
      */
     public function testProcessValueThrows(): void
     {
-        $this->expectExceptionObject(
-            new BadMethodCallException('Method "12" not callable.'),
+        $this->expectException(
+            TypeError::class,
         );
         $r = new Request('post', 'https://Test.com/test&var=käse');
 
         $prepareComponents = new PrepareComponents($r);
-        $messageStack      = PrepareComponents::getDefaultDerivedStack();
+        $messageStack      = PrepareComponents::defaultMapperClosure();
         // todo never allow a number only closure or string
         $messageStack[' bullshit '] = '12';
-        $prepareComponents->setDerivedMapper($messageStack);
+        $prepareComponents->setMappingValues($messageStack);
 
         $prepareComponents->processValue(' bullshit ');
     }
@@ -115,14 +106,14 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processTargetUri());
+        $this->assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
     }
 
     public function testProcessAtMethod(): void
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $prepareInstance = new PrepareComponents($r);
-        $this->assertSame('POST', $prepareInstance->processAtMethod());
+        $this->assertSame('POST', $prepareInstance->processValue('@method'));
     }
 
     public function testProcessAuthority(): void
@@ -131,11 +122,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('test.com', $prepareInstance->processAuthority());
+        $this->assertSame('test.com', $prepareInstance->processValue('@authority'));
 
         $r = new Request('post', 'https://www.Test.com/var/pathy/?qer=var');
 
-        $this->assertSame('www.test.com', new PrepareComponents($r)->processAuthority());
+        $this->assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority'));
     }
 
     public function testProcessScheme(): void
@@ -144,11 +135,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('https', $prepareInstance->processScheme());
+        $this->assertSame('https', $prepareInstance->processValue('@scheme'));
 
         $r = new Request('post', 'http://www.Test.com/var/pathy/?qer=var');
 
-        $this->assertSame('http', new PrepareComponents($r)->processScheme());
+        $this->assertSame('http', new PrepareComponents($r)->processValue('@scheme'));
     }
 
     public function testProcessPath(): void
@@ -157,11 +148,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame('/var/pathy/', $prepareInstance->processPath());
+        $this->assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
 
         $r = new Request('post', 'http://www.Test.com');
 
-        $this->assertSame('/', new PrepareComponents($r)->processPath());
+        $this->assertSame('/', new PrepareComponents($r)->processValue('@path'));
     }
 
     public function testProcessValueNotCallable(): void
@@ -198,6 +189,6 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        $this->assertSame(62, $prepareInstance->processContentLength());
+        $this->assertSame(62, $prepareInstance->processValue('content-length'));
     }
 }

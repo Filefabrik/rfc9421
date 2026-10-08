@@ -6,6 +6,7 @@ namespace Filefabrik\Rfc9421\Signer;
 
 use BadMethodCallException;
 use Closure;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -45,67 +46,20 @@ use UnexpectedValueException;
  */
 /**
  * todo closure processing
- * @phpstan-type defaultStack array{'@method': 'processAtMethod', '@target-uri': 'processTargetUri', '@authority': 'processAuthority', '@scheme': 'processScheme', '@request-target': 'processHost', '@path': 'processPath', content-length: 'processContentLength'}
  * @phpstan-type entry array{string: Closure|string}
  */
 final class PrepareComponents
 {
-    /**
-     * for different components there can be different methods to prepare the values(upper-case lower-case )
-     *
-     * @phpstan-var defaultStack
-     */
-    private static array $defaultDerivedStack = [
-        '@method'         => 'processAtMethod',
-        '@target-uri'     => 'processTargetUri',
-        '@authority'      => 'processAuthority',
-        '@scheme'         => 'processScheme',
-        '@request-target' => 'processHost',
-        '@path'           => 'processPath',
-        //  '@status'         => 'processStatus',
-        'content-length'  => 'processContentLength',
-    ];
 
     public function __construct(
         private(set) readonly RequestInterface $message,
         /**
          * otherwise use the default stack
          *
-         * @var array{string:string|Closure}
+         * @var array{string,Closure}
          */
-        private(set) ?array $derivedMapper = null,
+        private(set) ?array $methodStack = null,
     ) {
-    }
-
-    /**
-     * @return defaultStack
-     */
-    public static function getDefaultDerivedStack(): array
-    {
-        return self::$defaultDerivedStack;
-    }
-
-    /**
-     * Todo setter has to be a type/format validator that is callable or closure
-     * While having systemwide an own mapping dialect for your needs, set the method stack globally
-     *
-     * @param defaultStack $defaultDerivedStack
-     */
-    public static function setDefaultDerivedStack(array $defaultDerivedStack): void
-    {
-        self::$defaultDerivedStack = $defaultDerivedStack;
-    }
-
-    /**
-     * Configure later the MethodStack if need
-     *
-     * @param array{string:Closure|string}|null $derivedMapper
-     */
-    public function setDerivedMapper(?array $derivedMapper): self
-    {
-        $this->derivedMapper = $derivedMapper;
-
-        return $this;
     }
 
     /**
@@ -123,48 +77,61 @@ final class PrepareComponents
     public function setMappingValue(string $key, Closure $callable): self
     {
         // init stack
-        $stack               = $this->getMethodStack();
-        $stack[$key]         = $callable;
-        $this->derivedMapper = $stack;
+        $stack             = $this->getMethodStack();
+        $stack[$key]       = $callable;
+        $this->methodStack = $stack;
 
         return $this;
     }
 
     /**
-     * @return array{string:Closure|string}|defaultStack
+     * use default is nothing was overridden
+     *
+     * @return array{string:Closure}
      */
     private function getMethodStack(): array
     {
-        return $this->derivedMapper ??= self::$defaultDerivedStack;
-    }
-
-    public function processValue(string $key): int|string
-    {
-        if (!array_key_exists($key, $this->getMethodStack())) {
-            throw new UnexpectedValueException(sprintf('Method "%s" not registered.', $key));
-        }
-
-        $callableMethod = $this->getMethodStack()[$key];
-
-        if ($callableMethod instanceof Closure) {
-            return $callableMethod($this->message);
-        }
-
-        if (method_exists($this, $callableMethod)) {
-            return $this->$callableMethod();
-        }
-
-        throw new BadMethodCallException(sprintf('Method "%s" not callable.', $callableMethod));
+        return $this->methodStack ??= self::defaultMapperClosure();
     }
 
     /**
-     * extracting the "method" from header to use later as "@method"
-     *
-     * @see 2.2.1. Method
+     * @return array{string,Closure}
      */
-    public function processAtMethod(): string
+    public static function defaultMapperClosure(): array
     {
-        return strtoupper($this->message->getMethod());
+        /**
+         * for different components there can be different methods to prepare the values(upper-case lower-case )
+         *
+
+         */
+        return [
+            /**
+             * extracting the "method" from header to use later as "@method"
+             *
+             * @see 2.2.1. Method
+             */
+            '@method'         => fn(MessageInterface $message) => strtoupper($message->getMethod()),
+            '@target-uri'     => fn(MessageInterface $message) => self::processTargetUriClosure($message),
+            /**
+             * @see 2.2.3. Authority
+             */
+            '@authority'      => fn(MessageInterface $message) => $message->getUri()
+                                                                          ->getHost(),
+            /**
+             * @see 2.2.4. Scheme
+             */
+            '@scheme'         => fn(MessageInterface $message) => $message->getUri()
+                /** * Todo More complex as described in 2.2.5. Request Target**/ ->getScheme(),
+            '@request-target' => fn(MessageInterface $message) => throw new BadMethodCallException(
+                '@request-target not implemented',
+            ),
+            /**
+             * @see 2.2.6. Path
+             **/
+            '@path'           => fn(MessageInterface $message) => self::processPathClosure($message),
+            //  '@status'         => 'processStatus',
+            'content-length'  => fn(MessageInterface $message) => strlen((string)$message->getBody()),
+        ];
     }
 
     /**
@@ -172,9 +139,9 @@ final class PrepareComponents
      *
      * @see 2.2.2. Target URI @target-uri
      */
-    public function processTargetUri(): string
+    public static function processTargetUriClosure(MessageInterface $message): string
     {
-        $messageUri = clone $this->message->getUri();
+        $messageUri = clone $message->getUri();
         $parts      = [];
         $parts[]    = $messageUri->getHost();
         if ('' !== ($path = $messageUri->getPath())) {
@@ -189,46 +156,26 @@ final class PrepareComponents
     }
 
     /**
-     * @see 2.2.3. Authority
-     */
-    public function processAuthority(): string
-    {
-        return $this->message->getUri()
-                             ->getHost()
-        ;
-    }
-
-    /**
-     * @see 2.2.4. Scheme
-     */
-    public function processScheme(): string
-    {
-        return $this->message->getUri()
-                             ->getScheme()
-        ;
-    }
-
-    /*
-     * Todo More complex as described in 2.2.5. Request Target
-     *
-     * @return void
-     *
-     *
-     * public function processRequestTarget()
-     * {
-     * }*/
-
-    /**
      * @return string empty with /
      * @see 2.2.6. Path
      */
-    public function processPath(): string
+    public static function processPathClosure(MessageInterface $message): string
     {
-        $p = $this->message->getUri()
-                           ->getPath()
+        $p = $message->getUri()
+                     ->getPath()
         ;
 
         return (!str_starts_with($p, '/')) ? '/'.$p : $p;
+    }
+
+    public function processValue(string $key): int|string
+    {
+        if (!array_key_exists($key, $this->getMethodStack())) {
+            throw new UnexpectedValueException(sprintf('Method "%s" not registered.', $key));
+        }
+
+        return $this->getMethodStack()[$key]($this->message)
+        ;
     }
 
     /*
@@ -244,8 +191,5 @@ final class PrepareComponents
         {
         }   */
     // todo 2.3. Signature Parameters über signature params preconfigured
-    public function processContentLength(): int
-    {
-        return strlen((string)$this->message->getBody());
-    }
+
 }
