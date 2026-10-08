@@ -8,6 +8,7 @@ use BadMethodCallException;
 use Filefabrik\Rfc9421\Cryptography\SigningEnumsRegistry;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
+use UnexpectedValueException;
 
 abstract class AbstractMetadata
 {
@@ -59,46 +60,24 @@ abstract class AbstractMetadata
      */
     private(set) string|null $tag = null;
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function set(string $key, int|string|null $value): static
     {
         $methodName = 'set'.ucfirst($key);
-        method_exists($this, $methodName) ? $this->$methodName($value) :
-            throw new BadMethodCallException('Method not exists "'.$methodName.'($value)".');
+
+        match ($methodName) {
+            'setCreated' => $this->setCreated($this->setIntOrNull($value)),
+            'setExpires' => $this->setExpires($this->setIntOrNull($value)),
+            'setNonce'   => $this->setNonce($this->setStringOrNull($value)),
+            'setKeyid'   => $this->setKeyid($this->setStringOrNull($value)),
+            'setAlg'     => $this->setAlg($this->setStringOrSigningEnum($value)),
+            'setTag'     => $this->setTag($this->setStringOrNull($value)),
+            default      => throw new BadMethodCallException('Method not exists "'.$methodName.'($value)".'),
+        };
 
         return $this;
-    }
-
-    /**
-     * @return array<string,string|int>
-     */
-    public function toArray(): array
-    {
-        $metadata = [];
-        if (null!==$this->created) {
-            $metadata['created'] = $this->created;
-        }
-
-        if (null!==$this->expires) {
-            $metadata['expires'] = $this->expires;
-        }
-
-        if (null!==$this->nonce) {
-            $metadata['nonce'] = $this->nonce;
-        }
-
-        if (null!==$this->keyid) {
-            $metadata['keyid'] = $this->keyid;
-        }
-
-        if ($this->alg instanceof SigningEnumInterface) {
-            $metadata['alg'] = $this->alg->getValue();
-        }
-
-        if (null!==$this->tag) {
-            $metadata['tag'] = $this->tag;
-        }
-
-        return $metadata;
     }
 
     public function setCreated(?int $created): static
@@ -106,6 +85,12 @@ abstract class AbstractMetadata
         $this->created = $created;
 
         return $this;
+    }
+
+    private function setIntOrNull(mixed $value): ?int
+    {
+        return (is_int($value) || null === $value) ? $value :
+            throw new UnexpectedValueException('$value must be int|null');
     }
 
     public function setExpires(?int $expires): static
@@ -120,6 +105,12 @@ abstract class AbstractMetadata
         $this->nonce = $nonce;
 
         return $this;
+    }
+
+    private function setStringOrNull(mixed $value): ?string
+    {
+        return null === $value || is_string($value) ? $value :
+            throw new UnexpectedValueException('$value must be string|null');
     }
 
     public function setKeyid(?string $keyid): static
@@ -139,10 +130,49 @@ abstract class AbstractMetadata
         return $this;
     }
 
+    private function setStringOrSigningEnum(mixed $value): string|SigningEnumInterface
+    {
+        return is_string($value) || $value instanceof SigningEnumInterface ? $value :
+            throw new UnexpectedValueException('$value must be string|SigningEnumInterface');
+    }
+
     public function setTag(?string $tag): static
     {
         $this->tag = $tag;
 
         return $this;
+    }
+
+    /**
+     * @return array<string,string|int>
+     */
+    public function toArray(): array
+    {
+        $metadata = [];
+        if (null !== $this->created) {
+            $metadata['created'] = $this->created;
+        }
+
+        if (null !== $this->expires) {
+            $metadata['expires'] = $this->expires;
+        }
+
+        if (null !== $this->nonce) {
+            $metadata['nonce'] = $this->nonce;
+        }
+
+        if (null !== $this->keyid) {
+            $metadata['keyid'] = $this->keyid;
+        }
+
+        if ($this->alg instanceof SigningEnumInterface) {
+            $metadata['alg'] = $this->alg->getValue();
+        }
+
+        if (null !== $this->tag) {
+            $metadata['tag'] = $this->tag;
+        }
+
+        return $metadata;
     }
 }

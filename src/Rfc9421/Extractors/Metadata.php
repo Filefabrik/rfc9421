@@ -21,6 +21,7 @@ final class Metadata extends AbstractMetadata
      * for the moment a statical method
      *
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public static function stringToMetadata(string $metadataString): self
     {
@@ -32,6 +33,9 @@ final class Metadata extends AbstractMetadata
         return $self;
     }
 
+    /**
+     * @return array<string,string|int>
+     */
     private function extractString(): array
     {
         $segments = [];
@@ -47,6 +51,11 @@ final class Metadata extends AbstractMetadata
         return $segments;
     }
 
+    /**
+     * @param string $segment
+     *
+     * @return array{string,string}
+     */
     private function extractPart(string $segment): array
     {
         $parts = explode('=', $segment);
@@ -57,7 +66,7 @@ final class Metadata extends AbstractMetadata
         throw new InvalidArgumentException(sprintf('Invalid segment: %s. Expects "key=value"', $segment));
     }
 
-    private function deQuoteIfNeed(string $key, string|int $value): string|int
+    private function deQuoteIfNeed(string $key, string $value): string|int
     {
         if (in_array($key, self::$propertiesToQuote, true)) {
             $value = UnquoteHelper::unquote($value);

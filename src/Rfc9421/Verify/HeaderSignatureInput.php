@@ -19,6 +19,8 @@ final class HeaderSignatureInput
 
     /**
      * only if validatedSignatureParts was successfully
+     *
+     * @var array{string,string|int}|array<void>|null $extractedComponents
      */
     private(set) null|array $extractedComponents = [];
 
@@ -36,7 +38,7 @@ final class HeaderSignatureInput
     /**
      * Central decoding action
      *
-     * @throws VerifyHeaderSignatureException
+     * @throws VerifyHeaderSignatureException|\Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function extract(): void
     {

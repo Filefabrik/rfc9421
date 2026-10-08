@@ -40,6 +40,7 @@ use UnexpectedValueException;
         '@query-param' => $parsedAndEncodedQueryParameters,
         // Default is an HTTP field name.
         default => $headerValueCorrespondingToHeaderName,
+        }
       };
  */
 /**

@@ -34,7 +34,9 @@ final class MetadataTest extends TestCase
 
     public function testExtractThrowParts(): void
     {
-        $this->expectExceptionObject(new \InvalidArgumentException('Invalid segment: nonce=="my-nonce". Expects "key=value"'));
+        $this->expectExceptionObject(
+            new \InvalidArgumentException('Invalid segment: nonce=="my-nonce". Expects "key=value"'),
+        );
         $now    = new DateTime()->getTimestamp();
         $string =
             'created='.$now.';'.'expires='.$now.';'.'nonce=="my-nonce";keyid="my-keyid";algorithm="my-algorithm";tag="my-tag"';
@@ -51,4 +53,21 @@ final class MetadataTest extends TestCase
 
         Metadata::stringToMetadata($string);
     }
+
+    public function testExtractEmptyCreated(): void
+    {
+        $now     = new DateTime()->getTimestamp();
+        $string  = 'created=;'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";tag="my-tag"';
+        $created = Metadata::stringToMetadata($string)->created;
+        $this->assertEquals(0, $created);
+    }
+
+    public function testExtractZeroCreated(): void
+    {
+        $now     = new DateTime()->getTimestamp();
+        $string  = 'created=0;'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";tag="my-tag"';
+        $created = Metadata::stringToMetadata($string)->created;
+        $this->assertEquals(0, $created);
+    }
+
 }

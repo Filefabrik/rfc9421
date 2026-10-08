@@ -15,21 +15,20 @@ trait PrepareComponentMethodsTrait
     /**
      * Injecting callables
      *
-     * @var array{string: Closure}
+     * @var array{string, Closure}|array<void>
      */
     private(set) array $prepareComponentsMethods = [];
 
     /**
      * Modify the generation methods
      *
-     * @param array{string|Closure} $methods
+     * @param array{string,Closure} $methods
      *
-     * @see
      */
     public function withPrepareComponentsMethods(array $methods): SigningConfiguration
     {
-        foreach ($methods as $keyValueArray) {
-            $this->withPrepareComponentsMethod(...$keyValueArray);
+        foreach ($methods as [$key, $closure]) {
+            $this->withPrepareComponentsMethod($key, $closure);
         }
 
         return $this;

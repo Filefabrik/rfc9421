@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-require_once __DIR__.'/vendor/autoload.php';
-
 use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
+
+require_once __DIR__.'/vendor/autoload.php';
 
 $finder = PhpCsFixer\Finder::create()
                            ->in(__DIR__.'/src')

@@ -18,9 +18,9 @@ final class SignaturInput
 {
     private(set) ?string $signatureKeyName = null;
 
-    private(set) ?string $components       = null;
+    private(set) ?string $components = null;
 
-    private(set) ?string $metadata         = null;
+    private(set) ?string $metadata = null;
 
     private bool $valid = true;
 
@@ -42,9 +42,9 @@ final class SignaturInput
 
     private function extracting(): bool
     {
-        preg_match('#(.*?)\((.*?)\)(.*?)$#', $this->signatureLine, $matches);
+        $extracted = preg_match('#(.*?)\((.*?)\)(.*?)$#', $this->signatureLine, $matches);
 
-        if ($matches) {
+        if (1 === $extracted) {
             $this->signatureKeyName = $matches[1];
 
             $this->components = $matches[2];
