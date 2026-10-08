@@ -53,12 +53,7 @@ final class PrepareComponents
 
     public function __construct(
         private(set) readonly RequestInterface $message,
-        /**
-         * otherwise use the default stack
-         *
-         * @var array{string:Closure}
-         */
-        private(set) ?PreparedMethods $methodStack = null,
+        private(set) ?PreparedMethods $preparedMethods = null,
     ) {
     }
 
@@ -115,7 +110,7 @@ final class PrepareComponents
      */
     private function getMethodStack(): PreparedMethods
     {
-        return $this->methodStack ??= new PreparedMethods()->adds(self::defaultMapperClosure());
+        return $this->preparedMethods ??= new PreparedMethods()->adds(self::defaultMapperClosure());
     }
 
     /**
@@ -160,7 +155,7 @@ final class PrepareComponents
 
     public function setPreparedMethods(PreparedMethods $preparedMethods): self
     {
-        $this->methodStack = $preparedMethods;
+        $this->preparedMethods = $preparedMethods;
 
         return $this;
     }

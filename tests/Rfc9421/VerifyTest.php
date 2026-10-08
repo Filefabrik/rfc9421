@@ -111,7 +111,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            ['@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),],
+            '@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
         $tamperedRequest = clone $signedRequest;

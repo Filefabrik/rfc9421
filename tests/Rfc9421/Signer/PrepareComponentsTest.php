@@ -9,11 +9,11 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SignatureParams;
+use Filefabrik\Rfc9421\Support\PreparedMethods;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
-use TypeError;
 use UnexpectedValueException;
 
 #[CoversClass(PrepareComponents::class)]
@@ -55,24 +55,12 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame('Post', $prepareInstance->processValue('@method'));
     }
 
-    /**
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
-     */
-    public function testProcessValueThrows(): void
+    public function testSetPreparedMethods()
     {
-        $this->expectException(
-            TypeError::class,
-        );
-        $r = new Request('post', 'https://Test.com/test&var=käse');
+        $instance = new PrepareComponents(new Request('post', 'https://Test.com'));
+        $instance->setPreparedMethods(new PreparedMethods());
 
-        $prepareComponents = new PrepareComponents($r);
-        $messageStack      = PrepareComponents::defaultMapperClosure();
-        // todo never allow a number only closure or string
-        $messageStack[' bullshit '] = '12';
-        $prepareComponents->addMappingValues($messageStack);
-
-        $prepareComponents->processValue(' bullshit ');
+        self::assertSame([],$instance->preparedMethods->methods);
     }
 
     /**
@@ -107,6 +95,16 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents($r);
 
         self::assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+    }
+
+    public function testProcessingThrow()
+    {
+        $this->expectExceptionObject(new UnexpectedValueException('Method "missing" not registered.'));
+        $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+
+        $prepareInstance = new PrepareComponents($r);
+
+        $prepareInstance->processValue('missing');
     }
 
     public function testProcessAtMethod(): void

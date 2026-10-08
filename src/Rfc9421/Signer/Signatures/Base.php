@@ -10,6 +10,7 @@ use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -53,7 +54,7 @@ final class Base
         // todo prepare components with extra methods has to be separated
         $components = new PrepareComponents($this->message);
 
-        if (null !== ($preparedComponentMethods = $this->configuration->preparedMethods)) {
+        if (($preparedComponentMethods = $this->configuration->preparedMethods) instanceof PreparedMethods) {
             $components->setPreparedMethods($preparedComponentMethods);
         }
 

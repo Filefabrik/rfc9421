@@ -26,7 +26,7 @@ final class Verify
     /**
      * Only if verified successfully
      *
-     * @var array<string,string>|null null on not set
+     * @var list<array<string,string>>|null null on not set
      */
     private(set) null|array $validSignedParameters = null;
 

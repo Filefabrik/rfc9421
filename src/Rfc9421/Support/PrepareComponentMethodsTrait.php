@@ -35,7 +35,7 @@ trait PrepareComponentMethodsTrait
         return $this->preparedMethods ??=  new PreparedMethods()->adds(PrepareComponents::defaultMapperClosure());
     }
 
-    public function withPrepareComponentsMethod(string $componentName, callable $callable): self
+    public function withPrepareComponentsMethod(string $componentName, Closure $callable): self
     {
         $this->getPreparedMethods()
              ->add($componentName, $callable)

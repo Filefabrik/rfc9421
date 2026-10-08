@@ -18,6 +18,7 @@ use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\MessageInterface;
 use UnexpectedValueException;
 
 #[CoversClass(Base::class)]
@@ -146,6 +147,24 @@ final class BaseTest extends TestCase
         $res = Base::compileSignatureInputToString($sls);
 
         self::assertEquals('"header-key": the-value', $res);
+    }
+
+    public function testWithPreparedComponents()
+    {
+        $sc = new SigningConfiguration();
+        $sc->signHeader('not-ExistinG')
+           ->signHeader('@method')
+           ->signHeader('@authority')
+        ;;
+        $sc->withPrepareComponentsMethod('@authority', fn(MessageInterface $message): string => 'game');
+        $r = new Request('post', '', ['noT-exIsting' => 'hm']);
+        $i = new Base($r, $sc);
+
+        $arr = $i->createSignatureLines()
+                 ->toArray()
+        ;
+
+        self::assertEquals([['not-existing', 'hm'], ['@method', 'POST'], ['@authority', 'game']], $arr);
     }
 
 }
