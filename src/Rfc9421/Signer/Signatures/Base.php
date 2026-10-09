@@ -22,13 +22,16 @@ final class Base
     public function __construct(
         private(set) RequestInterface $message,
         private(set) readonly SigningConfiguration $configuration,
+        /**
+         * ready prepared lines they will be part of the signature
+         */
+        private(set) readonly Lines $signatureLines = new Lines(),
     ) {
     }
 
     /**
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
      *
-
      */
     public static function compileSignatureInputToString(Lines $signatureLines): string
     {
@@ -49,8 +52,6 @@ final class Base
      */
     public function createSignatureLines(): Lines
     {
-        $signatureLines = new Lines();
-
         // todo prepare components with extra methods has to be separated
         $components = new PrepareComponents($this->message);
 
@@ -59,11 +60,11 @@ final class Base
         }
 
         foreach ($this->configuration->signatureParams->getSignatureParameters() as $signatureParam) {
-            $signatureLines->add($this->createSignatureLine($signatureParam, $components));
+            $this->signatureLines->add($this->createSignatureLine($signatureParam, $components));
         }
 
         // at least
-        return $signatureLines;
+        return $this->signatureLines;
     }
 
     /**

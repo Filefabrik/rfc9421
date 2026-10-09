@@ -90,7 +90,7 @@ final class Verify
 
         if ($verified) {
             // getting back validated parameters non-tempered parameters
-            $this->validSignedParameters = $signer->signingParameters?->toArray() ?? throw new UnexpectedValueException(
+            $this->validSignedParameters = $signer->signingLines?->toArray() ?? throw new UnexpectedValueException(
                 'Signed Parameters not set',
             );
         }

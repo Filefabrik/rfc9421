@@ -25,7 +25,7 @@ final class Signer
     /**
      * Data for signing the relevant header data
      */
-    private(set) null|Lines $signingParameters = null;
+    private(set) null|Lines $signingLines = null;
 
     /**
      * @var string|null null throws an error
@@ -76,7 +76,7 @@ final class Signer
     {
         $base = new Base($this->message, $this->signingConfiguration);
 
-        $this->signingParameters = $base->createSignatureLines();
+        $this->signingLines = $base->createSignatureLines();
 
         // rebind because the header maybe changed in signature base class
         $this->message = $base->message;
@@ -85,11 +85,11 @@ final class Signer
         $this->signatureBase = $base->makeSignatureInput();
 
         // now set the signature-params ONLY into the signature-base line.
-        $this->signingParameters->add(new Line('@signature-params', $this->signatureBase));
+        $this->signingLines->add(new Line('@signature-params', $this->signatureBase));
 
-        // makes the array of signingParameters to a string. The string kann be base64EncodedValue
+        // makes the array of signingLines to a string. The string kann be base64EncodedValue
         // keep the $this->signingParametersString public readable. maybe for testing and other stuff
-        $this->signingParametersString = Base::compileSignatureInputToString($this->signingParameters);
+        $this->signingParametersString = Base::compileSignatureInputToString($this->signingLines);
     }
 
     /**
