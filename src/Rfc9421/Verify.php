@@ -69,7 +69,7 @@ final class Verify
         $this->prepareSigningComponents();
 
         // Validates the Content digest if needed from signature-line sig1=(content-digest)
-        if ($this->signingConfiguration->hasContentDigestHashAlgo() && (null === $this->validateContentDigest())) {
+        if ($this->signingConfiguration->hasContentDigestHashAlgo() && !$this->validateContentDigest()) {
             return false;
         }
 
@@ -126,6 +126,11 @@ final class Verify
         $this->preparedVerifier         = true;
     }
 
+    public function getHeaderHelper(): HeaderHelper
+    {
+        return $this->headerHelper ??= new HeaderHelper(message: $this->message);
+    }
+
     /**
      * Extract which "Components" must be used to validate the header data
      *
@@ -166,11 +171,6 @@ final class Verify
 
         // no validation of the body
         return $verified;
-    }
-
-    public function getHeaderHelper(): HeaderHelper
-    {
-        return $this->headerHelper ??= new HeaderHelper(message: $this->message);
     }
 
     /**
