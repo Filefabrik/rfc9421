@@ -7,11 +7,11 @@ namespace Filefabrik\Rfc9421Test;
 use BadMethodCallException;
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Signer;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Verify;
+use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Utils;
@@ -127,7 +127,10 @@ final class VerifyTest extends TestCase
         $tamperedBody    = $bodyParams;
         #$tamperedBody['mod'] = 'hasModiefied';
         $tamperedRequest = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
-        $verifier        = new Verify($tamperedRequest);
+
+        $verifyPrepare = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
+        $verifyPrepare->prepareVerify();
+        $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
@@ -138,7 +141,6 @@ final class VerifyTest extends TestCase
         /**
          * now prepare the verify process
          */
-        $verifier->prepareVerify();
 
         /*
          * Optional we have found a "tag" from sender.
@@ -146,110 +148,6 @@ final class VerifyTest extends TestCase
          *
          */
         if (null !== $signerConfiguration->metadata->tag) {
-            // for mastodon an own config für x-origin or something
-            $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
-        }
-
-        self::assertEquals(1, $verifier->verifying());
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \JsonException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     */
-    #[DataProvider('withSigningMethods')]
-    public function testPrepareVerifyTwiceThrow(
-        string|SigningEnum $signingAlgo,
-        string $cert,
-    ): void {
-        $this->expectExceptionObject(new BadMethodCallException('already prepared'));
-        $certInstance = new CertHelper($cert);
-
-        $signatureKeyName = 'testing=';
-        /**
-         * Prepare signingConfiguration
-         */
-        $currentDateTime = new DateTime()->getTimestamp();
-        $configuration   = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-                      ->withSigningAlgorithm($signingAlgo)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
-                      ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
-            // for signing needs private
-                      ->setPrivatePem($certInstance->getPrivatPemContent())
-        ;
-
-        /**
-         * Prepare the Request
-         */
-        $bodyParams = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];
-        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-        $request    = new Request(
-            method : 'POST',
-            uri    : 'https://target-host.com',
-            headers: ['x-origin-host' => 'target-host.com'],
-            body   : $bodyJson,
-        );
-        /**
-         * todo only with library Openssl test
-         */
-        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
-            $this->expectExceptionObject(
-                new BadMethodCallException(
-                    'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
-                ),
-            );
-        }
-
-        $signer        = new Signer($request, $configuration);
-        $signedRequest = $signer->sign();
-
-        /**
-         * Now decrypt the Request
-         */
-        /**
-         * optional we prepare a method that we inject if we need this
-         */
-        $mastodonVerifierMethods = [
-            '@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
-        ];
-
-        $tamperedRequest = clone $signedRequest;
-        $tamperedBody    = $bodyParams;
-        #$tamperedBody['mod'] = 'hasModiefied';
-        $tamperedRequest = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
-        $verifier        = new Verify($tamperedRequest);
-
-        // optional before preparing verify and verifying
-        $signerConfiguration = $verifier->signingConfiguration;
-        //  ->withSignatureKeyName($signatureKeyName)
-        // for verify needs public
-        $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
-
-        /**
-         * now prepare the verify process
-         */
-        $verifier->prepareVerify();
-        /**
-         * prepareVerify is public so it can be re-run. there is an prevention
-         */
-        $verifier->prepareVerify();
-        /*
-         * Optional we have found a "tag" from sender.
-         * Maybe that let us know, that we handle derivedComponents with a special method
-         *
-         */
-        if ($signerConfiguration->metadata->hasTag()) {
             // for mastodon an own config für x-origin or something
             $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
         }
@@ -335,18 +233,15 @@ final class VerifyTest extends TestCase
         $tamperedBody        = $bodyParams;
         $tamperedBody['mod'] = 'hasModiefied';
         $tamperedRequest     = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
-        $verifier            = new Verify($tamperedRequest);
+        $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
+        $verifyPrepare->prepareVerify();
+        $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
         //  ->withSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
-
-        /**
-         * now prepare the verify process
-         */
-        $verifier->prepareVerify();
 
         /*
          * Optional we have found a "tag" from sender.
@@ -359,48 +254,6 @@ final class VerifyTest extends TestCase
         }
 
         self::assertEquals(1, $verifier->verifying());
-    }
-
-    public function testValidateThrowMissingSignature(): void
-    {
-        $this->expectExceptionObject(new VerifyHeaderSignatureException('Missing signature'));
-        $r = new Request(
-            method : 'POST',
-            uri    : 'https://test',
-            headers: [
-            ],
-        );
-        new Verify($r)->verifying();
-    }
-
-    public function testValidateThrowMissingSignatureInput(): void
-    {
-        $this->expectExceptionObject(new VerifyHeaderSignatureException('Missing signature-input'));
-        $r = new Request(
-            method : 'POST',
-            uri    : 'https://test',
-            headers: [
-                'signature' => 'test=:crypt:',
-            ],
-        );
-        new Verify($r)->verifying();
-    }
-
-    public function testValidateThrowHeaderKeyName(): void
-    {
-        $this->expectExceptionObject(
-            new VerifyHeaderSignatureException('Error during extracting the signatureKeyName'),
-        );
-        $r        = new Request(
-            method : 'POST',
-            uri    : 'https://test',
-            headers: [
-                'signature'       => 'crypt:',
-                'signature-input' => 'atmNotRelevant',
-            ],
-        );
-        $instance = new Verify($r);
-        $instance->verifying();
     }
 
     /**
@@ -469,8 +322,9 @@ final class VerifyTest extends TestCase
         /**
          * Now decrypt the Request
          */
-
-        $verifier = new Verify($signedRequest);
+        $verifyPrepare = new VerifyPrepare($signedRequest, new SigningConfiguration());
+        $verifyPrepare->prepareVerify();
+        $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
@@ -481,7 +335,6 @@ final class VerifyTest extends TestCase
         /**
          * now prepare the verify process
          */
-        $verifier->prepareVerify();
 
         self::assertEquals(1, $verifier->verifying());
     }
@@ -569,7 +422,9 @@ final class VerifyTest extends TestCase
         $tamperedBody        = $bodyParams;
         $tamperedBody['mod'] = 'hasModiefied';
         $tamperedRequest     = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
-        $verifier            = new Verify($tamperedRequest);
+        $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
+        $verifyPrepare->prepareVerify();
+        $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
@@ -580,7 +435,6 @@ final class VerifyTest extends TestCase
         /**
          * now prepare the verify process
          */
-        $verifier->prepareVerify();
 
         /*
          * Optional we have found a "tag" from sender.

@@ -2,35 +2,47 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Verify;
+namespace Filefabrik\Rfc9421;
 
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\ContentDigest;
 use Filefabrik\Rfc9421\Extractors\HeaderSignature;
 use Filefabrik\Rfc9421\Signer\Metadata;
-use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\Verify\HeaderHelper;
+use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
+use Filefabrik\Rfc9421\Verify\PrepareSignatureKeyName;
 use Psr\Http\Message\RequestInterface;
 
 /**
  * Outside from the verify process read only the incoming request
  */
-final class PrepareVerify
+final class VerifyPrepare
 {
 
     /**
-     * @var null|\Filefabrik\Rfc9421\Verify\HeaderSignatureInput
-     */
-    private(set) ?HeaderSignatureInput $signatureInputInstance = null;
-    /**
      * @var ?\Filefabrik\Rfc9421\Extractors\HeaderSignature
      */
-    private ?HeaderSignature $headerSignatureExtractor = null;
+    private(set) ?HeaderSignature $headerSignatureExtractor = null;
+    /**
+     * @var null|\Filefabrik\Rfc9421\Verify\HeaderSignatureInput
+     */
+    private ?HeaderSignatureInput $signatureInputInstance = null;
+    /**
+     * @var \Filefabrik\Rfc9421\Verify\HeaderHelper
+     */
+    private HeaderHelper $headerHelper;
 
     public function __construct(
         private(set) readonly RequestInterface $message,
         private(set) readonly SigningConfiguration $signingConfiguration,
-        private(set) readonly HeaderHelper $headerHelper,
+
     ) {
+        $this->headerHelper = new HeaderHelper($this->message);
+    }
+
+    public function getHeaderHelper(): HeaderHelper
+    {
+        return $this->headerHelper;
     }
 
     /**
@@ -41,7 +53,7 @@ final class PrepareVerify
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
-    public function prepareVerify(): void
+    public function prepareVerify(): bool
     {
         // first stage we must have both signature and signature-input header
         if (
@@ -92,6 +104,9 @@ final class PrepareVerify
                 )->getAlgorithm(),
             );
         }
+
+        // only bool that there were no exceptions
+        return true;
     }
 
     public function getHeaderSignatureExtractor(): HeaderSignature
@@ -116,5 +131,14 @@ final class PrepareVerify
         $headerSignatureInstance->extract();
 
         return $this->signatureInputInstance = $headerSignatureInstance;
+    }
+
+    /**
+     * @return \Filefabrik\Rfc9421\Verify\HeaderSignatureInput
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
+    public function getSignatureInputInstance(): HeaderSignatureInput
+    {
+        return $this->signatureInputInstance ?? throw new VerifyHeaderSignatureException('missing header signature');
     }
 }

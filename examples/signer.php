@@ -6,6 +6,7 @@ use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Signer;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Verify;
+use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\MessageInterface;
@@ -85,15 +86,17 @@ $signedRequest = $signer->sign();
  * Now decrypt the Request
  */
 $verifierConfiguration = new SigningConfiguration();
+$verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
+$prepared = $verifyPrepareInstance->prepareVerify();
 /**
  * Verify the generated request from above(receiver-side)
  */
-$verifier = new Verify(message: $signedRequest, signingConfiguration: $verifierConfiguration);
+$verifier = new Verify($verifyPrepareInstance);
 /**
  * Prepare the verify to extract for mastodon the sender public pem location
  */
-$verifier->prepareVerify();
+
 /**
  * with the keyId you should be able to download the public pem
  */
@@ -133,7 +136,9 @@ if ($keyId) {
         if ($metadata->created) {
             // ...
         }
-        $body = (string)$verifier->message->getBody();
+        $body = (string)$verifier->getMessage()
+                                 ->getBody()
+        ;
     }
 
     return;
