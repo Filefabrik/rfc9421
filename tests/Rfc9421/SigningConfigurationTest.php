@@ -29,6 +29,9 @@ final class SigningConfigurationTest extends TestCase
         self::assertFalse($i->mustSignBody);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testGetContentDigestHashAlgo(): void
     {
         $i = new SigningConfiguration();
@@ -47,6 +50,11 @@ final class SigningConfigurationTest extends TestCase
         self::assertSame($dt, $i->metadata->created);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     */
     public function testSignHeader(): void
     {
         $i = new SigningConfiguration();
@@ -55,6 +63,9 @@ final class SigningConfigurationTest extends TestCase
         self::assertSame(['foo', 'bar'], $i->signatureParams->getSignatureParameters());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testSetContentDigestHashAlgo(): void
     {
         $i = new SigningConfiguration();
@@ -96,6 +107,9 @@ final class SigningConfigurationTest extends TestCase
         self::assertSame('foo', $i->metadata->keyid);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testWithSigningAlgorithm(): void
     {
         $i = new SigningConfiguration();

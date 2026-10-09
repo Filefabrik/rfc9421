@@ -32,6 +32,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents(new Request('post', 'https://Test.com'));
         $prepareInstance->addMappingValues($arr);
+
         $signatureParams = new SignatureParams();
 
         $signatureParams->setDerivedComponentName('@method');
@@ -55,7 +56,7 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame('Post', $prepareInstance->processValue('@method'));
     }
 
-    public function testSetPreparedMethods()
+    public function testSetPreparedMethods(): void
     {
         $instance = new PrepareComponents(new Request('post', 'https://Test.com'));
         $instance->setPreparedMethods(new PreparedMethods());
@@ -97,7 +98,7 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
     }
 
-    public function testProcessingThrow()
+    public function testProcessingThrow(): void
     {
         $this->expectExceptionObject(new UnexpectedValueException('Method "missing" not registered.'));
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');

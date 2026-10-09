@@ -16,16 +16,19 @@ use Filefabrik\Rfc9421\Signer\Signatures\Lines;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
 use UnexpectedValueException;
 
 #[CoversClass(Base::class)]
-#[CoversMethod(Base::class, 'handleSignBody')]
-#[CoversMethod(Base::class, 'createSignatureLine')]
 final class BaseTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     */
     public function testCreateSignatureLines(): void
     {
         $sc = new SigningConfiguration();
@@ -149,13 +152,19 @@ final class BaseTest extends TestCase
         self::assertEquals('"header-key": the-value', $res);
     }
 
-    public function testWithPreparedComponents()
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     */
+    public function testWithPreparedComponents(): void
     {
         $sc = new SigningConfiguration();
         $sc->signHeader('not-ExistinG')
            ->signHeader('@method')
            ->signHeader('@authority')
-        ;;
+        ;
         $sc->withPrepareComponentsMethod('@authority', fn(MessageInterface $message): string => 'game');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
