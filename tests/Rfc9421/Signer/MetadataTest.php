@@ -9,11 +9,12 @@ use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Metadata::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(Metadata::class,'toString')]
+#[CoversMethod(Metadata::class, 'toString')]
 final class MetadataTest extends TestCase
 {
     public static function dataProviderToArray(): array
@@ -119,5 +120,14 @@ final class MetadataTest extends TestCase
     public function testSetKeyid(): void
     {
         self::assertEquals('my-keyid', new Metadata()->setKeyid('my-keyid')->keyid);
+    }
+
+    public function testHasTag(): void
+    {
+        self::assertTrue(
+            new Metadata()->setTag('my-tag')
+                          ->hasTag(),
+        );
+        self::assertFalse(new Metadata()->hasTag());
     }
 }

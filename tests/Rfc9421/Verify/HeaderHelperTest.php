@@ -38,4 +38,40 @@ final class HeaderHelperTest extends TestCase
             new HeaderHelper($r)->getContentDigestLine(),
         );
     }
+
+    public function testHasSignatureInputLine(): void
+    {
+        $r = new Request(method: 'Post', uri: '', headers: ['signature-input' => 'my-signature-inputline']);
+        self::assertTrue(
+            new HeaderHelper($r)->hasSignatureInputLine(),
+        );
+        $r = new Request(method: 'Post', uri: '', headers: ['signature-inputz' => 'my-signature-inputline']);
+        self::assertFalse(
+            new HeaderHelper($r)->hasSignatureInputLine(),
+        );
+    }
+
+    public function testHasContentDigestLine(): void
+    {
+        $r = new Request(method: 'Post', uri: '', headers: ['content-digest' => 'my-content-digest']);
+        self::assertTrue(
+            new HeaderHelper($r)->hasContentDigestLine(),
+        );
+        $r = new Request(method: 'Post', uri: '', headers: ['content-digestasdf' => 'my-content-digest']);
+        self::assertFalse(
+            new HeaderHelper($r)->hasContentDigestLine(),
+        );
+    }
+
+    public function testHasSignatureLine(): void
+    {
+        $r = new Request(method: 'Post', uri: '', headers: ['signature' => 'my-signature']);
+        self::assertTrue(
+            new HeaderHelper($r)->hasSignatureLine(),
+        );
+        $r = new Request(method: 'Post', uri: '', headers: []);
+        self::assertFalse(
+            new HeaderHelper($r)->hasSignatureLine(),
+        );
+    }
 }
