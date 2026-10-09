@@ -28,9 +28,6 @@ final class Verify
 
     private(set) SigningConfiguration $signingConfiguration;
 
-    /**
-     *
-     */
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
     {
         $this->signingConfiguration = $this->preparedVerify->signingConfiguration;
@@ -92,11 +89,11 @@ final class Verify
     }
 
     /**
-     * @return string[]
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     * @return string[]
      */
     private function getSigningComponents(): array
     {

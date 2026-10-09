@@ -14,7 +14,7 @@ trait EnumSupportTrait
             return $key;
         }
 
-        return array_find(self::cases(), fn($case): bool => $case->name === $key || $case->value === $key);
+        return array_find(self::cases(), fn ($case): bool => $case->name === $key || $case->value === $key);
     }
 
     /**

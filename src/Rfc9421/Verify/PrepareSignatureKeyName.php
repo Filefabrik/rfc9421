@@ -39,7 +39,7 @@ final readonly class PrepareSignatureKeyName
                 // @codeCoverageIgnoreEnd
             }
 
-            /**
+            /*
              * extracted signature key from the "signature" which is the key for extracting the "components" and the "metadata"
              * todo maybe decide we are using an signature key name if there are more then one signatures
              * */

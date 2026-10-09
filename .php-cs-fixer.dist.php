@@ -7,16 +7,17 @@ use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 require_once __DIR__.'/vendor/autoload.php';
 
 $finder = PhpCsFixer\Finder::create()
-                           ->in(__DIR__.'/src')
-                           ->in(__DIR__.'/tests')
+                           ->in(__DIR__.'/src/Rfc9421')
+                           ->in(__DIR__.'/tests/Rfc9421')
 ;
 
 $config = new PhpCsFixer\Config();
 
 return $config
     ->setParallelConfig(ParallelConfigFactory::detect())
-    ->setRiskyAllowed(false)
+    ->setRiskyAllowed(true)
     ->setRules([
+        '@PHP8x5Migration'                                 => true,
         '@PSR12'                                           => true,
         'array_syntax'                                     => ['syntax' => 'short'],
         'concat_space'                                     => ['spacing' => 'none'],
@@ -38,14 +39,16 @@ return $config
             'imports_order'  => ['class', 'function', 'const'],
             'sort_algorithm' => 'alpha',
         ],
+        'final_class'                                      => true,
         'phpdoc_add_missing_param_annotation'              => ['only_untyped' => true],
         'phpdoc_align'                                     => ['align' => 'left'],
         'phpdoc_no_empty_return'                           => true,
         'phpdoc_order'                                     => true,
         'phpdoc_scalar'                                    => true,
         'phpdoc_to_comment'                                => true,
-        'phpdoc_summary'                                   => true,
+        'phpdoc_summary'                                   => false,
         'psr_autoloading'                                  => true,
+        'modifier_keywords'                                => ['elements' => ['const', 'method']],
         'return_type_declaration'                          => ['space_before' => 'none'],
         'blank_lines_before_namespace'                     => true,
         'single_quote'                                     => true,

@@ -50,7 +50,6 @@ use Psr\Http\Message\RequestInterface;
  */
 final class PrepareComponents
 {
-
     public function __construct(
         private(set) readonly RequestInterface $message,
         private(set) ?PreparedMethods $preparedMethods = null,
@@ -117,41 +116,41 @@ final class PrepareComponents
      */
     public static function defaultMapperClosure(): array
     {
-        /**
+        /*
          * for different components there can be different methods to prepare the values(upper-case lower-case )
          *
 
          */
         return [
-            /**
+            /*
              * extracting the "method" from header to use later as "@method"
              *
              * @see 2.2.1. Method
              */
-            '@method'         => fn(RequestInterface $message): string => strtoupper($message->getMethod()),
+            '@method'         => fn (RequestInterface $message): string => strtoupper($message->getMethod()),
             '@target-uri'     => self::processTargetUriClosure(...),
-            /**
+            /*
              * @see 2.2.3. Authority
              */
-            '@authority'      => fn(RequestInterface $message): string => $message->getUri()
+            '@authority'      => fn (RequestInterface $message): string => $message->getUri()
                                                                                   ->getHost(),
-            /**
+            /*
              * @see 2.2.4. Scheme
              */
-            '@scheme'         => fn(RequestInterface $message): string => $message->getUri()
-                /**
+            '@scheme'         => fn (RequestInterface $message): string => $message->getUri()
+                /*
                  * 2.2.5. Request Target
                  * Todo More complex as described in 2.2.5. Request Target
                  * **/ ->getScheme(),
-            '@request-target' => fn(MessageInterface $message) => throw new BadMethodCallException(
+            '@request-target' => fn (MessageInterface $message) => throw new BadMethodCallException(
                 '@request-target not implemented',
             ),
-            /**
+            /*
              * @see 2.2.6. Path
              **/
             '@path'           => self::processPathClosure(...),
             //  '@status'         => 'processStatus',
-            'content-length'  => fn(RequestInterface $message): int => strlen((string)$message->getBody()),
+            'content-length'  => fn (RequestInterface $message): int => strlen((string)$message->getBody()),
         ];
     }
 
@@ -166,8 +165,8 @@ final class PrepareComponents
     {
         return $this->getMethodStack()
                     ->getMethod($key)(
-            $this->message,
-        );
+                        $this->message,
+                    );
     }
 
     /*

@@ -41,7 +41,7 @@ final readonly class ContentDigest
             algorithm: DigestAlgorithmsEnum::isOwnTypeOrThrow($this->phpAlgorithm),
         )->calculateSignature();
 
-        /**
+        /*
          * hash must be the same
          */
         return $reCalculatedSignature === $this->base64EncodedValue;

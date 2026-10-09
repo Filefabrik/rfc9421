@@ -20,8 +20,8 @@ final class VerifyContentDigest
     }
 
     /**
-     * @return bool true if valid
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @return bool true if valid
      */
     public function verify(): bool
     {

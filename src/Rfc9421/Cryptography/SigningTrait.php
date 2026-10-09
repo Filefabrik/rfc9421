@@ -25,7 +25,7 @@ trait SigningTrait
             return $found;
         }
 
-        /** @var string|null $key phpstan error */
+        /* @var string|null $key phpstan error */
         throw SignatureException::signatureEnumNotFound($key);
     }
 

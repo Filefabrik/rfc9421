@@ -28,7 +28,7 @@ enum DigestAlgorithmsEnum: string
             return $res;
         }
 
-        /** @var string|null $key */
+        /* @var string|null $key */
         throw ContentDigestException::hashAlgoNotSupported($key ?? '');
     }
 

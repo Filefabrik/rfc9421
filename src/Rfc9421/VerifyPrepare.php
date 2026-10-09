@@ -20,24 +20,13 @@ use UnexpectedValueException;
  */
 final class VerifyPrepare
 {
-
-    /**
-     * @var ?\Filefabrik\Rfc9421\Extractors\HeaderSignature
-     */
     private(set) ?HeaderSignature $headerSignatureExtractor = null;
-    /**
-     * @var null|\Filefabrik\Rfc9421\Verify\HeaderSignatureInput
-     */
     private ?HeaderSignatureInput $signatureInputInstance = null;
-    /**
-     * @var \Filefabrik\Rfc9421\Verify\HeaderHelper
-     */
     private HeaderHelper $headerHelper;
 
     public function __construct(
         private(set) readonly RequestInterface $message,
         private(set) readonly SigningConfiguration $signingConfiguration,
-
     ) {
         $this->headerHelper = new HeaderHelper($this->message);
     }
@@ -81,7 +70,7 @@ final class VerifyPrepare
             headerSignatureExtractor: $this->getHeaderSignatureExtractor(),
         )->prepare();
 
-        /**
+        /*
          * Early step to prepare the signer configuration.
          * The signer configuration can be modified before validation
          *
@@ -92,7 +81,7 @@ final class VerifyPrepare
             metadata: $this->getExtractedMetadataArray(),
         );
 
-        /**
+        /*
          * extract the content-digest if exists in header
          */
         if (
@@ -120,10 +109,10 @@ final class VerifyPrepare
     }
 
     /**
-     * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
     private function getExtractedMetadataArray(): array
     {
@@ -149,7 +138,6 @@ final class VerifyPrepare
     }
 
     /**
-     * @return \Filefabrik\Rfc9421\Verify\HeaderSignatureInput
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     public function getSignatureInputInstance(): HeaderSignatureInput

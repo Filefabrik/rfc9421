@@ -92,8 +92,8 @@ final class Base
      * Handle the body signing
      * Todo create a extra config for the digest-hash
      *
-     * @return array{string,string}
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @return array{string,string}
      */
     private function handleSignBody(): array
     {
@@ -104,7 +104,7 @@ final class Base
                 algorithm: $this->configuration->getContentDigestHashAlgoOrThrow(),
             )->getContentDigestHeaderArray();
 
-            /**
+            /*
              * rebind the MessageInterface because of cloned change
              */
             $this->message = $this->message->withHeader($headerKey, $value);

@@ -76,9 +76,9 @@ final class HeaderSignature
     /**
      * checks we have the :base64EncodedValue-code: ...between the double colons
      *
-     * @return array{0:non-falsy-string,1:string,2:string}|non-empty-array<string> SignatureExtractionException on format missmatch
      *
      * @throws SignatureExtractionException
+     * @return array{0:non-falsy-string,1:string,2:string}|non-empty-array<string> SignatureExtractionException on format missmatch
      */
     public function getValidatedSignatureParts(): array
     {
