@@ -19,7 +19,7 @@ final readonly class Components
     }
 
     /**
-     * @return string[]
+     * @return string[]|array<void>
      * @example ['content-length', '@query-param', 'example-dict']
      */
     public function toArray(): array

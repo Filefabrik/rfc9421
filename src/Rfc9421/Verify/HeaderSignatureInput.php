@@ -20,9 +20,9 @@ final class HeaderSignatureInput
     /**
      * only if validatedSignatureParts was successfully
      *
-     * @var array{string,string|int}|array<void>|null $extractedComponents
+     * @var string[]|array<void> $extractedComponents
      */
-    private(set) null|array $extractedComponents = [];
+    private(set) array $extractedComponents = [];
 
     /**
      * only if validatedSignatureParts was successfully

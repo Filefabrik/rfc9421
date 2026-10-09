@@ -38,6 +38,16 @@ final class Lines
         return $array;
     }
 
+    public function toKeyValueArray(): array
+    {
+        $array = [];
+        foreach ($this->lines as $line) {
+            $array[$line->key] = $line->value;
+        }
+
+        return $array;
+    }
+
     public function getLineNumber(int $lineNumber): Line
     {
         return $this->lines[$lineNumber] ?? throw new UnexpectedValueException(

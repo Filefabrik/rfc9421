@@ -19,6 +19,12 @@ class LinesTest extends TestCase
         $sl->add(new Line('foo', 'bar'));
         self::assertEquals([['foo', 'bar']], $sl->toArray());
     }
+    public function testToKeyValueArray(): void
+    {
+        $sl = new Lines();
+        $sl->add(new Line('foo', 'bar'));
+        self::assertEquals(['foo'=> 'bar'], $sl->toKeyValueArray());
+    }
 
     public function testGetLineNumber(): void
     {

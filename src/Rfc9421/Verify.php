@@ -20,10 +20,9 @@ use UnexpectedValueException;
 
 final class Verify
 {
+
     /**
-     * Only if verified successfully
-     *
-     * @var list<array<string,string>>|null null on not set
+     * @var array{string,string|int}|array<void>|null null on not set
      */
     private(set) null|array $validSignedParameters = null;
 
@@ -83,9 +82,7 @@ final class Verify
 
         if ($verified) {
             // getting back validated parameters non-tempered parameters
-            $this->validSignedParameters = $signer->signingLines->toArray() ?? throw new UnexpectedValueException(
-                'Signed Parameters not set',
-            );
+            $this->validSignedParameters = $signer->getSignedLines()->toKeyValueArray() ;
         }
 
         return $verified;

@@ -41,6 +41,14 @@ final class Signer
     ) {
     }
 
+    public function getSignedLines(): Lines
+    {
+        return $this->signingLines ??
+            throw new UnexpectedValueException(
+                'Signing\Lines not set',
+            );
+    }
+
     /**
      * @throws AlreadySetException
      * @throws ContentDigestException
