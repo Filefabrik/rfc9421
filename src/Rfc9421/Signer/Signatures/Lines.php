@@ -38,6 +38,9 @@ final class Lines
         return $array;
     }
 
+    /**
+     * @return array<string,string|int>|array<void>
+     */
     public function toKeyValueArray(): array
     {
         $array = [];

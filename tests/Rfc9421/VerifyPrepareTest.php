@@ -51,9 +51,6 @@ class VerifyPrepareTest extends TestCase
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerify(string|SigningEnum $signingAlgo, string $cert): void
     {
-        /**
-         *
-         */
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName = 'testing=';
@@ -260,9 +257,13 @@ class VerifyPrepareTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \JsonException
      */
     public function testGetSignatureInputInstance(): void
     {
@@ -306,7 +307,7 @@ class VerifyPrepareTest extends TestCase
         self::assertInstanceOf(HeaderSignatureInput::class, $prepareVerifierInstance->getSignatureInputInstance());
     }
 
-    public function testGetHeaderHelper()
+    public function testGetHeaderHelper(): void
     {
         $prepareVerifierInstance = new VerifyPrepare(
             message             : new Request('post','https://test'),
@@ -314,4 +315,7 @@ class VerifyPrepareTest extends TestCase
         );
         self::assertInstanceOf(HeaderHelper::class,$prepareVerifierInstance->getHeaderHelper());
     }
+
+
+
 }

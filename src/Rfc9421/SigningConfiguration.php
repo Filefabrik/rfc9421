@@ -106,7 +106,7 @@ final class SigningConfiguration
     /**
      * Signing header Parameter
      *
-     * @param string[]|array<void> $headerKeys
+     * @param array{int?:string} $headerKeys
      *
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException

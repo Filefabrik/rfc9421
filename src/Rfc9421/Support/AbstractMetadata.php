@@ -149,7 +149,7 @@ abstract class AbstractMetadata
     }
 
     /**
-     * @return array<string,string|int>
+     * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
     public function toArray(): array
     {
