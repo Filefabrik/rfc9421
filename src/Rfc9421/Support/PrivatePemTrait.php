@@ -13,11 +13,6 @@ trait PrivatePemTrait
 {
     private(set) ?string $privatePem = null;
 
-    public function getPrivatePem(): ?string
-    {
-        return $this->privatePem ?? throw new UnexpectedValueException('PrivatePem is null');
-    }
-
     public function setPrivatePem(?string $privatePem): self
     {
         $this->privatePem = $privatePem;

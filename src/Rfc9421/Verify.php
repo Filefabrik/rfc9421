@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421;
 
-use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Cryptography\VerifyRegistry;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
@@ -14,38 +13,27 @@ use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Signer\SignatureParams;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
-use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Verification Process of incoming Request
+ */
 final class Verify
 {
-
     /**
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
     private(set) null|ReadLines $signedHeaderLines = null;
 
-    /**
-     * Extracting the signature and split into parts
-     */
-    private(set) Extractors\HeaderSignature $headerSignatureExtractor;
-
     private(set) SigningConfiguration $signingConfiguration;
-    /**
-     * @var \Filefabrik\Rfc9421\Verify\HeaderSignatureInput
-     */
-    private HeaderSignatureInput $signatureInputInstance;
 
     /**
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
     {
-        $this->signingConfiguration     = $this->preparedVerify->signingConfiguration;
-        $this->signatureInputInstance   = $this->preparedVerify->getSignatureInputInstance();
-        $this->headerSignatureExtractor = $this->preparedVerify->getHeaderSignatureExtractor();
+        $this->signingConfiguration = $this->preparedVerify->signingConfiguration;
     }
 
     /**
@@ -69,14 +57,11 @@ final class Verify
         $signer = $this->getSigner();
 
         // base_decoded signature to get binary
-        $sig = $this->headerSignatureExtractor
-            ->getBinarySignatureValue()
-        ;
 
         $verified = VerifyRegistry::verifying(
-            signingEnum: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
+            signingEnum: $this->signingConfiguration->metadata->getAlgOrThrow(),
             data       : $signer->getSigningParametersStringOrThrow(),
-            signature  : $sig,
+            signature  : $this->getBinarySignatureValue(),
             publicKey  : $this->signingConfiguration->getPublicPem(),
         );
 
@@ -94,19 +79,30 @@ final class Verify
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     private function prepareSigningComponents(): void
     {
         // all keys they have into rebuildable signing array
 
-        $signingComponents = SignatureParams::fromArray($this->signatureInputInstance->extractedComponents)
-                                            ->getSignatureParameters()
-        ;
-
         // no compile the signature array such as in singer
-        foreach ($signingComponents as $signingComponent) {
+        foreach ($this->getSigningComponents() as $signingComponent) {
             $this->signingConfiguration->signHeader($signingComponent);
         }
+    }
+
+    /**
+     * @return string[]
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     */
+    private function getSigningComponents(): array
+    {
+        return SignatureParams::fromArray($this->preparedVerify->getSignatureInputInstance()->extractedComponents)
+                              ->getSignatureParameters()
+        ;
     }
 
     /**
@@ -161,6 +157,16 @@ final class Verify
         $signer->prepareSigning();
 
         return $signer;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    private function getBinarySignatureValue(): string
+    {
+        return $this->preparedVerify->getHeaderSignatureExtractor()
+                                    ->getBinarySignatureValue()
+        ;
     }
 
 }

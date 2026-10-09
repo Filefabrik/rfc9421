@@ -12,6 +12,7 @@ use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\Verify\PrepareSignatureKeyName;
 use Psr\Http\Message\RequestInterface;
+use UnexpectedValueException;
 
 /**
  * Outside from the verify process read only the incoming request
@@ -88,7 +89,7 @@ final class VerifyPrepare
          */
         Metadata::bindMetadata(
             instance: $this->signingConfiguration->metadata,
-            metadata: $this->getSignaturInputInstance()->extractedMetadata->toArray(),
+            metadata: $this->getExtractedMetadataArray(),
         );
 
         /**
@@ -115,6 +116,19 @@ final class VerifyPrepare
         return $this->headerSignatureExtractor ??= new HeaderSignature(
             signatureString: $this->headerHelper
                 ->getSignatureLine(),
+        );
+    }
+
+    /**
+     * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    private function getExtractedMetadataArray(): array
+    {
+        return $this->getSignaturInputInstance()->extractedMetadata?->toArray() ?? throw new UnexpectedValueException(
+            'No Metadata Found',
         );
     }
 

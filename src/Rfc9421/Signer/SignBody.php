@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
-use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 
 /**
@@ -12,15 +11,16 @@ use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
  */
 final class SignBody
 {
+    private DigestAlgorithmsEnum $algorithm;
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function __construct(
         private(set) readonly string $body,
-        private DigestAlgorithmsEnum|string $algorithm {
-            /**
-             * @throws ContentDigestException
-             */
-            set => $this->algorithm = DigestAlgorithmsEnum::isOwnTypeOrThrow($value);
-        },
+        DigestAlgorithmsEnum|string $algorithm,
     ) {
+        $this->algorithm = DigestAlgorithmsEnum::isOwnTypeOrThrow($algorithm);
     }
 
     /**
@@ -38,6 +38,8 @@ final class SignBody
      * This string will be present in the header "content-digest".
      * The Validator checks the integrity of the body that all parts of the body matches this hash"
      * If the Body was changed outside, the signature does not match, and you can be sure, someone has "hacked" the request.
+     *
+
      */
     public function getContentDigest(): string
     {

@@ -12,7 +12,7 @@ abstract class AbstractLines
     private(set) array $lines = [];
 
     /**
-     * @return array<string,string|int>|array<void>
+     * @return array<string,string|int>|array{}
      */
     public function toKeyValueArray(): array
     {
@@ -24,7 +24,7 @@ abstract class AbstractLines
         return $array;
     }
 
-    protected function protectedAddEntry(string $key, string $value): static
+    protected function protectedAddEntry(string $key, string|int $value): static
     {
         return $this->protectedAdd(new Line($key, $value));
     }

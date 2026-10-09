@@ -114,6 +114,7 @@ final class SigningConfiguration
      */
     public function signHeader(...$headerKeys): self
     {
+        /** @var string $headerKey */
         foreach ($headerKeys as $headerKey) {
             $this->signatureParams->add(key: $headerKey);
         }
@@ -140,6 +141,14 @@ final class SigningConfiguration
             DigestAlgorithmsEnum::isOwnTypeOrThrow($contentDigestHashAlgo);
 
         return $this;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function getContentDigestHashAlgoOrThrow(): DigestAlgorithmsEnum
+    {
+        return $this->contentDigestHashAlgo ?? throw ContentDigestException::hashAlgoNotSupported('Missing');
     }
 
     public function hasContentDigestHashAlgo(): bool

@@ -134,7 +134,10 @@ abstract class AbstractMetadata
 
         return $this;
     }
-
+public function getAlgOrThrow():SigningEnumInterface
+{
+    return $this->alg?? throw new UnexpectedValueException('$alg must be SigningEnumInterface');
+}
     private function setStringOrSigningEnum(mixed $value): string|SigningEnumInterface
     {
         return is_string($value) || $value instanceof SigningEnumInterface ? $value :

@@ -4,17 +4,32 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
+/**
+ * after verify
+ */
 final class ReadLines extends AbstractLines
 {
+    /**
+     * @param array<string,string|int>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
+     */
     public function __construct(array|WriteLines $lines)
+    {
+        $this->setup($lines);
+    }
+
+    /**
+     * @param array<string,string|int>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
+     *
+     * @return void
+     */
+    private function setup(array|WriteLines $lines): void
     {
         if ($lines instanceof WriteLines) {
             $lines = $lines->toKeyValueArray();
         }
-        if (is_array($lines)) {
-            foreach ($lines as $key => $line) {
-                $this->protectedAddEntry($key, $line);
-            }
+
+        foreach ($lines as $key => $line) {
+            $this->protectedAddEntry($key, $line);
         }
     }
 }

@@ -106,7 +106,6 @@ final class PrepareComponents
     /**
      * use default is nothing was overridden
      *
-
      */
     private function getMethodStack(): PreparedMethods
     {
@@ -114,7 +113,7 @@ final class PrepareComponents
     }
 
     /**
-     * @return array{string:Closure}
+     * @return array{'@method': Closure(RequestInterface): string, '@target-uri': Closure(RequestInterface): string, '@authority': Closure(RequestInterface): string, '@scheme': Closure(RequestInterface): string, '@request-target': Closure(MessageInterface): never, '@path': Closure(RequestInterface): string, content-length: Closure(RequestInterface): int<0, max>}
      */
     public static function defaultMapperClosure(): array
     {
@@ -140,7 +139,10 @@ final class PrepareComponents
              * @see 2.2.4. Scheme
              */
             '@scheme'         => fn(RequestInterface $message): string => $message->getUri()
-                /** * Todo More complex as described in 2.2.5. Request Target**/ ->getScheme(),
+                /**
+                 * 2.2.5. Request Target
+                 * Todo More complex as described in 2.2.5. Request Target
+                 * **/ ->getScheme(),
             '@request-target' => fn(MessageInterface $message) => throw new BadMethodCallException(
                 '@request-target not implemented',
             ),
