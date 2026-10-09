@@ -96,14 +96,12 @@ $verifierConfiguration = new SigningConfiguration();
 $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
 /**
+ * Prepare the incoming Request for verifying
+ * after $verifyPrepareInstance->prepareVerification(); you are able to configure/check/load(i.e. the public pem from the sender) and then you handle the real verify process
  * important, throws if something wrong
  */
 $verifyPrepareInstance->prepareVerification();
 
-/**
- * Verify the generated request from above(receiver-side)
- */
-$verifier = new Verify($verifyPrepareInstance);
 /**
  * Prepare the verify to extract for mastodon the sender public pem location
  */
@@ -113,7 +111,7 @@ $verifier = new Verify($verifyPrepareInstance);
  */
 $keyId = $verifierConfiguration->metadata->keyid;
 
-if ($keyId) {
+if (!empty($keyId)) {
     $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
 
     /*
@@ -128,6 +126,10 @@ if ($keyId) {
      * $verifierConfiguration->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha256);
      */
 
+    /**
+     * Verify the generated request from above(receiver-side)
+     */
+    $verifier = new Verify($verifyPrepareInstance);
     try {
         $res = $verifier->verifying();
     } catch (AlreadySetException|ContentDigestException|InvalidDerivedKeyException|InvalidHeaderKeyException|SignatureExtractionException|SignatureException|VerifyHeaderSignatureException $e) {
