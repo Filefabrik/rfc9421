@@ -129,7 +129,7 @@ final class VerifyTest extends TestCase
         $tamperedRequest = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
 
         $verifyPrepare = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
-        $verifyPrepare->prepareVerify();
+        $verifyPrepare->prepareVerification();
         $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying
@@ -234,7 +234,7 @@ final class VerifyTest extends TestCase
         $tamperedBody['mod'] = 'hasModiefied';
         $tamperedRequest     = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
         $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
-        $verifyPrepare->prepareVerify();
+        $verifyPrepare->prepareVerification();
         $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying
@@ -323,7 +323,7 @@ final class VerifyTest extends TestCase
          * Now decrypt the Request
          */
         $verifyPrepare = new VerifyPrepare($signedRequest, new SigningConfiguration());
-        $verifyPrepare->prepareVerify();
+        $verifyPrepare->prepareVerification();
         $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying
@@ -423,7 +423,7 @@ final class VerifyTest extends TestCase
         $tamperedBody['mod'] = 'hasModiefied';
         $tamperedRequest     = $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody)));
         $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
-        $verifyPrepare->prepareVerify();
+        $verifyPrepare->prepareVerification();
         $verifier = new Verify($verifyPrepare);
 
         // optional before preparing verify and verifying

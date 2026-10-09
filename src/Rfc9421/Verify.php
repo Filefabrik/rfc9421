@@ -38,11 +38,15 @@ final class Verify
      */
     private HeaderSignatureInput $signatureInputInstance;
 
-    public function __construct(private(set) readonly VerifyPrepare $verifyPrepare)
+    /**
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
+    public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
     {
-        $this->signingConfiguration     = $this->verifyPrepare->signingConfiguration;
-        $this->signatureInputInstance   = $this->verifyPrepare->getSignatureInputInstance();
-        $this->headerSignatureExtractor = $this->verifyPrepare->getHeaderSignatureExtractor();
+        $this->signingConfiguration     = $this->preparedVerify->signingConfiguration;
+        $this->signatureInputInstance   = $this->preparedVerify->getSignatureInputInstance();
+        $this->headerSignatureExtractor = $this->preparedVerify->getHeaderSignatureExtractor();
     }
 
     /**
@@ -134,12 +138,12 @@ final class Verify
 
     public function getHeaderHelper(): HeaderHelper
     {
-        return $this->verifyPrepare->getHeaderHelper();
+        return $this->preparedVerify->getHeaderHelper();
     }
 
     public function getMessage(): RequestInterface
     {
-        return $this->verifyPrepare->message;
+        return $this->preparedVerify->message;
     }
 
     /**

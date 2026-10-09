@@ -15,6 +15,7 @@ use Psr\Http\Message\RequestInterface;
 
 /**
  * Outside from the verify process read only the incoming request
+ * After the prepareVerification method call, the request was fully "decoded"
  */
 final class VerifyPrepare
 {
@@ -53,7 +54,7 @@ final class VerifyPrepare
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
-    public function prepareVerify(): bool
+    public function prepareVerification(): bool
     {
         // first stage we must have both signature and signature-input header
         if (

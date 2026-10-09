@@ -112,7 +112,7 @@ class VerifyPrepareTest extends TestCase
         /**
          * now prepare the verify process
          */
-        self::assertTrue($prepareVerifierInstance->prepareVerify());
+        self::assertTrue($prepareVerifierInstance->prepareVerification());
     }
 
     /**
@@ -189,7 +189,7 @@ class VerifyPrepareTest extends TestCase
         /**
          * now prepare the verify process
          */
-        self::assertTrue($prepareVerifierInstance->prepareVerify());
+        self::assertTrue($prepareVerifierInstance->prepareVerification());
     }
 
     /**
@@ -215,7 +215,7 @@ class VerifyPrepareTest extends TestCase
         /**
          * now prepare the verify process
          */
-        self::assertTrue($prepareVerifierInstance->prepareVerify());
+        self::assertTrue($prepareVerifierInstance->prepareVerification());
     }
 
     public function testValidateThrowMissingSignature(): void
@@ -236,7 +236,7 @@ class VerifyPrepareTest extends TestCase
         /**
          * now prepare the verify process
          */
-        self::assertTrue($prepareVerifierInstance->prepareVerify());
+        self::assertTrue($prepareVerifierInstance->prepareVerification());
     }
 
     /**
@@ -302,7 +302,7 @@ class VerifyPrepareTest extends TestCase
             message             : $signedRequest,
             signingConfiguration: new SigningConfiguration(),
         );
-        $prepareVerifierInstance->prepareVerify();
+        $prepareVerifierInstance->prepareVerification();
         self::assertInstanceOf(HeaderSignatureInput::class, $prepareVerifierInstance->getSignatureInputInstance());
     }
 

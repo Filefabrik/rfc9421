@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
+use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
+use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Signer;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Verify;
@@ -88,7 +95,11 @@ $signedRequest = $signer->sign();
 $verifierConfiguration = new SigningConfiguration();
 $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
-$prepared = $verifyPrepareInstance->prepareVerify();
+/**
+ * important, throws if something wrong
+ */
+$verifyPrepareInstance->prepareVerification();
+
 /**
  * Verify the generated request from above(receiver-side)
  */
@@ -117,7 +128,13 @@ if ($keyId) {
      * $verifierConfiguration->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha256);
      */
 
-    $res = $verifier->verifying();
+    try {
+        $res = $verifier->verifying();
+    } catch (AlreadySetException|ContentDigestException|InvalidDerivedKeyException|InvalidHeaderKeyException|SignatureExtractionException|SignatureException|VerifyHeaderSignatureException $e) {
+        echo 'result false: '.$e->getMessage();
+
+        return;
+    }
     echo 'verify result: ', $res, "\n";
 
     /**
