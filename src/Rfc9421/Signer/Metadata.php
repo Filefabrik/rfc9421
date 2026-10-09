@@ -24,7 +24,7 @@ final class Metadata extends AbstractMetadata
     }
 
     /**
-     * @param array{string:int|string} $metadata
+     * @param array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string} $metadata
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */

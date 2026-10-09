@@ -106,7 +106,7 @@ final class SigningConfiguration
     /**
      * Signing header Parameter
      *
-     * @param array{int?:string} $headerKeys
+     * @param array{int?:string}|string[] $headerKeys
      *
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
@@ -115,7 +115,7 @@ final class SigningConfiguration
     public function signHeader(...$headerKeys): self
     {
         foreach ($headerKeys as $headerKey) {
-            $this->signatureParams->add($headerKey);
+            $this->signatureParams->add(key: $headerKey);
         }
 
         return $this;
