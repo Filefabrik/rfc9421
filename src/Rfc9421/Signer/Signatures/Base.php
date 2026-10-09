@@ -25,7 +25,7 @@ final class Base
         /**
          * ready prepared lines they will be part of the signature
          */
-        private(set) readonly Lines $signatureLines = new Lines(),
+        private(set) readonly WriteLines $signatureLines = new WriteLines(),
     ) {
     }
 
@@ -33,7 +33,7 @@ final class Base
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
      *
      */
-    public static function compileSignatureInputToString(Lines $signatureLines): string
+    public static function compileSignatureInputToString(WriteLines $signatureLines): string
     {
         $cArray = [];
         foreach ($signatureLines->lines as $signatureLine) {
@@ -50,7 +50,7 @@ final class Base
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
-    public function createSignatureLines(): Lines
+    public function createSignatureLines(): WriteLines
     {
         // todo prepare components with extra methods has to be separated
         $components = new PrepareComponents($this->message);

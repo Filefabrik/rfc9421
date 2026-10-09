@@ -12,7 +12,7 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
-use Filefabrik\Rfc9421\Signer\Signatures\Lines;
+use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -145,7 +145,7 @@ final class BaseTest extends TestCase
 
     public function testCompileSignatureInputToString(): void
     {
-        $sls = new Lines()->addEntry('header-key', 'the-value');
+        $sls = new WriteLines()->addEntry('header-key', 'the-value');
 
         $res = Base::compileSignatureInputToString($sls);
 

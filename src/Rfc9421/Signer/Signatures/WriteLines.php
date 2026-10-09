@@ -6,23 +6,20 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 
 use UnexpectedValueException;
 
-final class Lines
+/**
+ * During the Signer Process
+ */
+final class WriteLines extends AbstractLines
 {
-    /**
-     * @var \Filefabrik\Rfc9421\Signer\Signatures\Line[]
-     */
-    private(set) array $lines = [];
 
     public function addEntry(string $key, string $value): self
     {
-        return $this->add(new Line($key, $value));
+        return $this->protectedAddEntry($key, $value);
     }
 
     public function add(Line $signatureLine): self
     {
-        $this->lines[] = $signatureLine;
-
-        return $this;
+        return $this->protectedAdd($signatureLine);
     }
 
     /**
@@ -33,19 +30,6 @@ final class Lines
         $array = [];
         foreach ($this->lines as $line) {
             $array[] = [$line->key, $line->value];
-        }
-
-        return $array;
-    }
-
-    /**
-     * @return array<string,string|int>|array<void>
-     */
-    public function toKeyValueArray(): array
-    {
-        $array = [];
-        foreach ($this->lines as $line) {
-            $array[$line->key] = $line->value;
         }
 
         return $array;

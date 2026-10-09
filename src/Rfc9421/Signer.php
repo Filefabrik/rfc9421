@@ -13,7 +13,7 @@ use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
-use Filefabrik\Rfc9421\Signer\Signatures\Lines;
+use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
@@ -26,7 +26,7 @@ final class Signer
     /**
      * Data for signing the relevant header data
      */
-    private(set) null|Lines $signingLines = null;
+    private(set) null|WriteLines $signingLines = null;
 
     /**
      * @var string|null null throws an error
@@ -41,7 +41,7 @@ final class Signer
     ) {
     }
 
-    public function getSignedLines(): Lines
+    public function getSignedLines(): WriteLines
     {
         return $this->signingLines ??
             throw new UnexpectedValueException(

@@ -144,7 +144,7 @@ if (!empty($keyId)) {
      */
 
     if ($res) {
-        $params = $verifier->validSignedParameters;
+        $signedHeaderLines = $verifier->signedHeaderLines;
 
         /*
          * Also the $metadata are verified

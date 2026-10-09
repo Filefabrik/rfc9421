@@ -12,19 +12,19 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Signer\SignatureParams;
+use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
 use Psr\Http\Message\RequestInterface;
-use UnexpectedValueException;
 
 final class Verify
 {
 
     /**
-     * @var array{string,string|int}|array<void>|null null on not set
+     * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
-    private(set) null|array $validSignedParameters = null;
+    private(set) null|ReadLines $signedHeaderLines = null;
 
     /**
      * Extracting the signature and split into parts
@@ -82,7 +82,7 @@ final class Verify
 
         if ($verified) {
             // getting back validated parameters non-tempered parameters
-            $this->validSignedParameters = $signer->getSignedLines()->toKeyValueArray() ;
+            $this->signedHeaderLines = new ReadLines($signer->getSignedLines());
         }
 
         return $verified;
