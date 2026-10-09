@@ -57,6 +57,7 @@ final class BaseTest extends TestCase
         $sc->signHeader('not-ExistinG')
            ->signHeader('@method')
            ->signHeader('content-digest')
+           ->setContentDigestHashAlgo('sha256')
         ;
         $r     = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i     = new Base($r, $sc);
@@ -90,7 +91,6 @@ final class BaseTest extends TestCase
            ->signHeader('@method')
             // do not use this
            ->signHeader('content-digest')
-           ->mustSignBody(false)
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);

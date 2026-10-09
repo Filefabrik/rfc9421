@@ -12,11 +12,10 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
-use Filefabrik\Rfc9421\Signer\Metadata;
 use Filefabrik\Rfc9421\Signer\SignatureParams;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
-use Filefabrik\Rfc9421\Verify\PrepareSignatureKeyName;
+use Filefabrik\Rfc9421\Verify\PrepareVerify;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
@@ -48,7 +47,7 @@ final class Verify
          *
          * @var SigningConfiguration
          */
-        private(set) readonly SigningConfiguration $signingConfiguration = new SigningConfiguration(),
+        private(set) SigningConfiguration $signingConfiguration = new SigningConfiguration(),
     ) {
     }
 
@@ -70,15 +69,15 @@ final class Verify
         $this->prepareSigningComponents();
 
         // Validates the Content digest if needed from signature-line sig1=(content-digest)
-        if ($this->signingConfiguration->mustSignBody && !$this->validateContentDigest()) {
+        if ($this->signingConfiguration->hasContentDigestHashAlgo() && (null === $this->validateContentDigest())) {
             return false;
         }
 
         $signer = $this->getSigner();
 
         // base_decoded signature to get binary
-        $sig = $this->getHeaderSignatureExtractor()
-                    ->getBinarySignatureValue()
+        $sig = $this->headerSignatureExtractor
+            ->getBinarySignatureValue()
         ;
 
         $verified = VerifyRegistry::verifying(
@@ -90,7 +89,7 @@ final class Verify
 
         if ($verified) {
             // getting back validated parameters non-tempered parameters
-            $this->validSignedParameters = $signer->signingLines?->toArray() ?? throw new UnexpectedValueException(
+            $this->validSignedParameters = $signer->signingLines->toArray() ?? throw new UnexpectedValueException(
                 'Signed Parameters not set',
             );
         }
@@ -103,6 +102,7 @@ final class Verify
      *
      * @throws VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
     public function prepareVerify(): void
     {
@@ -110,73 +110,20 @@ final class Verify
             throw new BadMethodCallException('already prepared');
         }
 
+        $prepareVerifyInstance = new PrepareVerify(
+            message             : $this->message,
+            signingConfiguration: $this->signingConfiguration,
+            headerHelper        : $this->getHeaderHelper(),
+        );
+
         // first stage we must have both signature and signature-input header
-        if (
-            '' === $this->getHeaderHelper()
-                        ->getSignatureLine()
-        ) {
-            throw VerifyHeaderSignatureException::missingSignature();
-        }
+        $prepareVerifyInstance->prepareVerify();
 
-        // empty
-        if (
-            '' === $this->getHeaderHelper()
-                        ->getSignatureInputLine()
-        ) {
-            throw VerifyHeaderSignatureException::missingSignatureInput();
-        }
-
-        /*
-         * Extracts the signatureKeyName if not already set above.
-         */
-        new PrepareSignatureKeyName(
-            signingConfiguration    : $this->signingConfiguration,
-            headerSignatureExtractor: $this->getHeaderSignatureExtractor(),
-        )->prepare();
-        /*
-         * now prepare the signer configuration which is need for re-compile the request
-         */
-        /**
-         * Early step to prepare the signer configuration.
-         * The signer configuration can be modified before validation
-         *
-         * @throws VerifyHeaderSignatureException
-         */
-        Metadata::bindMetadata(
-            instance: $this->signingConfiguration->metadata,
-            metadata: $this->getSignaturInputInstance()->extractedMetadata->toArray(),
-        );
-
-        $this->preparedVerifier = true;
-    }
-
-    public function getHeaderHelper(): HeaderHelper
-    {
-        return $this->headerHelper ??= new HeaderHelper(message: $this->message);
-    }
-
-    public function getHeaderSignatureExtractor(): Extractors\HeaderSignature
-    {
-        return $this->headerSignatureExtractor ??= new Extractors\HeaderSignature(
-            signatureString: $this->getHeaderHelper()
-                                  ->getSignatureLine(),
-        );
-    }
-
-    /**
-     * @throws VerifyHeaderSignatureException|\Filefabrik\Rfc9421\Exceptions\SignatureException
-     */
-    private function getSignaturInputInstance(): HeaderSignatureInput
-    {
-        $headerSignatureInstance = new HeaderSignatureInput(
-            headerSignatureInputValue: $this->getHeaderHelper()
-                                            ->getSignatureInputLine(),
-            signatureNameKey         : $this->signingConfiguration->signatureKeyName,
-        );
-        // throws error
-        $headerSignatureInstance->extract();
-
-        return $this->signatureInputInstance = $headerSignatureInstance;
+// rebind
+        $this->signingConfiguration     = $prepareVerifyInstance->signingConfiguration;
+        $this->headerSignatureExtractor = $prepareVerifyInstance->getHeaderSignatureExtractor();
+        $this->signatureInputInstance   = $prepareVerifyInstance->signatureInputInstance;
+        $this->preparedVerifier         = true;
     }
 
     /**
@@ -188,20 +135,14 @@ final class Verify
      */
     private function prepareSigningComponents(): void
     {
-        // alle keys they have into rebuildable signing array
+        // all keys they have into rebuildable signing array
 
         $signingComponents = SignatureParams::fromArray($this->signatureInputInstance->extractedComponents);
-        // todo, has nothing todo with configuration
 
         // no compile the signature array such as in singer
         foreach ($signingComponents->getSignatureParameters() as $signingComponent) {
             $this->signingConfiguration->signHeader($signingComponent);
         }
-
-        /**
-         * ignores the content-digest if not want
-         */
-        $this->signingConfiguration->mustSignBody($signingComponents->exists('content-digest'));
     }
 
     /**
@@ -227,7 +168,14 @@ final class Verify
         return $verified;
     }
 
+    public function getHeaderHelper(): HeaderHelper
+    {
+        return $this->headerHelper ??= new HeaderHelper(message: $this->message);
+    }
+
     /**
+     * Getting the Signer instance to rebuild the received message
+     *
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException

@@ -32,13 +32,6 @@ final class SigningConfiguration
     use PrepareComponentMethodsTrait;
 
     /**
-     * Flag has to sign the body and the sig must be in header
-     *
-     * @todo documentation
-     */
-    private(set) bool $mustSignBody = true;
-
-    /**
      * Prefix the signature value
      */
     private(set) ?string $signatureKeyName = null;
@@ -111,16 +104,6 @@ final class SigningConfiguration
     }
 
     /**
-     * want to sign the body in header signatur
-     */
-    public function mustSignBody(?bool $mustSign = null): self
-    {
-        $this->mustSignBody = $mustSign ?? true;
-
-        return $this;
-    }
-
-    /**
      * Signing header Parameter
      *
      * @param array{string} $headerKeys
@@ -139,13 +122,13 @@ final class SigningConfiguration
     }
 
     /**
-     * Hashing the content-digest|body
+     * Hashing the content-digest|body with algo
+     * if set, the header line "content-digest" will be created and the hash value will be stored into the header
      *
-     * @throws ContentDigestException
      */
-    public function getContentDigestHashAlgo(): DigestAlgorithmsEnum
+    public function getContentDigestHashAlgo(): ?DigestAlgorithmsEnum
     {
-        return $this->contentDigestHashAlgo ??= DigestAlgorithmsEnum::isOwnTypeOrThrow('sha256');
+        return $this->contentDigestHashAlgo;
     }
 
     /**
@@ -157,5 +140,10 @@ final class SigningConfiguration
             DigestAlgorithmsEnum::isOwnTypeOrThrow($contentDigestHashAlgo);
 
         return $this;
+    }
+
+    public function hasContentDigestHashAlgo(): bool
+    {
+        return null !== $this->contentDigestHashAlgo;
     }
 }

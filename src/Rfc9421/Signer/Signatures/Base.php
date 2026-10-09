@@ -93,11 +93,10 @@ final class Base
      * Todo create a extra config for the digest-hash
      *
      * @return array{string,string}
-     * @throws ContentDigestException
      */
     private function handleSignBody(): array
     {
-        if ($this->configuration->mustSignBody) {
+        if ($this->configuration->hasContentDigestHashAlgo()) {
             // set the body digest into the header
             [$headerKey, $value] = new SignBody(
                 body     : (string)$this->message->getBody(),

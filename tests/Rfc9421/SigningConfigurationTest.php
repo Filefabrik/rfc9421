@@ -21,13 +21,6 @@ final class SigningConfigurationTest extends TestCase
         self::assertNull($i->metadata->tag);
     }
 
-    public function testMustSignBody(): void
-    {
-        $i = new SigningConfiguration();
-        self::assertTrue($i->mustSignBody);
-        $i->mustSignBody(false);
-        self::assertFalse($i->mustSignBody);
-    }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
@@ -36,7 +29,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         self::assertNull($i->contentDigestHashAlgo);
-        self::assertSame(DigestAlgorithmsEnum::sha256, $i->getContentDigestHashAlgo());
+        self::assertNull( $i->getContentDigestHashAlgo());
         $i->setContentDigestHashAlgo('sha-512');
         self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestHashAlgo);
     }

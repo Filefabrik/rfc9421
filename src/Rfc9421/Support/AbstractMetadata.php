@@ -60,6 +60,11 @@ abstract class AbstractMetadata
      */
     private(set) string|null $tag = null;
 
+    public function hasTag(): bool
+    {
+        return null !== $this->tag;
+    }
+
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */

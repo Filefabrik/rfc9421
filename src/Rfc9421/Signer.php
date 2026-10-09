@@ -14,6 +14,7 @@ use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\Lines;
+use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
@@ -50,7 +51,7 @@ final class Signer
     public function sign(): RequestInterface
     {
         // set up the content digest into rendering
-        if ($this->signingConfiguration->mustSignBody) {
+        if ($this->signingConfiguration->getContentDigestHashAlgo() instanceof DigestAlgorithmsEnum) {
             $this->signingConfiguration->signatureParams->add('content-digest');
         }
 

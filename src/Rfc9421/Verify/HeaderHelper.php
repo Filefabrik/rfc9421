@@ -23,6 +23,10 @@ final readonly class HeaderHelper
     {
         return $this->message->getHeaderLine('signature');
     }
+    public function hasSignatureLine(): bool
+    {
+        return $this->message->hasHeader('signature');
+    }
 
     /**
      * From MessageInterface header-value "signature-input"
@@ -32,10 +36,18 @@ final readonly class HeaderHelper
     {
         return $this->message->getHeaderLine('signature-input');
     }
+    public function hasSignatureInputLine(): bool
+    {
+        return $this->message->hasHeader('signature-input');
+    }
 
     public function getContentDigestLine(): string
     {
         return $this->message->getHeaderLine('content-digest');
+    }
+    public function hasContentDigestLine(): bool
+    {
+        return $this->message->hasHeader('content-digest');
     }
 
 }
