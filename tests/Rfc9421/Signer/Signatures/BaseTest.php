@@ -57,7 +57,7 @@ final class BaseTest extends TestCase
         $sc->signHeader('not-ExistinG')
            ->signHeader('@method')
            ->signHeader('content-digest')
-           ->setContentDigestHashAlgo('sha256')
+           ->setContentDigestAlgo('sha256')
         ;
         $r     = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i     = new Base($r, $sc);
@@ -129,10 +129,10 @@ final class BaseTest extends TestCase
     {
         $sc      = new SigningConfiguration();
         $created = new DateTime()->getTimestamp();
-        $sc->signHeader('stupid-header', '@method')
-           ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
-           ->withCreated($created)
-           ->withSignatureKeyName('')
+        $sc->signHeaders(['stupid-header', '@method'])
+           ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
+           ->setCreated($created)
+           ->setSignatureKeyName('')
         ;
         $r   = new Request('POST', '', ['stupid-header' => 'hm']);
         $i   = new Base($r, $sc);
@@ -165,7 +165,7 @@ final class BaseTest extends TestCase
            ->signHeader('@method')
            ->signHeader('@authority')
         ;
-        $sc->withPrepareComponentsMethod('@authority', fn(MessageInterface $message): string => 'game');
+        $sc->withPrepareComponentsMethod('@authority', fn (MessageInterface $message): string => 'game');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 

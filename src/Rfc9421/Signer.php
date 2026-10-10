@@ -59,7 +59,7 @@ final class Signer
     public function sign(): RequestInterface
     {
         // set up the content digest into rendering
-        if ($this->signingConfiguration->getContentDigestHashAlgo() instanceof DigestAlgorithmsEnum) {
+        if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
             $this->signingConfiguration->signatureParams->add('content-digest');
         }
 

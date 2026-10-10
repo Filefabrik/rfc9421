@@ -17,8 +17,8 @@ final class SigningConfigurationTest extends TestCase
     public function testWithTag(): void
     {
         $i = new SigningConfiguration();
-        self::assertSame('tagname', $i->withTag('tagname')->metadata->tag);
-        $i->withTag(null);
+        self::assertSame('tagname', $i->setTag('tagname')->metadata->tag);
+        $i->setTag(null);
         self::assertNull($i->metadata->tag);
     }
 
@@ -28,10 +28,10 @@ final class SigningConfigurationTest extends TestCase
     public function testGetContentDigestHashAlgo(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->contentDigestHashAlgo);
-        self::assertNull($i->getContentDigestHashAlgo());
-        $i->setContentDigestHashAlgo('sha-512');
-        self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestHashAlgo);
+        self::assertNull($i->contentDigestAlgo);
+        self::assertNull($i->getContentDigestAlgo());
+        $i->setContentDigestAlgo('sha-512');
+        self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestAlgo);
     }
 
     /**
@@ -43,7 +43,7 @@ final class SigningConfigurationTest extends TestCase
 
         self::assertFalse($i->hasContentDigestHashAlgo());
 
-        $i->setContentDigestHashAlgo('sha-512');
+        $i->setContentDigestAlgo('sha-512');
         self::assertTrue($i->hasContentDigestHashAlgo());
     }
 
@@ -52,7 +52,7 @@ final class SigningConfigurationTest extends TestCase
         $i = new SigningConfiguration();
         self::assertNull($i->metadata->created);
         $dt = 123456;
-        $i->withCreated($dt);
+        $i->setCreated($dt);
         self::assertSame($dt, $i->metadata->created);
     }
 
@@ -65,7 +65,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         self::assertEmpty($i->signatureParams->getSignatureParameters());
-        $i->signHeader('foo', 'bar');
+        $i->signHeaders(['foo', 'bar']);
         self::assertSame(['foo', 'bar'], $i->signatureParams->getSignatureParameters());
     }
 
@@ -75,16 +75,16 @@ final class SigningConfigurationTest extends TestCase
     public function testSetContentDigestHashAlgo(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->contentDigestHashAlgo);
-        $i->setContentDigestHashAlgo('sha-512');
-        self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestHashAlgo);
+        self::assertNull($i->contentDigestAlgo);
+        $i->setContentDigestAlgo('sha-512');
+        self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestAlgo);
     }
 
     public function testWithSignatureKeyName(): void
     {
         $i = new SigningConfiguration();
         self::assertNull($i->signatureKeyName);
-        $i->withSignatureKeyName('keyname=');
+        $i->setSignatureKeyName('keyname=');
         self::assertSame('keyname=', $i->signatureKeyName);
     }
 
@@ -93,7 +93,7 @@ final class SigningConfigurationTest extends TestCase
         $i = new SigningConfiguration();
         self::assertNull($i->metadata->expires);
         $dt = 123456;
-        $i->withExpires($dt);
+        $i->setExpires($dt);
         self::assertSame($dt, $i->metadata->expires);
     }
 
@@ -109,7 +109,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         self::assertNull($i->metadata->keyid);
-        $i->withKeyid('foo');
+        $i->setKeyid('foo');
         self::assertSame('foo', $i->metadata->keyid);
     }
 
@@ -120,9 +120,9 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         self::assertNull($i->metadata->alg);
-        $i->withSigningAlgorithm(SigningEnum::rsa_pss_sha512);
+        $i->setSigningAlgorithm(SigningEnum::rsa_pss_sha512);
         self::assertSame(SigningEnum::rsa_pss_sha512, $i->metadata->alg);
-        $i->withSigningAlgorithm('ecdsa-p256-sha256');
+        $i->setSigningAlgorithm('ecdsa-p256-sha256');
         self::assertSame(SigningEnum::ecdsa_p_256_sha_256, $i->metadata->alg);
     }
 
@@ -145,7 +145,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
 
-        $i->setContentDigestHashAlgo('sha-512');
+        $i->setContentDigestAlgo('sha-512');
         self::assertSame(DigestAlgorithmsEnum::sha512, $i->getContentDigestHashAlgoOrThrow());
     }
 }

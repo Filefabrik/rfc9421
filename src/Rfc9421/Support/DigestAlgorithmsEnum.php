@@ -24,11 +24,14 @@ enum DigestAlgorithmsEnum: string
      */
     public static function isOwnTypeOrThrow(self|string|null $key): self
     {
+        if ($key instanceof self) {
+            return $key;
+        }
+
         if (($res = self::isOwnType($key)) instanceof self) {
             return $res;
         }
 
-        /* @var string|null $key */
         throw ContentDigestException::hashAlgoNotSupported($key ?? '');
     }
 

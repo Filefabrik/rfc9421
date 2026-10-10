@@ -16,12 +16,13 @@ use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(VerifyPrepare::class)]
-class VerifyPrepareTest extends TestCase
+final class VerifyPrepareTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -65,12 +66,12 @@ class VerifyPrepareTest extends TestCase
              * check duplicate content-digest
              * ->withHeader('content-digest')
              */
-                      ->withSigningAlgorithm($signingAlgo)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
+                      ->setSigningAlgorithm($signingAlgo)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
+                      ->setSignatureKeyName($signatureKeyName)
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -86,7 +87,7 @@ class VerifyPrepareTest extends TestCase
             headers: ['x-origin-host' => 'target-host.com'],
             body   : $bodyJson,
         );
-        /**
+        /*
          * todo only with library Openssl test
          */
         if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
@@ -103,10 +104,9 @@ class VerifyPrepareTest extends TestCase
         $prepareVerifierInstance = new VerifyPrepare(
             message             : $signedRequest,
             signingConfiguration: new SigningConfiguration(),
-
         );
 
-        /**
+        /*
          * now prepare the verify process
          */
         self::assertTrue($prepareVerifierInstance->prepareVerification());
@@ -116,7 +116,7 @@ class VerifyPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \JsonException
+     * @throws JsonException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
@@ -124,9 +124,6 @@ class VerifyPrepareTest extends TestCase
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerifyWithContentDigest(string|SigningEnum $signingAlgo, string $cert): void
     {
-        /**
-         *
-         */
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName = 'testing=';
@@ -141,13 +138,13 @@ class VerifyPrepareTest extends TestCase
              * check duplicate content-digest
              * ->withHeader('content-digest')
              */
-                      ->withSigningAlgorithm($signingAlgo)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
+                      ->setSigningAlgorithm($signingAlgo)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
-                      ->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha512)
+                      ->setSignatureKeyName($signatureKeyName)
+                      ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -163,7 +160,7 @@ class VerifyPrepareTest extends TestCase
             headers: ['x-origin-host' => 'target-host.com'],
             body   : $bodyJson,
         );
-        /**
+        /*
          * todo only with library Openssl test
          */
         if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
@@ -180,10 +177,9 @@ class VerifyPrepareTest extends TestCase
         $prepareVerifierInstance = new VerifyPrepare(
             message             : $signedRequest,
             signingConfiguration: new SigningConfiguration(),
-
         );
 
-        /**
+        /*
          * now prepare the verify process
          */
         self::assertTrue($prepareVerifierInstance->prepareVerification());
@@ -209,7 +205,7 @@ class VerifyPrepareTest extends TestCase
             signingConfiguration: new SigningConfiguration(),
         );
 
-        /**
+        /*
          * now prepare the verify process
          */
         self::assertTrue($prepareVerifierInstance->prepareVerification());
@@ -227,10 +223,9 @@ class VerifyPrepareTest extends TestCase
         $prepareVerifierInstance = new VerifyPrepare(
             message             : $r,
             signingConfiguration: new SigningConfiguration(),
-
         );
 
-        /**
+        /*
          * now prepare the verify process
          */
         self::assertTrue($prepareVerifierInstance->prepareVerification());
@@ -263,7 +258,7 @@ class VerifyPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testGetSignatureInputInstance(): void
     {
@@ -286,13 +281,13 @@ class VerifyPrepareTest extends TestCase
              * check duplicate content-digest
              * ->withHeader('content-digest')
              */
-                      ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
+                      ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
-                      ->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha512)
+                      ->setSignatureKeyName($signatureKeyName)
+                      ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -310,12 +305,10 @@ class VerifyPrepareTest extends TestCase
     public function testGetHeaderHelper(): void
     {
         $prepareVerifierInstance = new VerifyPrepare(
-            message             : new Request('post','https://test'),
+            message             : new Request('post', 'https://test'),
             signingConfiguration: new SigningConfiguration(),
         );
-        self::assertInstanceOf(HeaderHelper::class,$prepareVerifierInstance->getHeaderHelper());
+        self::assertInstanceOf(HeaderHelper::class, $prepareVerifierInstance->getHeaderHelper());
     }
-
-
 
 }

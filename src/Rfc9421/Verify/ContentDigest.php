@@ -44,6 +44,7 @@ final readonly class ContentDigest
         /*
          * hash must be the same
          */
+
         return $reCalculatedSignature === $this->base64EncodedValue;
     }
 }

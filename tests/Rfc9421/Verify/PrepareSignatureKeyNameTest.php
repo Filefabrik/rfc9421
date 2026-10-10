@@ -32,7 +32,7 @@ final class PrepareSignatureKeyNameTest extends TestCase
     {
         $sc  = new SigningConfiguration();
         $hse = new HeaderSignature('blalba=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:');
-        $sc->withSignatureKeyName('katze=');
+        $sc->setSignatureKeyName('katze=');
         $instance = new PrepareSignatureKeyName(
             signingConfiguration    : $sc,
             headerSignatureExtractor: $hse,
@@ -41,18 +41,20 @@ final class PrepareSignatureKeyNameTest extends TestCase
         $instance->prepare();
 
         self::assertSame('katze=', $sc->signatureKeyName);
-    }  public function testPrepareThrow(): void
-{
-    $sc  = new SigningConfiguration();
-    $hse = new HeaderSignature(':Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:');
+    }
 
-    $instance = new PrepareSignatureKeyName(
-        signingConfiguration    : $sc,
-        headerSignatureExtractor: $hse,
-    );
+    public function testPrepareThrow(): void
+    {
+        $sc  = new SigningConfiguration();
+        $hse = new HeaderSignature(':Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:');
 
-    $instance->prepare();
+        $instance = new PrepareSignatureKeyName(
+            signingConfiguration    : $sc,
+            headerSignatureExtractor: $hse,
+        );
 
-    self::assertSame('', $sc->signatureKeyName);
-}
+        $instance->prepare();
+
+        self::assertSame('', $sc->signatureKeyName);
+    }
 }

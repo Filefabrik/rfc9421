@@ -10,10 +10,6 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 ✅ CodeCoverage 100%
 
-✅ Dependencies for live usage
-
-    PSR-7 "psr/http-message"
-
 ✅ easy to use.
 
 ✅ integrate the signer and verifier into existing projects
@@ -25,6 +21,10 @@ PHP RFC9421 HTTP Message Signing and Verify
 ✅ change|set|extend your own signing algorithms via interface
 
 ✅ switch between php cryptography as your project need
+
+✅ Dependencies for live usage
+
+    PSR-7 "psr/http-message"
 
 ## Release
 
@@ -95,15 +95,15 @@ $currentDateTime = new DateTime()->getTimestamp();
 $signingConfiguration = new SigningConfiguration()
     ->signHeader('@method')
     ->signHeader('x-Origins-host')
-    ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-    ->withCreated($currentDateTime)
-    ->withExpires($currentDateTime + 7200)
-    ->withTag('mastodon')
-    ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+    ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+    ->setCreated($currentDateTime)
+    ->setExpires($currentDateTime + 7200)
+    ->setTag('mastodon')
+    ->setKeyid('http://127.0.0.1:8001/actor#main-key')
     ->withNonce('nonce-now')
-    ->setContentDigestHashAlgo('sha512')
+    ->setContentDigestAlgo('sha512')
     // content digest signer key
-    ->withSignatureKeyName('sig=')
+    ->setSignatureKeyName('sig=')
     // for signing needs private
     ->setPrivatePem('your-private.pem')
 ;
@@ -133,6 +133,46 @@ _That's All_
 * Getting the Public Key from the Sender and configure some parts if need
 * Verify
 
+```php
+<?php 
+$verifierConfiguration = new SigningConfiguration();
+$verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
+
+/**
+ * Prepare the incoming Request for verifying
+ * after $verifyPrepareInstance->prepareVerification(); you are able to configure/check/load(i.e. the public pem from the sender) and then you handle the real verify process
+ * important, throws if something wrong
+ */
+$verifyPrepareInstance->prepareVerification();
+
+// if there is no exception thrown you can go further.
+// For mastodon, you have to download the user public pem
+
+$keyId = $verifierConfiguration->metadata->keyid;
+// download or get from your local cache the users pem
+$downloadedUsersPem = '--- pem ---';
+$verifierConfiguration->setPublicPem(publicPem: $downloadedUsersPem);
+
+$verifier = new Verify($verifyPrepareInstance);
+/**
+* Throws if something went wrong during the verifying
+ */
+$verifyingBool = $verifier->verifying();
+
+// check also is verifying bool that is true
+// after that you can use the validated incoming request parameters to execute your Code
+if ($verifier->hasValidatedBody) {
+    echo 'Cool, body verified'."\n";
+    $body = (string)$verifier->getMessage()
+                             ->getBody()
+    ;
+} else {
+    echo 'body was not part of verifying process'."\n";
+}
+
+?>
+```
+
 ## Explained signing configuration
 
 ```php
@@ -155,11 +195,13 @@ $signingConfiguration->signHeader('@method')
     ->signHeader('x-Origin-host');
 ?>
 ```
+
 or:
+
 ```php
 <?php 
 
-$signingConfiguration->signHeader('@method','x-Origin-host');
+$signingConfiguration->signHeaders(['@method','x-Origin-host']);
 ?>
 ```
 
@@ -169,40 +211,45 @@ The algorithm must be implemented at your server and at the target-server.
 
 ```php
 <?php 
-$signingConfiguration->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512);
+$signingConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512);
 ?>
 ```
 
 it can be a string or an enum `SigningEnum::rsa_v_1_5_sha_512`
 
-### ContentDigest Hash default sha-256
+### content-digest
 
 One important aspect is hashing the "body" of the POST Message.
 The hashed "content-digest" will be part in the signed message. So the receiver know that the "body" of the Message was
 not modified.
 
+The reason of the RFC9421 is to make sure, some information's of the request are not modified after signing.
+I think a signedBody is mandatory for Post Requests.
+Per default the body will be automatically signed.
+That makes sure, the body was never tempered.
+
 ```php
 <?php 
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 
-$signingConfiguration->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha512);
+$signingConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha512);
 ?>
 ```
+
 other forms of writings are also valid:
+
 ```php
 <?php 
  
-$signingConfiguration->setContentDigestHashAlgo('sha256');
+$signingConfiguration->setContentDigestAlgo('sha256');
 // or
-$signingConfiguration->setContentDigestHashAlgo('sha-256');
+$signingConfiguration->setContentDigestAlgo('sha-256');
 // or 
-$signingConfiguration->setContentDigestHashAlgo('sha512');
+$signingConfiguration->setContentDigestAlgo('sha512');
 // or
-$signingConfiguration->setContentDigestHashAlgo('sha-512');
+$signingConfiguration->setContentDigestAlgo('sha-512');
 ?>
 ```
-
-
 
 ### Private Key Pem (required)
 
@@ -225,21 +272,6 @@ $signingConfiguration->setPrivatePem(file_get_contents('the-private-key.pem'));
 ?>
 ```
 
-### signingBody (default=true, optional but proposed!)
-
-The reason of the RFC9421 is to make sure, some information's of the request are not modified after signing.
-I think a signedBody is mandatory for Post Requests.
-Per default the body will be automatically signed.
-That makes sure, the body was never tempered.
-
-But if you **don't want sign the body**, set it to **false**
-
-```php
-<?php 
-$signingConfiguration->mustSignBody(false);
-?>
-```
-
 ### Nonce (optional)
 
 when you are the sender you can set each request with your own "nonce". The receiver can check that he is only one time
@@ -258,7 +290,7 @@ Note: receiver can ignore it
 
 ```php
 <?php 
-$signingConfiguration->withCreated( new DateTime()->getTimestamp());
+$signingConfiguration->setCreated( new DateTime()->getTimestamp());
 ?>
 ```
 
@@ -269,7 +301,7 @@ Note: receiver can ignore it
 
 ```php
 <?php 
-$signingConfiguration->withExpires( new DateTime()->getTimestamp() + 3600);
+$signingConfiguration->setExpires( new DateTime()->getTimestamp() + 3600);
 ?>
 ```
 
@@ -280,7 +312,7 @@ Note: receiver can ignore it
 
 ```php
 <?php 
-$signingConfiguration->withTag('fediverse');
+$signingConfiguration->setTag('fediverse');
 ?>
 ```
 

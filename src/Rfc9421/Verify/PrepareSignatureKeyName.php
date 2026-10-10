@@ -44,7 +44,7 @@ final readonly class PrepareSignatureKeyName
              * todo maybe decide we are using an signature key name if there are more then one signatures
              * */
             $this->signingConfiguration
-                ->withSignatureKeyName(signatureKey: $signatureKeyName)
+                ->setSignatureKeyName(signatureKey: $signatureKeyName)
             ;
         }
     }

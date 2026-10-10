@@ -36,7 +36,7 @@ final class SigningConfiguration
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      */
-    private(set) ?DigestAlgorithmsEnum $contentDigestHashAlgo = null;
+    private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
 
     public function __construct(
         private(set) readonly Metadata $metadata = new Metadata(),
@@ -45,21 +45,21 @@ final class SigningConfiguration
     }
 
     // metadata
-    public function withCreated(?int $created): self
+    public function setCreated(?int $created): self
     {
         $this->metadata->setCreated($created);
 
         return $this;
     }
 
-    public function withSignatureKeyName(string $signatureKey): self
+    public function setSignatureKeyName(string $signatureKey): self
     {
         $this->signatureKeyName = $signatureKey;
 
         return $this;
     }
 
-    public function withExpires(?int $expires): self
+    public function setExpires(?int $expires): self
     {
         $this->metadata->setExpires($expires);
 
@@ -73,7 +73,7 @@ final class SigningConfiguration
         return $this;
     }
 
-    public function withKeyid(?string $keyid): self
+    public function setKeyid(?string $keyid): self
     {
         $this->metadata->setKeyid($keyid);
 
@@ -86,14 +86,14 @@ final class SigningConfiguration
      *
      * @throws SignatureException
      */
-    public function withSigningAlgorithm(string|SigningEnumInterface $algorithm): self
+    public function setSigningAlgorithm(string|SigningEnumInterface $algorithm): self
     {
         $this->metadata->setAlg($algorithm);
 
         return $this;
     }
 
-    public function withTag(?string $tag): self
+    public function setTag(?string $tag): self
     {
         $this->metadata->setTag($tag);
 
@@ -103,16 +103,29 @@ final class SigningConfiguration
     /**
      * Signing header Parameter
      *
+     * @param string[] $headerKeys
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
-    public function signHeader(...$headerKeys): self
+    public function signHeaders(array $headerKeys): self
     {
-        /** @var string $headerKey */
         foreach ($headerKeys as $headerKey) {
-            $this->signatureParams->add(key: $headerKey);
+            $this->signHeader($headerKey);
         }
+
+        return $this;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     */
+    public function signHeader(string $headerKey): self
+    {
+        $this->signatureParams->add(key: $headerKey);
 
         return $this;
     }
@@ -122,18 +135,18 @@ final class SigningConfiguration
      * if set, the header line "content-digest" will be created and the hash value will be stored into the header
      *
      */
-    public function getContentDigestHashAlgo(): ?DigestAlgorithmsEnum
+    public function getContentDigestAlgo(): ?DigestAlgorithmsEnum
     {
-        return $this->contentDigestHashAlgo;
+        return $this->contentDigestAlgo;
     }
 
     /**
      * @throws ContentDigestException
      */
-    public function setContentDigestHashAlgo(null|string|DigestAlgorithmsEnum $contentDigestHashAlgo): self
+    public function setContentDigestAlgo(null|string|DigestAlgorithmsEnum $contentDigestAlgo): self
     {
-        $this->contentDigestHashAlgo = null === $contentDigestHashAlgo ? null :
-            DigestAlgorithmsEnum::isOwnTypeOrThrow($contentDigestHashAlgo);
+        $this->contentDigestAlgo = null === $contentDigestAlgo ? null :
+            DigestAlgorithmsEnum::isOwnTypeOrThrow($contentDigestAlgo);
 
         return $this;
     }
@@ -143,11 +156,11 @@ final class SigningConfiguration
      */
     public function getContentDigestHashAlgoOrThrow(): DigestAlgorithmsEnum
     {
-        return $this->contentDigestHashAlgo ?? throw ContentDigestException::hashAlgoNotSupported('Missing');
+        return $this->contentDigestAlgo ?? throw ContentDigestException::hashAlgoNotSupported('Missing');
     }
 
     public function hasContentDigestHashAlgo(): bool
     {
-        return $this->contentDigestHashAlgo instanceof DigestAlgorithmsEnum;
+        return $this->contentDigestAlgo instanceof DigestAlgorithmsEnum;
     }
 }

@@ -6,18 +6,21 @@ namespace Filefabrik\Rfc9421Test\Cryptography;
 
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Cryptography\SigningEnumsRegistry;
+use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 use Filefabrik\Rfc9421Test\Tools\ExtraSigningEnum;
 use Filefabrik\Rfc9421Test\Tools\WrongInterfaceEnum;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(\Filefabrik\Rfc9421\Cryptography\SigningEnumsRegistry::class)]
+#[CoversClass(SigningEnumsRegistry::class)]
 final class SigningEnumsRegistryTest extends TestCase
 {
     public function testFindEnumOrThrow(): void
     {
         $this->expectExceptionObject(
-            new \Filefabrik\Rfc9421\Exceptions\SignatureException(
+            new SignatureException(
                 'The signature enum "throws" for signing is not supported.',
             ),
         );
@@ -41,8 +44,8 @@ final class SigningEnumsRegistryTest extends TestCase
     public function testAddEnumClassThrowInterface(): void
     {
         $this->expectExceptionObject(
-            new \InvalidArgumentException(
-                'The class "'.WrongInterfaceEnum::class.'" does not have the interface "'.\Filefabrik\Rfc9421\Interfaces\SigningEnumInterface::class.'"',
+            new InvalidArgumentException(
+                'The class "'.WrongInterfaceEnum::class.'" does not have the interface "'.SigningEnumInterface::class.'"',
             ),
         );
         SigningEnumsRegistry::addEnumClass(WrongInterfaceEnum::class);
@@ -51,7 +54,7 @@ final class SigningEnumsRegistryTest extends TestCase
     public function testAddEnumClassThrowNoExists(): void
     {
         $this->expectExceptionObject(
-            new \InvalidArgumentException(
+            new InvalidArgumentException(
                 'class "no-class" does not exist',
             ),
         );

@@ -10,9 +10,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(WriteLines::class)]
-class WriteLinesTest extends TestCase
+final class WriteLinesTest extends TestCase
 {
-
     public function testToArray(): void
     {
         $sl = new WriteLines();
@@ -24,7 +23,7 @@ class WriteLinesTest extends TestCase
     {
         $sl = new WriteLines();
         $sl->add(new Line('foo', 'bar'));
-        self::assertEquals(['foo'=> 'bar'], $sl->toKeyValueArray());
+        self::assertEquals(['foo' => 'bar'], $sl->toKeyValueArray());
     }
 
     public function testGetLineNumber(): void

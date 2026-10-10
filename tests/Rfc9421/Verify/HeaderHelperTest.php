@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(\Filefabrik\Rfc9421\Verify\HeaderHelper::class)]
+#[CoversClass(HeaderHelper::class)]
 final class HeaderHelperTest extends TestCase
 {
     public function testGetSignatureLine(): void

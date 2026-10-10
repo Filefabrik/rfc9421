@@ -43,10 +43,11 @@ final class VerifyHeaderSignatureExceptionTest extends TestCase
 
     public function testInvalidSignatureKeyName(): void
     {
-
-      $this->expectExceptionObject(
-          new VerifyHeaderSignatureException('Error during extracting the signatureKeyName from signature-input. Expects the keyname: "testSig=" in header: "ugly="'),
-      );
+        $this->expectExceptionObject(
+            new VerifyHeaderSignatureException(
+                'Error during extracting the signatureKeyName from signature-input. Expects the keyname: "testSig=" in header: "ugly="',
+            ),
+        );
         throw VerifyHeaderSignatureException::invalidSignatureKeyName('testSig=', 'ugly=');
     }
 }

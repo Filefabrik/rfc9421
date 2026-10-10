@@ -10,6 +10,7 @@ use Filefabrik\Rfc9421\Signer;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
@@ -31,7 +32,7 @@ final class SignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testSign(): void
     {
@@ -42,15 +43,15 @@ final class SignerTest extends TestCase
         $signingConfiguration = new SigningConfiguration()
             ->signHeader('@method')
             ->signHeader('x-Origin-host')
-            ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->withCreated($currentDateTime)
-            ->withExpires($currentDateTime + 7200)
-            ->withTag('mastodon')
-            ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
-            ->setContentDigestHashAlgo('sha512')
+            ->setContentDigestAlgo('sha512')
             // content digest signer key
-            ->withSignatureKeyName('testValue=')
+            ->setSignatureKeyName('testValue=')
             // for signing needs private
             ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -81,7 +82,7 @@ final class SignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testSignWithoutContentDigest(): void
     {
@@ -92,15 +93,15 @@ final class SignerTest extends TestCase
         $signingConfiguration = new SigningConfiguration()
             ->signHeader('@method')
             ->signHeader('x-Origin-host')
-            ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->withCreated($currentDateTime)
-            ->withExpires($currentDateTime + 7200)
-            ->withTag('mastodon')
-            ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
-            //->setContentDigestHashAlgo('sha512')
+            //->setContentDigestAlgo('sha512')
             // content digest signer key
-            ->withSignatureKeyName('testValue=')
+            ->setSignatureKeyName('testValue=')
             // for signing needs private
             ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -125,7 +126,7 @@ final class SignerTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \JsonException
+     * @throws JsonException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
@@ -140,15 +141,15 @@ final class SignerTest extends TestCase
         $signingConfiguration = new SigningConfiguration()
             ->signHeader('@method')
             ->signHeader('x-Origin-host')
-            ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->withCreated($currentDateTime)
-            ->withExpires($currentDateTime + 7200)
-            ->withTag('mastodon')
-            ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
-            ->setContentDigestHashAlgo('sha512')
+            ->setContentDigestAlgo('sha512')
             // content digest signer key
-            ->withSignatureKeyName('testValue=')
+            ->setSignatureKeyName('testValue=')
             // for signing needs private
             ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -182,7 +183,7 @@ final class SignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testGetSignedLinesOne(): void
     {
@@ -191,15 +192,15 @@ final class SignerTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
 
         $signingConfiguration = new SigningConfiguration()
-            ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->withCreated($currentDateTime)
-            ->withExpires($currentDateTime + 7200)
-            ->withTag('mastodon')
-            ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
 
             // content digest signer key
-            ->withSignatureKeyName('testValue=')
+            ->setSignatureKeyName('testValue=')
             // for signing needs private
             ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -229,7 +230,7 @@ final class SignerTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testGetSignedLinesThrow(): void
     {
@@ -244,15 +245,15 @@ final class SignerTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
 
         $signingConfiguration = new SigningConfiguration()
-            ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->withCreated($currentDateTime)
-            ->withExpires($currentDateTime + 7200)
-            ->withTag('mastodon')
-            ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
 
             // content digest signer key
-            ->withSignatureKeyName('testValue=')
+            ->setSignatureKeyName('testValue=')
             // for signing needs private
             ->setPrivatePem($certInstance->getPrivatPemContent())
         ;

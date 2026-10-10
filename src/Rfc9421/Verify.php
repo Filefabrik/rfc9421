@@ -95,10 +95,10 @@ final class Verify
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @return string[]
      */
     private function getSigningComponents(): array
@@ -123,8 +123,8 @@ final class Verify
         if ($verified = $verifyInstance->verify()) {
             // rebind the extracted php hash-algo
             // later in verify process, during rebuild the content-digest the algo is needed
-            $this->signingConfiguration->setContentDigestHashAlgo(
-                contentDigestHashAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
+            $this->signingConfiguration->setContentDigestAlgo(
+                contentDigestAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
             );
         }
 

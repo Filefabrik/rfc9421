@@ -22,7 +22,7 @@ final class PrepareComponentsTest extends TestCase
     public function testSetDefaultDerivedStack(): void
     {
         $arr = [
-            '@method' => fn(RequestInterface $message): string => str_replace(
+            '@method' => fn (RequestInterface $message): string => str_replace(
                 't',
                 'B',
                 ucfirst(strtolower($message->getMethod())),
@@ -43,7 +43,7 @@ final class PrepareComponentsTest extends TestCase
     public function testSetDerivedMapper(): void
     {
         $arr = [
-            '@method' => fn(RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
+            '@method' => fn (RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
         ];
 
         $r               = new Request('post', 'https://Test.com');
@@ -61,7 +61,7 @@ final class PrepareComponentsTest extends TestCase
         $instance = new PrepareComponents(new Request('post', 'https://Test.com'));
         $instance->setPreparedMethods(new PreparedMethods());
 
-        self::assertSame([],$instance->preparedMethods->methods);
+        self::assertSame([], $instance->preparedMethods->methods);
     }
 
     /**
@@ -168,7 +168,7 @@ final class PrepareComponentsTest extends TestCase
     public function testSetMappingValues(): void
     {
         $arr = [
-            '@methodsss' => fn(RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
+            '@methodsss' => fn (RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
         ];
 
         $r = new Request('post', 'https://Test.com');

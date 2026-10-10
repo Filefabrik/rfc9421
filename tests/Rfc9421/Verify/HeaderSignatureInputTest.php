@@ -26,7 +26,7 @@ final class HeaderSignatureInputTest extends TestCase
             'someSig=("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
 
-        //
+
         $headerSignatureInput->extract();
 
         self::assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
@@ -46,7 +46,7 @@ final class HeaderSignatureInputTest extends TestCase
             '("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, '');
 
-        //
+
         $headerSignatureInput->extract();
 
         self::assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
@@ -74,19 +74,23 @@ final class HeaderSignatureInputTest extends TestCase
             'someSig=();created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
 
-        //
+
         $headerSignatureInput->extract();
     }
 
     public function testExtractInvalidSignature(): void
     {
-        $this->expectExceptionObject(new VerifyHeaderSignatureException('Invalid signature line ");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon""'));
+        $this->expectExceptionObject(
+            new VerifyHeaderSignatureException(
+                'Invalid signature line ");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon""',
+            ),
+        );
 
         $sig                  =
             'someSig=);created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
 
-        //
+
         $headerSignatureInput->extract();
     }
 }

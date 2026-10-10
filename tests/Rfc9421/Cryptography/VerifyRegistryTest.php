@@ -9,7 +9,7 @@ use Filefabrik\Rfc9421\Cryptography\VerifyRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(\Filefabrik\Rfc9421\Cryptography\VerifyRegistry::class)]
+#[CoversClass(VerifyRegistry::class)]
 final class VerifyRegistryTest extends TestCase
 {
     public function testRegisterVerifyingMethods(): void
@@ -17,8 +17,8 @@ final class VerifyRegistryTest extends TestCase
         $this->expectNotToPerformAssertions();
         VerifyRegistry::registerMethods([
             SigningEnum::rsa_pss_sha512->name    =>
-                fn(string $signingDatas, $signature, $publicKeyPem): bool => true,
-            SigningEnum::rsa_v_1_5_sha_256->name => fn(string $signingDatas, $signature, $publicKeyPem): bool => false,
+                fn (string $signingDatas, $signature, $publicKeyPem): bool => true,
+            SigningEnum::rsa_v_1_5_sha_256->name => fn (string $signingDatas, $signature, $publicKeyPem): bool => false,
         ]);
     }
 
@@ -27,7 +27,7 @@ final class VerifyRegistryTest extends TestCase
         $this->expectNotToPerformAssertions();
         VerifyRegistry::registerMethod(
             SigningEnum::rsa_pss_sha512->name,
-            fn(string $signingDatas, $signature, $publicKeyPem): bool => true,
+            fn (string $signingDatas, $signature, $publicKeyPem): bool => true,
         );
     }
 
@@ -35,8 +35,8 @@ final class VerifyRegistryTest extends TestCase
     {
         VerifyRegistry::registerMethods([
             SigningEnum::rsa_pss_sha512->name    =>
-                fn(string $signingDatas, $signature, $publicKeyPem): bool => true,
-            SigningEnum::rsa_v_1_5_sha_256->name => fn(string $signingDatas, $signature, $publicKeyPem): bool => false,
+                fn (string $signingDatas, $signature, $publicKeyPem): bool => true,
+            SigningEnum::rsa_v_1_5_sha_256->name => fn (string $signingDatas, $signature, $publicKeyPem): bool => false,
         ]);
         self::assertTrue(VerifyRegistry::verifying(SigningEnum::rsa_pss_sha512, '', '', ''));
         self::assertFalse(VerifyRegistry::verifying(SigningEnum::rsa_v_1_5_sha_256, '', '', ''));

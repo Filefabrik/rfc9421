@@ -46,16 +46,16 @@ try {
     $signingConfiguration = new SigningConfiguration()
         ->signHeader('@method')
         ->signHeader('x-Origin-host')
-        ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-        // ->withSigningAlgorithm(SigningEnum::hmac_sha_256)
-        ->withCreated($currentDateTime)
-        ->withExpires($currentDateTime + 7200)
-        ->withTag('mastodon')
-        ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+        ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+        // ->setSigningAlgorithm(SigningEnum::hmac_sha_256)
+        ->setCreated($currentDateTime)
+        ->setExpires($currentDateTime + 7200)
+        ->setTag('mastodon')
+        ->setKeyid('http://127.0.0.1:8001/actor#main-key')
         ->withNonce('nonce-now')
-        ->setContentDigestHashAlgo('sha512')
+        ->setContentDigestAlgo('sha512')
         // content digest signer key
-        ->withSignatureKeyName('testValue=')
+        ->setSignatureKeyName('testValue=')
         // for signing needs private
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
@@ -143,11 +143,11 @@ if (null !== $keyId && '' !== $keyId) {
      * The only supported algorithm is still RSASSA-PKCS1-v1_5 Using SHA-256
      */
     /*
-     * $verifierConfiguration->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256);
+     * $verifierConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256);
      */
     /*
      *  todo check for mastodon
-     * $verifierConfiguration->setContentDigestHashAlgo(DigestAlgorithmsEnum::sha256);
+     * $verifierConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha256);
      */
 
     /**

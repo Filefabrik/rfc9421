@@ -76,12 +76,12 @@ final class VerifyTest extends TestCase
              * check duplicate content-digest
              * ->withHeader('content-digest')
              */
-                      ->withSigningAlgorithm($signingAlgo)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
+                      ->setSigningAlgorithm($signingAlgo)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
+                      ->setSignatureKeyName($signatureKeyName)
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -118,7 +118,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            '@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+            '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
         $tamperedRequest = clone $signedRequest;
@@ -133,7 +133,7 @@ final class VerifyTest extends TestCase
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
-        //  ->withSignatureKeyName($signatureKeyName)
+        //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
 
@@ -179,12 +179,12 @@ final class VerifyTest extends TestCase
         $configuration   = new SigningConfiguration();
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
-                      ->withSigningAlgorithm($signingAlgo)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
+                      ->setSigningAlgorithm($signingAlgo)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
+                      ->setSignatureKeyName($signatureKeyName)
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
@@ -222,7 +222,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            '@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+            '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
         $tamperedRequest     = clone $signedRequest;
@@ -236,7 +236,7 @@ final class VerifyTest extends TestCase
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
-        //  ->withSignatureKeyName($signatureKeyName)
+        //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
 
@@ -276,17 +276,17 @@ final class VerifyTest extends TestCase
         $configuration   = new SigningConfiguration();
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
-                      ->setContentDigestHashAlgo(contentDigestHashAlgo: DigestAlgorithmsEnum::sha512)
+                      ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
             /*
              * check duplicate content-digest
              * ->withHeader('content-digest')
              */
-                      ->withSigningAlgorithm($signingAlgo)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
+                      ->setSigningAlgorithm($signingAlgo)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
+                      ->setSignatureKeyName($signatureKeyName)
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
@@ -326,7 +326,7 @@ final class VerifyTest extends TestCase
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
-        //  ->withSignatureKeyName($signatureKeyName)
+        //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
 
@@ -365,13 +365,13 @@ final class VerifyTest extends TestCase
 
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
-                      ->withSigningAlgorithm($signingAlgo)
-                      ->withCreated($currentDateTime)
-                      ->withExpires($currentDateTime + 7200)
-                      ->withTag('mastodon')
+                      ->setSigningAlgorithm($signingAlgo)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
                       ->withNonce('nonce-now')
-                      ->withSignatureKeyName($signatureKeyName)
-                      ->setContentDigestHashAlgo('sha256')
+                      ->setSignatureKeyName($signatureKeyName)
+                      ->setContentDigestAlgo('sha256')
 
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
@@ -409,7 +409,7 @@ final class VerifyTest extends TestCase
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
-            '@authority' => fn(MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+            '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
         $tamperedRequest     = clone $signedRequest;
@@ -423,7 +423,7 @@ final class VerifyTest extends TestCase
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
-        //  ->withSignatureKeyName($signatureKeyName)
+        //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
 

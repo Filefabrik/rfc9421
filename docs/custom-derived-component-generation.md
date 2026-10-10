@@ -42,20 +42,3 @@ $signingConfiguration = new SigningConfiguration()
     ->withPrepareComponentsMethod('something-special',fn(RequestInterface $message) => 'do something special')
 ?>
 ```
-
-### or Set static/globally
-
-When you use only a single Message Signing between known frameworks, set it globally.
-
-```php
-<?php 
-$arr  = [
-    '@authority' => fn(RequestInterface $message) => $message->getHeaderLine('X-Original-Host'),
-    //.. others
-];
-PrepareComponents::setDefaultDerivedStack($arr);
-?>
-```
-
-note: with `PrepareComponents::setDefaultDerivedStack($arr)` You have to set the full array of methods. The other
-methods you find it in class `PrepareComponents` 

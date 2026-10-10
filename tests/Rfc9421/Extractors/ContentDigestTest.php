@@ -6,16 +6,16 @@ namespace Filefabrik\Rfc9421Test\Extractors;
 
 use Filefabrik\Rfc9421\Extractors\ContentDigest;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ContentDigest::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(\Filefabrik\Rfc9421\Extractors\ContentDigest::class, 'validateExtraction')]
+#[CoversMethod(ContentDigest::class, 'validateExtraction')]
 final class ContentDigestTest extends TestCase
 {
     public function testvalidateExtractionFalse(): void
     {
         self::assertFalse(new ContentDigest('bullshit')->validateExtraction());
-
     }
 
     public function testGetAlgorithm(): void

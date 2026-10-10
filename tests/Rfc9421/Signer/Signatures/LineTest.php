@@ -9,9 +9,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Line::class)]
-class LineTest extends TestCase
+final class LineTest extends TestCase
 {
-
     public function test__construct(): void
     {
         $i = new Line('one', 'val');

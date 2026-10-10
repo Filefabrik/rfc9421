@@ -22,8 +22,8 @@ final class DigestAlgorithmsEnumTest extends TestCase
             ['sha256', DigestAlgorithmsEnum::sha256],
             ['sha-256', DigestAlgorithmsEnum::sha256],
             ['sha512', DigestAlgorithmsEnum::sha512],
-            ['sha-512', DigestAlgorithmsEnum::sha512,],
-            [DigestAlgorithmsEnum::sha512, DigestAlgorithmsEnum::sha512,],
+            ['sha-512', DigestAlgorithmsEnum::sha512],
+            [DigestAlgorithmsEnum::sha512, DigestAlgorithmsEnum::sha512],
         ];
     }
 
@@ -69,8 +69,6 @@ final class DigestAlgorithmsEnumTest extends TestCase
         DigestAlgorithmsEnum::isOwnTypeOrThrow('never mind');
     }
 
-    /**
-     */
     #[DataProvider('validDigestAlgorithms')]
     public function testIsOwnType(...$datas): void
     {
@@ -80,8 +78,6 @@ final class DigestAlgorithmsEnumTest extends TestCase
         );
     }
 
-    /**
-     */
     #[DataProvider('invalidDigestAlgorithms')]
     public function testIsOwnTypeNull(...$datas): void
     {

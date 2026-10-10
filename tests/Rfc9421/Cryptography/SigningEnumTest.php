@@ -51,14 +51,18 @@ final class SigningEnumTest extends TestCase
     }
 
     #[DataProvider('dataSigningEnums')]
-    public function testIsOwnTypeOrThrow(\Filefabrik\Rfc9421\Cryptography\SigningEnum|string $signingEnum, ?\Filefabrik\Rfc9421\Cryptography\SigningEnum $exp = null): void
-    {
+    public function testIsOwnTypeOrThrow(
+        SigningEnum|string $signingEnum,
+        ?SigningEnum $exp = null,
+    ): void {
         self::assertSame($exp ?? $signingEnum, SigningEnum::isOwnTypeOrThrow($signingEnum));
     }
 
     #[DataProvider('dataSigningEnums')]
-    public function testIsOwnType(\Filefabrik\Rfc9421\Cryptography\SigningEnum|string $signingEnum, ?\Filefabrik\Rfc9421\Cryptography\SigningEnum $exp = null): void
-    {
+    public function testIsOwnType(
+        SigningEnum|string $signingEnum,
+        ?SigningEnum $exp = null,
+    ): void {
         self::assertSame($exp ?? $signingEnum, SigningEnum::isOwnType($signingEnum));
     }
 

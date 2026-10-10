@@ -10,14 +10,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
-#[CoversClass(\Filefabrik\Rfc9421\Cryptography\SignatureRegistry::class)]
+#[CoversClass(SignatureRegistry::class)]
 final class SignatureRegistryTest extends TestCase
 {
     public function testSigning(): void
     {
         SignatureRegistry::registerMethod(
             SigningEnum::ed25519,
-            fn(string $signingDatas, string $privateKeyPem): string => 'isSigned',
+            fn (string $signingDatas, string $privateKeyPem): string => 'isSigned',
         );
 
         self::assertSame('isSigned', SignatureRegistry::signing(SigningEnum::ed25519, '', ''));
@@ -29,7 +29,7 @@ final class SignatureRegistryTest extends TestCase
         SignatureRegistry::registerMethods(
             [
                 SigningEnum::ed25519->name =>
-                    fn(string $signingDatas, string $privateKeyPem): string => 'isSigned',
+                    fn (string $signingDatas, string $privateKeyPem): string => 'isSigned',
             ],
         );
     }
@@ -39,7 +39,7 @@ final class SignatureRegistryTest extends TestCase
         $this->expectNotToPerformAssertions();
         SignatureRegistry::registerMethod(
             SigningEnum::ed25519,
-            fn(string $signingDatas, string $privateKeyPem): string => 'isSigned',
+            fn (string $signingDatas, string $privateKeyPem): string => 'isSigned',
         );
     }
 

@@ -86,17 +86,7 @@ final class VerifyPrepare
         /*
          * extract the content-digest if exists in header
          */
-        if (
-            $this->headerHelper
-                ->hasContentDigestLine()
-        ) {
-            $this->signingConfiguration->setContentDigestHashAlgo(
-                new ContentDigest(
-                    $this->headerHelper
-                        ->getContentDigestLine(),
-                )->getAlgorithm(),
-            );
-        }
+        $this->prepareContentDigestIfNeed();
 
         // only bool that there were no exceptions
         return true;
@@ -137,6 +127,24 @@ final class VerifyPrepare
         $headerSignatureInstance->extract();
 
         return $this->signatureInputInstance = $headerSignatureInstance;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    private function prepareContentDigestIfNeed(): void
+    {
+        if (
+            $this->headerHelper
+                ->hasContentDigestLine()
+        ) {
+            $this->signingConfiguration->setContentDigestAlgo(
+                contentDigestAlgo: new ContentDigest(
+                    contentDigest: $this->headerHelper
+                        ->getContentDigestLine(),
+                )->getAlgorithm(),
+            );
+        }
     }
 
     /**
