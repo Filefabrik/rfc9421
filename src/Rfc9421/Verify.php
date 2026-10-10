@@ -27,6 +27,7 @@ final class Verify
     private(set) null|ReadLines $signedHeaderLines = null;
 
     private(set) SigningConfiguration $signingConfiguration;
+    private(set) bool $hasValidatedBody = false;
 
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
     {
@@ -47,8 +48,11 @@ final class Verify
         $this->prepareSigningComponents();
 
         // Validates the Content digest if needed from signature-line sig1=(content-digest)
-        if ($this->signingConfiguration->hasContentDigestHashAlgo() && !$this->validateContentDigest()) {
-            return false;
+        if ($this->signingConfiguration->hasContentDigestHashAlgo()) {
+            if (!$this->validateContentDigest()) {
+                return false;
+            }
+            $this->hasValidatedBody = true;
         }
 
         $signer = $this->getSigner();
@@ -89,10 +93,10 @@ final class Verify
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @return string[]
      */
     private function getSigningComponents(): array
@@ -112,7 +116,7 @@ final class Verify
             contentDigest: $this->getHeaderHelper()
                                 ->getContentDigestLine(),
             body         : (string)$this->preparedVerify->message
-                                        ->getBody(),
+                ->getBody(),
         );
         if ($verified = $verifyInstance->verify()) {
             // rebind the extracted php hash-algo
@@ -129,11 +133,6 @@ final class Verify
     public function getHeaderHelper(): HeaderHelper
     {
         return $this->preparedVerify->getHeaderHelper();
-    }
-
-    public function getMessage(): RequestInterface
-    {
-        return $this->preparedVerify->message;
     }
 
     /**
@@ -164,6 +163,11 @@ final class Verify
         return $this->preparedVerify->getHeaderSignatureExtractor()
                                     ->getBinarySignatureValue()
         ;
+    }
+
+    public function getMessage(): RequestInterface
+    {
+        return $this->preparedVerify->message;
     }
 
 }
