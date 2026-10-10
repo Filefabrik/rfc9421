@@ -27,6 +27,7 @@ final class Verify
     private(set) null|ReadLines $signedHeaderLines = null;
 
     private(set) SigningConfiguration $signingConfiguration;
+
     private(set) bool $hasValidatedBody = false;
 
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
@@ -52,6 +53,7 @@ final class Verify
             if (!$this->validateContentDigest()) {
                 return false;
             }
+
             $this->hasValidatedBody = true;
         }
 
