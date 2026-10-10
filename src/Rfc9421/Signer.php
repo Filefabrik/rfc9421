@@ -120,7 +120,6 @@ final class Signer
     /**
      * The base64EncodedValue signature-value
      *
-     *
      * @return string $signatureKeyName:$signature:
      *
      */

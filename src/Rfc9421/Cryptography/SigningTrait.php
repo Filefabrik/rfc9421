@@ -29,7 +29,6 @@ trait SigningTrait
             return $found;
         }
 
-
         throw SignatureException::signatureEnumNotFound($key);
     }
 

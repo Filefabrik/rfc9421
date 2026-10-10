@@ -16,27 +16,25 @@ use Filefabrik\Rfc9421\Verify;
 use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
-/**
+/*
  * use openssl (native php extension) which so preconfigured
  * if you need another library oar need some modifications, build your own
  */
 require_once dirname(__DIR__).'/src/register-openssl-signing-verify.php';
-/**
+/*
  * use phpseclib4 library which is preconfigured
  * if you need another library oar need some modifications, build your own
  */
 #require_once dirname(__DIR__).'/src/register-phpseclib4-signing-verify.php';
 
-/**
+/*
  * for testing purposes we use an own cert-loader
  */
 $certInstance = new CertHelper('rsa');
-#$certInstance = new CertHelper('hmac');
-#$certInstance = new CertHelper('ed25519');
-$targetUrl = 'http://localhost:8001/mastodon';
+$targetUrl    = 'http://localhost:8001/mastodon';
 /**
  * Prepare signingConfiguration
  */
@@ -46,16 +44,16 @@ try {
     $signingConfiguration = new SigningConfiguration()
         ->signHeader('@method')
         ->signHeader('x-Origin-host')
+        ->signHeader('@authority')
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-        // ->setSigningAlgorithm(SigningEnum::hmac_sha_256)
         ->setCreated($currentDateTime)
         ->setExpires($currentDateTime + 7200)
         ->setTag('mastodon')
         ->setKeyid('http://127.0.0.1:8001/actor#main-key')
         ->withNonce('nonce-now')
-        ->setContentDigestAlgo('sha512')
+        ->setContentDigestAlgo('sha256')
         // content digest signer key
-        ->setSignatureKeyName('testValue=')
+        ->setSignatureKeyName('sig=')
         // for signing needs private
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
@@ -64,16 +62,19 @@ try {
 
     return;
 }
-
+/*
+ * Make sure to use the same methods in signer and verifier!
+ */
+$prepareMethods = [
+    '@authority' =>
+        fn(RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+];
 /*
  * Modify derived components generation if needed.
  *
  * don't forget to use thís prepared component in the verifier
  */
-$signingConfiguration->withPrepareComponentsMethod(
-    componentName: '@authority',
-    callable     : fn (MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),
-);
+$signingConfiguration->withPrepareComponentsMethods($prepareMethods);
 /**
  * Prepare the Request
  */
@@ -100,10 +101,8 @@ try {
 
     return;
 }
-/**
- * working with local server
- */
-/**
+
+/*
  * @noinspection \PhpFullyQualifiedNameUsageInspection
  * $response = new \GuzzleHttp\Client()->send($signedRequest);
  */
@@ -111,6 +110,7 @@ try {
  * Now decrypt the Request
  */
 $verifierConfiguration = new SigningConfiguration();
+$verifierConfiguration->withPrepareComponentsMethods($prepareMethods);
 $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
 /*
@@ -125,28 +125,23 @@ try {
 
     return;
 }
-
-/**
- * Prepare the verify to extract for mastodon the sender public pem location
- */
-
-/**
+/*
  * with the keyId you should be able to download the public pem
  */
 $keyId = $verifierConfiguration->metadata->keyid;
 
-if (null !== $keyId && '' !== $keyId) {
+if (null !== $keyId) {
     $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
 
     /*
-     * // when using mastodon it does not request in the metadata the signature algorithm
+     * When using mastodon it does not request in the metadata the signature algorithm
      * The only supported algorithm is still RSASSA-PKCS1-v1_5 Using SHA-256
      */
     /*
      * $verifierConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256);
      */
     /*
-     *  todo check for mastodon
+     * todo check for mastodon
      * $verifierConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha256);
      */
 
@@ -174,7 +169,6 @@ if (null !== $keyId && '' !== $keyId) {
          * Also the $metadata are verified
          */
         $metadata = $verifier->signingConfiguration->metadata;
-        // in example: check created or expire
 
         /*
          * or something
