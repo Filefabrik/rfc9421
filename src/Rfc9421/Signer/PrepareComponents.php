@@ -115,9 +115,7 @@ final class PrepareComponents
     {
         /*
          * for different components there can be different methods to prepare the values(upper-case lower-case )
-         *
          */
-
         return new PreparedMethods()
             /*
              * extracting the "method" from header to use later as "@method"
