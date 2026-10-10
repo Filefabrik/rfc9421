@@ -11,7 +11,6 @@ use UnexpectedValueException;
  */
 final class WriteLines extends AbstractLines
 {
-
     public function addEntry(string $key, string $value): self
     {
         return $this->protectedAddEntry($key, $value);
@@ -24,6 +23,7 @@ final class WriteLines extends AbstractLines
 
     /**
      * @return list<array{string,string|int}>
+     * @deprecated make array key value paired
      */
     public function toArray(): array
     {
