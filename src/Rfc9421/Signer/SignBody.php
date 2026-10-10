@@ -9,7 +9,7 @@ use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 /**
  * After setting all relevant parameters/body sign the body for header["content-digest"]
  */
-final class SignBody
+final readonly class SignBody
 {
     private DigestAlgorithmsEnum $algorithm;
 
@@ -17,7 +17,7 @@ final class SignBody
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
     public function __construct(
-        private(set) readonly string $body,
+        private(set) string $body,
         DigestAlgorithmsEnum|string $algorithm,
     ) {
         $this->algorithm = DigestAlgorithmsEnum::isOwnTypeOrThrow($algorithm);

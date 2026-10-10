@@ -21,8 +21,10 @@ use UnexpectedValueException;
 final class VerifyPrepare
 {
     private(set) ?HeaderSignature $headerSignatureExtractor = null;
+
     private ?HeaderSignatureInput $signatureInputInstance = null;
-    private HeaderHelper $headerHelper;
+
+    private readonly HeaderHelper $headerHelper;
 
     public function __construct(
         private(set) readonly RequestInterface $message,

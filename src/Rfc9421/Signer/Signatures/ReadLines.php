@@ -19,8 +19,6 @@ final class ReadLines extends AbstractLines
 
     /**
      * @param array<string,string|int>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
-     *
-     * @return void
      */
     private function setup(array|WriteLines $lines): void
     {

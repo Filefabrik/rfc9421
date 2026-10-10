@@ -106,7 +106,7 @@ final class SigningConfiguration
     /**
      * Signing header Parameter
      *
-     * @param array{int?:string}|string[] $headerKeys
+     * @param array{int?:string} $headerKeys
      *
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
@@ -153,6 +153,6 @@ final class SigningConfiguration
 
     public function hasContentDigestHashAlgo(): bool
     {
-        return null !== $this->contentDigestHashAlgo;
+        return $this->contentDigestHashAlgo instanceof \Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
     }
 }
