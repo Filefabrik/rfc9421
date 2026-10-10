@@ -16,6 +16,7 @@ use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Support\PrepareComponentMethodsTrait;
 use Filefabrik\Rfc9421\Support\PrivatePemTrait;
 use Filefabrik\Rfc9421\Support\PublicPemTrait;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * Signer Configuration can be configured at different position on your code, such as in a bootstrap file or something
@@ -106,12 +107,12 @@ final class SigningConfiguration
     /**
      * Signing header Parameter
      *
-     * @param array{int?:string} $headerKeys
      *
      * @throws AlreadySetException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      */
+    #[ArrayShape(['int => string'])]
     public function signHeader(...$headerKeys): self
     {
         /** @var string $headerKey */

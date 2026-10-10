@@ -42,22 +42,27 @@ $targetUrl = 'http://localhost:8001/mastodon';
  */
 $currentDateTime = new DateTime()->getTimestamp();
 
-$signingConfiguration = new SigningConfiguration()
-    ->signHeader('@method')
-    ->signHeader('x-Origin-host')
-    ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-    // ->withSigningAlgorithm(SigningEnum::hmac_sha_256)
-    ->withCreated($currentDateTime)
-    ->withExpires($currentDateTime + 7200)
-    ->withTag('mastodon')
-    ->withKeyid('http://127.0.0.1:8001/actor#main-key')
-    ->withNonce('nonce-now')
-    ->setContentDigestHashAlgo('sha512')
-    // content digest signer key
-    ->withSignatureKeyName('testValue=')
-    // for signing needs private
-    ->setPrivatePem($certInstance->getPrivatPemContent())
-;
+try {
+    $signingConfiguration = new SigningConfiguration()
+        ->signHeader('@method')
+        ->signHeader('x-Origin-host')
+        ->withSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+        // ->withSigningAlgorithm(SigningEnum::hmac_sha_256)
+        ->withCreated($currentDateTime)
+        ->withExpires($currentDateTime + 7200)
+        ->withTag('mastodon')
+        ->withKeyid('http://127.0.0.1:8001/actor#main-key')
+        ->withNonce('nonce-now')
+        ->setContentDigestHashAlgo('sha512')
+        // content digest signer key
+        ->withSignatureKeyName('testValue=')
+        // for signing needs private
+        ->setPrivatePem($certInstance->getPrivatPemContent())
+    ;
+} catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
+    echo $e->getMessage();
+    return ;
+}
 
 /*
  * Modify derived components generation if needed.
