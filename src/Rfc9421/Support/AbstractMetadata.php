@@ -135,6 +135,9 @@ abstract class AbstractMetadata
         return $this;
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     private function setStringOrSigningEnum(mixed $value): string|SigningEnumInterface
     {
         return is_string($value) || $value instanceof SigningEnumInterface ? $value :

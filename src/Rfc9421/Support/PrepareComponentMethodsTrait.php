@@ -32,7 +32,7 @@ trait PrepareComponentMethodsTrait
 
     public function getPreparedMethods(): PreparedMethods
     {
-        return $this->preparedMethods ??=  new PreparedMethods()->adds(PrepareComponents::defaultMapperClosure());
+        return $this->preparedMethods ??= PrepareComponents::defaultMapperClosure();
     }
 
     public function withPrepareComponentsMethod(string $componentName, Closure $callable): self
@@ -43,6 +43,5 @@ trait PrepareComponentMethodsTrait
 
         return $this;
     }
-
 
 }

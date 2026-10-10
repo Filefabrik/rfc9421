@@ -21,74 +21,73 @@ require_once __DIR__.'/../vendor/autoload.php';
  */
 $signingMethodsRsaPhpSeclib4 = [
     //phpseclib4
-    SigningEnum::rsa_pss_sha512->name    => fn(string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
+    SigningEnum::rsa_pss_sha512->name    => fn (string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
               ->withHash('sha512')
               ->withPadding(RSA::SIGNATURE_PSS)
               ->sign($signingDatas),
     //phpseclib4
-    SigningEnum::rsa_v_1_5_sha_256->name => fn(string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
+    SigningEnum::rsa_v_1_5_sha_256->name => fn (string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
               ->withHash('sha256')
               ->withPadding(RSA::SIGNATURE_PKCS1)
               ->sign($signingDatas),
     //phpseclib4
-    SigningEnum::rsa_v_1_5_sha_384->name => fn(string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
+    SigningEnum::rsa_v_1_5_sha_384->name => fn (string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
               ->withHash('sha384')
               ->withPadding(RSA::SIGNATURE_PKCS1)
               ->sign($signingDatas),
     //phpseclib4
-    SigningEnum::rsa_v_1_5_sha_512->name => fn(string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
+    SigningEnum::rsa_v_1_5_sha_512->name => fn (string $signingDatas, string|array $privateKeyPem) => RSA::loadPrivateKey($privateKeyPem)
               ->withHash('sha512')
               ->withPadding(RSA::SIGNATURE_PKCS1)
               ->sign($signingDatas),
     // native php
-    SigningEnum::hmac_sha_256->name      => fn(string $signingDatas, $privateKeyPem): string => hash_hmac('sha256', $signingDatas, $privateKeyPem, true),
+    SigningEnum::hmac_sha_256->name      => fn (string $signingDatas, $privateKeyPem): string => hash_hmac('sha256', $signingDatas, $privateKeyPem, true),
     // native php
-    SigningEnum::hmac_sha_384->name      => fn(string $signingDatas, $privateKeyPem): string => hash_hmac('sha384', $signingDatas, $privateKeyPem, true),
+    SigningEnum::hmac_sha_384->name      => fn (string $signingDatas, $privateKeyPem): string => hash_hmac('sha384', $signingDatas, $privateKeyPem, true),
     // native php
-    SigningEnum::hmac_sha_512->name      => fn(string $signingDatas, $privateKeyPem): string => hash_hmac('sha512', $signingDatas, $privateKeyPem, true),
+    SigningEnum::hmac_sha_512->name      => fn (string $signingDatas, $privateKeyPem): string => hash_hmac('sha512', $signingDatas, $privateKeyPem, true),
     //phpseclib4
-    SigningEnum::ed25519->name           => fn(string $signingDatas, string|array $privateKeyPem): string|array => EC::loadPrivateKey($privateKeyPem)
+    SigningEnum::ed25519->name           => fn (string $signingDatas, string|array $privateKeyPem): string|array => EC::loadPrivateKey($privateKeyPem)
              ->sign($signingDatas),
 ];
 
-/** @noinspection PhpUnhandledExceptionInspection */
+/* @noinspection PhpUnhandledExceptionInspection */
 SignatureRegistry::registerMethods(methods: $signingMethodsRsaPhpSeclib4);
 
 /**
  * Verifier config
  */
-
 $verifierMethodsRsaPhpSeclib4 = [
     //phpseclib4
-    SigningEnum::rsa_pss_sha512->name    => fn(string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
+    SigningEnum::rsa_pss_sha512->name    => fn (string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
               ->withHash('sha512')
               ->withPadding(RSA::SIGNATURE_PSS)
               ->verify($signingDatas, $signature),
     //phpseclib4
-    SigningEnum::rsa_v_1_5_sha_256->name => fn(string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
+    SigningEnum::rsa_v_1_5_sha_256->name => fn (string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
               ->withHash('sha256')
               ->withPadding(RSA::SIGNATURE_PKCS1)
               ->verify($signingDatas, $signature),
     //phpseclib4
-    SigningEnum::rsa_v_1_5_sha_384->name => fn(string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
+    SigningEnum::rsa_v_1_5_sha_384->name => fn (string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
               ->withHash('sha384')
               ->withPadding(RSA::SIGNATURE_PKCS1)
               ->verify($signingDatas, $signature),
     //phpseclib4
-    SigningEnum::rsa_v_1_5_sha_512->name => fn(string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
+    SigningEnum::rsa_v_1_5_sha_512->name => fn (string $signingDatas, $signature, string|array $publicKeyPem) => RSA::loadPublicKey($publicKeyPem)
               ->withHash('sha512')
               ->withPadding(RSA::SIGNATURE_PKCS1)
               ->verify($signingDatas, $signature),
     // native php
-    SigningEnum::hmac_sha_256->name      => fn(string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(hash_hmac('sha256', $signingDatas, $publicKeyPem, true), $signature),
+    SigningEnum::hmac_sha_256->name      => fn (string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(hash_hmac('sha256', $signingDatas, $publicKeyPem, true), $signature),
     // native php
-    SigningEnum::hmac_sha_384->name      => fn(string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(hash_hmac('sha384', $signingDatas, $publicKeyPem, true), $signature),
+    SigningEnum::hmac_sha_384->name      => fn (string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(hash_hmac('sha384', $signingDatas, $publicKeyPem, true), $signature),
     // native php
-    SigningEnum::hmac_sha_512->name      => fn(string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(hash_hmac('sha512', $signingDatas, $publicKeyPem, true), $signature),
+    SigningEnum::hmac_sha_512->name      => fn (string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(hash_hmac('sha512', $signingDatas, $publicKeyPem, true), $signature),
     //phpseclib4
-    SigningEnum::ed25519->name           => fn(string $signingDatas, string|array $signature, string|array $publicKeyPem): bool => EC::loadPublicKey($publicKeyPem)
+    SigningEnum::ed25519->name           => fn (string $signingDatas, string|array $signature, string|array $publicKeyPem): bool => EC::loadPublicKey($publicKeyPem)
              ->verify($signingDatas, $signature),
 ];
 
-/** @noinspection PhpUnhandledExceptionInspection */
+/* @noinspection PhpUnhandledExceptionInspection */
 VerifyRegistry::registerMethods(methods: $verifierMethodsRsaPhpSeclib4);

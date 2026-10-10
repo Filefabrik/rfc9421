@@ -17,7 +17,7 @@ $signings = [
 
         $signature = '';
 
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
+        /* @noinspection PhpMethodParametersCountMismatchInspection */
         openssl_sign(
             $signingDatas,
             $signature,
@@ -68,21 +68,21 @@ $signings = [
         return $signature;
     },
     // native php
-    SigningEnum::hmac_sha_256->name        => fn(string $signingDatas, $privateKeyPem): string => hash_hmac(
+    SigningEnum::hmac_sha_256->name        => fn (string $signingDatas, $privateKeyPem): string => hash_hmac(
         'sha256',
         $signingDatas,
         $privateKeyPem,
         true,
     ),
     // native php
-    SigningEnum::hmac_sha_384->name        => fn(string $signingDatas, $privateKeyPem): string => hash_hmac(
+    SigningEnum::hmac_sha_384->name        => fn (string $signingDatas, $privateKeyPem): string => hash_hmac(
         'sha384',
         $signingDatas,
         $privateKeyPem,
         true,
     ),
     // native php
-    SigningEnum::hmac_sha_512->name        => fn(string $signingDatas, $privateKeyPem): string => hash_hmac(
+    SigningEnum::hmac_sha_512->name        => fn (string $signingDatas, $privateKeyPem): string => hash_hmac(
         'sha512',
         $signingDatas,
         $privateKeyPem,
@@ -116,7 +116,7 @@ $signings = [
 
 ];
 
-/** @noinspection PhpUnhandledExceptionInspection */
+/* @noinspection PhpUnhandledExceptionInspection */
 SignatureRegistry::registerMethods(methods: $signings);
 
 $verifying = [
@@ -128,82 +128,82 @@ $verifying = [
             );
         }
 
-        /** @noinspection PhpMethodParametersCountMismatchInspection */
+        /* @noinspection PhpMethodParametersCountMismatchInspection */
         return 0 < openssl_verify(
-                $signingDatas,
-                $signature,
-                $publicKeyPem,
-                OPENSSL_ALGO_SHA512,
-                OPENSSL_PKCS1_PSS_PADDING,
-            );
-    },
-    // php native openssl
-    SigningEnum::rsa_v_1_5_sha_256->name   => fn(
-        string $signingDatas,
-        $signature,
-        $publicKeyPem,
-    ): bool => 0 < openssl_verify(
-            $signingDatas,
-            $signature,
-            $publicKeyPem,
-            OPENSSL_ALGO_SHA256,
-        ),
-    // php native openssl
-    SigningEnum::rsa_v_1_5_sha_384->name   => fn(
-        string $signingDatas,
-        $signature,
-        $publicKeyPem,
-    ): bool => 0 < openssl_verify(
-            $signingDatas,
-            $signature,
-            $publicKeyPem,
-            OPENSSL_ALGO_SHA384,
-        ),
-    // php native openssl
-    SigningEnum::rsa_v_1_5_sha_512->name   => fn(
-        string $signingDatas,
-        $signature,
-        $publicKeyPem,
-    ): bool => 0 < openssl_verify(
             $signingDatas,
             $signature,
             $publicKeyPem,
             OPENSSL_ALGO_SHA512,
-        ),
+            OPENSSL_PKCS1_PSS_PADDING,
+        );
+    },
+    // php native openssl
+    SigningEnum::rsa_v_1_5_sha_256->name   => fn (
+        string $signingDatas,
+        $signature,
+        $publicKeyPem,
+    ): bool => 0 < openssl_verify(
+        $signingDatas,
+        $signature,
+        $publicKeyPem,
+        OPENSSL_ALGO_SHA256,
+    ),
+    // php native openssl
+    SigningEnum::rsa_v_1_5_sha_384->name   => fn (
+        string $signingDatas,
+        $signature,
+        $publicKeyPem,
+    ): bool => 0 < openssl_verify(
+        $signingDatas,
+        $signature,
+        $publicKeyPem,
+        OPENSSL_ALGO_SHA384,
+    ),
+    // php native openssl
+    SigningEnum::rsa_v_1_5_sha_512->name   => fn (
+        string $signingDatas,
+        $signature,
+        $publicKeyPem,
+    ): bool => 0 < openssl_verify(
+        $signingDatas,
+        $signature,
+        $publicKeyPem,
+        OPENSSL_ALGO_SHA512,
+    ),
     // native php
-    SigningEnum::hmac_sha_256->name        => fn(string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(
+    SigningEnum::hmac_sha_256->name        => fn (string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(
         hash_hmac('sha256', $signingDatas, $publicKeyPem, true),
         $signature,
     ),
     // native php
-    SigningEnum::hmac_sha_384->name        => fn(string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(
+    SigningEnum::hmac_sha_384->name        => fn (string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(
         hash_hmac('sha384', $signingDatas, $publicKeyPem, true),
         $signature,
     ),
     // native php
-    SigningEnum::hmac_sha_512->name        => fn(string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(
+    SigningEnum::hmac_sha_512->name        => fn (string $signingDatas, $signature, $publicKeyPem): bool => hash_equals(
         hash_hmac('sha512', $signingDatas, $publicKeyPem, true),
         $signature,
     ),
     // php native openssl
-    SigningEnum::ecdsa_p_256_sha_256->name => fn(
+    SigningEnum::ecdsa_p_256_sha_256->name => fn (
         string $signingDatas,
         $signature,
         $publicKeyPem,
     ): bool => 0 < openssl_verify($signingDatas, $signature, $publicKeyPem, OPENSSL_ALGO_SHA256),
     // php native openssl
-    SigningEnum::ecdsa_p_384_sha_384->name => fn(
+    SigningEnum::ecdsa_p_384_sha_384->name => fn (
         string $signingDatas,
         $signature,
         $publicKeyPem,
     ): bool => 0 < openssl_verify($signingDatas, $signature, $publicKeyPem, OPENSSL_ALGO_SHA384),
     // php native openssl
-    SigningEnum::ed25519->name             => fn(
+    SigningEnum::ed25519->name             => fn (
         string $signingDatas,
         $signature,
         $publicKeyPem,
     ): bool => 0 < openssl_verify($signingDatas, $signature, openssl_pkey_get_public($publicKeyPem), 0),
 ];
 
-/** @noinspection PhpUnhandledExceptionInspection */
+/* @noinspection PhpUnhandledExceptionInspection */
 VerifyRegistry::registerMethods(methods: $verifying);

@@ -15,16 +15,12 @@ final class PreparedMethods
     private(set) array $methods = [];
 
     /**
-     * @param list<array{string:Closure}>|array{string:Closure} $methods
+     * @param array<string,Closure> $methods
      */
     public function adds(array $methods): self
     {
         foreach ($methods as $nr => $method) {
-            if (is_string($nr) && $method instanceof Closure) {
-                $this->add($nr, $method);
-            } else {
-                throw new UnexpectedValueException('unknown array structure');
-            }
+            $this->add($nr, $method);
         }
 
         return $this;

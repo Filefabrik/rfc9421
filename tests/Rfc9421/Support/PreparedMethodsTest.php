@@ -9,19 +9,19 @@ use Filefabrik\Rfc9421\Support\PreparedMethods;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
+use TypeError;
 use UnexpectedValueException;
 
 #[CoversClass(PreparedMethods::class)]
-class PreparedMethodsTest extends TestCase
+final class PreparedMethodsTest extends TestCase
 {
-
     public function testGetMethod(): void
     {
         $i = new PreparedMethods();
         $i->adds(
             [
-                'texst'  => fn(MessageInterface $message): string => $message->getMethod(),
-                'poster' => fn(MessageInterface $message): string => $message->getMethod(),
+                'texst'  => fn (MessageInterface $message): string => $message->getMethod(),
+                'poster' => fn (MessageInterface $message): string => $message->getMethod(),
             ],
         );
         self::assertInstanceOf(Closure::class, $i->getMethod('poster'));
@@ -33,8 +33,8 @@ class PreparedMethodsTest extends TestCase
         $i = new PreparedMethods();
         $i->adds(
             [
-                'texst'  => fn(MessageInterface $message): string => $message->getMethod(),
-                'poster' => fn(MessageInterface $message): string => $message->getMethod(),
+                'texst'  => fn (MessageInterface $message): string => $message->getMethod(),
+                'poster' => fn (MessageInterface $message): string => $message->getMethod(),
             ],
         );
 
@@ -44,8 +44,8 @@ class PreparedMethodsTest extends TestCase
     public function testAdds(): void
     {
         $arr = [
-            'texst'  => fn(MessageInterface $message): string => $message->getMethod(),
-            'poster' => fn(MessageInterface $message): string => $message->getMethod(),
+            'texst'  => fn (MessageInterface $message): string => $message->getMethod(),
+            'poster' => fn (MessageInterface $message): string => $message->getMethod(),
         ];
         $i   = new PreparedMethods();
         $i->adds(
@@ -56,43 +56,43 @@ class PreparedMethodsTest extends TestCase
 
     public function testAddsThrow(): void
     {
-        $this->expectExceptionObject(new UnexpectedValueException('unknown array structure'));
+        $this->expectException(TypeError::class);
         $arr = [
-            'texst'  => fn(MessageInterface $message): string => $message->getMethod(),
-            'poster' , fn(MessageInterface $message): string => $message->getMethod(),
+            'texst' => fn (MessageInterface $message): string => $message->getMethod(),
+            'poster',
+            'bullshit',
         ];
 
         new PreparedMethods()->adds(
             $arr,
         );
-
     }
 
     public function testHasMethod(): void
     {
         $arr = [
-            'texst'  => fn(MessageInterface $message): string => $message->getMethod(),
-            'poster' => fn(MessageInterface $message): string => $message->getMethod(),
+            'texst'  => fn (MessageInterface $message): string => $message->getMethod(),
+            'poster' => fn (MessageInterface $message): string => $message->getMethod(),
         ];
         $i   = new PreparedMethods();
         $i->adds(
             $arr,
         );
-        $i->add('poster2', fn(MessageInterface $message) => $message->getMethod());
+        $i->add('poster2', fn (MessageInterface $message) => $message->getMethod());
         self::assertTrue($i->hasMethod('poster2'));
     }
 
     public function testAdd(): void
     {
         $arr = [
-            'texst'  => fn(MessageInterface $message): string => $message->getMethod(),
-            'poster' => fn(MessageInterface $message): string => $message->getMethod(),
+            'texst'  => fn (MessageInterface $message): string => $message->getMethod(),
+            'poster' => fn (MessageInterface $message): string => $message->getMethod(),
         ];
         $i   = new PreparedMethods();
         $i->adds(
             $arr,
         );
-        $i->add('poster2', fn(MessageInterface $message) => $message->getMethod());
+        $i->add('poster2', fn (MessageInterface $message) => $message->getMethod());
         self::assertTrue($i->hasMethod('poster2'));
     }
 

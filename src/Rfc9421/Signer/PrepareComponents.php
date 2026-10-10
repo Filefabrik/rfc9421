@@ -108,50 +108,47 @@ final class PrepareComponents
      */
     private function getMethodStack(): PreparedMethods
     {
-        return $this->preparedMethods ??= new PreparedMethods()->adds(self::defaultMapperClosure());
+        return $this->preparedMethods ??= self::defaultMapperClosure();
     }
 
-    /**
-     * @return array{'@method': Closure(RequestInterface): string, '@target-uri': Closure(RequestInterface): string, '@authority': Closure(RequestInterface): string, '@scheme': Closure(RequestInterface): string, '@request-target': Closure(MessageInterface): never, '@path': Closure(RequestInterface): string, content-length: Closure(RequestInterface): int<0, max>}
-     */
-    public static function defaultMapperClosure(): array
+
+    public static function defaultMapperClosure(): PreparedMethods
     {
         /*
          * for different components there can be different methods to prepare the values(upper-case lower-case )
          *
-
          */
-        return [
-            /*
-             * extracting the "method" from header to use later as "@method"
-             *
-             * @see 2.2.1. Method
-             */
-            '@method'         => fn (RequestInterface $message): string => strtoupper($message->getMethod()),
-            '@target-uri'     => self::processTargetUriClosure(...),
-            /*
-             * @see 2.2.3. Authority
-             */
-            '@authority'      => fn (RequestInterface $message): string => $message->getUri()
-                                                                                  ->getHost(),
-            /*
-             * @see 2.2.4. Scheme
-             */
-            '@scheme'         => fn (RequestInterface $message): string => $message->getUri()
-                /*
-                 * 2.2.5. Request Target
-                 * Todo More complex as described in 2.2.5. Request Target
-                 * **/ ->getScheme(),
-            '@request-target' => fn (MessageInterface $message) => throw new BadMethodCallException(
-                '@request-target not implemented',
-            ),
-            /*
-             * @see 2.2.6. Path
-             **/
-            '@path'           => self::processPathClosure(...),
-            //  '@status'         => 'processStatus',
-            'content-length'  => fn (RequestInterface $message): int => strlen((string)$message->getBody()),
-        ];
+        return new PreparedMethods()->adds([
+              /*
+               * extracting the "method" from header to use later as "@method"
+               *
+               * @see 2.2.1. Method
+               */
+              '@method'         => fn (RequestInterface $message): string => strtoupper($message->getMethod()),
+              '@target-uri'     => self::processTargetUriClosure(...),
+              /*
+               * @see 2.2.3. Authority
+               */
+              '@authority'      => fn (RequestInterface $message): string => $message->getUri()
+                                                                                    ->getHost(),
+              /*
+               * @see 2.2.4. Scheme
+               */
+              '@scheme'         => fn (RequestInterface $message): string => $message->getUri()
+                  /*
+                   * 2.2.5. Request Target
+                   * Todo More complex as described in 2.2.5. Request Target
+                   * **/ ->getScheme(),
+              '@request-target' => fn (MessageInterface $message) => throw new BadMethodCallException(
+                  '@request-target not implemented',
+              ),
+              /*
+               * @see 2.2.6. Path
+               **/
+              '@path'           => self::processPathClosure(...),
+              //  '@status'         => 'processStatus',
+              'content-length'  => fn (RequestInterface $message): int => strlen((string)$message->getBody()),
+          ]);
     }
 
     public function setPreparedMethods(PreparedMethods $preparedMethods): self

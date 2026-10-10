@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421;
 
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 use Filefabrik\Rfc9421\Signer\Metadata;
@@ -16,7 +13,6 @@ use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Support\PrepareComponentMethodsTrait;
 use Filefabrik\Rfc9421\Support\PrivatePemTrait;
 use Filefabrik\Rfc9421\Support\PublicPemTrait;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * Signer Configuration can be configured at different position on your code, such as in a bootstrap file or something
@@ -107,12 +103,10 @@ final class SigningConfiguration
     /**
      * Signing header Parameter
      *
-     *
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
-    #[ArrayShape(['int => string'])]
     public function signHeader(...$headerKeys): self
     {
         /** @var string $headerKey */
@@ -154,6 +148,6 @@ final class SigningConfiguration
 
     public function hasContentDigestHashAlgo(): bool
     {
-        return $this->contentDigestHashAlgo instanceof \Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
+        return $this->contentDigestHashAlgo instanceof DigestAlgorithmsEnum;
     }
 }

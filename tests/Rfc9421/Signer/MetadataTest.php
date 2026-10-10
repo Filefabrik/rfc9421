@@ -8,17 +8,16 @@ use BadMethodCallException;
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Signer\Metadata;
-use JetBrains\PhpStorm\ArrayShape;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Metadata::class)]
-#[CoversMethod(Metadata::class, 'toString')]
 final class MetadataTest extends TestCase
 {
-    #[ArrayShape(['set all' => 'array', 'set without dates' => 'string[]'])]
+    /**
+     * @return array{"set all": array{created: int, expires: int, nonce: string, keyid: string, alg: string, tag: string}, "set without dates": array{nonce: string, keyid: string, alg: string, tag: string}}
+     */
     public static function dataProviderToArray(): array
     {
         return [
@@ -85,6 +84,9 @@ final class MetadataTest extends TestCase
         self::assertEquals('my-tag', new Metadata()->setTag('my-tag')->tag);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     #[DataProvider('dataProviderToArray')]
     public function testToArray(...$datas): void
     {
