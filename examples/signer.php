@@ -183,9 +183,14 @@ if (null !== $keyId && '' !== $keyId) {
             // ...
             echo 'created: '.$metadata->created."\n";
         }
-        $body = (string)$verifier->getMessage()
-                                 ->getBody()
-        ;
+        if ($verifier->hasValidatedBody) {
+            echo 'Cool, body verified'."\n";
+            $body = (string)$verifier->getMessage()
+                                     ->getBody()
+            ;
+        } else {
+            echo 'body was not part of verifying process'."\n";
+        }
     }
 
     return;
