@@ -15,7 +15,7 @@ final class PreparedMethods
     private(set) array $methods = [];
 
     /**
-     * @param array<string,Closure> $methods
+     * @param array{string:Closure} $methods
      */
     public function adds(array $methods): self
     {
