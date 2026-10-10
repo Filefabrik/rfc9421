@@ -111,7 +111,7 @@ final class Verify
         $verifyInstance = new VerifyContentDigest(
             contentDigest: $this->getHeaderHelper()
                                 ->getContentDigestLine(),
-            body         : (string)$this->getMessage()
+            body         : (string)$this->preparedVerify->message
                                         ->getBody(),
         );
         if ($verified = $verifyInstance->verify()) {
@@ -147,7 +147,7 @@ final class Verify
     private function getSigner(): Signer
     {
         $signer = new Signer(
-            message             : clone $this->getMessage(),
+            message             : clone $this->preparedVerify->message,
             signingConfiguration: $this->signingConfiguration,
         );
 

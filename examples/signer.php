@@ -59,14 +59,14 @@ $signingConfiguration = new SigningConfiguration()
     ->setPrivatePem($certInstance->getPrivatPemContent())
 ;
 
-/**
+/*
  * Modify derived components generation if needed.
  *
  * don't forget to use thís prepared component in the verifier
  */
 $signingConfiguration->withPrepareComponentsMethod(
     componentName: '@authority',
-    callable     : fn(MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),
+    callable     : fn (MessageInterface $message) => $message->getHeaderLine('x-Origin-host'),
 );
 /**
  * Prepare the Request
@@ -95,7 +95,7 @@ $signedRequest = $signer->sign();
 $verifierConfiguration = new SigningConfiguration();
 $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
-/**
+/*
  * Prepare the incoming Request for verifying
  * after $verifyPrepareInstance->prepareVerification(); you are able to configure/check/load(i.e. the public pem from the sender) and then you handle the real verify process
  * important, throws if something wrong
@@ -139,7 +139,7 @@ if (!empty($keyId)) {
     }
     echo 'verify result: ', $res, "\n";
 
-    /**
+    /*
      * After successfully verifying you have access to verified header
      */
 
