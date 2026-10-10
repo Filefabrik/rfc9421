@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test;
 
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -123,5 +124,28 @@ final class SigningConfigurationTest extends TestCase
         self::assertSame(SigningEnum::rsa_pss_sha512, $i->metadata->alg);
         $i->withSigningAlgorithm('ecdsa-p256-sha256');
         self::assertSame(SigningEnum::ecdsa_p_256_sha_256, $i->metadata->alg);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function testGetContentDigestHashAlgoOrThrow(): void
+    {
+        $this->expectExceptionObject(
+            new ContentDigestException('Hash algorithm "Missing" for the content-digest not supported'),
+        );
+        $i = new SigningConfiguration();
+        $i->getContentDigestHashAlgoOrThrow();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function testGetContentDigestHashAlgoOrThrowValid(): void
+    {
+        $i = new SigningConfiguration();
+
+        $i->setContentDigestHashAlgo('sha-512');
+        self::assertSame(DigestAlgorithmsEnum::sha512, $i->getContentDigestHashAlgoOrThrow());
     }
 }

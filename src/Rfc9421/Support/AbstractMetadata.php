@@ -134,14 +134,11 @@ abstract class AbstractMetadata
 
         return $this;
     }
-    public function getAlgOrThrow(): SigningEnumInterface
-    {
-        return $this->alg ?? throw new UnexpectedValueException('$alg must be SigningEnumInterface');
-    }
+
     private function setStringOrSigningEnum(mixed $value): string|SigningEnumInterface
     {
         return is_string($value) || $value instanceof SigningEnumInterface ? $value :
-            throw new UnexpectedValueException('$value must be string|SigningEnumInterface');
+            throw SignatureException::wrongFormat();
     }
 
     public function setTag(?string $tag): static
@@ -149,6 +146,14 @@ abstract class AbstractMetadata
         $this->tag = $tag;
 
         return $this;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function getAlgOrThrow(): SigningEnumInterface
+    {
+        return $this->alg ?? throw SignatureException::notSet();
     }
 
     /**

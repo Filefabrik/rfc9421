@@ -12,4 +12,14 @@ final class SignatureException extends Exception
     {
         return new self(sprintf('The signature enum "%s" for signing is not supported.', $alg));
     }
+
+    public static function wrongFormat(): self
+    {
+        return new self('The signature algorithm must be a string|SigningEnumInterface.');
+    }
+
+    public static function notSet(): self
+    {
+        return new self('Signature algorithm must be set.');
+    }
 }
