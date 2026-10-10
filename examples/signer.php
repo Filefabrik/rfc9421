@@ -31,7 +31,7 @@ require_once dirname(__DIR__).'/src/register-openssl-signing-verify.php';
 #require_once dirname(__DIR__).'/src/register-phpseclib4-signing-verify.php';
 
 /**
- * for testing purposes we use a own cert-loader
+ * for testing purposes we use an own cert-loader
  */
 $certInstance = new CertHelper('rsa');
 #$certInstance = new CertHelper('hmac');
@@ -61,7 +61,8 @@ try {
     ;
 } catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
     echo $e->getMessage();
-    return ;
+
+    return;
 }
 
 /*
@@ -76,17 +77,29 @@ $signingConfiguration->withPrepareComponentsMethod(
 /**
  * Prepare the Request
  */
-$bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'fdawsfs'];
-$bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-$request    = new Request(
+$bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'some text'];
+try {
+    $bodyJson = json_encode($bodyParams, JSON_THROW_ON_ERROR);
+} catch (JsonException $e) {
+    echo $e->getMessage();
+
+    return;
+}
+$request = new Request(
     method : 'POST',
     uri    : $targetUrl,
     headers: ['x-origin-host' => 'mytest.com'],
     body   : $bodyJson,
 );
 
-$signer        = new Signer(message: $request, signingConfiguration: $signingConfiguration);
-$signedRequest = $signer->sign();
+$signer = new Signer(message: $request, signingConfiguration: $signingConfiguration);
+try {
+    $signedRequest = $signer->sign();
+} catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
+    echo $e->getMessage();
+
+    return;
+}
 /**
  * working with local server
  */
@@ -105,7 +118,13 @@ $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguratio
  * after $verifyPrepareInstance->prepareVerification(); you are able to configure/check/load(i.e. the public pem from the sender) and then you handle the real verify process
  * important, throws if something wrong
  */
-$verifyPrepareInstance->prepareVerification();
+try {
+    $verifyPrepareInstance->prepareVerification();
+} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException $e) {
+    echo $e->getMessage();
+
+    return;
+}
 
 /**
  * Prepare the verify to extract for mastodon the sender public pem location
@@ -116,7 +135,7 @@ $verifyPrepareInstance->prepareVerification();
  */
 $keyId = $verifierConfiguration->metadata->keyid;
 
-if (!empty($keyId)) {
+if (null !== $keyId && '' !== $keyId) {
     $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
 
     /*
@@ -157,8 +176,12 @@ if (!empty($keyId)) {
         $metadata = $verifier->signingConfiguration->metadata;
         // in example: check created or expire
 
-        if ($metadata->created) {
+        /*
+         * or something
+         */
+        if (null !== $metadata->created && ($currentDateTime + 6000) > $metadata->created) {
             // ...
+            echo 'created: '.$metadata->created."\n";
         }
         $body = (string)$verifier->getMessage()
                                  ->getBody()
