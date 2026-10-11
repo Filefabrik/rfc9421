@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
-final class ContentDigestException extends AbstractFilefabrikRfc9421Exception
+final class ContentDigestException extends AbstractRfc9421Exception
 {
     public static function wrongInputFormat(): self
     {

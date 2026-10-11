@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Exceptions\AbstractFilefabrikRfc9421Exception;
+use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
@@ -151,7 +151,7 @@ if (null !== $keyId) {
     $verifier = new Verify($verifyPrepareInstance);
     try {
         $res = $verifier->verifying();
-    } catch (AbstractFilefabrikRfc9421Exception $e) {
+    } catch (AbstractRfc9421Exception $e) {
         echo 'result false: '.$e->getMessage();
 
         return;

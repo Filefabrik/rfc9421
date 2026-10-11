@@ -7,7 +7,7 @@ namespace Filefabrik\Rfc9421\Exceptions;
 /**
  * during the VerificationHeaderSignature
  */
-final class VerifyHeaderSignatureException extends AbstractFilefabrikRfc9421Exception
+final class VerifyHeaderSignatureException extends AbstractRfc9421Exception
 {
     public static function missingSignature(): self
     {

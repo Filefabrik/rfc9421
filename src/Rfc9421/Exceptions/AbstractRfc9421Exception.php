@@ -9,6 +9,6 @@ use Exception;
 /**
  * Abstraction-Layer to encapsulate RFC9421 Messages
  */
-abstract class AbstractFilefabrikRfc9421Exception extends Exception
+abstract class AbstractRfc9421Exception extends Exception
 {
 }

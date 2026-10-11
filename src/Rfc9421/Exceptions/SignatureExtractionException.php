@@ -7,6 +7,6 @@ namespace Filefabrik\Rfc9421\Exceptions;
 /**
  * @codeCoverageIgnore
  */
-final class SignatureExtractionException extends AbstractFilefabrikRfc9421Exception
+final class SignatureExtractionException extends AbstractRfc9421Exception
 {
 }
