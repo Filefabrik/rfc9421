@@ -80,6 +80,19 @@ final class SigningConfigurationTest extends TestCase
         self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestAlgo);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function testSetContentDigestHashAlgoWithNull(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertNull($i->contentDigestAlgo);
+        $i->setContentDigestAlgo('sha-512');
+        self::assertSame(DigestAlgorithmsEnum::sha512, $i->contentDigestAlgo);
+        $i->setContentDigestAlgo(null);
+        self::assertNull($i->contentDigestAlgo);
+    }
+
     public function testWithSignatureKeyName(): void
     {
         $i = new SigningConfiguration();

@@ -12,7 +12,6 @@ use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\RequestInterface;
-use UnexpectedValueException;
 
 /**
  * Handling the signature base params
@@ -120,9 +119,7 @@ final class Base
             return [$headerKey, $value];
         }
 
-        throw new UnexpectedValueException(
-            'Expecting content-digest from signingConfiguration header but mustSignBody is false',
-        );
+        throw ContentDigestException::canNotHashWithoutAlgorithm();
     }
 
     /**

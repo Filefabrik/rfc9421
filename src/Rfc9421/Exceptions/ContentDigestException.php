@@ -20,4 +20,9 @@ final class ContentDigestException extends AbstractRfc9421Exception
     {
         return new self(sprintf('Hash algorithm "%s" for the content-digest not supported.', $alg));
     }
+    
+    public static function canNotHashWithoutAlgorithm(): self
+    {
+        return new self('content-digest header is set but the ContentDigestHashAlgo was not configuration.');
+    }
 }

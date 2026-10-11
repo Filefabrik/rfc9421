@@ -18,7 +18,6 @@ use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
-use UnexpectedValueException;
 
 #[CoversClass(Base::class)]
 final class BaseTest extends TestCase
@@ -82,8 +81,8 @@ final class BaseTest extends TestCase
     public function testHandleSignBodyThrowConfig(): void
     {
         $this->expectExceptionObject(
-            new UnexpectedValueException(
-                'Expecting content-digest from signingConfiguration header but mustSignBody is false',
+            new ContentDigestException(
+                'content-digest header is set but the ContentDigestHashAlgo was not configuration.',
             ),
         );
         $sc = new SigningConfiguration();

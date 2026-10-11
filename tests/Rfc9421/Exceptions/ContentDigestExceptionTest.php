@@ -39,4 +39,17 @@ final class ContentDigestExceptionTest extends TestCase
         );
         throw ContentDigestException::hashAlgoNotSupported('something');
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function testCanNotHashWithoutAlgorithm(): void
+    {
+        $this->expectExceptionObject(
+            new ContentDigestException(
+                'content-digest header is set but the ContentDigestHashAlgo was not configuration.',
+            ),
+        );
+        throw ContentDigestException::canNotHashWithoutAlgorithm();
+    }
 }
