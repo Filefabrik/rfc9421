@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
-use Exception;
-
-final class SignatureException extends Exception
+final class SignatureException extends AbstractFilefabrikRfc9421Exception
 {
     public static function signatureEnumNotFound(string|null $alg): self
     {

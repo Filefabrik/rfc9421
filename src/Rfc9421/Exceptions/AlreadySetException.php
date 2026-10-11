@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
-use Exception;
-
-final class AlreadySetException extends Exception
+final class AlreadySetException extends AbstractFilefabrikRfc9421Exception
 {
     public static function inputSignature(null|int|string $var = null): self
     {

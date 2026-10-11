@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
-use Exception;
-
 /**
  * during the VerificationHeaderSignature
  */
-final class VerifyHeaderSignatureException extends Exception
+final class VerifyHeaderSignatureException extends AbstractFilefabrikRfc9421Exception
 {
     public static function missingSignature(): self
     {

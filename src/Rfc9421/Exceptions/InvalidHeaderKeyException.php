@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
-use Exception;
-
 /**
  * @codeCoverageIgnore
  */
-final class InvalidHeaderKeyException extends Exception
+final class InvalidHeaderKeyException extends AbstractFilefabrikRfc9421Exception
 {
     public static function headerNotExists(string $headerName): self
     {

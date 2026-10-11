@@ -52,15 +52,22 @@ final class Base
      */
     public function createSignatureLines(): WriteLines
     {
-        // todo prepare components with extra methods has to be separated
         $components = new PrepareComponents($this->message);
 
+        /*
+         * Prepare methods they must render your signature-params and singing parameters
+         */
         if (($preparedComponentMethods = $this->configuration->preparedMethods) instanceof PreparedMethods) {
             $components->setPreparedMethods($preparedComponentMethods);
         }
 
         foreach ($this->configuration->signatureParams->getSignatureParameters() as $signatureParam) {
-            $this->signatureLines->add($this->createSignatureLine($signatureParam, $components));
+            $this->signatureLines->add(
+                signatureLine: $this->createSignatureLine(
+                    signatureParam: $signatureParam,
+                    components    : $components,
+                ),
+            );
         }
 
         // at least
