@@ -33,6 +33,14 @@ trait TraitSigner
 
     private null|string $signatureBase = null;
 
+    public function getSignedLines(): WriteLines
+    {
+        return $this->signingLines ??
+            throw new UnexpectedValueException(
+                'Signing\Lines not set',
+            );
+    }
+
     /**
      * @throws AlreadySetException
      * @throws ContentDigestException
@@ -64,6 +72,7 @@ trait TraitSigner
      * für das verify auch verwenden
      *
      * @throws ContentDigestException|InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function prepareSigning(): void
     {
@@ -127,13 +136,5 @@ trait TraitSigner
         $this->message = $this->message->withHeader($name, $value ?? '');
 
         return $this;
-    }
-
-    public function getSignedLines(): WriteLines
-    {
-        return $this->signingLines ??
-            throw new UnexpectedValueException(
-                'Signing\Lines not set',
-            );
     }
 }

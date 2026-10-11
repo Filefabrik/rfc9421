@@ -34,6 +34,10 @@ final class SigningConfiguration
     private(set) ?string $signatureKeyName = null;
 
     /**
+     * @var string[]
+     */
+    private(set) array|null $withoutExistingHeader = null;
+    /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      */
     private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
@@ -131,6 +135,23 @@ final class SigningConfiguration
     }
 
     /**
+     * Signing Params they do not need an existing header.
+     *
+     *
+     * @return $this
+     * @example Header content-length will be injected into the real header after processing the signing process.
+     *          So you have to forecast the content-length of the body and set this processed value into the signing process.
+     *          The receiver of the signed request or signend response verifies the Header value of the (Guzzle) Generated header
+     *
+     */
+    public function processWithoutExistingHeader(?array $withoutExistingHeader): self
+    {
+        $this->withoutExistingHeader = $withoutExistingHeader;
+
+        return $this;
+    }
+
+    /**
      * Hashing the content-digest|body with algo
      * if set, the header line "content-digest" will be created and the hash value will be stored into the header
      *
@@ -163,5 +184,20 @@ final class SigningConfiguration
     public function hasContentDigestHashAlgo(): bool
     {
         return $this->contentDigestAlgo instanceof DigestAlgorithmsEnum;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @return string[]
+     */
+    public function getWithoutExistingHeader(): array
+    {
+        return $this->hasWithProcessing() ? $this->withoutExistingHeader :
+            throw new SignatureException('Processing is empty! ');
+    }
+
+    public function hasWithProcessing(): bool
+    {
+        return null !== $this->withoutExistingHeader && count($this->withoutExistingHeader) > 0;
     }
 }

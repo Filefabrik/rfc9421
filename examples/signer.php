@@ -72,7 +72,7 @@ try {
  */
 $prepareMethods = [
     '@authority' =>
-        fn(RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+        fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
 /*
  * Modify derived components generation if needed.
@@ -206,8 +206,8 @@ if (null !== $keyId) {
 
         return;
     }
-
-    $response = new Response(headers: ['content-length' => (string)strlen($responseBodyJson)], body: $responseBodyJson);
+    $contentLength = ['content-length' => (string)strlen($responseBodyJson)];
+    $response      = new Response(headers: [], body: $responseBodyJson);
 
     //... now sign the response
     try {
@@ -216,14 +216,26 @@ if (null !== $keyId) {
              * Content Length as a special method
              */
             ->withPrepareComponentsMethod(
-                'content-length',
-                fn(ResponseInterface $response): int =>$response->getBody()
-                                                                            ->getSize(),
+                componentName: 'content-length',
+                callable     : fn (ResponseInterface $response): int => $response->getBody()
+                                                                                ->getSize(),
             )
+            /*
+             * The content-length will be created to header by guzzle or something AFTER we are signing the request/response. So we have to calculate the length before.
+             * @important, when the receiver of this response verifies this response the `->processWithoutExistingHeader(['content-length'])` never set.
+             * also the:
+             * `->withPrepareComponentsMethod(
+                componentName: 'content-length',
+             callable     : fn(ResponseInterface $response): int => $response->getBody()
+                                                                                ->getSize(),
+            )`
+       */
+            ->processWithoutExistingHeader(['content-length'])
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
             // singing the status as relevant information for the requester Alice, to ensure the status
             ->signHeader('@status')
+            // todo header exists and must not be set separate as header
             ->signHeader('content-length')
             // the sender of the request expects an algo that Bob can check while receive this signed response
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
@@ -248,6 +260,7 @@ if (null !== $keyId) {
 
     echo 'response is successfully signed and can be response to the sender'.PHP_EOL;
 
+    //... next step the receiver of this response verifies this response
     return;
 }
 

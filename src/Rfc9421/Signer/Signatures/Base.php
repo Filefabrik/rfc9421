@@ -48,6 +48,7 @@ final class Base
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function createSignatureLines(): WriteLines
     {
@@ -77,6 +78,7 @@ final class Base
      *
      * @throws ContentDigestException
      * @throws InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     private function createSignatureLine(string $signatureParam, PrepareComponents $components): Line
     {
@@ -84,12 +86,8 @@ final class Base
             return new Line(...$this->handleSignBody());
         }
 
-        // getting the value from header
-        return str_starts_with($signatureParam, '@') ?
-            // special processing for preconfigured derived @components
+        return $this->mustProcessingLine($signatureParam) ?
             new Line($signatureParam, $components->processValue($signatureParam)) :
-            // regular. todo make content-length also with a special "processing" value
-            // todo, if an header not exists, then must throw
             $this->checkExistingHeader($signatureParam);
     }
 
@@ -118,6 +116,27 @@ final class Base
         }
 
         throw ContentDigestException::canNotHashWithoutAlgorithm();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    private function mustProcessingLine(string $signatureParam): bool
+    {
+        return str_starts_with($signatureParam, '@') ||
+            (
+                /*
+                 * Content-length works over processing
+                 */
+                $this->configuration->hasWithProcessing() &&
+                (
+                    in_array(
+                        $signatureParam,
+                        $this->configuration->getWithoutExistingHeader(),
+                        true,
+                    )
+                )
+            );
     }
 
     /**
