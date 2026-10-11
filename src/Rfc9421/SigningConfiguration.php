@@ -145,7 +145,8 @@ final class SigningConfiguration
      */
     public function setContentDigestAlgo(null|string|DigestAlgorithmsEnum $contentDigestAlgo): self
     {
-        $this->contentDigestAlgo = null === $contentDigestAlgo ? null :
+        $this->contentDigestAlgo = null === $contentDigestAlgo ?
+            null :
             DigestAlgorithmsEnum::isOwnTypeOrThrow($contentDigestAlgo);
 
         return $this;

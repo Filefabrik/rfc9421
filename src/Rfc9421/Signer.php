@@ -58,7 +58,7 @@ final class Signer
      */
     public function sign(): RequestInterface
     {
-        // set up the content digest into rendering
+        // set up the content digest into rendering if the ContentDigestAlgo exists
         if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
             $this->signingConfiguration->signatureParams->add('content-digest');
         }
