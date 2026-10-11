@@ -18,12 +18,12 @@ use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 
-require_once dirname(__DIR__).'/vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 /*
  * use openssl (native php extension) which so preconfigured
  * if you need another library oar need some modifications, build your own
  */
-require_once dirname(__DIR__).'/src/register-openssl-signing-verify.php';
+require_once __DIR__.'/../src/register-openssl-signing-verify.php';
 /*
  * use phpseclib4 library which is preconfigured
  * if you need another library oar need some modifications, build your own
@@ -62,12 +62,13 @@ try {
 
     return;
 }
+
 /*
  * Make sure to use the same methods in signer and verifier!
  */
 $prepareMethods = [
     '@authority' =>
-        fn(RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+        fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
 /*
  * Modify derived components generation if needed.
@@ -81,11 +82,12 @@ $signingConfiguration->withPrepareComponentsMethods($prepareMethods);
 $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'some text'];
 try {
     $bodyJson = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-} catch (JsonException $e) {
-    echo $e->getMessage();
+} catch (JsonException $jsonException) {
+    echo $jsonException->getMessage();
 
     return;
 }
+
 $request = new Request(
     method : 'POST',
     uri    : $targetUrl,
@@ -125,6 +127,7 @@ try {
 
     return;
 }
+
 /*
  * with the keyId you should be able to download the public pem
  */
@@ -156,6 +159,7 @@ if (null !== $keyId) {
 
         return;
     }
+
     echo 'verify result: ', $res, "\n";
 
     /*
@@ -177,6 +181,7 @@ if (null !== $keyId) {
             // ...
             echo 'created: '.$metadata->created."\n";
         }
+
         if ($verifier->hasValidatedBody) {
             echo 'Cool, body verified'."\n";
             $body = (string)$verifier->getMessage()
@@ -189,4 +194,5 @@ if (null !== $keyId) {
 
     return;
 }
+
 echo 'missing key id/PEm';

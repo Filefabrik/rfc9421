@@ -18,7 +18,7 @@ trait PrepareComponentMethodsTrait
     /**
      * Modify the generation methods
      *
-     * @param array{string:Closure} $methods
+     * @param array{string:Closure(\Psr\Http\Message\RequestInterface): string} $methods
      *
      */
     public function withPrepareComponentsMethods(array $methods): SigningConfiguration
