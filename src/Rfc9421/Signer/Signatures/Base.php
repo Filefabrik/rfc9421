@@ -30,7 +30,6 @@ final class Base
 
     /**
      * Make the signature-relevant params array to a string. The string will be base64EncodedValue later
-     *
      */
     public static function compileSignatureInputToString(WriteLines $signatureLines): string
     {
@@ -69,7 +68,6 @@ final class Base
             );
         }
 
-        // at least
         return $this->signatureLines;
     }
 
@@ -87,16 +85,15 @@ final class Base
 
         // getting the value from header
         return str_starts_with($signatureParam, '@') ?
-            // special processing for preconfigured @ components
+            // special processing for preconfigured derived @components
             new Line($signatureParam, $components->processValue($signatureParam)) :
             // regular. todo make content-length also with a special "processing" value
-            // todo, if an header not exists, then must throw during
+            // todo, if an header not exists, then must throw
             $this->checkExistingHeader($signatureParam);
     }
 
     /**
      * Handle the body signing
-     * Todo create a extra config for the digest-hash
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @return array{string,string}
