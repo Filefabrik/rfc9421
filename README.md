@@ -426,7 +426,7 @@ Under docs the CSV's for
 
 https://www.iana.org/assignments/http-message-signature
 
-Testing http signatures: https://httpsig.org/
+Testing http signatures: https://httpsig.org/ // will not work. js errors in website
 
 To create Certs have a look into ./tests/generators/ there are some generators you can modify as you need if you need
 
