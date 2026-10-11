@@ -35,7 +35,8 @@ require_once __DIR__.'/../src/register-openssl-signing-verify.php';
  */
 $certInstance = new CertHelper('rsa');
 $targetUrl    = 'http://localhost:8001/mastodon';
-/**
+
+/*
  * Prepare signingConfiguration
  */
 $currentDateTime = new DateTime()->getTimestamp();

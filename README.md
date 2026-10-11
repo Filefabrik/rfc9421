@@ -157,7 +157,12 @@ $verifier = new Verify($verifyPrepareInstance);
 /**
 * Throws if something went wrong during the verifying
  */
-$verifyingBool = $verifier->verifying();
+$verifiedBool = $verifier->verifying();
+
+if(!$verifiedBool){
+    echo 'Signature was not verified.'
+    return;
+}
 
 // check also is verifying bool that is true
 // after that you can use the validated incoming request parameters to execute your Code
@@ -429,6 +434,7 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
 
 ## todos
 
+* Signing response example after receive a request
 * multiple signatures
 * prepareComponents
     * 2.2.5. Request Target
