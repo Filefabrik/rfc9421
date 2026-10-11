@@ -4,7 +4,7 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 ## Features
 
-✅ RFC 9421 Signing and Verification
+✅ RFC 9421 Signing and Verification for Requests and Responses
 
 ✅ PHP-8.4|PHP-8.5
 

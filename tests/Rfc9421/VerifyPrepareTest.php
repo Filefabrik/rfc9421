@@ -8,7 +8,7 @@ use BadMethodCallException;
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
-use Filefabrik\Rfc9421\Signer;
+use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
@@ -98,7 +98,7 @@ final class VerifyPrepareTest extends TestCase
             );
         }
 
-        $signer        = new Signer($request, $configuration);
+        $signer        = new RequestSigner($request, $configuration);
         $signedRequest = $signer->sign();
 
         $prepareVerifierInstance = new VerifyPrepare(
@@ -171,7 +171,7 @@ final class VerifyPrepareTest extends TestCase
             );
         }
 
-        $signer        = new Signer($request, $configuration);
+        $signer        = new RequestSigner($request, $configuration);
         $signedRequest = $signer->sign();
 
         $prepareVerifierInstance = new VerifyPrepare(
@@ -292,7 +292,7 @@ final class VerifyPrepareTest extends TestCase
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
-        $signer                  = new Signer($request, $configuration);
+        $signer                  = new RequestSigner($request, $configuration);
         $signedRequest           = $signer->sign();
         $prepareVerifierInstance = new VerifyPrepare(
             message             : $signedRequest,

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421;
+namespace Filefabrik\Rfc9421\Signer;
 
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
@@ -16,12 +16,10 @@ use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
 
-/**
- * Base singing method
- */
-final class Signer
+trait TraitSigner
 {
     /**
      * Data for signing the relevant header data
@@ -35,20 +33,6 @@ final class Signer
 
     private null|string $signatureBase = null;
 
-    public function __construct(
-        private(set) RequestInterface $message,
-        private(set) readonly SigningConfiguration $signingConfiguration,
-    ) {
-    }
-
-    public function getSignedLines(): WriteLines
-    {
-        return $this->signingLines ??
-            throw new UnexpectedValueException(
-                'Signing\Lines not set',
-            );
-    }
-
     /**
      * @throws AlreadySetException
      * @throws ContentDigestException
@@ -56,7 +40,7 @@ final class Signer
      * @throws InvalidHeaderKeyException
      * @throws SignatureException
      */
-    public function sign(): RequestInterface
+    private function sign(): ResponseInterface|RequestInterface
     {
         // set up the content digest into rendering if the ContentDigestAlgo exists
         if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
@@ -143,5 +127,13 @@ final class Signer
         $this->message = $this->message->withHeader($name, $value ?? '');
 
         return $this;
+    }
+
+    public function getSignedLines(): WriteLines
+    {
+        return $this->signingLines ??
+            throw new UnexpectedValueException(
+                'Signing\Lines not set',
+            );
     }
 }

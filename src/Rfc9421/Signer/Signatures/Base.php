@@ -11,6 +11,7 @@ use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
+use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -19,7 +20,7 @@ use Psr\Http\Message\RequestInterface;
 final class Base
 {
     public function __construct(
-        private(set) RequestInterface $message,
+        private(set) RequestInterface|Response $message,
         private(set) readonly SigningConfiguration $configuration,
         /**
          * ready prepared lines they will be part of the signature

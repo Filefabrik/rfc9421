@@ -19,7 +19,7 @@ use Psr\Http\Message\RequestInterface;
 /**
  * Verification Process of incoming Request
  */
-final class Verify
+final class VerifyRequest
 {
     /**
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
@@ -145,9 +145,9 @@ final class Verify
      * @throws AlreadySetException
      * @throws ContentDigestException
      */
-    private function getSigner(): Signer
+    private function getSigner(): RequestSigner
     {
-        $signer = new Signer(
+        $signer = new RequestSigner(
             message             : clone $this->preparedVerify->message,
             signingConfiguration: $this->signingConfiguration,
         );

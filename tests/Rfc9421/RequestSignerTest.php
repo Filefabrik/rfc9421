@@ -6,7 +6,7 @@ namespace Filefabrik\Rfc9421Test;
 
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Signer;
+use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
@@ -15,8 +15,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
-#[CoversClass(Signer::class)]
-final class SignerTest extends TestCase
+#[CoversClass(RequestSigner::class)]
+final class RequestSignerTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -68,7 +68,7 @@ final class SignerTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer        = new Signer(message: $request, signingConfiguration: $signingConfiguration);
+        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signedRequest = $signer->sign();
         self::assertInstanceOf(Request::class, $signedRequest);
         self::assertTrue($signedRequest->hasHeader('content-digest'));
@@ -78,11 +78,10 @@ final class SignerTest extends TestCase
      * Just a running Test
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function testSignWithoutContentDigest(): void
     {
@@ -118,7 +117,7 @@ final class SignerTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer        = new Signer(message: $request, signingConfiguration: $signingConfiguration);
+        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signedRequest = $signer->sign();
         self::assertInstanceOf(Request::class, $signedRequest);
         self::assertFalse($signedRequest->hasHeader('content-digest'));
@@ -166,7 +165,7 @@ final class SignerTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer        = new Signer(message: $request, signingConfiguration: $signingConfiguration);
+        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signedRequest = $signer->sign();
         self::assertInstanceOf(Request::class, $signedRequest);
         self::assertTrue($signedRequest->hasHeader('content-digest'));
@@ -178,12 +177,8 @@ final class SignerTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function testGetSignedLinesOne(): void
     {
@@ -217,7 +212,7 @@ final class SignerTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer        = new Signer(message: $request, signingConfiguration: $signingConfiguration);
+        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signedRequest = $signer->sign();
         self::assertInstanceOf(Request::class, $signedRequest);
 
@@ -270,7 +265,7 @@ final class SignerTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer = new Signer(message: $request, signingConfiguration: $signingConfiguration);
+        $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->getSignedLines()
                ->toKeyValueArray()
         ;

@@ -7,8 +7,8 @@ namespace Filefabrik\Rfc9421\Signer;
 use BadMethodCallException;
 use Closure;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
-use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Specific Request Headers has to be prepared
@@ -51,7 +51,7 @@ use Psr\Http\Message\RequestInterface;
 final class PrepareComponents
 {
     public function __construct(
-        private(set) readonly RequestInterface $message,
+        private(set) readonly RequestInterface|ResponseInterface $message,
         private(set) ?PreparedMethods $preparedMethods = null,
     ) {
     }
@@ -123,38 +123,38 @@ final class PrepareComponents
              * @see 2.2.1. Method
              */
             ->add(
-                '@method',
-                fn (RequestInterface $message): string => strtoupper(
+                key    : '@method',
+                closure: fn (RequestInterface $message): string => strtoupper(
                     $message->getMethod(),
                 ),
             )
             ->add(
-                '@target-uri',
-                self::processTargetUriClosure(...),
+                key    : '@target-uri',
+                closure: self::processTargetUriClosure(...),
             )
             /*
              * @see 2.2.3. Authority
              */
             ->add(
-                '@authority',
-                fn (RequestInterface $message): string => $message->getUri()
-                                                                 ->getHost(),
+                key    : '@authority',
+                closure: fn (RequestInterface $message): string => $message->getUri()
+                                                                          ->getHost(),
             )
             /*
              * @see 2.2.4. Scheme
              */
             ->add(
-                '@scheme',
-                fn (RequestInterface $message): string => $message->getUri()
-                                                                 ->getScheme(),
+                key    : '@scheme',
+                closure: fn (RequestInterface $message): string => $message->getUri()
+                                                                          ->getScheme(),
             )
             /*
              * 2.2.5. Request Target
              * Todo More complex as described in 2.2.5. Request Target
              */
             ->add(
-                '@request-target',
-                fn (MessageInterface $message) => throw new BadMethodCallException(
+                key    : '@request-target',
+                closure: fn (RequestInterface $message) => throw new BadMethodCallException(
                     '@request-target not implemented',
                 ),
             )
@@ -162,16 +162,19 @@ final class PrepareComponents
              * @see 2.2.6. Path
              */
             ->add(
-                '@path',
-                self::processPathClosure(...),
+                key    : '@path',
+                closure: self::processPathClosure(...),
             )
             ->add(
-                'content-length',
-                fn (RequestInterface $message): int => strlen(
+                key    : 'content-length',
+                closure: fn (RequestInterface|ResponseInterface $message): int => strlen(
                     (string)$message->getBody(),
                 ),
-            )//  '@status'         => 'processStatus',
-
+            )
+            ->add(
+                key    : '@status',
+                closure: fn (ResponseInterface $message): int => $message->getStatusCode(),
+            )
         ;
     }
 

@@ -7,11 +7,11 @@ namespace Filefabrik\Rfc9421Test;
 use BadMethodCallException;
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Signer;
+use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
-use Filefabrik\Rfc9421\Verify;
 use Filefabrik\Rfc9421\VerifyPrepare;
+use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Utils;
@@ -21,8 +21,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
 
-#[CoversClass(Verify::class)]
-final class VerifyTest extends TestCase
+#[CoversClass(VerifyRequest::class)]
+final class VerifyRequestTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -108,7 +108,7 @@ final class VerifyTest extends TestCase
             );
         }
 
-        $signer        = new Signer($request, $configuration);
+        $signer        = new RequestSigner($request, $configuration);
         $signedRequest = $signer->sign();
 
         /**
@@ -129,7 +129,7 @@ final class VerifyTest extends TestCase
         $verifyPrepare = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
-        $verifier = new Verify($verifyPrepare);
+        $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
@@ -200,7 +200,7 @@ final class VerifyTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer = new Signer($request, $configuration);
+        $signer = new RequestSigner($request, $configuration);
 
         /*
          * todo only with library Openssl test
@@ -232,7 +232,7 @@ final class VerifyTest extends TestCase
         $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
-        $verifier = new Verify($verifyPrepare);
+        $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
@@ -313,7 +313,7 @@ final class VerifyTest extends TestCase
             );
         }
 
-        $signer        = new Signer($request, $configuration);
+        $signer        = new RequestSigner($request, $configuration);
         $signedRequest = $signer->sign();
 
         /**
@@ -322,7 +322,7 @@ final class VerifyTest extends TestCase
         $verifyPrepare = new VerifyPrepare($signedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
-        $verifier = new Verify($verifyPrepare);
+        $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
@@ -399,7 +399,7 @@ final class VerifyTest extends TestCase
             );
         }
 
-        $signer        = new Signer($request, $configuration);
+        $signer        = new RequestSigner($request, $configuration);
         $signedRequest = $signer->sign();
 
         /**
@@ -419,7 +419,7 @@ final class VerifyTest extends TestCase
         $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
-        $verifier = new Verify($verifyPrepare);
+        $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
         $signerConfiguration = $verifier->signingConfiguration;
@@ -451,7 +451,7 @@ final class VerifyTest extends TestCase
 
         self::assertSame(
             'https://target-host.com?play=something',
-            new Verify($verifyPrepare)->getMessage()
+            new VerifyRequest($verifyPrepare)->getMessage()
                                       ->getUri()
                                       ->__toString(),
         );

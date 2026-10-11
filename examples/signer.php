@@ -10,13 +10,16 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
-use Filefabrik\Rfc9421\Signer;
+use Filefabrik\Rfc9421\RequestSigner;
+use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\Verify;
 use Filefabrik\Rfc9421\VerifyPrepare;
+use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 require_once __DIR__.'/../vendor/autoload.php';
 /*
@@ -69,7 +72,7 @@ try {
  */
 $prepareMethods = [
     '@authority' =>
-        fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+        fn(RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
 /*
  * Modify derived components generation if needed.
@@ -96,7 +99,7 @@ $request = new Request(
     body   : $bodyJson,
 );
 
-$signer = new Signer(message: $request, signingConfiguration: $signingConfiguration);
+$signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
 } catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
@@ -152,7 +155,7 @@ if (null !== $keyId) {
     /**
      * Verify the generated request from above(receiver-side)
      */
-    $verifier = new Verify($verifyPrepareInstance);
+    $verifier = new VerifyRequest($verifyPrepareInstance);
     try {
         $res = $verifier->verifying();
     } catch (AbstractRfc9421Exception $e) {
@@ -161,7 +164,7 @@ if (null !== $keyId) {
         return;
     }
 
-    echo 'verify result: ', $res, "\n";
+    echo 'verify result: ', $res, PHP_EOL;
 
     /*
      * After successfully verifying you have access to verified header
@@ -180,18 +183,70 @@ if (null !== $keyId) {
          */
         if (null !== $metadata->created && ($currentDateTime + 6000) > $metadata->created) {
             // ...
-            echo 'created: '.$metadata->created."\n";
+            echo 'created: '.$metadata->created.PHP_EOL;
         }
 
         if ($verifier->hasValidatedBody) {
-            echo 'Cool, body verified'."\n";
+            echo 'Cool, body verified'.PHP_EOL;
             $body = (string)$verifier->getMessage()
                                      ->getBody()
             ;
         } else {
-            echo 'body was not part of verifying process'."\n";
+            echo 'body was not part of verifying process'.PHP_EOL;
         }
     }
+
+    //... your internal processing here
+    // after processing give back a signed response, that the sender can be sure the response is valid
+    $responseBodyParams = ['account' => 'Alex', 'new-amount' => 900000000];
+    try {
+        $responseBodyJson = json_encode($responseBodyParams, JSON_THROW_ON_ERROR);
+    } catch (JsonException $jsonException) {
+        echo $jsonException->getMessage();
+
+        return;
+    }
+
+    $response = new Response(headers: ['content-length' => (string)strlen($responseBodyJson)], body: $responseBodyJson);
+
+    //... now sign the response
+    try {
+        $responseSigningConfiguration = new SigningConfiguration()
+            /*
+             * Content Length as a special method
+             */
+            ->withPrepareComponentsMethod(
+                'content-length',
+                fn(ResponseInterface $response): int =>$response->getBody()
+                                                                            ->getSize(),
+            )
+            // make sure the receiver Alice expects the following response Key
+            ->setSignatureKeyName('responseSig=')
+            // singing the status as relevant information for the requester Alice, to ensure the status
+            ->signHeader('@status')
+            ->signHeader('content-length')
+            // the sender of the request expects an algo that Bob can check while receive this signed response
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            // set alice private pem to encrypt the response
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+            // singing the response body
+            ->setContentDigestAlgo('sha256')
+        ;
+    } catch (AbstractRfc9421Exception $e) {
+        echo 'response signing configuration error: '.$e->getMessage();
+
+        return;
+    }
+    $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
+    try {
+        $signedResponse = $responseSigner->sign();
+    } catch (AbstractRfc9421Exception $e) {
+        echo 'response signing error: '.$e->getMessage();
+
+        return;
+    }
+
+    echo 'response is successfully signed and can be response to the sender'.PHP_EOL;
 
     return;
 }
