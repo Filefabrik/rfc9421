@@ -46,6 +46,21 @@ $currentDateTime = new DateTime()->getTimestamp();
 
 try {
     $signingConfiguration = new SigningConfiguration()
+        /*
+         * content-type will be injected after signing so configure that we are signing manuell the content-type
+         */
+        ->processWithoutExistingHeader('content-type')
+        /*
+         * the method we are generating the content-type value (simply via header line)
+         */
+        ->withPrepareComponentsMethod(
+            'content-type',
+            fn (RequestInterface $request): string => $request->getHeaderLine('content-type'),
+        )
+        /*
+         * tell the signing process that content-type has to be signed
+         */
+        ->signHeader('content-type')
         ->signHeader('@method')
         ->signHeader('x-Origin-host')
         ->signHeader('@authority')
@@ -53,7 +68,7 @@ try {
         ->setCreated($currentDateTime)
         ->setExpires($currentDateTime + 7200)
         ->setTag('mastodon')
-        ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+        ->setKeyid('http://127.0.0.1:8001/account/publicPem#main-key')
         ->withNonce('nonce-now')
         ->setContentDigestAlgo('sha256')
         // content digest signer key
@@ -95,7 +110,7 @@ try {
 $request = new Request(
     method : 'POST',
     uri    : $targetUrl,
-    headers: ['x-origin-host' => 'mytest.com'],
+    headers: ['x-origin-host' => 'mytest.com', 'content-type' => 'application/json'],
     body   : $bodyJson,
 );
 
@@ -222,7 +237,7 @@ if (null !== $keyId) {
             )
             /*
              * The content-length will be created to header by guzzle or something AFTER we are signing the request/response. So we have to calculate the length before.
-             * @important, when the receiver of this response verifies this response the `->processWithoutExistingHeader(['content-length'])` never set.
+             * @important, when the receiver of this response verifies this response the `->processWithoutExistingHeaders(['content-length'])` never set.
              * also the:
              * `->withPrepareComponentsMethod(
                 componentName: 'content-length',
@@ -230,7 +245,7 @@ if (null !== $keyId) {
                                                                                 ->getSize(),
             )`
        */
-            ->processWithoutExistingHeader(['content-length'])
+            ->processWithoutExistingHeaders(['content-length'])
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
             // singing the status as relevant information for the requester Alice, to ensure the status

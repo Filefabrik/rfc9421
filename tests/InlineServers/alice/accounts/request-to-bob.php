@@ -120,5 +120,9 @@ try {
 displayLogger('During request signing at Alice Server there was no exception thrown.');
 displayLogger('Now, send the Request to Bob', 2);
 $bobsResponse = new Client()->send($signedRequest);
+displayLogger('Response is back from Bob to Alice Server. Shows the Response-Body from Bob.', 2);
 
 echo $bobsResponse->getBody();
+
+displayLogger('', 1, false);
+displayLogger('All Finished at Bob\'s Server');

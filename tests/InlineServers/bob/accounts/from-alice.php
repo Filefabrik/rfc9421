@@ -17,12 +17,11 @@ use Psr\Http\Message\RequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
 
-//header('Content-Type: text/text');
 displayLogger('', 2);
 displayLogger('Here is Bob\'s Server', 2);
 
 // Specify the URL and data
-$url = 'http://localhost:8001/accounts/from-alice?XDEBUG_SESSION=PHPSTORM';
+$url = 'http://localhost:8001/accounts/from-alice';
 
 $bobCertInstance = new CertHelper('rsa', __DIR__.'/../Keys/');
 
@@ -38,8 +37,7 @@ $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory
 $psr7Request    = $psrHttpFactory->createRequest($fromGlobals);
 
 $prepareMethods        = [
-    '@authority' =>
-        fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+    '@authority' => fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
 $verifierConfiguration = new SigningConfiguration();
 $verifierConfiguration->withPrepareComponentsMethods($prepareMethods);
@@ -57,15 +55,15 @@ try {
 
     return;
 }
-displayLogger('prepareVerification from Alice Request without Errors');
+displayLogger('prepareVerification from Alice Request at Bob\'s Server without Errors');
 /*
  * with the keyId you should be able to download the public pem
  */
 $keyId = $verifierConfiguration->metadata->keyid;
 
 if (null !== $keyId) {
-    displayLogger('Alice send the KeyId '.$keyId);
-    displayLogger('Bob tries to request the public pem from Alice.');
+    displayLogger('Alice sends the KeyId in her request: '.$keyId);
+    displayLogger('Bob tries to request the public pem from Alice via the KeyId-Url.');
     /*
      * Requesting the Public Pem from Alice. This Cert is need to check the Requested Signature
      */
@@ -82,7 +80,7 @@ if (null !== $keyId) {
         return;
     }
 
-    displayLogger('Bob has load the Public Pem from Alice.');
+    displayLogger('Bob has requested and received the Public Pem from Alice.');
     displayLogger('..with content of pem: ');
     displayLogger((string)$bobPublicPem, 1, false);
 
@@ -96,7 +94,6 @@ if (null !== $keyId) {
      * $verifierConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256);
      */
     /*
-     * todo check for mastodon
      * $verifierConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha256);
      */
     displayLogger('Bob now verifies the incoming signed request from Alice with her public pem.');
