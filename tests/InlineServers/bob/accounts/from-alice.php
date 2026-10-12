@@ -109,7 +109,7 @@ if (null !== $keyId) {
         return;
     }
 
-    displayLogger('During the verify process there no exception was thrown.');
+    displayLogger('During the verify process there was no exception thrown.');
 
     displayLogger('The Verify process has endet with the result: '.($res ? 'true' : 'false'));
 

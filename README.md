@@ -44,7 +44,27 @@ composer install filefabrik/rfc9421
 * a Full-Example from console without spinning an extra webserver
 * a signing Example
 
-### Full HTTP Signing and Verify Example over two Servers
+### Full HTTP Signing and Verify Example over two Servers 
+
+To help you understand and test all the processes in RFC 9421, we have provided a complete example.
+
+All processes
+* Creating a request
+* Signing a request
+* Sending the signed request
+* Receiving the signed request
+* Verifying the signed request
+* Processing the verified request
+* Signing the response
+* Returning the signed response
+* Verifying the signed response
+
+are provided as a transparent and easy-to-follow example.
+
+Feel free to experiment with the ready-to-use example to familiarize yourself with all aspects of the RFC 9421 message signing and verification process.
+
+If you have any requests or ideas, please create a ticket.
+
 
 see in `/examples/full-flow.php`
 
