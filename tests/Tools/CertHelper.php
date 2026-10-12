@@ -6,9 +6,9 @@ namespace Filefabrik\Rfc9421Test\Tools;
 
 use UnexpectedValueException;
 
-final readonly class CertHelper
+final class CertHelper
 {
-    public function __construct(public private(set) string $name)
+    public function __construct(public private(set) readonly string $name, private(set) ?string $dir = null)
     {
     }
 
@@ -22,7 +22,7 @@ final readonly class CertHelper
 
     public function getDir(): string
     {
-        return dirname(__DIR__, 2).'/tests/Keys/';
+        return $this->dir ??= dirname(__DIR__, 2).'/tests/Keys/';
     }
 
     private function getFC(string $path): string
