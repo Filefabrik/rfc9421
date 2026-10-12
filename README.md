@@ -39,6 +39,19 @@ you like to take a look at the code in advance? If so, please open a ticket.
 composer install filefabrik/rfc9421
 ```
 
+## Examples
+
+* a Full-Example from console without spinning an extra webserver
+* a signing Example
+
+### Full HTTP Signing and Verify Example over two Servers
+
+see in `/examples/full-flow.php`
+
+```shell
+php ./examples/full-flow.php
+```
+
 ### Example
 
 For getting directly results in your code, have a look into `./examples/signer.php` there is a full example of signing
@@ -435,9 +448,15 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
 ## todos
 
 * Signing response example after receive a request
+    * documentation for signing the response without processing `content-length` during generation and other RFC header
+      variables they will be injected into request|response after Filefabrik/Rfc9421 signing
 * multiple signatures
 * prepareComponents
     * 2.2.5. Request Target
     * 2.2.7. Query
     * 2.4. Signing Request Components in a Response Message
 * check https://github.com/bakame-php/http-structured-fields
+* for symfony composer require symfony/psr-http-message-bridge
+    * `"symfony/http-foundation": "^v8.1.8",
+      "symfony/psr-http-message-bridge": "^v8.1.0",
+      "nyholm/psr7": "^1.8"`
