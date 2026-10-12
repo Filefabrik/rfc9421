@@ -17,7 +17,7 @@ use Psr\Http\Message\RequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
 
-header('Content-Type: text/text');
+//header('Content-Type: text/text');
 displayLogger('', 2);
 displayLogger('Here is Bob\'s Server', 2);
 

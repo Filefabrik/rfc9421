@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+/**
+ * Console logging
+ */
 function displayLogger(string $message, int $cnt = 1, bool $showLines = true): void
 {
     $phpEol = str_repeat(PHP_EOL, $cnt);
@@ -11,9 +14,9 @@ function displayLogger(string $message, int $cnt = 1, bool $showLines = true): v
     }
     $parts = debug_backtrace()[0];
 
-    $line = $showLines ?
-        (str_replace('/var/www/html/tests/InlineServers', '', $parts['file'])).'::'.$parts['line'] .': ' :
-        '';
+    $p = explode('/tests/InlineServers', $parts['file'] ?? '');
+
+    $line = $showLines ? implode(' ', [$p[1] ?? '', ':: ', $parts['line'] ?? '', ': ']) : '';
 
     echo $line, $message, $phpEol;
 }
