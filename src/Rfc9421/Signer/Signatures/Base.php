@@ -132,7 +132,7 @@ final class Base
                 (
                     in_array(
                         $signatureParam,
-                        $this->configuration->getWithoutExistingHeader(),
+                        $this->configuration->getWithoutExistingHeaders(),
                         true,
                     )
                 )

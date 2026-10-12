@@ -36,7 +36,7 @@ final class SigningConfiguration
     /**
      * @var string[]
      */
-    private(set) array|null $withoutExistingHeader = null;
+    private(set) array|null $withoutExistingHeaders = null;
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      */
@@ -137,6 +137,7 @@ final class SigningConfiguration
     /**
      * Signing Params they do not need an existing header.
      *
+     * @param string[]|null $withoutExistingHeader
      *
      * @return $this
      * @example Header content-length will be injected into the real header after processing the signing process.
@@ -144,9 +145,17 @@ final class SigningConfiguration
      *          The receiver of the signed request or signend response verifies the Header value of the (Guzzle) Generated header
      *
      */
-    public function processWithoutExistingHeader(?array $withoutExistingHeader): self
+    public function processWithoutExistingHeaders(?array $withoutExistingHeader): self
     {
-        $this->withoutExistingHeader = $withoutExistingHeader;
+        $this->withoutExistingHeaders = $withoutExistingHeader;
+
+        return $this;
+    }
+
+    public function processWithoutExistingHeader(null|string $withoutExistingHeader): self
+    {
+        $this->withoutExistingHeaders   ??= [];
+        $this->withoutExistingHeaders[] = $withoutExistingHeader;
 
         return $this;
     }
@@ -190,14 +199,14 @@ final class SigningConfiguration
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @return string[]
      */
-    public function getWithoutExistingHeader(): array
+    public function getWithoutExistingHeaders(): array
     {
-        return $this->hasWithProcessing() ? $this->withoutExistingHeader :
+        return $this->hasWithProcessing() ? $this->withoutExistingHeaders :
             throw new SignatureException('Processing is empty! ');
     }
 
     public function hasWithProcessing(): bool
     {
-        return null !== $this->withoutExistingHeader && count($this->withoutExistingHeader) > 0;
+        return null !== $this->withoutExistingHeaders && count($this->withoutExistingHeaders) > 0;
     }
 }
