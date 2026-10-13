@@ -22,8 +22,6 @@ final class SignaturInput
 
     private(set) ?string $metadata = null;
 
-    private bool $valid = true;
-
     private function __construct(private readonly string $signatureLine)
     {
     }
@@ -55,9 +53,9 @@ final class SignaturInput
                 $this->metadata = $matches[3];
             }
 
-            return $this->valid;
+            return true;
         }
 
-        return $this->valid = false;
+        return false;
     }
 }
