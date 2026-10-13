@@ -11,6 +11,7 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Signature\Component;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
@@ -52,7 +53,7 @@ trait TraitSigner
     {
         // set up the content digest into rendering if the ContentDigestAlgo exists
         if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
-            $this->signingConfiguration->signatureParams->add('content-digest');
+            $this->signingConfiguration->signatureComponents->add(new Component('content-digest'));
         }
 
         $this->prepareSigning();

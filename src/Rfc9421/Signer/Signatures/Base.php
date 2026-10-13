@@ -6,6 +6,7 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Signature\Component;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\Signer\SignBody;
@@ -61,12 +62,13 @@ final class Base
             $components->setPreparedMethods($preparedComponentMethods);
         }
 
-        foreach ($this->configuration->signatureParams->getSignatureParameters() as $signatureParam) {
+        foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
+            $v = $this->createSignatureLine(
+                signatureComponent: $signatureComponent,
+                components        : $components,
+            );
             $this->signatureLines->add(
-                signatureLine: $this->createSignatureLine(
-                    signatureParam: $signatureParam,
-                    components    : $components,
-                ),
+                signatureLine: $v,
             );
         }
 
@@ -80,15 +82,15 @@ final class Base
      * @throws InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
-    private function createSignatureLine(string $signatureParam, PrepareComponents $components): Line
+    private function createSignatureLine(Component $signatureComponent, PrepareComponents $components): Line
     {
-        if ('content-digest' === $signatureParam) {
+        if ('content-digest' === $signatureComponent->name) {
             return new Line(...$this->handleSignBody());
         }
 
-        return $this->mustProcessingLine($signatureParam) ?
-            new Line($signatureParam, $components->processValue($signatureParam)) :
-            $this->checkExistingHeader($signatureParam);
+        return $this->mustProcessingLine($signatureComponent->name) ?
+            new Line($signatureComponent->name, $components->processValue($signatureComponent->name)) :
+            $this->checkExistingHeader($signatureComponent->name);
     }
 
     /**
@@ -160,8 +162,8 @@ final class Base
     public function makeSignatureInput(): string
     {
         $headerString = new SigCompilerHelper(
-            signatureParams : $this->configuration->signatureParams,
-            signatureKeyName: $this->configuration->signatureKeyName ?? '',
+            signatureComponents: $this->configuration->signatureComponents,
+            signatureKeyName   : $this->configuration->signatureKeyName ?? '',
         )->makeSig1fromSignatureParams();
 
         $metadataString = $this->configuration->metadata->toString();

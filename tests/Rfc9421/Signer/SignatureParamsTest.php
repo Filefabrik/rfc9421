@@ -9,15 +9,9 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\SignatureParams;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SignatureParams::class)]
-#[CoversMethod(SignatureParams::class, 'add')]
-#[CoversMethod(SignatureParams::class, 'fromArray')]
-#[CoversMethod(SignatureParams::class, 'getSignatureParameters')]
-#[CoversMethod(SignatureParams::class, 'exists')]
-#[CoversMethod(SignatureParams::class, 'setHeaderName')]
 final class SignatureParamsTest extends TestCase
 {
     /**

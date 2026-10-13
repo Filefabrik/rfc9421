@@ -81,7 +81,7 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \JsonException
+     * @throws \JsonException|\Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
     public function testSignWithoutContentDigest(): void
     {

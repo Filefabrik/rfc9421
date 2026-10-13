@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Verify;
 
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
+use Filefabrik\Rfc9421\Signature\Components;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -15,7 +16,7 @@ final class HeaderSignatureInputTest extends TestCase
 {
     public function testExtract(): void
     {
-        $expectedComponents   = ['@method', 'content-digest'];
+        $expectedComponents   =new Components()->adding('@method',)->adding('content-digest') ;
         $expectedMetadata     = [
             'created' => 1789749530,
             'expires' => 1789756730,
@@ -29,13 +30,13 @@ final class HeaderSignatureInputTest extends TestCase
 
         $headerSignatureInput->extract();
 
-        self::assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
+        self::assertEquals($expectedComponents, $headerSignatureInput->extractedComponents);
         self::assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 
     public function testExtractWithoutKey(): void
     {
-        $expectedComponents   = ['@method', 'content-digest'];
+        $expectedComponents   =new Components()->adding('@method',)->adding('content-digest') ;
         $expectedMetadata     = [
             'created' => 1789749530,
             'expires' => 1789756730,
@@ -49,7 +50,7 @@ final class HeaderSignatureInputTest extends TestCase
 
         $headerSignatureInput->extract();
 
-        self::assertSame($expectedComponents, $headerSignatureInput->extractedComponents);
+        self::assertEquals($expectedComponents, $headerSignatureInput->extractedComponents);
         self::assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 

@@ -10,6 +10,8 @@ use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 
 /**
  * Handles all relevant signatures for the header key "Signature-Input"
+ * @deprecated use \Filefabrik\Rfc9421\Signature\Components
+ * todo setting component make some methods from here
  */
 final class SignatureParams
 {

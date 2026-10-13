@@ -6,6 +6,7 @@ namespace Filefabrik\Rfc9421Test;
 
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+use Filefabrik\Rfc9421\Signature\Component;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -64,9 +65,9 @@ final class SigningConfigurationTest extends TestCase
     public function testSignHeader(): void
     {
         $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureParams->getSignatureParameters());
+        self::assertEmpty($i->signatureComponents->getComponents());
         $i->signHeaders(['foo', 'bar']);
-        self::assertSame(['foo', 'bar'], $i->signatureParams->getSignatureParameters());
+        self::assertEquals([new Component('foo'), new Component('bar')], $i->signatureComponents->getComponents());
     }
 
     /**

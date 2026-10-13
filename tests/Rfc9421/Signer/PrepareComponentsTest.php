@@ -8,7 +8,6 @@ use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
-use Filefabrik\Rfc9421\Signer\SignatureParams;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -33,9 +32,7 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents(new Request('post', 'https://Test.com'));
         $prepareInstance->addMappingValues($arr);
 
-        $signatureParams = new SignatureParams();
 
-        $signatureParams->setDerivedComponentName('@method');
 
         self::assertSame('PosB', $prepareInstance->processValue('@method'));
     }
@@ -47,9 +44,7 @@ final class PrepareComponentsTest extends TestCase
         ];
 
         $r               = new Request('post', 'https://Test.com');
-        $signatureParams = new SignatureParams();
-
-        $signatureParams->setDerivedComponentName('@method');
+     
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->addMappingValues($arr);

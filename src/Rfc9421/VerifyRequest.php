@@ -10,7 +10,6 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
-use Filefabrik\Rfc9421\Signer\SignatureParams;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
@@ -46,7 +45,9 @@ final class VerifyRequest
      */
     public function verifying(): bool
     {
-        $this->prepareSigningComponents();
+        $this->signingConfiguration->setComponents(
+            components: $this->preparedVerify->getSignatureInputInstance()->extractedComponents,
+        );
 
         // Validates the Content digest if needed from signature-line sig1=(content-digest)
         if ($this->signingConfiguration->hasContentDigestHashAlgo()) {
@@ -74,38 +75,6 @@ final class VerifyRequest
         }
 
         return $verified;
-    }
-
-    /**
-     * Extract which "Components" must be used to validate the header data
-     *
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     */
-    private function prepareSigningComponents(): void
-    {
-        // all keys they have into rebuildable signing array
-
-        // no compile the signature array such as in singer
-        foreach ($this->getSigningComponents() as $signingComponent) {
-            $this->signingConfiguration->signHeader($signingComponent);
-        }
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @return string[]
-     */
-    private function getSigningComponents(): array
-    {
-        return SignatureParams::fromArray($this->preparedVerify->getSignatureInputInstance()->extractedComponents)
-                              ->getSignatureParameters()
-        ;
     }
 
     /**
@@ -143,7 +112,7 @@ final class VerifyRequest
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
      * @throws AlreadySetException
-     * @throws ContentDigestException
+     * @throws ContentDigestException|\Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     private function getSigner(): RequestSigner
     {

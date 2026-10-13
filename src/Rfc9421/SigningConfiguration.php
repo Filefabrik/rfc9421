@@ -7,8 +7,10 @@ namespace Filefabrik\Rfc9421;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
+use Filefabrik\Rfc9421\Signature\Component;
+use Filefabrik\Rfc9421\Signature\Components;
+use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signer\Metadata;
-use Filefabrik\Rfc9421\Signer\SignatureParams;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Support\PrepareComponentMethodsTrait;
 use Filefabrik\Rfc9421\Support\PrivatePemTrait;
@@ -37,6 +39,7 @@ final class SigningConfiguration
      * @var string[]
      */
     private(set) array|null $withoutExistingHeaders = null;
+
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      */
@@ -44,7 +47,7 @@ final class SigningConfiguration
 
     public function __construct(
         private(set) readonly Metadata $metadata = new Metadata(),
-        private(set) readonly SignatureParams $signatureParams = new SignatureParams(),
+        private(set)  Components $signatureComponents = new Components(),
     ) {
     }
 
@@ -103,33 +106,36 @@ final class SigningConfiguration
 
         return $this;
     }
+    public function setComponents(Components $components): self
+    {
+        $this->signatureComponents = $components;
+        return $this;
+    }
 
     /**
      * Signing header Parameter
      *
-     * @param string[] $headerKeys
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
     public function signHeaders(array $headerKeys): self
     {
         foreach ($headerKeys as $headerKey) {
-            $this->signHeader($headerKey);
+            [$headerKey, $initialContentsEnum] = is_array($headerKey) ? $headerKey : [$headerKey, null];
+            $this->signHeader($headerKey, $initialContentsEnum);
         }
 
         return $this;
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     */
-    public function signHeader(string $headerKey): self
-    {
-        $this->signatureParams->add(key: $headerKey);
+    public function signHeader(
+        string|Component $headerKey,
+        null|string|InitialContentsEnum $initialContentsEnum = null,
+    ): self {
+        if ($headerKey instanceof Component) {
+            $this->signatureComponents->add($headerKey);
+        } else {
+            $this->signatureComponents->add(new Component($headerKey, $initialContentsEnum));
+        }
 
         return $this;
     }
@@ -139,7 +145,6 @@ final class SigningConfiguration
      *
      * @param string[]|null $withoutExistingHeader
      *
-     * @return $this
      * @example Header content-length will be injected into the real header after processing the signing process.
      *          So you have to forecast the content-length of the body and set this processed value into the signing process.
      *          The receiver of the signed request or signend response verifies the Header value of the (Guzzle) Generated header
