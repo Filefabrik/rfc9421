@@ -9,7 +9,20 @@ final class AlreadySetException extends AbstractRfc9421Exception
     public static function inputSignature(null|int|string $var = null): self
     {
         return new self(
-            sprintf('Signature-Input parameter "%s" was set before and can not be set again.', $var),
+            sprintf(
+                'Signature-Input parameter "%s" was set before and can not be set again.',
+                $var,
+            ),
+        );
+    }
+
+    public static function ComponentExists(string $componentName): self
+    {
+        return new self(
+            sprintf(
+                'The Component "%s" already exists.',
+                $componentName,
+            ),
         );
     }
 }

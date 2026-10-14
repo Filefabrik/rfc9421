@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AlreadySetException::class)]
 final class AlreadySetExceptionTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
     public function testInputSignature(): void
     {
         $this->expectExceptionObject(
@@ -20,5 +23,19 @@ final class AlreadySetExceptionTest extends TestCase
         );
 
         throw  AlreadySetException::inputSignature('my-var-was-set');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
+    public function testComponentExists(): void
+    {
+        $this->expectExceptionObject(
+            new AlreadySetException(
+                'The Component "@myVar-was-set" already exists',
+            ),
+        );
+
+        throw  AlreadySetException::ComponentExists('@myVar-was-set');
     }
 }
