@@ -53,7 +53,7 @@ trait TraitSigner
     {
         // set up the content digest into rendering if the ContentDigestAlgo exists
         if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
-            $this->signingConfiguration->signatureComponents->add(new Component('content-digest'));
+            $this->signingConfiguration->signatureComponents->set(new Component('content-digest'));
         }
 
         $this->prepareSigning();
