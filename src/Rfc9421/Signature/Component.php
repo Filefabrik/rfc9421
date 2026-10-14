@@ -17,7 +17,10 @@ final class Component
             set => strtolower($value);
         },
         null|InitialContentsEnum|string $initialContentsEnum = null {
-            set => $this->initialContentsEnum = InitialContentsEnum::isOwnTypeOrNullOrThrow($value);
+            /**
+             * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+             */
+            set => InitialContentsEnum::isOwnTypeOrNullOrThrow($value);
         },
     ) {
     }
