@@ -6,6 +6,7 @@ namespace Filefabrik\Rfc9421\Signer;
 
 use BadMethodCallException;
 use Closure;
+use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -123,20 +124,20 @@ final class PrepareComponents
              * @see 2.2.1. Method
              */
             ->add(
-                key    : '@method',
+                key    : DerivedComponentEnum::method,
                 closure: fn (RequestInterface $message): string => strtoupper(
                     $message->getMethod(),
                 ),
             )
             ->add(
-                key    : '@target-uri',
+                key    : DerivedComponentEnum::targetUri,
                 closure: self::processTargetUriClosure(...),
             )
             /*
              * @see 2.2.3. Authority
              */
             ->add(
-                key    : '@authority',
+                key    : DerivedComponentEnum::authority,
                 closure: fn (RequestInterface $message): string => $message->getUri()
                                                                           ->getHost(),
             )
@@ -144,7 +145,7 @@ final class PrepareComponents
              * @see 2.2.4. Scheme
              */
             ->add(
-                key    : '@scheme',
+                key    : DerivedComponentEnum::scheme,
                 closure: fn (RequestInterface $message): string => $message->getUri()
                                                                           ->getScheme(),
             )
@@ -153,7 +154,7 @@ final class PrepareComponents
              * Todo More complex as described in 2.2.5. Request Target
              */
             ->add(
-                key    : '@request-target',
+                key    : DerivedComponentEnum::requestTarget,
                 closure: fn (RequestInterface $message) => throw new BadMethodCallException(
                     '@request-target not implemented',
                 ),
@@ -162,7 +163,7 @@ final class PrepareComponents
              * @see 2.2.6. Path
              */
             ->add(
-                key    : '@path',
+                key    : DerivedComponentEnum::path,
                 closure: self::processPathClosure(...),
             )
             ->add(
@@ -172,7 +173,7 @@ final class PrepareComponents
                 ),
             )
             ->add(
-                key    : '@status',
+                key    : DerivedComponentEnum::status,
                 closure: fn (ResponseInterface $message): int => $message->getStatusCode(),
             )
         ;

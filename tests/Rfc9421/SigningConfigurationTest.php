@@ -6,7 +6,11 @@ namespace Filefabrik\Rfc9421Test;
 
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Signature\Component;
+use Filefabrik\Rfc9421\Signature\Components;
+use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,16 +62,70 @@ final class SigningConfigurationTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      */
     public function testSignHeader(): void
     {
         $i = new SigningConfiguration();
         self::assertEmpty($i->signatureComponents->getComponents());
+        $i->signHeader('foo', 'key');
+        self::assertEquals([new Component('foo', InitialContentsEnum::key)], $i->signatureComponents->getComponents());
+
+        $i = new SigningConfiguration();
+        $i->signHeader(new Component('@authority', 'name'));
+
+        self::assertEquals(
+            [new Component(DerivedComponentEnum::authority, InitialContentsEnum::name)],
+            $i->signatureComponents->getComponents(),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
+    public function testSignHeaderThrowWrongKey(): void
+    {
+        $this->expectExceptionObject(
+            new EnumTypeException(
+                '"@foo" is not a valid enumeration of "Filefabrik\Rfc9421\Signature\DerivedComponentEnum" Enum.',
+            ),
+        );
+        $i = new SigningConfiguration();
+        self::assertEmpty($i->signatureComponents->getComponents());
+        $i->signHeader('@foo');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
+    public function testSignHeaderThrowWrongInitialContent(): void
+    {
+        $this->expectExceptionObject(
+            new EnumTypeException(
+                '"bullshit" is not a valid enumeration of "Filefabrik\Rfc9421\Signature\InitialContentsEnum" Enum.',
+            ),
+        );
+        $i = new SigningConfiguration();
+        self::assertEmpty($i->signatureComponents->getComponents());
+        $i->signHeader('@authority','bullshit');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
+    public function testSignHeaders(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertEmpty($i->signatureComponents->getComponents());
         $i->signHeaders(['foo', 'bar']);
         self::assertEquals([new Component('foo'), new Component('bar')], $i->signatureComponents->getComponents());
+
+        $i = new SigningConfiguration();
+        $i->signHeaders([DerivedComponentEnum::authority, 'bar']);
+        self::assertEquals(
+            [new Component('@authority'), new Component('bar')],
+            $i->signatureComponents->getComponents(),
+        );
     }
 
     /**
@@ -161,5 +219,13 @@ final class SigningConfigurationTest extends TestCase
 
         $i->setContentDigestAlgo('sha-512');
         self::assertSame(DigestAlgorithmsEnum::sha512, $i->getContentDigestHashAlgoOrThrow());
+    }
+
+    public function testSetComponents(): void
+    {
+        $c = new Components();
+        $i = new SigningConfiguration();
+        $i->setComponents($c);
+        self::assertSame($c, $i->signatureComponents);
     }
 }

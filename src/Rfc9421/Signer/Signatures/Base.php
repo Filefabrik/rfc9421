@@ -84,13 +84,14 @@ final class Base
      */
     private function createSignatureLine(Component $signatureComponent, PrepareComponents $components): Line
     {
-        if ('content-digest' === $signatureComponent->name) {
+        $normalizedName = $signatureComponent->getNormalizedName();
+        if ('content-digest' === $normalizedName) {
             return new Line(...$this->handleSignBody());
         }
 
-        return $this->mustProcessingLine($signatureComponent->name) ?
-            new Line($signatureComponent->name, $components->processValue($signatureComponent->name)) :
-            $this->checkExistingHeader($signatureComponent->name);
+        return $this->mustProcessingLine($normalizedName) ?
+            new Line($normalizedName, $components->processValue($normalizedName)) :
+            $this->checkExistingHeader($normalizedName);
     }
 
     /**

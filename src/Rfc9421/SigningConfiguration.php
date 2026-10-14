@@ -9,6 +9,7 @@ use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 use Filefabrik\Rfc9421\Signature\Component;
 use Filefabrik\Rfc9421\Signature\Components;
+use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
@@ -47,7 +48,7 @@ final class SigningConfiguration
 
     public function __construct(
         private(set) readonly Metadata $metadata = new Metadata(),
-        private(set)  Components $signatureComponents = new Components(),
+        private(set) Components $signatureComponents = new Components(),
     ) {
     }
 
@@ -106,20 +107,27 @@ final class SigningConfiguration
 
         return $this;
     }
+
     public function setComponents(Components $components): self
     {
         $this->signatureComponents = $components;
+
         return $this;
     }
 
     /**
      * Signing header Parameter
      *
+     * @param array{array{string:null|string|\Filefabrik\Rfc9421\Signature\InitialContentsEnum}}|array{string} $headerKeys
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      */
     public function signHeaders(array $headerKeys): self
     {
-        foreach ($headerKeys as $headerKey) {
+        foreach ($headerKeys as $int=> $headerKey) {
+
+
+
             [$headerKey, $initialContentsEnum] = is_array($headerKey) ? $headerKey : [$headerKey, null];
             $this->signHeader($headerKey, $initialContentsEnum);
         }
@@ -127,14 +135,17 @@ final class SigningConfiguration
         return $this;
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
     public function signHeader(
-        string|Component $headerKey,
+        DerivedComponentEnum|string|Component $headerKey,
         null|string|InitialContentsEnum $initialContentsEnum = null,
     ): self {
         if ($headerKey instanceof Component) {
-            $this->signatureComponents->add($headerKey);
+            $this->signatureComponents->set($headerKey);
         } else {
-            $this->signatureComponents->add(new Component($headerKey, $initialContentsEnum));
+            $this->signatureComponents->set(new Component($headerKey, $initialContentsEnum));
         }
 
         return $this;

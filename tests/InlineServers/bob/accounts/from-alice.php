@@ -67,9 +67,14 @@ if (null !== $keyId) {
     /*
      * Requesting the Public Pem from Alice. This Cert is need to check the Requested Signature
      */
-    $psr17Factory   = new Psr17Factory();
-    $psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
-    $psrPemRequest  = $psrHttpFactory->createRequest(Request::create($keyId));
+    $psr17Factory  = new Psr17Factory();
+    $psrPemRequest = new PsrHttpFactory(
+        serverRequestFactory: $psr17Factory,
+        streamFactory       : $psr17Factory,
+        uploadedFileFactory : $psr17Factory,
+        responseFactory     : $psr17Factory,
+    )->createRequest(symfonyRequest: Request::create($keyId));
+
     try {
         $bobPublicPem = new Client()->send($psrPemRequest)
                                     ->getBody()

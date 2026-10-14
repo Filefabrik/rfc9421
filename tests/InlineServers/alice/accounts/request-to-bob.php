@@ -10,6 +10,7 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
+use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Client;
@@ -74,7 +75,7 @@ displayLogger('The Signing configuration is without errors.');
  * Make sure to use the same methods in signer and verifier!
  */
 $prepareMethods = [
-    '@authority' =>
+    DerivedComponentEnum::authority->value =>
         fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
 /*

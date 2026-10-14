@@ -16,7 +16,7 @@ final class HeaderSignatureInputTest extends TestCase
 {
     public function testExtract(): void
     {
-        $expectedComponents   =new Components()->adding('@method',)->adding('content-digest') ;
+        $expectedComponents   =new Components()->setByName('@method',)->setByName('content-digest') ;
         $expectedMetadata     = [
             'created' => 1789749530,
             'expires' => 1789756730,
@@ -36,7 +36,7 @@ final class HeaderSignatureInputTest extends TestCase
 
     public function testExtractWithoutKey(): void
     {
-        $expectedComponents   =new Components()->adding('@method',)->adding('content-digest') ;
+        $expectedComponents   =new Components()->setByName('@method',)->setByName('content-digest') ;
         $expectedMetadata     = [
             'created' => 1789749530,
             'expires' => 1789756730,

@@ -25,6 +25,11 @@ final class ComponentTest extends TestCase
         $i = new Component('caramba', InitialContentsEnum::name);
         self::assertEquals('caramba', $i->name);
         self::assertEquals(InitialContentsEnum::name, $i->initialContentsEnum);
+
+        // by string with @
+        $i = new Component('@status', InitialContentsEnum::name);
+        self::assertEquals('@status', $i->getNormalizedName());
+        self::assertEquals(InitialContentsEnum::name, $i->initialContentsEnum);
     }
 
     public function test__constructThrow(): void

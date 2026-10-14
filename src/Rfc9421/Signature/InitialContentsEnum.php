@@ -7,7 +7,8 @@ namespace Filefabrik\Rfc9421\Signature;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 
 /**
- * 6.5.2. Initial Contents
+ * @see 6.5. HTTP Signature Component Parameters Registry
+ * @see 6.5.2. Initial Contents
  * The table below contains the initial contents of the "HTTP Signature Component Parameters" registry.
  *
  * @see https://www.rfc-editor.org/info/rfc9421/#section-6.5.2

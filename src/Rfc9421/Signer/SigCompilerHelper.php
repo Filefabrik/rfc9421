@@ -53,7 +53,7 @@ final readonly class SigCompilerHelper
     {
         $parts = [];
         foreach ($components->getComponents() as $component) {
-            $name = sprintf('"%s"', $component->name);
+            $name = sprintf('"%s"', $component->getNormalizedName());
             if ($component->initialContentsEnum) {
                 $name .= ';'.$component->initialContentsEnum->name;
             }

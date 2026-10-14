@@ -17,7 +17,7 @@ final class Components
     private array $components = [];
 
     /**
-     * @return array{\Filefabrik\Rfc9421\Signature\Component}|array{}
+     * @return \Filefabrik\Rfc9421\Signature\Component[]|array{}
      */
     public function getComponents(): array
     {
@@ -27,7 +27,7 @@ final class Components
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      */
-    public function setByName(string $keyname, null|string|InitialContentsEnum $initialContentsEnum = null): self
+    public function setByName(string|DerivedComponentEnum $keyname, null|string|InitialContentsEnum $initialContentsEnum = null): self
     {
         return $this->set(component: new Component(name: $keyname, initialContentsEnum: $initialContentsEnum));
     }
@@ -38,7 +38,7 @@ final class Components
     public function set(Component $component): self
     {
         if ($this->isset($component)) {
-            throw AlreadySetException::ComponentExists($component->name);
+            throw AlreadySetException::ComponentExists($component->getNormalizedName());
         }
 
         $this->components[] = $component;
@@ -51,6 +51,9 @@ final class Components
      */
     private function isset(Component $component): bool
     {
-        return array_any($this->components, fn ($setComponent): bool => $component->name === $setComponent->name);
+        return array_any(
+            $this->components,
+            fn (Component $setComponent): bool => $component->getNormalizedName() === $setComponent->getNormalizedName(),
+        );
     }
 }

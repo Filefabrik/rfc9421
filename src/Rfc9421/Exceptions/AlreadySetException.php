@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
+use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+
 final class AlreadySetException extends AbstractRfc9421Exception
 {
     public static function inputSignature(null|int|string $var = null): self
@@ -16,12 +18,12 @@ final class AlreadySetException extends AbstractRfc9421Exception
         );
     }
 
-    public static function ComponentExists(string $componentName): self
+    public static function ComponentExists(string|DerivedComponentEnum $componentName): self
     {
         return new self(
             sprintf(
                 'The Component "%s" already exists.',
-                $componentName,
+                $componentName instanceof DerivedComponentEnum ? $componentName->value : $componentName
             ),
         );
     }
