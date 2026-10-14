@@ -49,14 +49,28 @@ enum InitialContentsEnum
             return $key;
         }
 
-        if (($found = self::isOwnTypeOrFalse($key)) instanceof self) {
+        if (($found = self::isOwnTypeOrNull($key)) instanceof self) {
             return $found;
         }
+
         throw EnumTypeException::TypeError($key, self::class);
     }
 
-    public static function isOwnTypeOrFalse(string|self $key): self|null
+    public static function isOwnTypeOrNull(string|self $key): self|null
     {
-        return array_find(self::cases(), fn ($case): bool => $case->name === $key);
+        return $key instanceof self ? $key : array_find(self::cases(), fn ($case): bool => $case->name === $key);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function names(): array
+    {
+        $names = [];
+        foreach (self::cases() as $case) {
+            $names[] = $case->name;
+        }
+
+        return $names;
     }
 }
