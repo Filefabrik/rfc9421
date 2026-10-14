@@ -6,7 +6,7 @@ namespace Filefabrik\Rfc9421\Extractors;
 
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Signature\Component;
-use Filefabrik\Rfc9421\Support\UnquoteHelper;
+use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 
 /**
  * Extracting the Signing Fields
@@ -21,35 +21,15 @@ final readonly class Components
     }
 
     /**
-     * @return array{int?:string}
-     * @todo    extract to signature components
-     * @example ['content-length', '@query-param', 'example-dict']
-     * @deprecated
-     */
-    public function toArray(): array
-    {
-        $extracted = [];
-
-        $parts = explode(' ', $this->componentsString);
-        foreach ($parts as $item) {
-            // todo extract the expression '"content-length" "@query-param";req'
-            $extracted[] = UnquoteHelper::unquote($item);
-        }
-
-        return $extracted;
-    }
-
-    /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      */
     public function extractToComponentsObject(): \Filefabrik\Rfc9421\Signature\Components
     {
         $components = new \Filefabrik\Rfc9421\Signature\Components();
         $parts      = explode(' ', $this->componentsString);
         foreach ($parts as $item) {
-            $components->add($this->extractSegment($item));
-            // todo extract the expression '"content-length" "@query-param";req'
-
+            $components->set($this->extractSegment($item));
         }
 
         return $components;
@@ -57,21 +37,26 @@ final readonly class Components
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @example '"content-something";req' '"content-something"'
      */
     public function extractSegment(string $segment): Component
     {
-        $parts = explode(';', $segment);
-        if (2 === count($parts)) {
-            [$key, $contentEnum] = $parts;
-        } elseif (1 === count($parts)) {
-            $key         = $parts[0];
-            $contentEnum = null;
-        } else {
-            throw new SignatureExtractionException('Segment error not 2 parts');
+        // todo, if there an ";" but no following expression "InitialContentsEnum" throw
+
+        $simple = '#^"(.*?)"$#';
+        preg_match($simple, $segment, $matches);
+
+        if (2 === count($matches)) {
+            return new Component($matches[1], null);
         }
 
-        $key = UnquoteHelper::unquote($key);
+        $s = implode('|', InitialContentsEnum::names());
+        preg_match('#^"(.*?)";('.$s.')$#', $segment, $matches);
 
-        return new Component($key, $contentEnum);
+        if (3 === count($matches)) {
+            return new Component($matches[1], $matches[2]);
+        }
+
+        throw new SignatureExtractionException(sprintf('Segment has unknown format "%s"', $segment));
     }
 }
