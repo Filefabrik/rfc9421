@@ -16,7 +16,9 @@ final class Component
         private(set) string $name {
             set => strtolower($value);
         },
-        private(set) null|InitialContentsEnum $initialContentsEnum = null,
+        null|InitialContentsEnum|string $initialContentsEnum = null {
+            set => $this->initialContentsEnum = InitialContentsEnum::isOwnTypeOrNullOrThrow($value);
+        },
     ) {
     }
 }
