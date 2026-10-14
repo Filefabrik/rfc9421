@@ -37,7 +37,7 @@ final readonly class SigCompilerHelper
         return sprintf(
             '%s%s',
             $signatureKeyName,
-            self::wrapBraces(self::compileFromArrayComponent($components->getComponents())),
+            self::wrapBraces(self::compileFromArrayComponent($components)),
         );
     }
 
@@ -49,10 +49,10 @@ final readonly class SigCompilerHelper
         return sprintf('(%s)', $string);
     }
 
-    public static function compileFromArrayComponent(array $componentsArray): string
+    public static function compileFromArrayComponent(Components $components): string
     {
         $parts = [];
-        foreach ($componentsArray as $component) {
+        foreach ($components->getComponents() as $component) {
             $name = sprintf('"%s"', $component->name);
             if ($component->initialContentsEnum) {
                 $name .= ';'.$component->initialContentsEnum->name;
