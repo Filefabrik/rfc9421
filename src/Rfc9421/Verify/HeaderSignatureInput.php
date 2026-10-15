@@ -12,7 +12,6 @@ use InvalidArgumentException;
 
 /**
  * Holds the decoded
- *
  */
 final class HeaderSignatureInput
 {
@@ -37,7 +36,10 @@ final class HeaderSignatureInput
     /**
      * Central decoding action
      *
-     * @throws VerifyHeaderSignatureException|\Filefabrik\Rfc9421\Exceptions\SignatureException|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     public function extract(): void
     {
@@ -50,8 +52,14 @@ final class HeaderSignatureInput
         if (null === $this->signatureInput->components || '' === $this->signatureInput->components) {
             throw new InvalidArgumentException('missing components');
         }
-
-        $this->extractedComponents = new Components($this->signatureInput->components)->extractToComponentsObject();
+        /*
+         * todo with structured fields
+         */
+        $this->extractedComponents = new Components(
+            componentsString: $this->signatureInput->components,
+        )
+            ->extractToComponentsObject()
+        ;
 
         if (null !== $this->signatureInput->metadata) {
             $this->extractedMetadata = Metadata::stringToMetadata($this->signatureInput->metadata);
