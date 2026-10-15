@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Signer;
 
 use Filefabrik\Rfc9421\Signature\Components;
+use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 
 /**
  * merges the signature params into sig1=("@method" "@authority" "@path" "content-type" "content-length")
@@ -54,7 +55,8 @@ final readonly class SigCompilerHelper
         $parts = [];
         foreach ($components->getComponents() as $component) {
             $name = sprintf('"%s"', $component->getNormalizedName());
-            if ($component->initialContentsEnum) {
+            // todo structured fields
+            if ($component->initialContentsEnum instanceof InitialContentsEnum) {
                 $name .= ';'.$component->initialContentsEnum->name;
             }
 
