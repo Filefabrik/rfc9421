@@ -12,6 +12,7 @@ use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
+use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421\VerifyRequest;
@@ -53,7 +54,7 @@ try {
         /*
          * the method we are generating the content-type value (simply via header line)
          */
-        ->withPrepareComponentsMethod(
+        ->addSigningMethod(
             'content-type',
             fn (RequestInterface $request): string => $request->getHeaderLine('content-type'),
         )
@@ -61,9 +62,9 @@ try {
          * tell the signing process that content-type has to be signed
          */
         ->signHeader('content-type')
-        ->signHeader('@method')
+        ->signHeader(DerivedComponentEnum::method)
         ->signHeader('x-Origin-host')
-        ->signHeader('@authority')
+        ->signHeader(DerivedComponentEnum::authority)
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated($currentDateTime)
         ->setExpires($currentDateTime + 7200)
@@ -86,7 +87,7 @@ try {
  * Make sure to use the same methods in signer and verifier!
  */
 $prepareMethods = [
-    '@authority' =>
+    DerivedComponentEnum::authority->value =>
         fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
 /*
@@ -94,7 +95,7 @@ $prepareMethods = [
  *
  * don't forget to use thís prepared component in the verifier
  */
-$signingConfiguration->withPrepareComponentsMethods($prepareMethods);
+$signingConfiguration->addSigningMethods($prepareMethods);
 /**
  * Prepare the Request
  */
@@ -131,7 +132,7 @@ try {
  * Now decrypt the Request
  */
 $verifierConfiguration = new SigningConfiguration();
-$verifierConfiguration->withPrepareComponentsMethods($prepareMethods);
+$verifierConfiguration->addSigningMethods($prepareMethods);
 $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
 /*
@@ -229,27 +230,20 @@ if (null !== $keyId) {
         $responseSigningConfiguration = new SigningConfiguration()
             /*
              * Content Length as a special method
-             */
-            ->withPrepareComponentsMethod(
-                componentName: 'content-length',
-                callable     : fn (ResponseInterface $response): int => $response->getBody()
-                                                                                ->getSize(),
-            )
-            /*
+             *
              * The content-length will be created to header by guzzle or something AFTER we are signing the request/response. So we have to calculate the length before.
              * @important, when the receiver of this response verifies this response the `->processWithoutExistingHeaders(['content-length'])` never set.
-             * also the:
-             * `->withPrepareComponentsMethod(
+             */
+            ->addSigningMethod(
                 componentName: 'content-length',
-             callable     : fn(ResponseInterface $response): int => $response->getBody()
+                closure      : fn (ResponseInterface $response): int => $response->getBody()
                                                                                 ->getSize(),
-            )`
-       */
+            )
             ->processWithoutExistingHeaders(['content-length'])
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
             // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signHeader('@status')
+            ->signHeader(DerivedComponentEnum::status)
             // todo header exists and must not be set separate as header
             ->signHeader('content-length')
             // the sender of the request expects an algo that Bob can check while receive this signed response
