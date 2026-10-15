@@ -12,6 +12,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
+ * todo make an mechanism for decoding the incoming request
  * Specific Request Headers has to be prepared
  */
 /*
@@ -156,7 +157,7 @@ final class PrepareComponents
             ->add(
                 key    : DerivedComponentEnum::requestTarget,
                 closure: fn (RequestInterface $message) => throw new BadMethodCallException(
-                    '@request-target not implemented',
+                    DerivedComponentEnum::requestTarget->value.' not implemented',
                 ),
             )
             /*
@@ -175,6 +176,15 @@ final class PrepareComponents
             ->add(
                 key    : DerivedComponentEnum::status,
                 closure: fn (ResponseInterface $message): int => $message->getStatusCode(),
+            )
+            /*
+             * Todo structured Fields
+             */
+            ->add(
+                key    : DerivedComponentEnum::queryParam,
+                closure: fn () => throw new BadMethodCallException(
+                    DerivedComponentEnum::queryParam->value.' not implemented',
+                ),
             )
         ;
     }
