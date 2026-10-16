@@ -8,6 +8,7 @@ use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
+use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -32,8 +33,6 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents(new Request('post', 'https://Test.com'));
         $prepareInstance->addMappingValues($arr);
 
-
-
         self::assertSame('PosB', $prepareInstance->processValue('@method'));
     }
 
@@ -43,8 +42,7 @@ final class PrepareComponentsTest extends TestCase
             '@method' => fn (RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
         ];
 
-        $r               = new Request('post', 'https://Test.com');
-     
+        $r = new Request('post', 'https://Test.com');
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->addMappingValues($arr);
@@ -106,7 +104,7 @@ final class PrepareComponentsTest extends TestCase
     public function testProcessAtMethod(): void
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
-        $prepareInstance = new PrepareComponents($r);
+        $prepareInstance = new PrepareComponents($r, signingConfiguration: new SigningConfiguration());
         self::assertSame('POST', $prepareInstance->processValue('@method'));
     }
 

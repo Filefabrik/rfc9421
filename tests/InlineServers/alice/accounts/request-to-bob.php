@@ -42,9 +42,9 @@ try {
         /*
          * the method we are generating the content-type value (simply via header line)
          */
-        ->withPrepareComponentsMethod(
-            'content-type',
-            fn (RequestInterface $request): string => $request->getHeaderLine('content-type'),
+        ->addSigningMethod(
+            componentName: 'content-type',
+            closure      : fn (RequestInterface $request): string => $request->getHeaderLine('content-type'),
         )
         /*
          * tell the signing process that content-type has to be signed
@@ -85,7 +85,7 @@ $prepareMethods = [
  */
 displayLogger('We are signing the @authority with $message->getHeaderLine(\'x-Origin-host\').');
 displayLogger('// So Bob\'s Server must also set this method to getting the correct @authority value from header.');
-$signingConfiguration->withPrepareComponentsMethods($prepareMethods);
+$signingConfiguration->addSigningMethods($prepareMethods);
 /**
  * Prepare the Request
  */

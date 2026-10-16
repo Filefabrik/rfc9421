@@ -53,12 +53,12 @@ final class Base
      */
     public function createSignatureLines(): WriteLines
     {
-        $components = new PrepareComponents($this->message);
+        $components = new PrepareComponents(message: $this->message, signingConfiguration: $this->configuration);
 
         /*
          * Prepare methods they must render your signature-params and singing parameters
          */
-        if (($preparedComponentMethods = $this->configuration->preparedMethods) instanceof PreparedMethods) {
+        if (($preparedComponentMethods = $this->configuration->signingMethods) instanceof PreparedMethods) {
             $components->setPreparedMethods($preparedComponentMethods);
         }
 
@@ -84,6 +84,7 @@ final class Base
      */
     private function createSignatureLine(Component $signatureComponent, PrepareComponents $components): Line
     {
+        // todo content-digest with methods more abstract
         $normalizedName = $signatureComponent->getNormalizedName();
         if ('content-digest' === $normalizedName) {
             return new Line(...$this->handleSignBody());

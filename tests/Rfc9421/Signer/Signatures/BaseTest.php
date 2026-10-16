@@ -23,10 +23,10 @@ use Psr\Http\Message\MessageInterface;
 final class BaseTest extends TestCase
 {
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function testCreateSignatureLines(): void
     {
@@ -45,10 +45,10 @@ final class BaseTest extends TestCase
     }
 
     /**
-     * @throws AlreadySetException
-     * @throws ContentDigestException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function testHandleSignBody(): void
     {
@@ -77,6 +77,7 @@ final class BaseTest extends TestCase
      * @throws ContentDigestException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function testHandleSignBodyThrowConfig(): void
     {
@@ -101,6 +102,7 @@ final class BaseTest extends TestCase
      * @throws ContentDigestException
      * @throws InvalidDerivedKeyException
      * @throws InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function testCreateSignatureLinesThrowMissingHeader(): void
     {
@@ -119,10 +121,8 @@ final class BaseTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
      */
     public function testMakeSignatureInput(): void
     {
@@ -156,6 +156,7 @@ final class BaseTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
     public function testWithPreparedComponents(): void
     {
@@ -164,7 +165,7 @@ final class BaseTest extends TestCase
            ->signHeader('@method')
            ->signHeader('@authority')
         ;
-        $sc->withPrepareComponentsMethod('@authority', fn (MessageInterface $message): string => 'game');
+        $sc->addSigningMethod(componentName: '@authority', closure: fn (MessageInterface $message): string => 'game');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 

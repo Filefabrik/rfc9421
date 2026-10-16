@@ -39,8 +39,7 @@ $psr7Request    = $psrHttpFactory->createRequest($fromGlobals);
 $prepareMethods        = [
     '@authority' => fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
-$verifierConfiguration = new SigningConfiguration();
-$verifierConfiguration->withPrepareComponentsMethods($prepareMethods);
+$verifierConfiguration = new SigningConfiguration()->addSigningMethods($prepareMethods);
 $verifyPrepareInstance = new VerifyPrepare(message: $psr7Request, signingConfiguration: $verifierConfiguration);
 
 /*

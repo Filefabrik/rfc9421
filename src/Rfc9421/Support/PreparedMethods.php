@@ -9,7 +9,8 @@ use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use UnexpectedValueException;
 
 /**
- * Todo test with normalized keys
+ * Stack which is configurable for each request/response to process the Derived Components or regular headers they are non-normative
+ * Todo use this prepared methods Class also for decoding incoming
  */
 final class PreparedMethods
 {
@@ -24,7 +25,7 @@ final class PreparedMethods
     public function adds(array $methods): self
     {
         foreach ($methods as $nr => $method) {
-            $this->add($nr, $method);
+            $this->add(key: $nr, closure: $method);
         }
 
         return $this;

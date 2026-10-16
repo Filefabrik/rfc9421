@@ -12,6 +12,7 @@ use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Signature\Component;
+use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
@@ -88,7 +89,7 @@ trait TraitSigner
         $this->signatureBase = $base->makeSignatureInput();
 
         // now set the signature-params ONLY into the signature-base line.
-        $this->signingLines->add(new Line('@signature-params', $this->signatureBase));
+        $this->signingLines->add(new Line(DerivedComponentEnum::signatureParams->value, $this->signatureBase));
 
         // makes the array of signingLines to a string. The string kann be base64EncodedValue
         // keep the $this->signingParametersString public readable. maybe for testing and other stuff

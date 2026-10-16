@@ -7,6 +7,7 @@ namespace Filefabrik\Rfc9421\Signer;
 use BadMethodCallException;
 use Closure;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -54,6 +55,15 @@ final class PrepareComponents
 {
     public function __construct(
         private(set) readonly RequestInterface|ResponseInterface $message,
+        /**
+         * Use configuration for later
+         *
+         */
+        private(set) readonly ?SigningConfiguration $signingConfiguration = null,
+        /**
+         * Prepared Methods are a Stack of closures to process the values in signing-params
+         *
+         */
         private(set) ?PreparedMethods $preparedMethods = null,
     ) {
     }
@@ -168,12 +178,6 @@ final class PrepareComponents
                 closure: self::processPathClosure(...),
             )
             ->add(
-                key    : 'content-length',
-                closure: fn (RequestInterface|ResponseInterface $message): int => strlen(
-                    (string)$message->getBody(),
-                ),
-            )
-            ->add(
                 key    : DerivedComponentEnum::status,
                 closure: fn (ResponseInterface $message): int => $message->getStatusCode(),
             )
@@ -184,6 +188,12 @@ final class PrepareComponents
                 key    : DerivedComponentEnum::queryParam,
                 closure: fn () => throw new BadMethodCallException(
                     DerivedComponentEnum::queryParam->value.' not implemented',
+                ),
+            )
+            ->add(
+                key    : 'content-length',
+                closure: fn (RequestInterface|ResponseInterface $message): int => strlen(
+                    (string)$message->getBody(),
                 ),
             )
         ;

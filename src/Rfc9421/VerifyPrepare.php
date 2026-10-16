@@ -102,8 +102,10 @@ final class VerifyPrepare
 
     /**
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
     private function getExtractedMetadataArray(): array
@@ -114,7 +116,10 @@ final class VerifyPrepare
     }
 
     /**
-     * @throws VerifyHeaderSignatureException|\Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     private function getSignaturInputInstance(): HeaderSignatureInput
     {
@@ -122,6 +127,7 @@ final class VerifyPrepare
             headerSignatureInputValue: $this->headerHelper
                 ->getSignatureInputLine(),
             signatureNameKey         : $this->signingConfiguration->signatureKeyName ?? '',
+            preparedMethods          : $this->signingConfiguration?->extractComponentMethods,
         );
         // throws error
         $headerSignatureInstance->extract();

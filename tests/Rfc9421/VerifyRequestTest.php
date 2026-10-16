@@ -148,7 +148,7 @@ final class VerifyRequestTest extends TestCase
          */
         if (null !== $signerConfiguration->metadata->tag) {
             // for mastodon an own config für x-origin or something
-            $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
+            $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
 
         self::assertEquals(1, $verifier->verifying());
@@ -247,7 +247,7 @@ final class VerifyRequestTest extends TestCase
          */
         if (null !== $signerConfiguration->metadata->tag) {
             // for mastodon an own config für x-origin or something
-            $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
+            $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
 
         self::assertEquals(1, $verifier->verifying());
@@ -438,7 +438,7 @@ final class VerifyRequestTest extends TestCase
          */
         if (null !== $signerConfiguration->metadata->tag) {
             // for mastodon an own config für x-origin or something
-            $signerConfiguration->withPrepareComponentsMethods($mastodonVerifierMethods);
+            $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
 
         self::assertFalse($verifier->verifying());
@@ -452,8 +452,8 @@ final class VerifyRequestTest extends TestCase
         self::assertSame(
             'https://target-host.com?play=something',
             new VerifyRequest($verifyPrepare)->getMessage()
-                                      ->getUri()
-                                      ->__toString(),
+                                             ->getUri()
+                                             ->__toString(),
         );
     }
 }

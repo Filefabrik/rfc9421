@@ -63,6 +63,22 @@ enum InitialContentsEnum
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public static function isOwnTypeOrThrow(string|self|null $key): self
+    {
+        if ($key instanceof self) {
+            return $key;
+        }
+
+        if (($found = self::isOwnTypeOrNull($key)) instanceof self) {
+            return $found;
+        }
+
+        throw EnumTypeException::TypeError($key, self::class);
+    }
+
+    /**
      * @return string[]
      */
     public static function names(): array

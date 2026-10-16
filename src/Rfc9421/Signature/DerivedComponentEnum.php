@@ -53,6 +53,6 @@ enum DerivedComponentEnum: string
             return $value;
         }
 
-        return array_find(self::cases(), fn ($item) => $item->value === $value);
+        return array_find(self::cases(), fn ($item): bool => $item->value === $value);
     }
 }

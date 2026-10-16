@@ -13,9 +13,11 @@ use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
-use Filefabrik\Rfc9421\Support\PrepareComponentMethodsTrait;
+use Filefabrik\Rfc9421\Support\ExtractComponentsMethodTrait;
+use Filefabrik\Rfc9421\Support\MetadataTrait;
 use Filefabrik\Rfc9421\Support\PrivatePemTrait;
 use Filefabrik\Rfc9421\Support\PublicPemTrait;
+use Filefabrik\Rfc9421\Support\SigningMethodsTrait;
 
 /**
  * Signer Configuration can be configured at different position on your code, such as in a bootstrap file or something
@@ -25,11 +27,9 @@ final class SigningConfiguration
 {
     use PublicPemTrait;
     use PrivatePemTrait;
-
-    /**
-     * simple helper to prepare some methods before executing
-     */
-    use PrepareComponentMethodsTrait;
+    use SigningMethodsTrait;
+    use ExtractComponentsMethodTrait;
+    use MetadataTrait;
 
     /**
      * Prefix the signature value
@@ -52,45 +52,8 @@ final class SigningConfiguration
     ) {
     }
 
-    // metadata
-    public function setCreated(?int $created): self
-    {
-        $this->metadata->setCreated($created);
-
-        return $this;
-    }
-
-    public function setSignatureKeyName(string $signatureKey): self
-    {
-        $this->signatureKeyName = $signatureKey;
-
-        return $this;
-    }
-
-    public function setExpires(?int $expires): self
-    {
-        $this->metadata->setExpires($expires);
-
-        return $this;
-    }
-
-    public function withNonce(?string $nonce): self
-    {
-        $this->metadata->setNonce($nonce);
-
-        return $this;
-    }
-
-    public function setKeyid(?string $keyid): self
-    {
-        $this->metadata->setKeyid($keyid);
-
-        return $this;
-    }
-
     /**
      * Signing algorithm valid for metadata
-     *
      *
      * @throws SignatureException
      */
@@ -124,10 +87,7 @@ final class SigningConfiguration
      */
     public function signHeaders(array $headerKeys): self
     {
-        foreach ($headerKeys as $int=> $headerKey) {
-
-
-
+        foreach ($headerKeys as $headerKey) {
             [$headerKey, $initialContentsEnum] = is_array($headerKey) ? $headerKey : [$headerKey, null];
             $this->signHeader($headerKey, $initialContentsEnum);
         }

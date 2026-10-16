@@ -8,6 +8,7 @@ use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 
 /**
  * Single component with InitialContentsEnum or without InitialContentsEnum
+ * or with structured fields
  */
 final class Component
 {
@@ -29,6 +30,13 @@ final class Component
              */
             set => InitialContentsEnum::isOwnTypeOrNullOrThrow($value);
         },
+        /**
+         * Todo structured Fields as method or from a repository such in prepare components
+         * While not setting the $initialContentsEnum use structured fields here
+         *
+         * @var mixed|null
+         */
+        private(set) readonly mixed $structured = null,
     ) {
     }
 
