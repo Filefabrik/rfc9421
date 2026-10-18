@@ -44,11 +44,12 @@ composer install filefabrik/rfc9421
 * a Full-Example from console without spinning an extra webserver
 * a signing Example
 
-### Full HTTP Signing and Verify Example over two Servers 
+### Full HTTP Signing and Verify Example over two Servers
 
 To help you understand and test all the processes in RFC 9421, we have provided a complete example.
 
 All processes
+
 * Creating a request
 * Signing a request
 * Sending the signed request
@@ -61,10 +62,10 @@ All processes
 
 are provided as a transparent and easy-to-follow example.
 
-Feel free to experiment with the ready-to-use example to familiarize yourself with all aspects of the RFC 9421 message signing and verification process.
+Feel free to experiment with the ready-to-use example to familiarize yourself with all aspects of the RFC 9421 message
+signing and verification process.
 
 If you have any requests or ideas, please create a ticket.
-
 
 see in `/examples/full-flow.php`
 
@@ -448,6 +449,9 @@ mastodon https://docs.joinmastodon.org/spec/security/ uses 3.3.2. RSASSA-PKCS1-v
 
 RFC9421 https://www.rfc-editor.org/info/rfc9421
 
+Structured Field Values for HTTP
+RFC9651 https://www.rfc-editor.org/rfc/rfc9651.html
+
 PSR-7: HTTP message interfaces
 https://www.php-fig.org/psr/psr-7/
 
@@ -480,3 +484,5 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
     * `"symfony/http-foundation": "^v8.1.8",
       "symfony/psr-http-message-bridge": "^v8.1.0",
       "nyholm/psr7": "^1.8"`
+* documentation: whenever possible use DerivedComponentEnum, every @-component-name is cased in DerivedComponentEnum or
+  throws 

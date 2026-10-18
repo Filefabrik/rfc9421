@@ -37,11 +37,16 @@ final class Base
     {
         $cArray = [];
         foreach ($signatureLines->lines as $signatureLine) {
-            $cArray[] = sprintf('"%s": %s', $signatureLine->key, $signatureLine->value);
+            $cArray[] = self::compileLinesToString($signatureLine);
         }
 
         // this is what to sign with private key
         return implode("\n", $cArray);
+    }
+
+    public static function compileLinesToString(Line $signatureLine): string
+    {
+        return sprintf('"%s": %s', $signatureLine->key, $signatureLine->value);
     }
 
     /**

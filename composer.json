@@ -50,7 +50,8 @@
     "rector/rector": "^2.7",
     "symfony/http-foundation": "^v8.1.8",
     "symfony/psr-http-message-bridge": "^v8.1.0",
-    "nyholm/psr7": "^1.8"
+    "nyholm/psr7": "^1.8",
+    "bakame/http-structured-fields": "^2.0"
   },
   "readme": "",
   "prefer-stable": true,

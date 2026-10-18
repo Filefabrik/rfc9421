@@ -13,8 +13,6 @@ final class UnquoteHelper
 {
     /**
      * Removes the quotes from a string
-     *
-     *
      */
     public static function unquote(string $string): string
     {
@@ -27,5 +25,25 @@ final class UnquoteHelper
         throw new UnexpectedValueException(
             sprintf('The expected value has to be wrapped by quotes "value" but is %s.', $string),
         );
+    }
+
+    public static function quotedUnderscore(string $string): string
+    {
+        return self::quote(self::underscore($string));
+    }
+
+    public static function quote(string $string): string
+    {
+        return '"'.$string.'"';
+    }
+
+    public static function underscore(string $string): string
+    {
+        return '_'.$string.'_';
+    }
+
+    public static function quoteKEYValue(string $keyName, string $value): string
+    {
+        return self::quote($keyName).': '.$value;
     }
 }

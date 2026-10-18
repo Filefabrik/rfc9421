@@ -75,9 +75,9 @@ final readonly class Components
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    private function callPreparedMethodIfExists(string $segment)
+    private function callPreparedMethodIfExists(string $segment): \Filefabrik\Rfc9421\Signature\Component|false
     {
-        if ($this->preparedMethods) {
+        if ($this->preparedMethods instanceof \Filefabrik\Rfc9421\Support\PreparedMethods) {
             $segmentName = $this->getSegmentName($segment);
 
             if ($this->preparedMethods->hasMethod($segmentName)) {
@@ -96,7 +96,7 @@ final readonly class Components
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    private function getSegmentName(string $segment)
+    private function getSegmentName(string $segment): string
     {
         $simple = '#^"(.*?)"#';
         preg_match($simple, $segment, $matches);

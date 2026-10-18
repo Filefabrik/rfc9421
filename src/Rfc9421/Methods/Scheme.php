@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Filefabrik\Rfc9421\Methods;
+
+use Filefabrik\Rfc9421\Support\UriHelper;
+use Psr\Http\Message\MessageInterface;
+
+final class Scheme
+{
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
+    public static function handle(MessageInterface $message): string
+    {
+        return strtolower(
+            UriHelper::messageGetUriHelper($message)
+                     ->getScheme(),
+        );
+    }
+}

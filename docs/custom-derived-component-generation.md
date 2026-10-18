@@ -38,7 +38,7 @@ $signingConfiguration = new SigningConfiguration()
     ->signHeader('@method')
     ->signHeader('x-Origin-host')
     //...
-    ->withPrepareComponentsMethod('@authority',fn(RequestInterface $message) => $message->getHeaderLine('X-Original-Host'))
-    ->withPrepareComponentsMethod('something-special',fn(RequestInterface $message) => 'do something special')
+    ->withSigningComponentMethod('@authority',fn(RequestInterface $message) => $message->getHeaderLine('X-Original-Host'))
+    ->withSigningComponentMethod('something-special',fn(RequestInterface $message) => 'do something special')
 ?>
 ```

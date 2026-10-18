@@ -16,28 +16,39 @@ use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 enum InitialContentsEnum
 {
     /**
-     * sf    Strict Structured Field serialization    Section 2.1.1 of RFC 9421
+     * sf
+     * Strict Structured Field serialization
+     * Section 2.1.1 of RFC 9421
      */
     case sf;
     /**
-     * key    Single key value of Dictionary Structured Fields    Section 2.1.2 of RFC 9421
+     * key
+     * Single key value of Dictionary Structured Fields
+     * Section 2.1.2 of RFC 9421
      */
     case key;
     /**
-     * bs    Byte Sequence wrapping indicator
+     * bs
+     * Byte Sequence wrapping indicator
      */
     case bs;
     /**
-     * tr    Trailer    Section 2.1.4 of RFC 9421
+     * tr
+     * Trailer
+     * Section 2.1.4 of RFC 9421
      */
     case tr;
     /**
+
+     * req
      * Related request indicator
-     * req    Related request indicator    Section 2.4 of RFC 9421
+     * Section 2.4 of RFC 9421
      */
     case req;
     /**
-     * name    Single named query parameter    Section 2.2.8 of RFC 9421
+     * name
+     * Single named query parameter
+     * Section 2.2.8 of RFC 9421
      */
     case name;
 
