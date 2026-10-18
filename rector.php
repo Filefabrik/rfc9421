@@ -9,7 +9,7 @@ use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 use Rector\ValueObject\PhpVersion;
 
-return static function(RectorConfig $rectorConfig) {
+return static function (RectorConfig $rectorConfig) {
     $rectorConfig
         ->paths([
 
