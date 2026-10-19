@@ -77,7 +77,7 @@ final class Entry
 
         $parts[] = $this->parseKeyMethods();
 
-        if ($this->initialContents instanceof \Filefabrik\Rfc9421\Signature\InitialContentsEnum) {
+        if ($this->initialContents instanceof InitialContentsEnum) {
             $parts[] = self::semicolon;
             $parts[] = $this->initialContents->name;
 

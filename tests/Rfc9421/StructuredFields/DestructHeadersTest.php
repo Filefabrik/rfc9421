@@ -10,8 +10,10 @@ use Bakame\Http\StructuredFields\Item;
 use Bakame\Http\StructuredFields\OuterList;
 use Bakame\Http\StructuredFields\Parameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\StructuredFields\DestructEntry;
 use Filefabrik\Rfc9421\StructuredFields\DestructHeaders;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
+use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 use GuzzleHttp\Psr7\Request;
 use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -113,5 +115,60 @@ final class DestructHeadersTest extends TestCase
         self::assertContains('"@target-uri": https://api.example.com/resource?bat&baz=3', $normalised);
         self::assertContains('"_baz_": "3"', $normalised);
         self::assertContains('"_bat_": ', $normalised);
+    }
+
+    /**
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws JsonException
+     */
+    public function testItemField(): void
+    {
+        $methods = [
+            'list'       => fn (string $fieldValue): OuterList => OuterList::fromHttpValue($fieldValue),
+            'innerlist'  => fn (string $fieldValue): InnerList => InnerList::fromHttpValue($fieldValue),
+            'parameters' => fn (string $fieldValue): Parameters => Parameters::fromHttpValue($fieldValue),
+            'dictionary' => fn (string $fieldValue): Dictionary => Dictionary::fromHttpValue($fieldValue),
+            'item'       => fn (string $fieldValue): Item => Item::fromHttpValue($fieldValue),
+            'etag'       => fn (string $fieldValue): string => MethodsMapper::defaultETagMethod($fieldValue),
+            'url'        => fn (string $fieldValue): string => '"'.$fieldValue.'"',
+            'date'       => fn (string $fieldValue): string => '@'.strtotime($fieldValue),
+        ];
+
+        $methodsMapper = new MethodsMapper()->addMany($methods);
+        $date          = gmdate('D, d M Y H:i:s T');
+        $request       = new Request(
+            'GET',
+            'https://api.example.com/resource?bat&baz=3',
+            [
+                'Host'         => 'api.example.com',
+                'Date'         => $date,
+                'x-test'       => '',
+                'Example-Dict' => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
+            ],
+        );
+
+        $config = new SigningConfiguration();
+
+        /**
+         * Use $request->withAddedHeader() method to provide an additional header with same name as an existing header.
+         */
+        $request       = $request->withHeader('Example-Header', 'value, with, lots');
+        $request       = $request->withAddedHeader('Example-Header', 'of, commas');
+        $request       = $request->withHeader('If-None-Match', 'W/"abcdef", "ghijkl", *');
+
+        $destructEntry = new DestructEntry(
+            fieldItem           : Item::fromHttpValue('"example-dict";key="a"'),
+            methodsMapper       : $methodsMapper,
+            structuredFields    : StructuredFields::fromDefaultList()
+                                                  ->add('example-dict', 'dictionary'),
+            signingConfiguration: $config,
+        );
+        $headerArray   = DestructHeaders::getLowerCasedHeadersFromInterface($request);
+
+        $normalised = $destructEntry->canonicalizeComponent($headerArray, $request);
+        $parsed     = $normalised->parse();
+        self::assertSame('"example-dict";key="a": 1', $parsed);
     }
 }

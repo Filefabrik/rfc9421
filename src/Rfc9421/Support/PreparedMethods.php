@@ -6,11 +6,12 @@ namespace Filefabrik\Rfc9421\Support;
 
 use Closure;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\StructuredFields\Entry;
 use UnexpectedValueException;
 
 /**
  * Stack which is configurable for each request/response to process the Derived Components or regular headers they are non-normative
- * Todo use this prepared methods Class also for decoding incoming
+ *
  */
 final class PreparedMethods
 {
@@ -46,6 +47,14 @@ final class PreparedMethods
     private function lowerKey(string $key): string
     {
         return strtolower($key);
+    }
+
+    /**
+     * Return Entry ensures the correctly handled Processing
+     */
+    public function callWith(string|DerivedComponentEnum $key, ...$params): Entry
+    {
+        return $this->getMethod($key)(...$params);
     }
 
     public function getMethod(string|DerivedComponentEnum $key): Closure

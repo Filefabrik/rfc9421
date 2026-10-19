@@ -170,7 +170,7 @@ final class PrepareComponents
              */
             ->add(
                 key    : DerivedComponentEnum::status,
-                closure: fn (ResponseInterface $response) => new Entry(
+                closure: fn (ResponseInterface $response): \Filefabrik\Rfc9421\StructuredFields\Entry => new Entry(
                     DerivedComponentEnum::status->value,
                     (string)$response->getStatusCode(),
                 ),
@@ -180,7 +180,7 @@ final class PrepareComponents
              */
             ->add(
                 key    : DerivedComponentEnum::queryParam,
-                closure: fn ($messageInterface, $parameters): Entry => QueryParams::handle(
+                closure: fn (\Psr\Http\Message\MessageInterface $messageInterface, $parameters): Entry => QueryParams::handle(
                     message  : $messageInterface,
                     fieldName: $parameters->getValueOrThrow(InitialContentsEnum::name),
                 ),

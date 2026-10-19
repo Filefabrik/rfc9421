@@ -50,11 +50,10 @@ final class DestructEntry
         $entry = new FieldValue(
             signingConfiguration     : $this->signingConfiguration,
             initialContentsParameters: $parameters,
-        )->getFieldValue(
-            fieldName       : $fieldName,
+            lowerCasedHeaders        : $whichHeaders,
+            fieldName: $fieldName,
             messageInterface: $whichRequest,
-            headers         : $whichHeaders,
-        );
+        )->getFieldValue();
 
         /*
          * handle InitialContentsEnum part

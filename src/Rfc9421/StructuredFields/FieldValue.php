@@ -12,80 +12,82 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
 
-final class FieldValue
+final readonly class FieldValue
 {
+    /**
+     * @param array<string,string> $lowerCasedHeaders
+     */
     public function __construct(
         private(set) SigningConfiguration $signingConfiguration,
         private(set) InitialContentsParameters $initialContentsParameters,
+        private(set) array $lowerCasedHeaders,
+        private(set) string $fieldName,
+        private(set) MessageInterface $messageInterface,
     ) {
     }
 
-    /**
-     * @param array<string,string> $headers
-     *
-     */
-    public function getFieldValue(
-        string $fieldName,
-        MessageInterface $messageInterface,
-        array $headers,
-      
-    ): Entry {
-        if ($messageInterface instanceof RequestInterface) {
-            return $this->handleRequestInterface($fieldName, $messageInterface,  $headers);
+    public function getFieldValue(): Entry
+    {
+        if ($this->messageInterface instanceof RequestInterface) {
+            return $this->handleRequestInterface();
         }
-        if ($messageInterface instanceof ResponseInterface) {
-            return $this->handleResponseInterface($fieldName, $messageInterface, $headers);
+
+        if ($this->messageInterface instanceof ResponseInterface) {
+            return $this->handleResponseInterface();
         }
-        throw new UnexpectedValueException(sprintf('Unexpected message interface "%s"', get_class($messageInterface)));
+
+        throw new UnexpectedValueException(
+            sprintf('Unexpected message interface "%s"', $this->messageInterface::class),
+        );
     }
 
-    private function handleRequestInterface(
-        string $fieldName,
-        RequestInterface $requestInterface,
-
-        $headers,
-    ): Entry {
+    private function handleRequestInterface(): Entry
+    {
         // first test the method is in the configuration stack
 
-        if ($this->signingConfiguration->signingMethods?->hasMethod($fieldName) ?? false) {
-            $entry = $this->signingConfiguration->signingMethods->getMethod($fieldName)
-                                                                ->call($this, $requestInterface, $this->initialContentsParameters)
-            ;
+        if ($this->signingConfiguration->signingMethods?->hasMethod($this->fieldName) ?? false) {
+            $entry = $this->signingConfiguration->signingMethods->callWith(
+                $this->fieldName,
+                $this->messageInterface,
+                $this->initialContentsParameters,
+            );
         } else {
-            $entry = new Entry($fieldName, trim($headers[$fieldName] ?? ''));
+            $entry = $this->getDefaultEntry();
         }
 
         return $this->handleREQ($entry);
     }
 
+    private function getDefaultEntry(): Entry
+    {
+        return new Entry($this->fieldName, trim($this->lowerCasedHeaders[$this->fieldName] ?? ''));
+    }
+
     /**
      * Todo req only on response signing
      *
-     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    private function handleREQ($entry)
+    private function handleREQ(Entry $entry): Entry
     {
         // todo req is only attachable if others not set
         if ($this->initialContentsParameters->has(InitialContentsEnum::req)) {
             $entry->withREQEnum();
-            // $entry[0] .= ';'.InitialContentsEnum::req->name;
         }
 
         return $entry;
     }
 
-    private function handleResponseInterface(
-        string $fieldName,
-        ResponseInterface $response,
-
-        $headers,
-    ): Entry {
-        if ($this->signingConfiguration->signingMethods?->hasMethod($fieldName) ?? false) {
-            $entry = $this->signingConfiguration->signingMethods->getMethod($fieldName)
-                                                                ->call($this, $response, $this->initialContentsParameters)
-            ;
+    private function handleResponseInterface(): Entry
+    {
+        if ($this->signingConfiguration->signingMethods?->hasMethod($this->fieldName) ?? false) {
+            $entry = $this->signingConfiguration->signingMethods->callWith(
+                $this->fieldName,
+                $this->messageInterface,
+                $this->initialContentsParameters,
+            );
         } else {
-            $entry = new Entry($fieldName, trim($headers[$fieldName] ?? ''));
+            $entry = $this->getDefaultEntry();
         }
 
         return $this->handleREQ($entry);
