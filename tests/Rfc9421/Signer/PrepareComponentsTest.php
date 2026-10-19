@@ -74,12 +74,36 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('POST', $prepareInstance->processValue('@method'));
-        self::assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
-        self::assertSame('test.com', $prepareInstance->processValue('@authority'));
-        self::assertSame('https', $prepareInstance->processValue('@scheme'));
-        self::assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
-        self::assertSame(62, $prepareInstance->processValue('content-length'));
+        self::assertSame(
+            '"@method": POST',
+            $prepareInstance->processValue('@method')
+                            ->parse(),
+        );
+        self::assertSame(
+            '"@target-uri": https://test.com/var/pathy/?qer=var',
+            $prepareInstance->processValue('@target-uri')
+                            ->parse(),
+        );
+        self::assertSame(
+            '"@authority": test.com',
+            $prepareInstance->processValue('@authority')
+                            ->parse(),
+        );
+        self::assertSame(
+            '"@scheme": https',
+            $prepareInstance->processValue('@scheme')
+                            ->parse(),
+        );
+        self::assertSame(
+            '"@path": /var/pathy/',
+            $prepareInstance->processValue('@path')
+                            ->parse(),
+        );
+        self::assertSame(
+            '"content-length": 62',
+            $prepareInstance->processValue('content-length')
+                            ->parse(),
+        );
     }
 
     public function testProcessTargetUri(): void
@@ -88,7 +112,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri'));
+        self::assertSame('https://test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri')->value);
     }
 
     public function testProcessingThrow(): void
@@ -105,7 +129,7 @@ final class PrepareComponentsTest extends TestCase
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $prepareInstance = new PrepareComponents($r, signingConfiguration: new SigningConfiguration());
-        self::assertSame('POST', $prepareInstance->processValue('@method'));
+        self::assertSame('POST', $prepareInstance->processValue('@method')->value);
     }
 
     public function testProcessAuthority(): void
@@ -114,11 +138,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('test.com', $prepareInstance->processValue('@authority'));
+        self::assertSame('test.com', $prepareInstance->processValue('@authority')->value);
 
         $r = new Request('post', 'https://www.Test.com/var/pathy/?qer=var');
 
-        self::assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority'));
+        self::assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority')->value);
     }
 
     public function testProcessScheme(): void
@@ -127,11 +151,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('https', $prepareInstance->processValue('@scheme'));
+        self::assertSame('https', $prepareInstance->processValue('@scheme')->value);
 
         $r = new Request('post', 'http://www.Test.com/var/pathy/?qer=var');
 
-        self::assertSame('http', new PrepareComponents($r)->processValue('@scheme'));
+        self::assertSame('http', new PrepareComponents($r)->processValue('@scheme')->value);
     }
 
     public function testProcessPath(): void
@@ -140,11 +164,19 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('/var/pathy/', $prepareInstance->processValue('@path'));
+        self::assertSame(
+            '"@path": /var/pathy/',
+            $prepareInstance->processValue('@path')
+                            ->parse(),
+        );
 
         $r = new Request('post', 'http://www.Test.com');
 
-        self::assertSame('/', new PrepareComponents($r)->processValue('@path'));
+        self::assertSame(
+            '"@path": /',
+            new PrepareComponents($r)->processValue('@path')
+                                     ->parse(),
+        );
     }
 
     public function testProcessValueNotCallable(): void
@@ -181,6 +213,6 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame(62, $prepareInstance->processValue('content-length'));
+        self::assertSame(62, $prepareInstance->processValue('content-length')->value);
     }
 }

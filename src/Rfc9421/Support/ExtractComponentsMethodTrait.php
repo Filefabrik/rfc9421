@@ -15,7 +15,7 @@ use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 trait ExtractComponentsMethodTrait
 {
     /**
-     * for signing methods
+     * for extracting
      */
     private(set) ?PreparedMethods $extractComponentMethods = null {
         get => $this->extractComponentMethods ??= new PreparedMethods();

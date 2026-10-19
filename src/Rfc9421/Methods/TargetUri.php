@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Methods;
 
-use Filefabrik\Rfc9421\Support\UriHelper;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 
 final class TargetUri
 {
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     */
-    public static function handle(MessageInterface $message): string
+    public static function handle(RequestInterface $requestInterface): string
     {
-        $uri = UriHelper::messageGetUriHelper($message);
+        $uri = $requestInterface->getUri();
 
         $parts = [
             $uri->getScheme(),
             '://',
-            NormalizedAuthority::handle($message),
+            NormalizedAuthority::handle($requestInterface),
             $uri->getPath(),
         ];
         if ('' !== ($q = $uri->getQuery())) {

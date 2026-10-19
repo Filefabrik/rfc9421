@@ -11,6 +11,7 @@ use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
@@ -95,9 +96,16 @@ final class Base
             return new Line(...$this->handleSignBody());
         }
 
-        return $this->mustProcessingLine($normalizedName) ?
-            new Line($normalizedName, $components->processValue($normalizedName)) :
-            $this->checkExistingHeader($normalizedName);
+        if ($this->mustProcessingLine($normalizedName)) {
+            $processedResult = $components->processValue($normalizedName);
+            if ($processedResult instanceof Entry) {
+                return new Line($normalizedName, $processedResult->parse());
+            }
+
+            return new Line($normalizedName, $processedResult);
+        }
+
+        return $this->checkExistingHeader($normalizedName);
     }
 
     /**

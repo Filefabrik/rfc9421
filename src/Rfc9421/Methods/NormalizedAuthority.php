@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Methods;
 
-use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
-use Filefabrik\Rfc9421\Support\UriHelper;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 
 final class NormalizedAuthority
 {
@@ -15,11 +13,10 @@ final class NormalizedAuthority
      * It must be lowercase and must not contain a port value.
      * todo check comment
      *
-     * @throws UnProcessableSignatureException
      */
-    public static function handle(MessageInterface $message): string
+    public static function handle(RequestInterface $requestInterface): string
     {
-        $uri = UriHelper::messageGetUriHelper($message);
+        $uri = $requestInterface->getUri();
 
         $authority = strtolower($uri->getAuthority());
         $authority = explode(':', $authority);

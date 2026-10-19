@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Methods;
 
-use Filefabrik\Rfc9421\Support\UriHelper;
+use Filefabrik\Rfc9421\Support\MessageInterfaceHelper;
 use Psr\Http\Message\MessageInterface;
 
 final class Scheme
@@ -15,7 +15,7 @@ final class Scheme
     public static function handle(MessageInterface $message): string
     {
         return strtolower(
-            UriHelper::messageGetUriHelper($message)
+            MessageInterfaceHelper::hasGetUri($message)
                      ->getScheme(),
         );
     }

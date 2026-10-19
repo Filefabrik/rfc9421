@@ -9,23 +9,31 @@ use Bakame\Http\StructuredFields\InnerList;
 use Bakame\Http\StructuredFields\Item;
 use Bakame\Http\StructuredFields\OuterList;
 use Bakame\Http\StructuredFields\Parameters;
+use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\DestructHeaders;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use GuzzleHttp\Psr7\Request;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DestructHeaders::class)]
 final class DestructHeadersTest extends TestCase
 {
+    /**
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws JsonException
+     */
     public function test__construct(): void
     {
         $methods = [
-            'list'       => fn (string $fieldValue) => OuterList::fromHttpValue($fieldValue),
-            'innerlist'  => fn (string $fieldValue) => InnerList::fromHttpValue($fieldValue),
-            'parameters' => fn (string $fieldValue) => Parameters::fromHttpValue($fieldValue),
-            'dictionary' => fn (string $fieldValue) => Dictionary::fromHttpValue($fieldValue),
-            'item'       => fn (string $fieldValue) => Item::fromHttpValue($fieldValue),
+            'list'       => fn (string $fieldValue): OuterList => OuterList::fromHttpValue($fieldValue),
+            'innerlist'  => fn (string $fieldValue): InnerList => InnerList::fromHttpValue($fieldValue),
+            'parameters' => fn (string $fieldValue): Parameters => Parameters::fromHttpValue($fieldValue),
+            'dictionary' => fn (string $fieldValue): Dictionary => Dictionary::fromHttpValue($fieldValue),
+            'item'       => fn (string $fieldValue): Item => Item::fromHttpValue($fieldValue),
             'etag'       => fn (string $fieldValue): string => MethodsMapper::defaultETagMethod($fieldValue),
             'url'        => fn (string $fieldValue): string => '"'.$fieldValue.'"',
             'date'       => fn (string $fieldValue): string => '@'.strtotime($fieldValue),
@@ -43,6 +51,9 @@ final class DestructHeadersTest extends TestCase
                 'Example-Dict' => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
             ],
         );
+
+        $config = new SigningConfiguration();
+
         /**
          * Use $request->withAddedHeader() method to provide an additional header with same name as an existing header.
          */
@@ -50,8 +61,28 @@ final class DestructHeadersTest extends TestCase
         $request = $request->withAddedHeader('Example-Header', 'of, commas');
         $request = $request->withHeader('If-None-Match', 'W/"abcdef", "ghijkl", *');
 
-        $coveredFields =
-            '("example-dict" "example-dict";sf "example-dict";key="a" "example-dict";key="b" "example-dict";key="c" "example-dict";key="d" "content-length" "@method" "example-header";bs "@path" "host" "if-none-match";sf "date" "date";sf "@request-target" "@target-uri" "@query-param";name="baz" "@query-param";name="bat")';
+        $parts = [
+            '"example-dict"',
+            '"example-dict";sf',
+            '"example-dict";key="a"',
+            '"example-dict";key="b"',
+            '"example-dict";key="c"',
+            '"example-dict";key="d"',
+            '"content-length"',
+            '"@method"',
+            '"example-header";bs',
+            '"@path"',
+            '"host"',
+            '"if-none-match";sf',
+            '"date"',
+            '"date";sf',
+            '"@request-target"',
+            '"@target-uri"',
+            '"@query-param";name="baz"',
+            '"@query-param";name="bat"',
+        ];
+
+        $coveredFields = '('.implode(' ', $parts).')';
 
         $destructHeaders = new DestructHeaders(
             lowerCasedHeaderLines: DestructHeaders::getLowerCasedHeadersFromInterface($request),
@@ -59,9 +90,10 @@ final class DestructHeadersTest extends TestCase
             message              : $request,
             originalRequest      : $request,
             methodsMapper        : $methodsMapper,
+            signingConfiguration : $config,
         );
 
-        $destructHeaders->structuredFieldTypes->add('example-dict', 'dictionary');
+        $destructHeaders->setStructuredFieldType('example-dict', 'dictionary');
         $normalised = $destructHeaders->start();
 
         self::assertContains('"example-dict": a=1,    b=2;x=1;y=2,   c=(a   b   c), d', $normalised);
@@ -81,6 +113,5 @@ final class DestructHeadersTest extends TestCase
         self::assertContains('"@target-uri": https://api.example.com/resource?bat&baz=3', $normalised);
         self::assertContains('"_baz_": "3"', $normalised);
         self::assertContains('"_bat_": ', $normalised);
-
     }
 }

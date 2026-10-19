@@ -25,7 +25,10 @@ final class Entry
 
     public function __construct(
         private(set) readonly string $key,
-        private(set) readonly null|string $value = null,
+        /**
+         * @var string|int|null int while content length
+         */
+        private(set) readonly null|string|int $value = null,
         private(set) null|InitialContentsEnum $initialContents = null,
     ) {
     }

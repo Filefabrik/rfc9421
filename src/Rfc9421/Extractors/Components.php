@@ -42,7 +42,7 @@ final readonly class Components
     /**
      * Todo with structured fields extractor
      * Todo Make extract Method such as in PrepareComponents
-     *
+     * 
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @example '"content-something";req' '"content-something"'
      *
@@ -51,7 +51,7 @@ final readonly class Components
     {
         // todo, if there an ";" but no following expression "InitialContentsEnum" throw
 
-        if ($component = $this->callPreparedMethodIfExists($segment)) {
+        if (($component = $this->callPreparedMethodIfExists($segment)) instanceof Component) {
             return $component;
         }
 
@@ -75,9 +75,9 @@ final readonly class Components
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    private function callPreparedMethodIfExists(string $segment): \Filefabrik\Rfc9421\Signature\Component|false
+    private function callPreparedMethodIfExists(string $segment): Component|false
     {
-        if ($this->preparedMethods instanceof \Filefabrik\Rfc9421\Support\PreparedMethods) {
+        if ($this->preparedMethods instanceof PreparedMethods) {
             $segmentName = $this->getSegmentName($segment);
 
             if ($this->preparedMethods->hasMethod($segmentName)) {

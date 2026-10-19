@@ -8,6 +8,7 @@ use Bakame\Http\StructuredFields\Dictionary;
 use Bakame\Http\StructuredFields\InnerList;
 use Bakame\Http\StructuredFields\Item;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
+use Filefabrik\Rfc9421\SigningConfiguration;
 use JsonException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -25,6 +26,7 @@ final class DestructHeaders
         private(set) readonly MessageInterface $message,
         private(set) readonly RequestInterface $originalRequest,
         private(set) readonly MethodsMapper $methodsMapper,
+        private(set) readonly SigningConfiguration $signingConfiguration,
     ) {
     }
 
@@ -42,10 +44,10 @@ final class DestructHeaders
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws JsonException
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws JsonException
      * @return array<string> all lines they are proceeded
      */
     public function start(): array
@@ -69,9 +71,17 @@ final class DestructHeaders
 
                 $processedComponents[] = $member;
 
-                $instance = new DestructEntry($member, $this->methodsMapper, $this->getStructuredFields());
+                $instance = new DestructEntry(
+                    fieldItem           : $member,
+                    methodsMapper       : $this->methodsMapper,
+                    structuredFields    : $this->getStructuredFields(),
+                    signingConfiguration: $this->signingConfiguration,
+                );
 
-                $resultEntry = $instance->canonicalizeComponent($this->lowerCasedHeaderLines, $this->message);
+                $resultEntry = $instance->canonicalizeComponent(
+                    headers  : $this->lowerCasedHeaderLines,
+                    interface: $this->message,
+                );
 
                 $parsed                = $resultEntry->parse();
                 $signatureComponents[] = $parsed;

@@ -38,7 +38,7 @@ final class BaseTest extends TestCase
         $i = new Base($r, $sc);
 
         $arr = $i->createSignatureLines()
-                 ->toArray()
+                 ->toKeyValueArray()
         ;
 
         self::assertEquals([['not-existing', 'hm'], ['@method', 'POST']], $arr);
@@ -66,7 +66,7 @@ final class BaseTest extends TestCase
             $lines->getLineNumber(0),
         );
         self::assertEquals(
-            new Line('@method', 'POST'),
+            new Line('@method', '"@method": POST'),
             $lines->getLineNumber(1),
         );
         self::assertEquals('content-digest', $lines->getLineNumber(2)->key);

@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
-use BadMethodCallException;
 use Closure;
+use Filefabrik\Rfc9421\Methods\NormalizedAuthority;
+use Filefabrik\Rfc9421\Methods\Path;
+use Filefabrik\Rfc9421\Methods\QueryParams;
+use Filefabrik\Rfc9421\Methods\RequestTarget;
+use Filefabrik\Rfc9421\Methods\Scheme;
+use Filefabrik\Rfc9421\Methods\TargetUri;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use UnexpectedValueException;
 
 /**
  * todo make an mechanism for decoding the incoming request
@@ -69,40 +77,6 @@ final class PrepareComponents
     }
 
     /**
-     * todo,needs more testing
-     *
-     * @see 2.2.2. Target URI @target-uri
-     */
-    public static function processTargetUriClosure(RequestInterface $message): string
-    {
-        $messageUri = clone $message->getUri();
-        $parts      = [];
-        $parts[]    = $messageUri->getHost();
-        if ('' !== ($path = $messageUri->getPath())) {
-            $parts[] = '/'.ltrim($path, '/');
-        }
-
-        if ('' !== ($query = $messageUri->getQuery())) {
-            $parts[] = '?'.ltrim($query, '?');
-        }
-
-        return implode('', $parts);
-    }
-
-    /**
-     * @return string empty with /
-     * @see 2.2.6. Path
-     */
-    public static function processPathClosure(RequestInterface $message): string
-    {
-        $p = $message->getUri()
-                     ->getPath()
-        ;
-
-        return (!str_starts_with($p, '/')) ? '/'.$p : $p;
-    }
-
-    /**
      * @param array{string:Closure} $values
      */
     public function addMappingValues(array $values): self
@@ -123,6 +97,10 @@ final class PrepareComponents
         return $this->preparedMethods ??= self::defaultMapperClosure();
     }
 
+    /**
+     * todo move to SignerMethods for the requestInterface
+     *
+     */
     public static function defaultMapperClosure(): PreparedMethods
     {
         /*
@@ -136,38 +114,46 @@ final class PrepareComponents
              */
             ->add(
                 key    : DerivedComponentEnum::method,
-                closure: fn (RequestInterface $message): string => strtoupper(
-                    $message->getMethod(),
+                closure: fn (RequestInterface $messageInterface): Entry => new Entry(
+                    DerivedComponentEnum::method->value,
+                    strtoupper($messageInterface->getMethod()),
                 ),
             )
             ->add(
                 key    : DerivedComponentEnum::targetUri,
-                closure: self::processTargetUriClosure(...),
+                closure: fn (RequestInterface $messageInterface): Entry => new Entry(
+                    key  : DerivedComponentEnum::targetUri->value,
+                    value: TargetUri::handle($messageInterface),
+                ),
             )
             /*
              * @see 2.2.3. Authority
              */
             ->add(
                 key    : DerivedComponentEnum::authority,
-                closure: fn (RequestInterface $message): string => $message->getUri()
-                                                                          ->getHost(),
+                closure: fn (RequestInterface $messageInterface): Entry => new Entry(
+                    DerivedComponentEnum::authority->value,
+                    NormalizedAuthority::handle($messageInterface),
+                ),
             )
             /*
              * @see 2.2.4. Scheme
              */
             ->add(
                 key    : DerivedComponentEnum::scheme,
-                closure: fn (RequestInterface $message): string => $message->getUri()
-                                                                          ->getScheme(),
+                closure: fn (RequestInterface $messageInterface): Entry => new Entry(
+                    key  : DerivedComponentEnum::scheme->value,
+                    value: Scheme::handle($messageInterface),
+                ),
             )
             /*
              * 2.2.5. Request Target
-             * Todo More complex as described in 2.2.5. Request Target
              */
             ->add(
                 key    : DerivedComponentEnum::requestTarget,
-                closure: fn (RequestInterface $message) => throw new BadMethodCallException(
-                    DerivedComponentEnum::requestTarget->value.' not implemented',
+                closure: fn (RequestInterface $messageInterface): Entry => new Entry(
+                    key  : DerivedComponentEnum::requestTarget->value,
+                    value: RequestTarget::handle($messageInterface),
                 ),
             )
             /*
@@ -175,25 +161,54 @@ final class PrepareComponents
              */
             ->add(
                 key    : DerivedComponentEnum::path,
-                closure: self::processPathClosure(...),
-            )
+                closure: fn (RequestInterface $messageInterface): Entry => new Entry(
+                    key  : DerivedComponentEnum::path->value,
+                    value: Path::handle($messageInterface),
+                ),
+            )/*
+             * @see 2.2.9. Status Code
+             */
             ->add(
                 key    : DerivedComponentEnum::status,
-                closure: fn (ResponseInterface $message): int => $message->getStatusCode(),
+                closure: fn (ResponseInterface $response) => new Entry(
+                    DerivedComponentEnum::status->value,
+                    (string)$response->getStatusCode(),
+                ),
             )
             /*
-             * Todo structured Fields
+             * @2.2.8. Query Parameters
              */
             ->add(
                 key    : DerivedComponentEnum::queryParam,
-                closure: fn () => throw new BadMethodCallException(
-                    DerivedComponentEnum::queryParam->value.' not implemented',
+                closure: fn ($messageInterface, $parameters): Entry => QueryParams::handle(
+                    message  : $messageInterface,
+                    fieldName: $parameters->getValueOrThrow(InitialContentsEnum::name),
+                ),
+            )/*
+             * @see 2.2.7. Query
+             */
+            ->add(
+                key    : DerivedComponentEnum::query,
+                closure: fn (RequestInterface $messageInterface): Entry => new Entry(
+                    key  : DerivedComponentEnum::query->value,
+                    value: $messageInterface->getUri()
+                                            ->getQuery(),
                 ),
             )
             ->add(
                 key    : 'content-length',
-                closure: fn (RequestInterface|ResponseInterface $message): int => strlen(
-                    (string)$message->getBody(),
+                closure: fn (RequestInterface|ResponseInterface $message): Entry => new Entry(
+                    'content-length',
+                    strlen((string)$message->getBody()),
+                ),
+            )
+            /*
+             * @see 2.3. Signature Parameters @Important after Processing all other components
+             */
+            ->add(
+                DerivedComponentEnum::signatureParams,
+                fn () => throw new UnexpectedValueException(
+                    'remove before processing signatureParams',
                 ),
             )
         ;
@@ -206,26 +221,12 @@ final class PrepareComponents
         return $this;
     }
 
-    public function processValue(string $key): int|string
+    public function processValue(string $key): int|string|Entry
     {
         return $this->getMethodStack()
                     ->getMethod($key)(
                         $this->message,
                     );
     }
-
-    /*
-     * todo query 2.2.7. Query as it is more komplex
-     * todo 2.2.8. Query Parameters as it is more complex
-     */
-    /*
-         * todo, the status can only be in the response, have a look what todo
-         *
-         * @return int
-
-        public function processStatusCode(): int
-        {
-        }   */
-    // todo 2.3. Signature Parameters über signature params preconfigured
 
 }
