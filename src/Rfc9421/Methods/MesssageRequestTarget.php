@@ -6,14 +6,10 @@ namespace Filefabrik\Rfc9421\Methods;
 
 use Psr\Http\Message\RequestInterface;
 
-final class Path
+final class MesssageRequestTarget
 {
     public static function handle(RequestInterface $requestInterface): string
     {
-        $p = $requestInterface->getUri()
-                              ->getPath()
-        ;
-
-        return (!str_starts_with($p, '/')) ? '/'.$p : $p;
+        return $requestInterface->getRequestTarget();
     }
 }

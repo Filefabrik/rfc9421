@@ -6,7 +6,7 @@ namespace Filefabrik\Rfc9421\Methods;
 
 use Psr\Http\Message\RequestInterface;
 
-final class NormalizedAuthority
+final class MessageAuthority
 {
     /**
      * $interface->getUri()->getAuthority() requires additional filtering for RFC-9421.

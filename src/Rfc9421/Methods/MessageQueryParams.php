@@ -10,7 +10,7 @@ use Filefabrik\Rfc9421\Support\MessageInterfaceHelper;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use Psr\Http\Message\MessageInterface;
 
-final class QueryParams
+final class MessageQueryParams
 {
     /**
      * Todo comment

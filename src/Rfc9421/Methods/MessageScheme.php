@@ -7,16 +7,16 @@ namespace Filefabrik\Rfc9421\Methods;
 use Filefabrik\Rfc9421\Support\MessageInterfaceHelper;
 use Psr\Http\Message\MessageInterface;
 
-final class Scheme
+final class MessageScheme
 {
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      */
     public static function handle(MessageInterface $message): string
     {
         return strtolower(
             MessageInterfaceHelper::hasGetUri($message)
-                     ->getScheme(),
+                                  ->getScheme(),
         );
     }
 }

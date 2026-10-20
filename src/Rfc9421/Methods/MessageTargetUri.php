@@ -6,7 +6,7 @@ namespace Filefabrik\Rfc9421\Methods;
 
 use Psr\Http\Message\RequestInterface;
 
-final class TargetUri
+final class MessageTargetUri
 {
     public static function handle(RequestInterface $requestInterface): string
     {
@@ -15,7 +15,7 @@ final class TargetUri
         $parts = [
             $uri->getScheme(),
             '://',
-            NormalizedAuthority::handle($requestInterface),
+            MessageAuthority::handle($requestInterface),
             $uri->getPath(),
         ];
         if ('' !== ($q = $uri->getQuery())) {
