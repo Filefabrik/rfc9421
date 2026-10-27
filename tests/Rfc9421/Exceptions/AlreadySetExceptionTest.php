@@ -37,10 +37,12 @@ final class AlreadySetExceptionTest extends TestCase
             ),
         );
 
-        throw  AlreadySetException::ComponentExists('@myVar-was-set');
-    } /**
- * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
- */
+        throw  AlreadySetException::ComponentExists('"@myVar-was-set"');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
     public function testComponentExistsEnum(): void
     {
         $this->expectExceptionObject(
