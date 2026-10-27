@@ -7,10 +7,8 @@ namespace Filefabrik\Rfc9421Test;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Signature\Component;
-use Filefabrik\Rfc9421\Signature\Components;
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
+use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentNames;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -63,25 +61,38 @@ final class SigningConfigurationTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignHeader(): void
     {
         $i = new SigningConfiguration();
         self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeader('foo', 'key');
-        self::assertEquals([new Component('foo', InitialContentsEnum::key)], $i->signatureComponents->getComponents());
+        $i->signHeader('foo');
+
+        $c = $i->signatureComponents->getComponents()[0]->getItem()
+                                                        ->toHttpValue()
+        ;
+        self::assertEquals('"foo"', $c);
 
         $i = new SigningConfiguration();
-        $i->signHeader(new Component('@authority', 'name'));
+        $i->signHeader(
+            ComponentName::fromNameAndInitialContentEnum('@authority', 'name')
+                         ->getItem()
+                         ->toHttpValue(),
+        );
 
         self::assertEquals(
-            [new Component(DerivedComponentEnum::authority, InitialContentsEnum::name)],
-            $i->signatureComponents->getComponents(),
+            '"@authority";name',
+            $i->signatureComponents->getComponents()[0]->getItem()
+                                                       ->toHttpValue(),
         );
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignHeaderThrowWrongKey(): void
     {
@@ -97,33 +108,33 @@ final class SigningConfigurationTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignHeaderThrowWrongInitialContent(): void
     {
         $this->expectExceptionObject(
             new EnumTypeException(
-                '"bullshit" is not a valid enumeration of "Filefabrik\Rfc9421\Signature\InitialContentsEnum" Enum.',
+                '"@bullshit" is not a valid enumeration of "Filefabrik\Rfc9421\Signature\DerivedComponentEnum" Enum.',
             ),
         );
         $i = new SigningConfiguration();
         self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeader('@authority','bullshit');
+        $i->signHeader('@bullshit');
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignHeaders(): void
     {
         $i = new SigningConfiguration();
         self::assertEmpty($i->signatureComponents->getComponents());
         $i->signHeaders(['foo', 'bar']);
-        self::assertEquals([new Component('foo'), new Component('bar')], $i->signatureComponents->getComponents());
 
-        $i = new SigningConfiguration();
-        $i->signHeaders([DerivedComponentEnum::authority, 'bar']);
         self::assertEquals(
-            [new Component('@authority'), new Component('bar')],
+            [ComponentName::fromComponentName('foo'), ComponentName::fromComponentName('bar')],
             $i->signatureComponents->getComponents(),
         );
     }
@@ -223,9 +234,10 @@ final class SigningConfigurationTest extends TestCase
 
     public function testSetComponents(): void
     {
-        $c = new Components();
+        $c = new ComponentNames();
         $i = new SigningConfiguration();
         $i->setComponents($c);
         self::assertSame($c, $i->signatureComponents);
     }
+
 }

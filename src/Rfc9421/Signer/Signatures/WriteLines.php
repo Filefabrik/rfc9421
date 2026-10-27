@@ -29,7 +29,7 @@ final class WriteLines extends AbstractLines
     {
         $array = [];
         foreach ($this->lines as $line) {
-            $array[] = [$line->key, $line->value];
+            $array[] = [$line->signatureComponent, $line->valueToSign];
         }
 
         return $array;

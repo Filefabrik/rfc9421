@@ -6,9 +6,8 @@ use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
@@ -20,7 +19,6 @@ use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 require_once __DIR__.'/../vendor/autoload.php';
 /*
@@ -38,7 +36,9 @@ require_once __DIR__.'/../src/register-openssl-signing-verify.php';
  * for testing purposes we use an own cert-loader
  */
 $certInstance = new CertHelper('rsa');
-$targetUrl    = 'http://localhost:8001/mastodon';
+$targetUrl    = 'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman';
+
+$extraParser = ['example-dict' => 'dictionary'];
 
 /*
  * Prepare signingConfiguration
@@ -55,15 +55,23 @@ try {
          * the method we are generating the content-type value (simply via header line)
          */
         ->addSigningMethod(
-            'content-type',
-            fn (RequestInterface $request): string => $request->getHeaderLine('content-type'),
+            componentName: 'content-type',
+            closure      : fn (RequestInterface $request): string => $request->getHeaderLine('content-type'),
         )
         /*
          * tell the signing process that content-type has to be signed
          */
         ->signHeader('content-type')
+        ->signHeader('content-length')
+        ->signHeader(DerivedComponentEnum::query)
         ->signHeader(DerivedComponentEnum::method)
-        ->signHeader('x-Origin-host')
+        ->signHeader('"@query-param";name="baz"')
+        ->signHeader('x-Origin-host')->signHeader('test-header')
+        ->signHeader('"example-dict"')
+        ->signHeader('"example-dict";sf')
+        ->signHeader('"example-dict";key="a"')
+        ->signHeader('"example-dict";key="c"')
+        ->signHeader('"example-dict";key="d"')
         ->signHeader(DerivedComponentEnum::authority)
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated($currentDateTime)
@@ -77,7 +85,8 @@ try {
         // for signing needs private
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
-} catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
+    $signingConfiguration->structuredFields->addMany($extraParser);
+} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException $e) {
     echo $e->getMessage();
 
     return;
@@ -111,14 +120,19 @@ try {
 $request = new Request(
     method : 'POST',
     uri    : $targetUrl,
-    headers: ['x-origin-host' => 'mytest.com', 'content-type' => 'application/json'],
+    headers: [
+        'x-origin-host' => 'mytest.com',
+        'content-type'  => 'application/json',
+        'test-header'=>'playmobile',
+        'Example-Dict'  => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
+    ],
     body   : $bodyJson,
 );
 
 $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
+} catch (AlreadySetException|SignatureException|ContentDigestException $e) {
     echo $e->getMessage();
 
     return;
@@ -132,6 +146,7 @@ try {
  * Now decrypt the Request
  */
 $verifierConfiguration = new SigningConfiguration();
+$verifierConfiguration->structuredFields->addMany($extraParser);
 $verifierConfiguration->addSigningMethods($prepareMethods);
 $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
@@ -142,12 +157,11 @@ $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguratio
  */
 try {
     $verifyPrepareInstance->prepareVerification();
-} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException $e) {
+} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException|AlreadySetException|SignatureExtractionException $e) {
     echo $e->getMessage();
 
     return;
 }
-
 /*
  * with the keyId you should be able to download the public pem
  */
@@ -185,8 +199,10 @@ if (null !== $keyId) {
     /*
      * After successfully verifying you have access to verified header
      */
-
     if ($res) {
+        /**
+         * here are all the headers they were in the singing process from requester and are validated and valued at this point
+         */
         $signedHeaderLines = $verifier->signedHeaderLines;
 
         /*
@@ -233,13 +249,8 @@ if (null !== $keyId) {
              *
              * The content-length will be created to header by guzzle or something AFTER we are signing the request/response. So we have to calculate the length before.
              * @important, when the receiver of this response verifies this response the `->processWithoutExistingHeaders(['content-length'])` never set.
-             */
-            ->addSigningMethod(
-                componentName: 'content-length',
-                closure      : fn (ResponseInterface $response): int => $response->getBody()
-                                                                                ->getSize(),
-            )
-            ->processWithoutExistingHeaders(['content-length'])
+            */
+            //   ->processWithoutExistingHeaders(['content-length'])
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
             // singing the status as relevant information for the requester Alice, to ensure the status

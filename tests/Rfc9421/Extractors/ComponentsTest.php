@@ -6,8 +6,6 @@ namespace Filefabrik\Rfc9421Test\Extractors;
 
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Extractors\Components;
-use Filefabrik\Rfc9421\Signature\Component;
-use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -20,36 +18,44 @@ final class ComponentsTest extends TestCase
      */
     public function testExtractToComponentsObject(): void
     {
-        $input = '"content-length";req "@query-param";bs "example-dict";tr "digi-test"';
+        $input = [/*
+             * 2.2.7. Query
+             *
+             * @see https://www.rfc-editor.org/info/rfc9421/#name-query
+             */
+                  '"@query-param";name="baz"',
+                  '"@query-param";name="bat"',
+                  '"example-dict"',
+                  '"example-dict";sf',
+                  '"example-dict";key="a"',
+                  '"example-dict";key="b"',
+                  '"example-dict";key="c"',
+                  '"example-dict";key="d"',
+                  '"content-length"',
+                  '"@method"',
+                  '"example-header";bs',
+                  '"@path"',
+                  '"host"',
+                  '"if-none-match";sf',
+                  '"date"',
+                  '"date";sf',
+                  '"@request-target"',
+                  '"@target-uri"',
+
+        ];
+
+        $input = implode(' ', $input);
 
         $result = new Components($input)->extractToComponentsObject();
 
-        $expects = new \Filefabrik\Rfc9421\Signature\Components()
-            ->set(
-                new Component('content-length', InitialContentsEnum::req),
-            )
-            ->set(
-                new Component(
-                    '@query-param',
-                    InitialContentsEnum::bs,
-                ),
-            )
-            ->set(
-                new Component(
-                    'example-dict',
-                    InitialContentsEnum::tr,
-                ),
-            )
-            ->set(
-                new Component(
-                    'digi-test',
-                ),
-            )
-        ;
-        self::assertEquals(
-            $expects,
-            $result,
-        );
+        $validateable = [];
+        foreach ($result->getComponents() as $item) {
+            $validateable[] = $item->httpValue;
+        }
+
+        $line = implode(' ', $validateable);
+
+        self::assertEquals($input, $line);
     }
 
     /**
@@ -66,52 +72,4 @@ final class ComponentsTest extends TestCase
         new Components($input)->extractToComponentsObject();
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-
-    public function testWithMethod(): void
-    {
-        // todo that is a wrong format
-        $input = '"content-length";name "@query-param";name="baz": batman "example-dict";tr "digi-test"';
-
-        $expects        = new \Filefabrik\Rfc9421\Signature\Components()
-            ->set(
-                new Component('content-length', InitialContentsEnum::req),
-            )
-            ->set(
-                new Component(
-                    '@query-param',
-                    InitialContentsEnum::bs,
-                ),
-            )
-            ->set(
-                new Component(
-                    'example-dict',
-                    InitialContentsEnum::tr,
-                ),
-            )
-            ->set(
-                new Component(
-                    'digi-test',
-                ),
-            )
-        ;
-        $prepareMethods = new PreparedMethods();
-        $prepareMethods->add(DerivedComponentEnum::queryParam, function ($headerLine, $segmentName) {
-       $headerLine=     str_replace('"'.$segmentName.'";','',$headerLine);
-
-            $p = Dictionary::fromHttpValue($headerLine);
-        });
-        $result = new Components(
-            componentsString: $input,
-            preparedMethods : $prepareMethods,
-        )->extractToComponentsObject();
-
-        self::assertEquals(
-            $expects,
-            $result,
-        );
-    }
-*/
 }

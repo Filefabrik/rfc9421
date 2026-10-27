@@ -54,7 +54,13 @@ final class PreparedMethods
      */
     public function callWith(string|DerivedComponentEnum $key, ...$params): Entry
     {
-        return $this->getMethod($key)(...$params);
+        $result = $this->getMethod($key)(...$params);
+
+        if (!$result instanceof Entry) {
+            return new Entry($key, $result);
+        }
+
+        return $result;
     }
 
     public function getMethod(string|DerivedComponentEnum $key): Closure

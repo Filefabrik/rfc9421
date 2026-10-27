@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Verify;
 
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
-use Filefabrik\Rfc9421\Signature\Components;
+use Filefabrik\Rfc9421\Signature\ComponentNames;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,7 +16,9 @@ final class HeaderSignatureInputTest extends TestCase
 {
     public function testExtract(): void
     {
-        $expectedComponents   =new Components()->setByName('@method',)->setByName('content-digest') ;
+        $expectedComponents   = new ComponentNames()->addName('@method')
+                                                    ->addName('content-digest')
+        ;
         $expectedMetadata     = [
             'created' => 1789749530,
             'expires' => 1789756730,
@@ -27,7 +29,6 @@ final class HeaderSignatureInputTest extends TestCase
             'someSig=("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
 
-
         $headerSignatureInput->extract();
 
         self::assertEquals($expectedComponents, $headerSignatureInput->extractedComponents);
@@ -36,7 +37,9 @@ final class HeaderSignatureInputTest extends TestCase
 
     public function testExtractWithoutKey(): void
     {
-        $expectedComponents   =new Components()->setByName('@method',)->setByName('content-digest') ;
+        $expectedComponents   = new ComponentNames()->addName('@method')
+                                                    ->addName('content-digest')
+        ;
         $expectedMetadata     = [
             'created' => 1789749530,
             'expires' => 1789756730,
@@ -46,7 +49,6 @@ final class HeaderSignatureInputTest extends TestCase
         $sig                  =
             '("@method" "content-digest");created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, '');
-
 
         $headerSignatureInput->extract();
 
@@ -75,7 +77,6 @@ final class HeaderSignatureInputTest extends TestCase
             'someSig=();created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
 
-
         $headerSignatureInput->extract();
     }
 
@@ -90,7 +91,6 @@ final class HeaderSignatureInputTest extends TestCase
         $sig                  =
             'someSig=);created=1789749530;expires=1789756730;nonce="nonce-now";tag="mastodon"';
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
-
 
         $headerSignatureInput->extract();
     }

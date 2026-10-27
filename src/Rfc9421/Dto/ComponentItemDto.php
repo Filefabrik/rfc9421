@@ -1,0 +1,51 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Filefabrik\Rfc9421\Dto;
+
+use Bakame\Http\StructuredFields\Item;
+use Exception;
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Signature\ComponentName;
+
+/**
+ * Ensured FieldItem read in during the componentNames method
+ */
+final readonly class ComponentItemDto
+{
+    private function __construct(
+        private(set) string $fieldName,
+        private(set) string $httpValue,
+        private(set) Item $item,
+    ) {
+    }
+
+    /**
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public static function fromComponentName(ComponentName $componentName): self
+    {
+        try {
+            return self::fromFieldItem($componentName->getItem());
+        } catch (Exception $exception) {
+            throw new SignatureExtractionException($exception->getMessage(), $exception->getCode(), $exception);
+        }
+    }
+
+    public static function fromFieldItem(Item $item): self
+    {
+        return new self(FieldNameDto::fromItem($item)->fieldName, $item->toHttpValue(), $item);
+    }
+
+    public function getItem(): Item
+    {
+        return $this->item;
+    }
+
+    public function getHttpValue(): string
+    {
+        return $this->httpValue;
+    }
+}

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\StructuredFields;
 
 use Bakame\Http\StructuredFields\Item;
+use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
@@ -12,47 +14,50 @@ use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Bs;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Key;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Sf;
+use Filefabrik\Rfc9421\Support\HeaderItems;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 final class DestructEntry
 {
-    public $originalRequest;
+    /**
+     * Required only if we are handle a signed response where we want to use the req field
+     */
+    private(set) RequestInterface|null $originalRequest = null;
+
+
 
     public function __construct(
-        private(set) readonly Item $fieldItem,
-        private(set) readonly MethodsMapper $methodsMapper,
-        private(set) readonly StructuredFields $structuredFields,
+        private(set) readonly ComponentItemDto $componentItemDto,
         private(set) readonly SigningConfiguration $signingConfiguration,
+        private(set) readonly HeaderItemsDto $headerItemsDto,
+        private(set) readonly MessageInterface $messageInterface,
     ) {
     }
 
     /**
-     * @param array<string,string> $headers
      *
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
-    public function canonicalizeComponent(array $headers, MessageInterface $interface): ?Entry
+    public function handle(): ?Entry
     {
-        $fieldName = (string)$this->fieldItem->value(fn ($value): bool => is_string($value));
-
-        $parameters = $this->extractParameters($this->fieldItem);
+        $parameters = $this->extractParameters($this->componentItemDto->getItem());
 
         // throws
         $this->checkParametersConflict($parameters);
 
-        $whichRequest = $interface;
-        $whichHeaders = $this->prepareWhichHeaders($headers, $interface, $parameters);
+        $whichHeaders = $this->prepareWhichHeaders($parameters);
 
         $entry = new FieldValue(
             signingConfiguration     : $this->signingConfiguration,
             initialContentsParameters: $parameters,
-            lowerCasedHeaders        : $whichHeaders,
-            fieldName: $fieldName,
-            messageInterface: $whichRequest,
+            headerItemsDto           : $whichHeaders,
+            componentItemDto             : $this->componentItemDto,
+            messageInterface         : $this->messageInterface,
         )->getFieldValue();
 
         /*
@@ -62,20 +67,20 @@ final class DestructEntry
             $entry = new Bs()
                 ->handle(
                     entry       : $entry,
-                    whichRequest: $whichRequest,
+                    whichRequest: $this->messageInterface,
                 )
             ;
         } elseif ($parameters->has(InitialContentsEnum::sf)) {
             $entry = new Sf(
-                methodsMapper       : $this->methodsMapper,
-                structuredFieldTypes: $this->structuredFields,
+                methodsMapper       : $this->signingConfiguration->methodsMapper,
+                structuredFieldTypes: $this->signingConfiguration->structuredFields,
             )->handle(
                 entry: $entry,
             );
         } elseif ($parameters->has(InitialContentsEnum::key)) {
             $entry = new Key(
-                methodsMapper       : $this->methodsMapper,
-                structuredFieldTypes: $this->structuredFields,
+                methodsMapper       : $this->signingConfiguration->methodsMapper,
+                structuredFieldTypes: $this->signingConfiguration->structuredFields,
             )->handle(
                 entry    : $entry,
                 childName: $parameters->getValueOrThrow(InitialContentsEnum::key),
@@ -122,22 +127,19 @@ final class DestructEntry
     }
 
     /**
-     * @param array<string,string> $headers
+     * Todo Method not tested, todo only during response signing
+     *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
-    private function prepareWhichHeaders(
-        array $headers,
-        MessageInterface|RequestInterface|ResponseInterface $interface,
-        InitialContentsParameters $parameters,
-    ): array {
-        $whichRequest = $interface;
-        $whichHeaders = $headers;
+    private function prepareWhichHeaders(InitialContentsParameters $parameters): HeaderItemsDto
+    {
+        $whichHeaders = $this->headerItemsDto;
         if ($parameters->has(InitialContentsEnum::req)) {
-            if ($interface instanceof ResponseInterface) {
+            if ($this->messageInterface instanceof ResponseInterface) {
                 $whichRequest = $this->originalRequest;
-                $whichHeaders = DestructHeaders::getLowerCasedHeadersFromInterface($whichRequest);
+                $whichHeaders = HeaderItemsDto::fromHeaderItems(HeaderItems::fromInterface($whichRequest));
             } else {
                 throw new UnProcessableSignatureException('missing request for req parameter');
             }

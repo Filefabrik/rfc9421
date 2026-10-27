@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields;
 
+use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
+use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -12,20 +15,24 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
 
+/**
+ * try to detect field with value
+ */
 final readonly class FieldValue
 {
-    /**
-     * @param array<string,string> $lowerCasedHeaders
-     */
     public function __construct(
         private(set) SigningConfiguration $signingConfiguration,
         private(set) InitialContentsParameters $initialContentsParameters,
-        private(set) array $lowerCasedHeaders,
-        private(set) string $fieldName,
+        private(set) HeaderItemsDto $headerItemsDto,
+        private(set) ComponentItemDto $componentItemDto,
         private(set) MessageInterface $messageInterface,
     ) {
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     public function getFieldValue(): Entry
     {
         if ($this->messageInterface instanceof RequestInterface) {
@@ -41,13 +48,18 @@ final readonly class FieldValue
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     private function handleRequestInterface(): Entry
     {
         // first test the method is in the configuration stack
 
-        if ($this->signingConfiguration->signingMethods?->hasMethod($this->fieldName) ?? false) {
+        if ($this->signingConfiguration->signingMethods?->hasMethod($this->componentItemDto->fieldName) ?? false) {
+
             $entry = $this->signingConfiguration->signingMethods->callWith(
-                $this->fieldName,
+                $this->componentItemDto->fieldName,
                 $this->messageInterface,
                 $this->initialContentsParameters,
             );
@@ -58,9 +70,19 @@ final readonly class FieldValue
         return $this->handleREQ($entry);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     */
     private function getDefaultEntry(): Entry
     {
-        return new Entry($this->fieldName, trim($this->lowerCasedHeaders[$this->fieldName] ?? ''));
+        // todo header field not found
+
+        $fieldName = $this->componentItemDto->fieldName;
+        if ($this->headerItemsDto->hasHeader($fieldName)) {
+            return new Entry($fieldName, $this->headerItemsDto->getTrimmedHeader($fieldName));
+        }
+
+        throw InvalidHeaderKeyException::headerNotExists($fieldName);
     }
 
     /**
@@ -78,11 +100,16 @@ final readonly class FieldValue
         return $entry;
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     private function handleResponseInterface(): Entry
     {
-        if ($this->signingConfiguration->signingMethods?->hasMethod($this->fieldName) ?? false) {
+        $fieldName = $this->componentItemDto->fieldName;
+        if ($this->signingConfiguration->signingMethods?->hasMethod($fieldName) ?? false) {
             $entry = $this->signingConfiguration->signingMethods->callWith(
-                $this->fieldName,
+                $fieldName,
                 $this->messageInterface,
                 $this->initialContentsParameters,
             );

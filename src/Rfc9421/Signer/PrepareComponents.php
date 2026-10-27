@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Signer;
 
 use Closure;
-use Filefabrik\Rfc9421\Methods\NormalizedAuthority;
-use Filefabrik\Rfc9421\Methods\Path;
-use Filefabrik\Rfc9421\Methods\QueryParams;
-use Filefabrik\Rfc9421\Methods\RequestTarget;
-use Filefabrik\Rfc9421\Methods\Scheme;
-use Filefabrik\Rfc9421\Methods\TargetUri;
+use Filefabrik\Rfc9421\Methods\MessageAuthority;
+use Filefabrik\Rfc9421\Methods\MessagePath;
+use Filefabrik\Rfc9421\Methods\MessageQueryParams;
+use Filefabrik\Rfc9421\Methods\MessageScheme;
+use Filefabrik\Rfc9421\Methods\MessageTargetUri;
+use Filefabrik\Rfc9421\Methods\MesssageRequestTarget;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
+use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
@@ -57,7 +59,6 @@ use UnexpectedValueException;
  */
 /**
  * todo closure processing
- * @phpstan-type entry array{string: Closure|string}
  */
 final class PrepareComponents
 {
@@ -123,7 +124,7 @@ final class PrepareComponents
                 key    : DerivedComponentEnum::targetUri,
                 closure: fn (RequestInterface $messageInterface): Entry => new Entry(
                     key  : DerivedComponentEnum::targetUri->value,
-                    value: TargetUri::handle($messageInterface),
+                    value: MessageTargetUri::handle($messageInterface),
                 ),
             )
             /*
@@ -133,7 +134,7 @@ final class PrepareComponents
                 key    : DerivedComponentEnum::authority,
                 closure: fn (RequestInterface $messageInterface): Entry => new Entry(
                     DerivedComponentEnum::authority->value,
-                    NormalizedAuthority::handle($messageInterface),
+                    MessageAuthority::handle($messageInterface),
                 ),
             )
             /*
@@ -143,7 +144,7 @@ final class PrepareComponents
                 key    : DerivedComponentEnum::scheme,
                 closure: fn (RequestInterface $messageInterface): Entry => new Entry(
                     key  : DerivedComponentEnum::scheme->value,
-                    value: Scheme::handle($messageInterface),
+                    value: MessageScheme::handle($messageInterface),
                 ),
             )
             /*
@@ -153,7 +154,7 @@ final class PrepareComponents
                 key    : DerivedComponentEnum::requestTarget,
                 closure: fn (RequestInterface $messageInterface): Entry => new Entry(
                     key  : DerivedComponentEnum::requestTarget->value,
-                    value: RequestTarget::handle($messageInterface),
+                    value: MesssageRequestTarget::handle($messageInterface),
                 ),
             )
             /*
@@ -163,14 +164,14 @@ final class PrepareComponents
                 key    : DerivedComponentEnum::path,
                 closure: fn (RequestInterface $messageInterface): Entry => new Entry(
                     key  : DerivedComponentEnum::path->value,
-                    value: Path::handle($messageInterface),
+                    value: MessagePath::handle($messageInterface),
                 ),
             )/*
              * @see 2.2.9. Status Code
              */
             ->add(
                 key    : DerivedComponentEnum::status,
-                closure: fn (ResponseInterface $response): \Filefabrik\Rfc9421\StructuredFields\Entry => new Entry(
+                closure: fn (ResponseInterface $response): Entry => new Entry(
                     DerivedComponentEnum::status->value,
                     (string)$response->getStatusCode(),
                 ),
@@ -180,7 +181,7 @@ final class PrepareComponents
              */
             ->add(
                 key    : DerivedComponentEnum::queryParam,
-                closure: fn (\Psr\Http\Message\MessageInterface $messageInterface, $parameters): Entry => QueryParams::handle(
+                closure: fn (MessageInterface $messageInterface, InitialContentsParameters$parameters): Entry => MessageQueryParams::handle(
                     message  : $messageInterface,
                     fieldName: $parameters->getValueOrThrow(InitialContentsEnum::name),
                 ),

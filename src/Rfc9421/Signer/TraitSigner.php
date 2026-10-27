@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
+use Exception;
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
-use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Rfc9421\Exceptions\SignatureException;
-use Filefabrik\Rfc9421\Signature\Component;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
@@ -44,17 +39,19 @@ trait TraitSigner
     }
 
     /**
-     * @throws AlreadySetException
-     * @throws ContentDigestException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws SignatureException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     private function sign(): ResponseInterface|RequestInterface
     {
         // set up the content digest into rendering if the ContentDigestAlgo exists
         if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
-            $this->signingConfiguration->signatureComponents->set(new Component('content-digest'));
+            $this->signingConfiguration->signatureComponents->addName('content-digest');
         }
 
         $this->prepareSigning();
@@ -73,8 +70,11 @@ trait TraitSigner
     /**
      * für das verify auch verwenden
      *
-     * @throws ContentDigestException|InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws Exception
      */
     public function prepareSigning(): void
     {

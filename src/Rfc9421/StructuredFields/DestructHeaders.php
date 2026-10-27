@@ -6,41 +6,36 @@ namespace Filefabrik\Rfc9421\StructuredFields;
 
 use Bakame\Http\StructuredFields\Dictionary;
 use Bakame\Http\StructuredFields\InnerList;
-use Bakame\Http\StructuredFields\Item;
+use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use JsonException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 
-final class DestructHeaders
+/**
+ * Destructing and recompile the whole signature ("") expression
+ */
+final readonly class DestructHeaders
 {
-    private(set) ?StructuredFields $structuredFieldTypes = null;
-
-    /**
-     * @param array<string,string> $lowerCasedHeaderLines
-     */
     public function __construct(
-        private(set) readonly array $lowerCasedHeaderLines,
-        private(set) readonly string $signatureParamsLine,
-        private(set) readonly MessageInterface $message,
-        private(set) readonly RequestInterface $originalRequest,
-        private(set) readonly MethodsMapper $methodsMapper,
-        private(set) readonly SigningConfiguration $signingConfiguration,
+        /**
+         * HeaderLines key:value we are compiling the signed component from
+         */
+        private(set) HeaderItemsDto $headerItemsDto,
+        /**
+         * ("example-dict" "some-thing;req")
+         */
+        private(set) string $signatureParamsLine,
+        private(set) MessageInterface $message,
+        /**
+         * only need if response signing
+         *
+         */
+        private(set) RequestInterface $originalRequest,
+        private(set) SigningConfiguration $signingConfiguration,
     ) {
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function getLowerCasedHeadersFromInterface(MessageInterface $interface): array
-    {
-        $headers = [];
-        foreach ($interface->getHeaders() as $name => $values) {
-            $headers[strtolower($name)] = implode(', ', $values);
-        }
-
-        return $headers;
     }
 
     /**
@@ -56,34 +51,25 @@ final class DestructHeaders
         $processedComponents = [];
         $dict                = $this->parseStructuredDict($this->signatureParamsLine);
         if ($dict->isNotEmpty()) {
-            $coveredStructuredFields = $dict->__toString();
-            $indices                 = $dict->indices();
-
-            foreach ($indices as $index) {
-                $member = $dict->getByIndex($index);
-                if (!$member instanceof Item) {
-                    throw new UnProcessableSignatureException('Index '.$index.' not found');
+            /** @var \Bakame\Http\StructuredFields\Item $item */
+            foreach ($dict as $item) {
+                if (in_array($item, $processedComponents, true)) {
+                    throw new UnProcessableSignatureException('Duplicate item found');
                 }
 
-                if (in_array($member, $processedComponents, true)) {
-                    throw new UnProcessableSignatureException('Duplicate member found');
-                }
-
-                $processedComponents[] = $member;
+                $processedComponents[] = $item;
 
                 $instance = new DestructEntry(
-                    fieldItem           : $member,
-                    methodsMapper       : $this->methodsMapper,
-                    structuredFields    : $this->getStructuredFields(),
+                    componentItemDto    : ComponentItemDto::fromFieldItem($item),
                     signingConfiguration: $this->signingConfiguration,
+                    headerItemsDto      : $this->headerItemsDto,
+                    messageInterface    : $this->message,
                 );
 
-                $resultEntry = $instance->canonicalizeComponent(
-                    headers  : $this->lowerCasedHeaderLines,
-                    interface: $this->message,
-                );
-
-                $parsed                = $resultEntry->parse();
+                // todo check what happens with null
+                $parsed                = $instance->handle()
+                                                  ->parse()
+                ;
                 $signatureComponents[] = $parsed;
             }
         }
@@ -101,26 +87,6 @@ final class DestructHeaders
         return str_starts_with($trimmedHeaderValue, '(') && str_ends_with($trimmedHeaderValue, ')') ?
             InnerList::fromHttpValue($headerValue) :
             Dictionary::fromHttpValue($headerValue);
-    }
-
-    /**
-     * @throws JsonException
-     */
-    private function getStructuredFields(): StructuredFields
-    {
-        return $this->structuredFieldTypes ??= StructuredFields::fromDefaultList();
-    }
-
-    /**
-     * @throws JsonException
-     */
-    public function setStructuredFieldType(string $key, string $value): self
-    {
-        $this->getStructuredFields()
-             ->add($key, $value)
-        ;
-
-        return $this;
     }
 
 }

@@ -7,6 +7,9 @@ namespace Filefabrik\Rfc9421\StructuredFields;
 use JsonException;
 use UnexpectedValueException;
 
+/**
+ * Header fields in lower cases they will process with the<value> from MethodsMapper
+ */
 final class StructuredFields
 {
     private static string $list = <<<JSON
@@ -80,6 +83,9 @@ final class StructuredFields
         }      
         JSON;
 
+    /**
+     * @param array{string:string}|array{} $fields lower-case header name, method
+     */
     public function __construct(private(set) array $fields = [])
     {
     }
@@ -101,6 +107,9 @@ final class StructuredFields
         return json_decode(self::$list, true, 512, JSON_THROW_ON_ERROR);
     }
 
+    /**
+     * @param array{string:string}|array{} $fields
+     */
     public function addMany(array $fields): self
     {
         foreach ($fields as $key => $value) {
@@ -112,19 +121,24 @@ final class StructuredFields
 
     public function add(string $key, string $value): self
     {
-        $this->fields[$key] = $value;
+        $this->fields[$this->normalizeKey($key)] = $value;
 
         return $this;
     }
 
     public function getOrNull(string $key): ?string
     {
-        return $this->fields[$key] ?? null;
+        return $this->fields[$this->normalizeKey($key)] ?? null;
     }
 
     public function getOrThrow(string $key): string
     {
-        return $this->fields[$key] ?? throw new UnexpectedValueException(sprintf("Field '%s' does not exist.", $key));
+        return $this->getOrNull($key) ?? throw new UnexpectedValueException(sprintf("Field '%s' does not exist.", $key));
+    }
+
+    private function normalizeKey(string $key): string
+    {
+        return strtolower(trim($key));
     }
 
 }

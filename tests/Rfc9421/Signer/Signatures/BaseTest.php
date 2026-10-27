@@ -6,9 +6,7 @@ namespace Filefabrik\Rfc9421Test\Signer\Signatures;
 
 use DateTime;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
@@ -23,10 +21,12 @@ use Psr\Http\Message\MessageInterface;
 final class BaseTest extends TestCase
 {
     /**
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testCreateSignatureLines(): void
     {
@@ -34,6 +34,7 @@ final class BaseTest extends TestCase
         $sc->signHeader('not-ExistinG')
            ->signHeader('@method')
         ;
+        $sc->structuredFields->add('not-existing', 'etag');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 
@@ -41,14 +42,16 @@ final class BaseTest extends TestCase
                  ->toKeyValueArray()
         ;
 
-        self::assertEquals([['not-existing', 'hm'], ['@method', 'POST']], $arr);
+        self::assertEquals(['"not-existing"' => '"not-existing": hm', '"@method"' => '"@method": POST'], $arr);
     }
 
     /**
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleSignBody(): void
     {
@@ -62,22 +65,23 @@ final class BaseTest extends TestCase
         $i     = new Base($r, $sc);
         $lines = $i->createSignatureLines();
         self::assertEquals(
-            new Line('not-existing', 'hm'),
+                new Line('"not-existing"', '"not-existing": hm'),
             $lines->getLineNumber(0),
         );
         self::assertEquals(
-            new Line('@method', '"@method": POST'),
+            new Line('"@method"', '"@method": POST'),
             $lines->getLineNumber(1),
         );
-        self::assertEquals('content-digest', $lines->getLineNumber(2)->key);
+        self::assertEquals('content-digest', $lines->getLineNumber(2)->signatureComponent);
     }
 
     /**
-     * @throws AlreadySetException
-     * @throws ContentDigestException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleSignBodyThrowConfig(): void
     {
@@ -98,11 +102,12 @@ final class BaseTest extends TestCase
     }
 
     /**
-     * @throws AlreadySetException
-     * @throws ContentDigestException
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testCreateSignatureLinesThrowMissingHeader(): void
     {
@@ -123,6 +128,7 @@ final class BaseTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testMakeSignatureInput(): void
     {
@@ -144,7 +150,7 @@ final class BaseTest extends TestCase
 
     public function testCompileSignatureInputToString(): void
     {
-        $sls = new WriteLines()->addEntry('header-key', 'the-value');
+        $sls = new WriteLines()->addEntry('header-key', '"header-key": the-value');
 
         $res = Base::compileSignatureInputToString($sls);
 
@@ -152,11 +158,12 @@ final class BaseTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testWithPreparedComponents(): void
     {
@@ -165,6 +172,8 @@ final class BaseTest extends TestCase
            ->signHeader('@method')
            ->signHeader('@authority')
         ;
+
+        $sc->structuredFields->add('not-existing', 'etag');
         $sc->addSigningMethod(componentName: '@authority', closure: fn (MessageInterface $message): string => 'game');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
@@ -173,7 +182,14 @@ final class BaseTest extends TestCase
                  ->toArray()
         ;
 
-        self::assertEquals([['not-existing', 'hm'], ['@method', 'POST'], ['@authority', 'game']], $arr);
+        self::assertEquals(
+            [
+                ['"not-existing"', '"not-existing": hm'],
+                ['"@method"', '"@method": POST'],
+                ['"@authority"', '"@authority": game'],
+            ],
+            $arr,
+        );
     }
 
 }

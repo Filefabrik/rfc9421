@@ -8,13 +8,16 @@ use Closure;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
+/**
+ * Compile from Header values with the wanted format into a line
+ */
 final class Entry
 {
-    public const string colon     = ': ';
+    public const string colon = ': ';
 
     public const string semicolon = ';';
 
-    public const string equals    = '=';
+    public const string equals = '=';
 
     private(set) bool $reqEnum = false;
 
@@ -71,6 +74,10 @@ final class Entry
         return $this;
     }
 
+    /**
+     * Todo Extra Parser from Outside
+     *
+     */
     public function parse(): string
     {
         $parts = [];
@@ -103,7 +110,7 @@ final class Entry
 
         $key = $this->key;
         foreach ($this->keyMethods as $keyMethod) {
-            $key = $keyMethod->call($this, $key);
+            $key = $keyMethod($key);
         }
 
         return $key;

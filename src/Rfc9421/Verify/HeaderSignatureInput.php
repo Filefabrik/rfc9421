@@ -7,7 +7,7 @@ namespace Filefabrik\Rfc9421\Verify;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\Components;
 use Filefabrik\Rfc9421\Extractors\Metadata;
-use Filefabrik\Rfc9421\Support\PreparedMethods;
+use Filefabrik\Rfc9421\Signature\ComponentNames;
 use Filefabrik\Rfc9421\Support\SignaturInput;
 use InvalidArgumentException;
 
@@ -21,7 +21,7 @@ final class HeaderSignatureInput
     /**
      * only if validatedSignatureParts was successfully
      */
-    private(set) ?\Filefabrik\Rfc9421\Signature\Components $extractedComponents = null;
+    private(set) ?ComponentNames $extractedComponents = null;
 
     /**
      * only if validatedSignatureParts was successfully
@@ -31,10 +31,6 @@ final class HeaderSignatureInput
     public function __construct(
         private(set) readonly string $headerSignatureInputValue,
         private(set) readonly string $signatureNameKey,
-        /**
-         * With Prepared Methods to extract parts
-         */
-        private(set) readonly ?PreparedMethods $preparedMethods =null,
     ) {
     }
 
@@ -61,10 +57,7 @@ final class HeaderSignatureInput
         /*
          * todo with structured fields
          */
-        $this->extractedComponents = new Components(
-            componentsString: $this->signatureInput->components,
-            preparedMethods : $this->preparedMethods,
-        )
+        $this->extractedComponents = new Components(componentsString: $this->signatureInput->components)
             ->extractToComponentsObject()
         ;
 

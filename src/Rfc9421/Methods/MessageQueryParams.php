@@ -26,22 +26,22 @@ final class MessageQueryParams
         $queryString = MessageInterfaceHelper::hasGetUri($message)
                                              ->getQuery()
         ;
-        if ('' !== $queryString) {
-            $queryParams = self::parseQueryString($queryString);
-
-            // todo, wenn not exists $queryParams[$fieldName], check what is expected
-            $value = '';
-            if (is_array($queryParams) && isset($queryParams[$fieldName]) && '' !== $queryParams[$fieldName]) {
-                $value = UnquoteHelper::quote($queryParams[$fieldName]);
-            }
-
-            // special of the key _baz_ with underscore before and after baz
-            return new Entry($fieldName, $value)->withKeyMethod(
-                method: fn ($key): string => UnquoteHelper::quotedUnderscore($key),
-            );
+        if ('' === $queryString) {
+            throw new UnProcessableSignatureException('Query string named parameter not set');
         }
 
-        throw new UnProcessableSignatureException('Query string named parameter not set');
+        $queryParams = self::parseQueryString($queryString);
+
+        // todo, wenn not exists $queryParams[$fieldNameDto], check what is expected
+        $value = '';
+        if (is_array($queryParams) && isset($queryParams[$fieldName]) && '' !== $queryParams[$fieldName]) {
+            $value = UnquoteHelper::quote($queryParams[$fieldName]);
+        }
+
+        // special of the key _baz_ with underscore before and after baz
+        return new Entry($fieldName, $value)->withKeyMethod(
+            method: fn ($key): string => UnquoteHelper::quotedUnderscore($key),
+        );
     }
 
     /**

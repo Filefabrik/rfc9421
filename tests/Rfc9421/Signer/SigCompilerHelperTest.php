@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Signer;
 
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Signature\Components;
+use Filefabrik\Rfc9421\Signature\ComponentNames;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -20,10 +19,10 @@ final class SigCompilerHelperTest extends TestCase
      */
     public function testMakeSig1fromComponents(): void
     {
-        $components = new Components()->setByName('test')
-                                      ->setByName('@authority')
-                                      ->setByName('try-out')
-                                      ->setByName('some-header')
+        $components = new ComponentNames()->addName('test')
+                                          ->addName('@authority')
+                                          ->addName('try-out')
+                                          ->addName('some-header')
         ;
         self::assertEquals(
             'someSig=("test" "@authority" "try-out" "some-header")',
@@ -37,10 +36,10 @@ final class SigCompilerHelperTest extends TestCase
     public function testMakeSig1fromSignatureParams(): void
     {
         // todo status only on response signing
-        $components = new Components()->setByName('test')
-                                      ->setByName('@status')
-                                      ->setByName('try-out')
-                                      ->setByName('some-header')
+        $components = new ComponentNames()->addName('test')
+                                          ->addName('@status')
+                                          ->addName('try-out')
+                                          ->addName('some-header')
         ;
 
         self::assertEquals(
@@ -54,14 +53,14 @@ final class SigCompilerHelperTest extends TestCase
      */
     public function testMakeSig1fromConstructWithInitial(): void
     {
-        $components = new Components()->setByName('test', 'req')
-                                      ->setByName(DerivedComponentEnum::requestTarget)
-                                      ->setByName('try-out')
-                                      ->setByName('some-header')
+        $components = new ComponentNames()->addName('test')
+                                          ->addName(DerivedComponentEnum::requestTarget)
+                                          ->addName('try-out')
+                                          ->addName('some-header')
         ;
 
         self::assertEquals(
-            'sig1=("test";req "@request-target" "try-out" "some-header")',
+            'sig1=("test" "@request-target" "try-out" "some-header")',
             new SigCompilerHelper($components, 'sig1=')->makeSig1fromSignatureParams(),
         );
     }
@@ -71,11 +70,11 @@ final class SigCompilerHelperTest extends TestCase
      */
     public function testMakeSig1fromConstructThrows(): void
     {
-        $this->expectExceptionObject(EnumTypeException::TypeError('baddabum', InitialContentsEnum::class));
-        $components = new Components()->setByName('test', 'baddabum')
-                                      ->setByName('@test')
-                                      ->setByName('try-out')
-                                      ->setByName('some-header')
+        $this->expectExceptionObject(EnumTypeException::TypeError('@test', DerivedComponentEnum::class));
+        $components = new ComponentNames()->addName('test')
+                                          ->addName('@test')
+                                          ->addName('try-out')
+                                          ->addName('some-header')
         ;
         new SigCompilerHelper($components, 'sig1=')->makeSig1fromSignatureParams();
     }

@@ -42,9 +42,11 @@ final class VerifyPrepare
      * First prepare some request datas
      * Throws if there is an error
      *
-     * @throws VerifyHeaderSignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     public function prepareVerification(): bool
     {
@@ -127,7 +129,7 @@ final class VerifyPrepare
             headerSignatureInputValue: $this->headerHelper
                 ->getSignatureInputLine(),
             signatureNameKey         : $this->signingConfiguration->signatureKeyName ?? '',
-            preparedMethods          : $this->signingConfiguration?->extractComponentMethods,
+
         );
         // throws error
         $headerSignatureInstance->extract();

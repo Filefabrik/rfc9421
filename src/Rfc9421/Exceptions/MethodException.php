@@ -10,4 +10,14 @@ final class MethodException extends AbstractRfc9421Exception
     {
         return new self(sprintf('Missing method "%s" for MessageInterface "%s"', $methodName, $className));
     }
+
+    public static function closureCallError(string $message = '-no message-'): self
+    {
+        return new self(sprintf('Closure Call Error with Message "%s"', $message));
+    }
+
+    public static function reflectionCallError(string $message = '-no message-'): self
+    {
+        return new self(sprintf('Closure Call Reflection Error with Message "%s"', $message));
+    }
 }

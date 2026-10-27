@@ -27,35 +27,39 @@ final class RequestSignerTest extends TestCase
     /**
      * Just a running Test
      *
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws JsonException
      */
     public function testSign(): void
     {
-        $targetUrl       = 'http://localhost:8001/mastodon';
+        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
-        $signingConfiguration = new SigningConfiguration()
-            ->signHeader('@method')
-            ->signHeader('x-Origin-host')
-            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->setCreated($currentDateTime)
-            ->setExpires($currentDateTime + 7200)
-            ->setTag('mastodon')
-            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
-            ->withNonce('nonce-now')
-            ->setContentDigestAlgo('sha512')
+        $signingConfiguration = new SigningConfiguration()->signHeader('"@query-param";name="baz"')
+                                                          ->signHeader('@method')
+                                                          ->signHeader('x-Origin-host')
+                                                          ->signHeader('"example-dict";sf')
+                                                          ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+                                                          ->setCreated($currentDateTime)
+                                                          ->setExpires($currentDateTime + 7200)
+                                                          ->setTag('mastodon')
+                                                          ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+                                                          ->withNonce('nonce-now')
+                                                          ->setContentDigestAlgo('sha512')
             // content digest signer key
-            ->setSignatureKeyName('testValue=')
+                                                          ->setSignatureKeyName('testValue=')
             // for signing needs private
-            ->setPrivatePem($certInstance->getPrivatPemContent())
+                                                          ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
+        $signingConfiguration->structuredFields->add('example-dict', 'dictionary');
         /**
          * Prepare the Request
          */
@@ -64,7 +68,7 @@ final class RequestSignerTest extends TestCase
         $request    = new Request(
             method : 'POST',
             uri    : $targetUrl,
-            headers: ['x-origin-host' => 'mytest.com'],
+            headers: ['x-origin-host' => 'mytest.com', 'Example-Dict' => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d '],
             body   : $bodyJson,
         );
 
@@ -77,15 +81,17 @@ final class RequestSignerTest extends TestCase
     /**
      * Just a running Test
      *
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \JsonException|\Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws JsonException|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignWithoutContentDigest(): void
     {
-        $targetUrl       = 'http://localhost:8001/mastodon';
+        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
@@ -124,16 +130,17 @@ final class RequestSignerTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws JsonException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws JsonException|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testGetSignedLines(): void
     {
-        $targetUrl       = 'http://localhost:8001/mastodon';
+        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
@@ -177,12 +184,17 @@ final class RequestSignerTest extends TestCase
     }
 
     /**
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws JsonException
      */
     public function testGetSignedLinesOne(): void
     {
-        $targetUrl       = 'http://localhost:8001/mastodon';
+        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
@@ -216,11 +228,7 @@ final class RequestSignerTest extends TestCase
         $signedRequest = $signer->sign();
         self::assertInstanceOf(Request::class, $signedRequest);
 
-        self::assertCount(
-            1,
-            $signer->getSignedLines()
-                   ->toKeyValueArray(),
-        );
+        self::assertCount(1, $signer->getSignedLines()->lines);
     }
 
     /**
@@ -235,7 +243,7 @@ final class RequestSignerTest extends TestCase
             ),
         );
 
-        $targetUrl       = 'http://localhost:8001/mastodon';
+        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 

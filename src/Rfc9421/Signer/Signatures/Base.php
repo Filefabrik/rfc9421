@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
+use Exception;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Rfc9421\Signature\Component;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 
 /**
  * Handling the signature base params
+ * The given Signing Components via setHeader('@method') will be prepared into "@method: POST" Lines.
+ * This Lines will be used as signing-parameters
  */
 final class Base
 {
@@ -38,24 +38,22 @@ final class Base
     {
         $cArray = [];
         foreach ($signatureLines->lines as $signatureLine) {
-            $cArray[] = self::compileLinesToString($signatureLine);
+            $cArray[] = $signatureLine->valueToSign;
         }
 
         // this is what to sign with private key
         return implode("\n", $cArray);
     }
 
-    public static function compileLinesToString(Line $signatureLine): string
-    {
-        return sprintf('"%s": %s', $signatureLine->key, $signatureLine->value);
-    }
 
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws Exception
      */
     public function createSignatureLines(): WriteLines
     {
@@ -68,53 +66,35 @@ final class Base
             $components->setPreparedMethods($preparedComponentMethods);
         }
 
+        /*
+         * todo, that is the place where to link into the Structured Fields
+         */
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
-            $v = $this->createSignatureLine(
-                signatureComponent: $signatureComponent,
-                components        : $components,
-            );
-            $this->signatureLines->add(
-                signatureLine: $v,
-            );
+
+            if ('content-digest' ===  $signatureComponent->fieldName) {
+                $line = $this->handleSignBody();
+            } else {
+
+                $line = new PrepareLine(
+                    signingConfiguration: $this->configuration,
+                    componentItemDto    : $signatureComponent,
+                    message             : $this->message,
+                )->handle();
+            }
+
+            $this->signatureLines->add(signatureLine: $line);
         }
 
         return $this->signatureLines;
     }
 
     /**
-     * Handle the preparation of a signature-base array/line(key, value)
-     *
-     * @throws ContentDigestException
-     * @throws InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     */
-    private function createSignatureLine(Component $signatureComponent, PrepareComponents $components): Line
-    {
-        // todo content-digest with methods more abstract
-        $normalizedName = $signatureComponent->getNormalizedName();
-        if ('content-digest' === $normalizedName) {
-            return new Line(...$this->handleSignBody());
-        }
-
-        if ($this->mustProcessingLine($normalizedName)) {
-            $processedResult = $components->processValue($normalizedName);
-            if ($processedResult instanceof Entry) {
-                return new Line($normalizedName, $processedResult->parse());
-            }
-
-            return new Line($normalizedName, $processedResult);
-        }
-
-        return $this->checkExistingHeader($normalizedName);
-    }
-
-    /**
      * Handle the body signing
+     * todo move out as special method
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @return array{string,string}
      */
-    private function handleSignBody(): array
+    private function handleSignBody(): Line
     {
         if ($this->configuration->hasContentDigestHashAlgo()) {
             // set the body digest into the header
@@ -124,55 +104,23 @@ final class Base
             )->getContentDigestHeaderArray();
 
             /*
+             * !! @important
              * rebind the MessageInterface because of cloned change
              */
             $this->message = $this->message->withHeader($headerKey, $value);
 
             // later to compile
-            return [$headerKey, $value];
+            return new Line($headerKey, $value);
         }
 
         throw ContentDigestException::canNotHashWithoutAlgorithm();
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     */
-    private function mustProcessingLine(string $signatureParam): bool
-    {
-        return str_starts_with($signatureParam, '@') ||
-            (
-                /*
-                 * Content-length works over processing
-                 */
-                $this->configuration->hasWithProcessing() &&
-                (
-                    in_array(
-                        $signatureParam,
-                        $this->configuration->getWithoutExistingHeaders(),
-                        true,
-                    )
-                )
-            );
-    }
-
-    /**
-     * Header Key must exist
-     *
-     * @throws InvalidHeaderKeyException
-     */
-    private function checkExistingHeader(string $signatureParam): Line
-    {
-        if ($this->message->hasHeader($signatureParam)) {
-            return new Line($signatureParam, $this->message->getHeaderLine($signatureParam));
-        }
-
-        throw InvalidHeaderKeyException::headerNotExists($signatureParam);
-    }
-
-    /**
      * Concat the signatureKey with the components part in braces with the Metadata
      * Signature-Input: sig1=("@method" "@authority" "@path" "content-type" "content-length");created=1618884475;keyid="test-key"
+     *
+     * @throws Exception
      */
     public function makeSignatureInput(): string
     {

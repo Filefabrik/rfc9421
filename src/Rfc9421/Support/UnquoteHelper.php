@@ -16,7 +16,7 @@ final class UnquoteHelper
      */
     public static function unquote(string $string): string
     {
-        if (str_starts_with($string, '"') && str_ends_with($string, '"')) {
+        if (self::isQuoted($string)) {
             $first = substr($string, 1);
 
             return substr($first, 0, -1);
@@ -25,6 +25,16 @@ final class UnquoteHelper
         throw new UnexpectedValueException(
             sprintf('The expected value has to be wrapped by quotes "value" but is %s.', $string),
         );
+    }
+
+    public static function isQuoted(string $string): bool
+    {
+        return (self::startsWithQuote($string) && str_ends_with($string, '"'));
+    }
+
+    public static function startsWithQuote(string $string): bool
+    {
+        return str_starts_with($string, '"');
     }
 
     public static function quotedUnderscore(string $string): string

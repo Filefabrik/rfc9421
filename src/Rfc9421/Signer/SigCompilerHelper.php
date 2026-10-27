@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
-use Filefabrik\Rfc9421\Signature\Components;
-use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
+use Filefabrik\Rfc9421\Signature\ComponentNames;
 
 /**
  * merges the signature params into sig1=("@method" "@authority" "@path" "content-type" "content-length")
  * todo make non-static methods
+ *
  */
 final readonly class SigCompilerHelper
 {
     public function __construct(
-        private(set) Components $signatureComponents,
+        private(set) ComponentNames $signatureComponents,
         private(set) string $signatureKeyName,
     ) {
     }
@@ -23,6 +23,7 @@ final readonly class SigCompilerHelper
      *
      * @return string sig1=("@method";req "@authority" "@path" "content-type" "content-length");
      *
+     * @throws \Exception
      */
     public function makeSig1fromSignatureParams(): string
     {
@@ -30,10 +31,12 @@ final readonly class SigCompilerHelper
     }
 
     /**
+     *
      * @return string sig1=("@method" "@authority";req "@path" "content-type" "content-length")
+     * @throws \Exception
      * @todo during concat with Metadata to signature-params don't forget the trailing semicolon
      */
-    public static function makeSig1fromComponents(Components $components, string $signatureKeyName): string
+    public static function makeSig1fromComponents(ComponentNames $components, string $signatureKeyName): string
     {
         return sprintf(
             '%s%s',
@@ -50,17 +53,17 @@ final readonly class SigCompilerHelper
         return sprintf('(%s)', $string);
     }
 
-    public static function compileFromArrayComponent(Components $components): string
+    /**
+     * todo that is wrong, must use the component-parser
+     *
+     * @throws \Exception
+     */
+    public static function compileFromArrayComponent(ComponentNames $components): string
     {
         $parts = [];
-        foreach ($components->getComponents() as $component) {
-            $name = sprintf('"%s"', $component->getNormalizedName());
-            // todo structured fields
-            if ($component->initialContentsEnum instanceof InitialContentsEnum) {
-                $name .= ';'.$component->initialContentsEnum->name;
-            }
 
-            $parts[] = $name;
+        foreach ($components->getComponents() as $component) {
+            $parts[] = $component->getItem()->toHttpValue();
         }
 
         return implode(' ', $parts);

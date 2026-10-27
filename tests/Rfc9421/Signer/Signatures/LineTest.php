@@ -14,7 +14,7 @@ final class LineTest extends TestCase
     public function test__construct(): void
     {
         $i = new Line('one', 'val');
-        self::assertEquals('one', $i->key);
-        self::assertEquals('val', $i->value);
+        self::assertEquals('one', $i->signatureComponent);
+        self::assertEquals('val', $i->valueToSign);
     }
 }
