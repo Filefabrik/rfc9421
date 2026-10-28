@@ -56,4 +56,46 @@ final class UnquoteHelper
     {
         return self::quote($keyName).': '.$value;
     }
+
+    public static function removeSurroundingBraces(string $string): string
+    {
+        return self::removeEndBrace(self::removeStartBrace($string));
+    }
+
+    public static function removeEndBrace(string $string): string
+    {
+        if (self::endsWithBrace($string)) {
+            return substr($string, 0, -1);
+        }
+
+        throw new UnexpectedValueException(
+            sprintf('There was no brace ")" at the end value:"%s".', $string),
+        );
+    }
+
+    public static function endsWithBrace(string $string): bool
+    {
+        return str_ends_with($string, ')');
+    }
+
+    public static function removeStartBrace(string $string): string
+    {
+        if (self::startsWithBrace($string)) {
+            return substr($string, 1);
+        }
+
+        throw new UnexpectedValueException(
+            sprintf('There was no brace "(" at the beginning value:"%s".', $string),
+        );
+    }
+
+    public static function startsWithBrace(string $string): bool
+    {
+        return str_starts_with($string, '(');
+    }
+
+    public static function hasSurroundBraces(string $string): bool
+    {
+        return self::startsWithBrace($string) && self::endsWithBrace($string);
+    }
 }
