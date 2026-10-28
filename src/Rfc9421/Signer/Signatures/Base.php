@@ -36,15 +36,9 @@ final class Base
      */
     public static function compileSignatureInputToString(WriteLines $signatureLines): string
     {
-        $cArray = [];
-        foreach ($signatureLines->lines as $signatureLine) {
-            $cArray[] = $signatureLine->valueToSign;
-        }
-
         // this is what to sign with private key
-        return implode("\n", $cArray);
+        return implode("\n", $signatureLines->values());
     }
-
 
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
@@ -70,11 +64,9 @@ final class Base
          * todo, that is the place where to link into the Structured Fields
          */
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
-
-            if ('content-digest' ===  $signatureComponent->fieldName) {
+            if ('content-digest' === $signatureComponent->fieldName) {
                 $line = $this->handleSignBody();
             } else {
-
                 $line = new PrepareLine(
                     signingConfiguration: $this->configuration,
                     componentItemDto    : $signatureComponent,
