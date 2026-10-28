@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
-/**
- * 
- */
 abstract class AbstractLines
 {
     /**
@@ -15,6 +12,8 @@ abstract class AbstractLines
     private(set) array $lines = [];
 
     /**
+     * for testing
+     *
      * @return array<string,string|int>|array{}
      */
     public function toKeyValueArray(): array
@@ -22,6 +21,34 @@ abstract class AbstractLines
         $array = [];
         foreach ($this->lines as $line) {
             $array[$line->signatureComponent] = $line->valueToSign;
+        }
+
+        return $array;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function values(): array
+    {
+        $array = [];
+        foreach ($this->lines as $line) {
+            $array[] = $line->valueToSign;
+        }
+
+        return $array;
+    }
+
+    /**
+     * for testing
+     *
+     * @return string[]
+     */
+    public function keys(): array
+    {
+        $array = [];
+        foreach ($this->lines as $line) {
+            $array[] = $line->signatureComponent;
         }
 
         return $array;
