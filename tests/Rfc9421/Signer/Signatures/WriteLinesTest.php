@@ -46,4 +46,22 @@ final class WriteLinesTest extends TestCase
         $sl->addEntry('foo', 'bar');
         self::assertEquals(new Line('foo', 'bar'), $sl->getLineNumber(0));
     }
+
+    public function testKeys(): void
+    {
+        $sl = new WriteLines();
+        $sl->add(new Line('foo', 'bar'))
+           ->add(new Line('foo2', 'bar2'))
+        ;
+        self::assertEquals(['foo', 'foo2'], $sl->keys());
+    }
+
+    public function testValues(): void
+    {
+        $sl = new WriteLines();
+        $sl->add(new Line('foo', 'bar'))
+           ->add(new Line('foo2', 'bar2'))
+        ;
+        self::assertEquals(['bar', 'bar2'], $sl->values());
+    }
 }
