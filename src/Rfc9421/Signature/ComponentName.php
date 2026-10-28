@@ -117,7 +117,7 @@ final class ComponentName
 
     /**
      * only the Name is need and known
-
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public static function fromComponentName(string|DerivedComponentEnum $name): ComponentItemDto
@@ -130,7 +130,7 @@ final class ComponentName
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    public static function fromNameAndInitialContentEnum(
+    public static function fromNameAndInitialContent(
         string|DerivedComponentEnum $name,
         InitialContentsEnum|string $initialContentsEnum,
     ): ComponentItemDto {
@@ -145,7 +145,7 @@ final class ComponentName
         InitialContentsEnum $initialContentsEnum,
         null|string $value,
     ): ComponentItemDto {
-        return ComponentItemDto::fromComponentName(new self($name, $initialContentsEnum, $value));
+        return ComponentItemDto::fromComponentName(componentName: new self($name, $initialContentsEnum, $value));
     }
 
     /**
