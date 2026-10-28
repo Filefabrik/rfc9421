@@ -7,11 +7,11 @@ namespace Filefabrik\Rfc9421Test\StructuredFields;
 use Bakame\Http\StructuredFields\Item;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
+use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\DestructEntry;
 use Filefabrik\Rfc9421\StructuredFields\DestructHeaders;
 use GuzzleHttp\Psr7\Request;
-use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -21,8 +21,9 @@ final class DestructHeadersTest extends TestCase
     /**
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws JsonException
      */
     public function test__construct(): void
     {
@@ -42,7 +43,9 @@ final class DestructHeadersTest extends TestCase
         );
 
         $config = new SigningConfiguration();
-        $config->structuredFields->add('example-dict', 'dictionary');
+        $config->getStructuredFields()
+               ->add('example-dict', 'dictionary')
+        ;
         /**
          * Use $request->withAddedHeader() method to provide an additional header with same name as an existing header.
          */
@@ -86,7 +89,6 @@ final class DestructHeadersTest extends TestCase
             signingConfiguration: $config,
         );
 
-
         $parsedArray = $destructHeaders->start();
 
         /*
@@ -115,8 +117,9 @@ final class DestructHeadersTest extends TestCase
     /**
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws JsonException
      */
     public function testItemField(): void
     {
@@ -133,7 +136,9 @@ final class DestructHeadersTest extends TestCase
         );
 
         $config = new SigningConfiguration();
-        $config->structuredFields->add('example-dict', 'dictionary');
+        $config->getStructuredFields()
+               ->add('example-dict', 'dictionary')
+        ;
         /**
          * Use $request->withAddedHeader() method to provide an additional header with same name as an existing header.
          */
@@ -151,5 +156,60 @@ final class DestructHeadersTest extends TestCase
         $compiledField = $destructEntry->handle();
         $parsed        = $compiledField->parse();
         self::assertSame('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $parsed);
+    }
+
+    /**
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
+    public function testDouble(): void
+    {
+        $this->expectExceptionObject(new UnprocessableSignatureException('Duplicate item found in singable components ""example-dict";key="b""'));
+        $date    = gmdate('D, d M Y H:i:s T');
+        $request = new Request(
+            'GET',
+            'https://api.example.com/resource?bat&baz=3',
+            [
+                'Host'         => 'api.example.com',
+                'Date'         => $date,
+                'x-test'       => '',
+                /*
+                * @see https://www.rfc-editor.org/info/rfc9421/#name-strict-serialization-of-htt
+                */
+                'Example-Dict' => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
+            ],
+        );
+
+        $config = new SigningConfiguration();
+        $config->getStructuredFields()
+               ->add('example-dict', 'dictionary')
+        ;
+        /**
+         * Use $request->withAddedHeader() method to provide an additional header with same name as an existing header.
+         */
+        $request = $request->withHeader('Example-Header', 'value, with, lots');
+        $request = $request->withAddedHeader('Example-Header', 'of, commas');
+        $request = $request->withHeader('If-None-Match', 'W/"abcdef", "ghijkl", *');
+
+        $signingParts = [
+            '"example-dict";key="b"',
+            '"example-dict";key="b"',
+
+        ];
+
+        $signatureParamsLine = '('.implode(' ', $signingParts).')';
+
+        $destructHeaders = new DestructHeaders(
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
+            signatureParamsLine : $signatureParamsLine,
+            message             : $request,
+            originalRequest     : $request,
+            signingConfiguration: $config,
+        );
+
+        $destructHeaders->start();
     }
 }

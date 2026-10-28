@@ -10,7 +10,6 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use JsonException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 
@@ -39,10 +38,11 @@ final readonly class DestructHeaders
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws JsonException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @return array<string> all lines they are proceeded
      */
     public function start(): array
@@ -53,11 +53,12 @@ final readonly class DestructHeaders
         if ($dict->isNotEmpty()) {
             /** @var \Bakame\Http\StructuredFields\Item $item */
             foreach ($dict as $item) {
-                if (in_array($item, $processedComponents, true)) {
-                    throw new UnProcessableSignatureException('Duplicate item found');
+                $httpValue = $item->toHttpValue();
+                if (in_array($httpValue, $processedComponents, true)) {
+                    throw new UnProcessableSignatureException(sprintf('Duplicate item found in singable components "%s"', $httpValue));
                 }
 
-                $processedComponents[] = $item;
+                $processedComponents[] = $httpValue;
 
                 $instance = new DestructEntry(
                     componentItemDto    : ComponentItemDto::fromFieldItem($item),
