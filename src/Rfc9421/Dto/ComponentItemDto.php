@@ -29,8 +29,10 @@ final readonly class ComponentItemDto
     {
         try {
             return self::fromFieldItem($componentName->getItem());
+            // @codeCoverageIgnoreStart
         } catch (Exception $exception) {
             throw new SignatureExtractionException($exception->getMessage(), $exception->getCode(), $exception);
+            // @codeCoverageIgnoreEnd
         }
     }
 
