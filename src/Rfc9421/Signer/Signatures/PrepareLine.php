@@ -23,9 +23,11 @@ final readonly class PrepareLine
     }
 
     /**
+     * @return \Filefabrik\Rfc9421\Signer\Signatures\Line
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function handle(): Line
