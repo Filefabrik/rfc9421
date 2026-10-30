@@ -80,6 +80,9 @@ trait TraitSigner
     {
         $base = new Base($this->message, $this->signingConfiguration);
 
+        /*
+         * Signing line is an array of Lines with the component representation and the calculated value
+         */
         $this->signingLines = $base->createSignatureLines();
 
         // rebind because the header maybe changed in signature base class
@@ -89,7 +92,12 @@ trait TraitSigner
         $this->signatureBase = $base->makeSignatureInput();
 
         // now set the signature-params ONLY into the signature-base line.
-        $this->signingLines->add(new Line(DerivedComponentEnum::signatureParams->value, $this->signatureBase));
+        $this->signingLines->add(
+            new Line(
+                signatureComponent: DerivedComponentEnum::signatureParams->value,
+                valueToSign       : $this->signatureBase,
+            ),
+        );
 
         // makes the array of signingLines to a string. The string kann be base64EncodedValue
         // keep the $this->signingParametersString public readable. maybe for testing and other stuff

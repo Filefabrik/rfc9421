@@ -15,9 +15,12 @@ use Filefabrik\Rfc9421\StructuredFields\Processing\Key;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Sf;
 use Psr\Http\Message\MessageInterface;
 
-final readonly class DestructEntry
+/**
+ * Create the Signing Key Value
+ */
+final readonly class CompileEntry
 {
-    /*
+    /* todo
      * Required only if we are handle a signed response where we want to use the req field
 
     private(set) RequestInterface|null $originalRequest = null;
@@ -88,6 +91,10 @@ final readonly class DestructEntry
             );
         }
 
+        /*
+         * todo req
+         */
+
         return $entry;
     }
 
@@ -107,30 +114,5 @@ final readonly class DestructEntry
 
         return $parameters;
     }
-
-    /*
-     * Todo Method not tested, todo only during response signing
-     *
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-
-    private function prepareheaderItemsDto(InitialContentsParameters $parameters): HeaderItemsDto
-    {
-        $headerItemsDto = $this->headerItemsDto;
-        if ($parameters->has(InitialContentsEnum::req)) {
-            if ($this->messageInterface instanceof ResponseInterface) {
-                $responseInterface = $this->originalRequest;
-                $headerItemsDto = HeaderItemsDto::fromHeaderItems(HeaderItems::fromInterface($responseInterface));
-            } else {
-                throw new UnProcessableSignatureException('missing request for req parameter');
-            }
-        }
-
-        // todo check tr value
-
-
-        return $headerItemsDto;
-    } */
 
 }

@@ -59,7 +59,7 @@ final class RequestSignerTest extends TestCase
                                                           ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
-        $signingConfiguration->structuredFields->add('example-dict', 'dictionary');
+        $signingConfiguration->getStructuredFields()->add('example-dict', 'dictionary');
         /**
          * Prepare the Request
          */
@@ -76,6 +76,21 @@ final class RequestSignerTest extends TestCase
         $signedRequest = $signer->sign();
         self::assertInstanceOf(Request::class, $signedRequest);
         self::assertTrue($signedRequest->hasHeader('content-digest'));
+
+        $signingLinesValues = $signer->signingLines->values();
+        $signingLinesKeys   = $signer->signingLines->keys();
+
+        self::assertContains('"@query-param";name="baz"', $signingLinesKeys);
+        self::assertContains('"_baz_": "bat-man"', $signingLinesValues);
+
+        self::assertContains('"@method"', $signingLinesKeys);
+        self::assertContains('"@method": POST', $signingLinesValues);
+
+        self::assertContains('"x-origin-host"', $signingLinesKeys);
+        self::assertContains('"x-origin-host": mytest.com', $signingLinesValues);
+
+        self::assertContains('"example-dict";sf', $signingLinesKeys);
+        self::assertContains('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $signingLinesValues);
     }
 
     /**

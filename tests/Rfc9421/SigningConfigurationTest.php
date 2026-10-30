@@ -8,8 +8,9 @@ use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signature\ComponentNames;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -61,7 +62,6 @@ final class SigningConfigurationTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignHeader(): void
@@ -77,7 +77,7 @@ final class SigningConfigurationTest extends TestCase
 
         $i = new SigningConfiguration();
         $i->signHeader(
-            ComponentName::fromNameAndInitialContentEnum('@authority', 'name')
+            ComponentName::fromNameAndInitialContent('@authority', 'name')
                          ->getItem()
                          ->toHttpValue(),
         );
@@ -91,7 +91,6 @@ final class SigningConfigurationTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignHeaderThrowWrongKey(): void
@@ -108,7 +107,6 @@ final class SigningConfigurationTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSignHeaderThrowWrongInitialContent(): void
@@ -131,10 +129,30 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeaders(['foo', 'bar']);
+        $i->signHeaders(['foo', 'bar', ComponentName::fromNameAndInitialContent('new', 'key')]);
 
         self::assertEquals(
-            [ComponentName::fromComponentName('foo'), ComponentName::fromComponentName('bar')],
+            [
+                ComponentName::fromComponentName('foo'),
+                ComponentName::fromComponentName('bar'),
+                ComponentName::fromNameAndInitialContent('new', 'key'),
+            ],
+            $i->signatureComponents->getComponents(),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testSignHeaderInitialContent(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertEmpty($i->signatureComponents->getComponents());
+        $i->signHeaderNameInitialContent('foo', 'key');
+
+        self::assertEquals(
+            [ComponentName::fromNameAndInitialContent('foo', 'key')],
             $i->signatureComponents->getComponents(),
         );
     }
@@ -234,10 +252,16 @@ final class SigningConfigurationTest extends TestCase
 
     public function testSetComponents(): void
     {
-        $c = new ComponentNames();
+        $c = new SigningComponents();
         $i = new SigningConfiguration();
         $i->setComponents($c);
         self::assertSame($c, $i->signatureComponents);
+    }
+
+    public function testGetStructuredFields()
+    {
+        $i = new SigningConfiguration();
+        self::assertEquals(StructuredFields::getDefaultList(),$i->getStructuredFields()->fields);
     }
 
 }

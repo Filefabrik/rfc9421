@@ -60,7 +60,7 @@ final readonly class DestructHeaders
 
                 $processedComponents[] = $httpValue;
 
-                $instance = new DestructEntry(
+                $instance = new CompileEntry(
                     componentItemDto    : ComponentItemDto::fromFieldItem($item),
                     signingConfiguration: $this->signingConfiguration,
                     headerItemsDto      : $this->headerItemsDto,

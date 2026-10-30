@@ -6,7 +6,7 @@ namespace Filefabrik\Rfc9421Test\Signature;
 
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signature\ComponentNames;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -14,8 +14,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * todo more testing
  */
-#[CoversClass(ComponentNames::class)]
-final class ComponentNamesTest extends TestCase
+#[CoversClass(SigningComponents::class)]
+final class SigningComponentsTest extends TestCase
 {
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -24,13 +24,13 @@ final class ComponentNamesTest extends TestCase
      */
     public function testSet(): void
     {
-        $t = new ComponentNames()->addName('test')
-                                 ->addWithContentsEnum('test2', InitialContentsEnum::req)
+        $t = new SigningComponents()->addName('test')
+                                    ->addWithContentsEnum('test2', InitialContentsEnum::req)
         ;
 
         $this->assertEquals([
             ComponentName::fromComponentName('test'),
-            ComponentName::fromNameAndInitialContentEnum('test2', 'req'),
+            ComponentName::fromNameAndInitialContent('test2', 'req'),
         ], $t->getComponents());
     }
 
@@ -41,7 +41,7 @@ final class ComponentNamesTest extends TestCase
     public function testSetThrow(): void
     {
         $this->expectExceptionObject(new AlreadySetException('The Component "test2" already exists.'));
-        new ComponentNames()->addName('test')
+        new SigningComponents()->addName('test')
                             ->addName('test2')
                             ->addName('test2')
         ;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields;
 
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use JsonException;
 use UnexpectedValueException;
 
@@ -91,7 +92,7 @@ final class StructuredFields
     }
 
     /**
-     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
     public static function fromDefaultList(): self
     {
@@ -99,12 +100,16 @@ final class StructuredFields
     }
 
     /**
-     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @return array{string:string}
      */
     public static function getDefaultList(): array
     {
-        return json_decode(self::$list, true, 512, JSON_THROW_ON_ERROR);
+        try {
+            return (array)json_decode(self::$list, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $jsonException) {
+            throw new StructuredFieldException($jsonException->getMessage(), $jsonException->getCode(), $jsonException);
+        }
     }
 
     /**
@@ -126,19 +131,21 @@ final class StructuredFields
         return $this;
     }
 
-    public function getOrNull(string $key): ?string
+    private function normalizeKey(string $key): string
     {
-        return $this->fields[$this->normalizeKey($key)] ?? null;
+        return strtolower(trim($key));
     }
 
     public function getOrThrow(string $key): string
     {
-        return $this->getOrNull($key) ?? throw new UnexpectedValueException(sprintf("Field '%s' does not exist.", $key));
+        return $this->getOrNull($key) ?? throw new UnexpectedValueException(
+            sprintf("Field '%s' does not exist.", $key),
+        );
     }
 
-    private function normalizeKey(string $key): string
+    public function getOrNull(string $key): ?string
     {
-        return strtolower(trim($key));
+        return $this->fields[$this->normalizeKey($key)] ?? null;
     }
 
 }

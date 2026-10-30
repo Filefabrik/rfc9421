@@ -57,11 +57,10 @@ final readonly class FieldValue
         // first test the method is in the configuration stack
 
         if ($this->signingConfiguration->signingMethods?->hasMethod($this->componentItemDto->fieldName) ?? false) {
-
-            $entry = $this->signingConfiguration->signingMethods->callWith(
-                $this->componentItemDto->fieldName,
-                $this->messageInterface,
-                $this->initialContentsParameters,
+            $callableParams = [$this->messageInterface, $this->initialContentsParameters];
+            $entry          = $this->signingConfiguration->signingMethods->callWith(
+                key   : $this->componentItemDto->fieldName,
+                params: $callableParams,
             );
         } else {
             $entry = $this->getDefaultEntry();
@@ -110,8 +109,10 @@ final readonly class FieldValue
         if ($this->signingConfiguration->signingMethods?->hasMethod($fieldName) ?? false) {
             $entry = $this->signingConfiguration->signingMethods->callWith(
                 $fieldName,
-                $this->messageInterface,
-                $this->initialContentsParameters,
+                [
+                    $this->messageInterface,
+                    $this->initialContentsParameters,
+                ],
             );
         } else {
             $entry = $this->getDefaultEntry();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
-use Filefabrik\Rfc9421\Signature\ComponentNames;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 
 /**
  * merges the signature params into sig1=("@method" "@authority" "@path" "content-type" "content-length")
@@ -14,7 +14,7 @@ use Filefabrik\Rfc9421\Signature\ComponentNames;
 final readonly class SigCompilerHelper
 {
     public function __construct(
-        private(set) ComponentNames $signatureComponents,
+        private(set) SigningComponents $signatureComponents,
         private(set) string $signatureKeyName,
     ) {
     }
@@ -36,7 +36,7 @@ final readonly class SigCompilerHelper
      * @throws \Exception
      * @todo during concat with Metadata to signature-params don't forget the trailing semicolon
      */
-    public static function makeSig1fromComponents(ComponentNames $components, string $signatureKeyName): string
+    public static function makeSig1fromComponents(SigningComponents $components, string $signatureKeyName): string
     {
         return sprintf(
             '%s%s',
@@ -58,7 +58,7 @@ final readonly class SigCompilerHelper
      *
      * @throws \Exception
      */
-    public static function compileFromArrayComponent(ComponentNames $components): string
+    public static function compileFromArrayComponent(SigningComponents $components): string
     {
         $parts = [];
 

@@ -9,7 +9,7 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\StructuredFields\DestructEntry;
+use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
 use Filefabrik\Rfc9421\StructuredFields\DestructHeaders;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -146,7 +146,7 @@ final class DestructHeadersTest extends TestCase
         $request = $request->withAddedHeader('Example-Header', 'of, commas');
         $request = $request->withHeader('If-None-Match', 'W/"abcdef", "ghijkl", *');
 
-        $destructEntry = new DestructEntry(
+        $destructEntry = new CompileEntry(
             componentItemDto    : ComponentItemDto::fromFieldItem(Item::fromHttpValue('"example-dict";sf')),
             signingConfiguration: $config,
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),

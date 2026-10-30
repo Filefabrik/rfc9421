@@ -16,7 +16,7 @@ function displayLogger(string $message, int $cnt = 1, bool $showLines = true): v
 
     $p = explode('/tests/InlineServers', $parts['file'] ?? '');
 
-    $line = $showLines ? implode(' ', [$p[1] ?? '', ':: ', $parts['line'] ?? '', ': ']) : '';
+    $line = $showLines ? implode('', [$p[1] ?? '', '::', $parts['line'] ?? ' ', ': ']) : '';
 
     echo $line, $message, $phpEol;
 }

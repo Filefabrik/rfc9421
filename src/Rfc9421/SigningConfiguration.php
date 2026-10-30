@@ -7,9 +7,7 @@ namespace Filefabrik\Rfc9421;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
-use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signature\ComponentNames;
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
@@ -17,8 +15,8 @@ use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Support\MetadataTrait;
 use Filefabrik\Rfc9421\Support\PrivatePemTrait;
 use Filefabrik\Rfc9421\Support\PublicPemTrait;
+use Filefabrik\Rfc9421\Support\SigningHeaderTrait;
 use Filefabrik\Rfc9421\Support\SigningMethodsTrait;
-use JsonException;
 
 /**
  * Signer Configuration can be configured at different position on your code, such as in a bootstrap file or something
@@ -30,6 +28,7 @@ final class SigningConfiguration
     use PrivatePemTrait;
     use SigningMethodsTrait;
     use MetadataTrait;
+    use SigningHeaderTrait;
 
     /**
      * Prefix the signature value
@@ -46,22 +45,32 @@ final class SigningConfiguration
      */
     private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
 
+    /**
+     * @param \Filefabrik\Rfc9421\Signer\Metadata $metadata
+     */
     public function __construct(
         private(set) readonly Metadata $metadata = new Metadata(),
-        private(set) ComponentNames $signatureComponents = new ComponentNames(),
+        private(set) SigningComponents $signatureComponents = new SigningComponents(),
         /**
          * Methods for extracting the header and recompile the component
          */
-        private(set) ?MethodsMapper $methodsMapper = null {
-            get => $this->methodsMapper ??= MethodsMapper::getDefaultMapper();
-        },
+        private(set) ?MethodsMapper $methodsMapper = null,
         // todo with prepared config factory
-        private(set) ?StructuredFields $structuredFields = null {
-            /**
-             * @throws JsonException
-             */ get => $this->structuredFields ??= StructuredFields::fromDefaultList();
-        },
+        private ?StructuredFields $structuredFields = null,
     ) {
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
+    public function getStructuredFields(): StructuredFields
+    {
+        return $this->structuredFields ??= StructuredFields::fromDefaultList();
+    }
+
+    public function getMethodsMapper(): MethodsMapper
+    {
+        return $this->methodsMapper ??= MethodsMapper::getDefaultMapper();
     }
 
     /**
@@ -76,6 +85,10 @@ final class SigningConfiguration
         return $this;
     }
 
+    /**
+     *
+     * @return $this
+     */
     public function setTag(?string $tag): self
     {
         $this->metadata->setTag($tag);
@@ -83,7 +96,11 @@ final class SigningConfiguration
         return $this;
     }
 
-    public function setComponents(ComponentNames $components): self
+    /**
+     *
+     * @return $this
+     */
+    public function setComponents(SigningComponents $components): self
     {
         $this->signatureComponents = $components;
 
@@ -91,44 +108,7 @@ final class SigningConfiguration
     }
 
     /**
-     * Signing header Parameter
-     *
-     * @param array{array{string:null|string|\Filefabrik\Rfc9421\Signature\InitialContentsEnum}}|array{string} $headerKeys
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function signHeaders(array $headerKeys): self
-    {
-        foreach ($headerKeys as $headerKey) {
-            [$headerKey] = is_array($headerKey) ? $headerKey : [$headerKey, null];
-            $this->signHeader($headerKey);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sign Component pure from header
-     * todo, if the code /path?param=value&foo=bar&baz=batman&qux= and the signing wich
-     * Todo set the sign header has some rules what is valid.
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function signHeader(
-        DerivedComponentEnum|string $headerKey,
-    ): self {
-        // the setter
-        $this->signatureComponents->set(ComponentName::fromString($headerKey));
-
-        return $this;
-    }
-
-    /**
      * todo maybe bullshit
-     *
      */
     public function processWithoutExistingHeader(null|string $withoutExistingHeader): self
     {

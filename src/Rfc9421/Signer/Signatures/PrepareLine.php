@@ -7,7 +7,7 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\StructuredFields\DestructEntry;
+use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
 use Psr\Http\Message\MessageInterface;
 
 /**
@@ -33,7 +33,7 @@ final readonly class PrepareLine
     public function handle(): Line
     {
         // todo getting signature component which is compiling
-        $destruct = new DestructEntry(
+        $destruct = new CompileEntry(
             componentItemDto    : $this->componentItemDto,
             signingConfiguration: $this->signingConfiguration,
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($this->message),

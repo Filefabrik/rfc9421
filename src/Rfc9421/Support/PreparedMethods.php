@@ -51,13 +51,19 @@ final class PreparedMethods
 
     /**
      * Return Entry ensures the correctly handled Processing
+     *
+     * @param string|\Filefabrik\Rfc9421\Signature\DerivedComponentEnum $key
+     * @param array                                                     $params
+     *
+     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      */
-    public function callWith(string|DerivedComponentEnum $key, ...$params): Entry
+    public function callWith(string|DerivedComponentEnum $key, array $params = []): Entry
     {
-        $result = $this->getMethod($key)(...$params);
+        $nKey   = $this->normalizeKey($key);
+        $result = $this->getMethod($nKey)(...$params);
 
         if (!$result instanceof Entry) {
-            return new Entry($key, $result);
+            return new Entry($nKey, $result);
         }
 
         return $result;

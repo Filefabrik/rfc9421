@@ -7,19 +7,22 @@ namespace Filefabrik\Rfc9421\Extractors;
 use Exception;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signature\ComponentNames;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
+use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
  * Extracting the Signing Fields from signature
  * Todo with structured fields extractor
  */
-final readonly class Components
+final class Components
 {
     /**
-     * @param string $componentsString "content-length" "@query-param" "example-dict"
+     * @param string $componentsString "content-length" "@query-param" "example-dict" or ("content-length" "@query-param" "example-dict")
      */
     public function __construct(
-        private(set) string $componentsString,
+        private string $componentsString {
+            set => UnquoteHelper::hasSurroundBraces($value) ? UnquoteHelper::removeSurroundingBraces($value) : $value;
+        },
     ) {
     }
 
@@ -30,9 +33,9 @@ final readonly class Components
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      */
-    public function extractToComponentsObject(): ComponentNames
+    public function extractToComponentsObject(): SigningComponents
     {
-        $components = new ComponentNames();
+        $components = new SigningComponents();
         $parts      = explode(' ', $this->componentsString);
         foreach ($parts as $item) {
             try {
@@ -46,6 +49,5 @@ final readonly class Components
 
         return $components;
     }
-
 
 }

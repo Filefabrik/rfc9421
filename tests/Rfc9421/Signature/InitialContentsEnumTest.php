@@ -46,4 +46,24 @@ final class InitialContentsEnumTest extends TestCase
         );
         InitialContentsEnum::isOwnTypeOrNullOrThrow('nothing');
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public function testIsOwnTypeOrThrow(): void
+    {
+        self::assertSame(InitialContentsEnum::key, InitialContentsEnum::isOwnTypeOrThrow('key'));
+        self::assertSame(InitialContentsEnum::key, InitialContentsEnum::isOwnTypeOrThrow(InitialContentsEnum::key));
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public function testIsOwnTypeOrThrowThrows(): void
+    {
+        $this->expectExceptionObject(
+            new EnumTypeException('"nothing" is not a valid enumeration of "'.InitialContentsEnum::class.'" Enum.'),
+        );
+        InitialContentsEnum::isOwnTypeOrThrow('nothing');
+    }
 }

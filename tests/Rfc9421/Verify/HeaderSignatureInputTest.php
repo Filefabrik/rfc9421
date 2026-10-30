@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Verify;
 
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
-use Filefabrik\Rfc9421\Signature\ComponentNames;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,8 +16,8 @@ final class HeaderSignatureInputTest extends TestCase
 {
     public function testExtract(): void
     {
-        $expectedComponents   = new ComponentNames()->addName('@method')
-                                                    ->addName('content-digest')
+        $expectedComponents   = new SigningComponents()->addName('@method')
+                                                       ->addName('content-digest')
         ;
         $expectedMetadata     = [
             'created' => 1789749530,
@@ -37,8 +37,8 @@ final class HeaderSignatureInputTest extends TestCase
 
     public function testExtractWithoutKey(): void
     {
-        $expectedComponents   = new ComponentNames()->addName('@method')
-                                                    ->addName('content-digest')
+        $expectedComponents   = new SigningComponents()->addName('@method')
+                                                       ->addName('content-digest')
         ;
         $expectedMetadata     = [
             'created' => 1789749530,

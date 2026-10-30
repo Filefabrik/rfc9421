@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signature;
 
-use Exception;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 
 /**
  * List of all Components for a singing process
  */
-final class ComponentNames
+final class SigningComponents
 {
     /**
      * @var array{ComponentItemDto}|array{}
@@ -38,7 +37,6 @@ final class ComponentNames
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws Exception
      */
     public function set(ComponentItemDto $component): self
     {
@@ -52,27 +50,23 @@ final class ComponentNames
     }
 
     /**
-     * Does not reorder
-     *
-     * @throws Exception
-     * @todo fully to string because of  '"example-dict"'  and '"example-dict";key="d"' they share the same 'example-dict' but have other values
+     * Does not reorder fully to string because of  '"example-dict"'  and '"example-dict";key="d"' they share the same 'example-dict' but have other values
      */
     private function isset(ComponentItemDto $component): bool
     {
         return array_any(
             $this->components,
-            fn (
-                ComponentItemDto $setComponent,
-            ): bool => $component->httpValue === $setComponent->httpValue,
+            fn (ComponentItemDto $setComponent): bool => $component->httpValue === $setComponent->httpValue,
         );
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function addWithContentsEnum(string $name, string|InitialContentsEnum $initialContentsEnum): self
     {
-        return $this->set(ComponentName::fromNameAndInitialContentEnum($name, $initialContentsEnum));
+        return $this->set(ComponentName::fromNameAndInitialContent($name, $initialContentsEnum));
     }
 
 }

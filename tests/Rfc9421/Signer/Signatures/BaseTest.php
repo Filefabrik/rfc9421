@@ -26,6 +26,7 @@ final class BaseTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testCreateSignatureLines(): void
@@ -34,7 +35,7 @@ final class BaseTest extends TestCase
         $sc->signHeader('not-ExistinG')
            ->signHeader('@method')
         ;
-        $sc->structuredFields->add('not-existing', 'etag');
+        $sc->getStructuredFields()->add('not-existing', 'etag');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 
@@ -163,6 +164,7 @@ final class BaseTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testWithPreparedComponents(): void
@@ -173,7 +175,7 @@ final class BaseTest extends TestCase
            ->signHeader('@authority')
         ;
 
-        $sc->structuredFields->add('not-existing', 'etag');
+        $sc->getStructuredFields()->add('not-existing', 'etag');
         $sc->addSigningMethod(componentName: '@authority', closure: fn (MessageInterface $message): string => 'game');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);

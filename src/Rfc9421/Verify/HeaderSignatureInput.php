@@ -7,7 +7,7 @@ namespace Filefabrik\Rfc9421\Verify;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\Components;
 use Filefabrik\Rfc9421\Extractors\Metadata;
-use Filefabrik\Rfc9421\Signature\ComponentNames;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Support\SignaturInput;
 use InvalidArgumentException;
 
@@ -21,7 +21,7 @@ final class HeaderSignatureInput
     /**
      * only if validatedSignatureParts was successfully
      */
-    private(set) ?ComponentNames $extractedComponents = null;
+    private(set) ?SigningComponents $extractedComponents = null;
 
     /**
      * only if validatedSignatureParts was successfully
