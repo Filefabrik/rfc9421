@@ -17,6 +17,14 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PrepareLine::class)]
 final class PrepareLineTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
     public function testHandle(): void
     {
         $request  = new Request('GET', 'my', ['test' => 'testValue']);
@@ -30,6 +38,14 @@ final class PrepareLineTest extends TestCase
         self::assertEquals(new Line('"test"', '"test": testValue'), $line);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
     public function testHandleBS(): void
     {
         $request = new Request('GET', 'my', ['test' => 'testValue']);
@@ -45,6 +61,14 @@ final class PrepareLineTest extends TestCase
         self::assertEquals($targetEntry, $line);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
     public function testHandleSF(): void
     {
         $config = new SigningConfiguration();
