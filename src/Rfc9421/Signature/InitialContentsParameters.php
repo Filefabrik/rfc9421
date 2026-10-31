@@ -12,16 +12,36 @@ use UnexpectedValueException;
 final class InitialContentsParameters
 {
     /**
-     * @param non-empty-array<string, mixed>|array{} $parameters
+     * @var non-empty-array<string, string|int|null>|array{}
      */
-    public function __construct(private(set) array $parameters = [])
+    private(set) array $parameters = [];
+
+    /**
+     * @param non-empty-array<string, string|int|null>|array{} $parameters
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public function __construct(array $parameters = [])
     {
+        $this->setParameters($parameters);
+    }
+
+    /**
+     * @param non-empty-array<string, string|int|null>|array{} $parameters
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    private function setParameters(array $parameters): void
+    {
+        foreach ($parameters as $name => $value) {
+            $this->setParameter($name, $value);
+        }
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function setParameter(string|InitialContentsEnum $name, mixed $value): self
+    public function setParameter(string|InitialContentsEnum $name, string|int|null $value = null): self
     {
         $this->parameters[$this->normalizeEnum($name)] = $value;
 
@@ -40,10 +60,13 @@ final class InitialContentsParameters
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function getValueOrThrow(string|InitialContentsEnum $name): mixed
+    public function getValueOrThrow(string|InitialContentsEnum $name): int|string|null
     {
-        return $this->has($name) ? $this->parameters[$this->normalizeEnum($name)] :
-            throw new UnexpectedValueException('Missing initial contents enum');
+        $sName = $this->normalizeEnum($name);
+
+        return $this->has($name) ?
+            $this->parameters[$sName] :
+            throw new UnexpectedValueException(sprintf('Initial contents enum: "%s" was not set before.', $sName));
     }
 
     /**
