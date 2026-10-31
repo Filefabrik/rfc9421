@@ -12,12 +12,12 @@ use UnexpectedValueException;
 final class InitialContentsParameters
 {
     /**
-     * @var non-empty-array<string, string|int|null>|array{}
+     * @var non-empty-array<string, string|int|null|bool>|array{}
      */
     private(set) array $parameters = [];
 
     /**
-     * @param non-empty-array<string, string|int|null>|array{} $parameters
+     * @param non-empty-array<string, string|int|null|bool>|array{} $parameters
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
@@ -41,7 +41,7 @@ final class InitialContentsParameters
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function setParameter(string|InitialContentsEnum $name, string|int|null $value = null): self
+    public function setParameter(string|InitialContentsEnum $name, string|int|null|bool $value = null): self
     {
         $this->parameters[$this->normalizeEnum($name)] = $value;
 
@@ -60,7 +60,7 @@ final class InitialContentsParameters
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function getValueOrThrow(string|InitialContentsEnum $name): int|string|null
+    public function getValueOrThrow(string|InitialContentsEnum $name): int|string|null|bool
     {
         $sName = $this->normalizeEnum($name);
 
