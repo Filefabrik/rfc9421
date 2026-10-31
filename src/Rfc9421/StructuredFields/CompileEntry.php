@@ -26,10 +26,10 @@ final readonly class CompileEntry
     private(set) RequestInterface|null $originalRequest = null;
 */
     public function __construct(
-        private(set) ComponentItemDto $componentItemDto,
-        private(set) SigningConfiguration $signingConfiguration,
-        private(set) HeaderItemsDto $headerItemsDto,
         private(set) MessageInterface $messageInterface,
+        private(set) SigningConfiguration $signingConfiguration,
+        private(set) ComponentItemDto $componentItemDto,
+        private(set) HeaderItemsDto $headerItemsDto,
     ) {
     }
 
@@ -57,11 +57,11 @@ final readonly class CompileEntry
          */
 
         $entry = new FieldValue(
+            messageInterface         : $this->messageInterface,
             signingConfiguration     : $this->signingConfiguration,
-            initialContentsParameters: $parameters,
             headerItemsDto           : $this->headerItemsDto,//$headerItemsDto,
             componentItemDto         : $this->componentItemDto,
-            messageInterface         : $this->messageInterface,
+            initialContentsParameters: $parameters,
         )->getFieldValue();
 
         /*
