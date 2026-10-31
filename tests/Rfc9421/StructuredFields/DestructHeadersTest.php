@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\StructuredFields;
 
 use Bakame\Http\StructuredFields\Item;
+use Exception;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
@@ -120,6 +121,7 @@ final class DestructHeadersTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws Exception
      */
     public function testItemField(): void
     {
@@ -147,10 +149,10 @@ final class DestructHeadersTest extends TestCase
         $request = $request->withHeader('If-None-Match', 'W/"abcdef", "ghijkl", *');
 
         $destructEntry = new CompileEntry(
-            componentItemDto    : ComponentItemDto::fromFieldItem(Item::fromHttpValue('"example-dict";sf')),
-            signingConfiguration: $config,
-            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
             messageInterface    : $request,
+            signingConfiguration: $config,
+            componentItemDto    : ComponentItemDto::fromFieldItem(Item::fromHttpValue('"example-dict";sf')),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
 
         $compiledField = $destructEntry->handle();
@@ -167,7 +169,9 @@ final class DestructHeadersTest extends TestCase
      */
     public function testDouble(): void
     {
-        $this->expectExceptionObject(new UnprocessableSignatureException('Duplicate item found in singable components ""example-dict";key="b""'));
+        $this->expectExceptionObject(
+            new UnprocessableSignatureException('Duplicate item found in singable components ""example-dict";key="b""'),
+        );
         $date    = gmdate('D, d M Y H:i:s T');
         $request = new Request(
             'GET',
