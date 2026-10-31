@@ -99,6 +99,8 @@ final readonly class CompileEntry
     }
 
     /**
+     * From Bakame Field Item Parameter into Filefabrik InitialContents Parameters
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
     private function extractParameters(Item $field): InitialContentsParameters
