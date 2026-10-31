@@ -32,6 +32,9 @@ final class InitialContentsParametersTest extends TestCase
         self::assertSame(['name' => '"baz"'], $t->parameters);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     public function testGetValueOrThrow(): void
     {
         $t = new InitialContentsParameters();
@@ -41,6 +44,9 @@ final class InitialContentsParametersTest extends TestCase
         self::assertNull($t->getValueOrThrow(InitialContentsEnum::sf));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     public function testGetValueOrThrowTThrows(): void
     {
         $this->expectExceptionObject(new UnexpectedValueException('Initial contents enum: "key" was not set before.'));
