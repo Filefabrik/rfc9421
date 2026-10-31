@@ -14,30 +14,29 @@ final class HeaderItems
     use LowerCaseHeaderTrait;
 
     /**
-     * @param array{string:string}|array{} $lowerCasedHeaders
+     * @var array<string,string>|array{}
      */
-    public function __construct(private array $lowerCasedHeaders = [])
-    {
-    }
+    private array $lowerCasedHeaders = [];
 
-    public static function fromInterface(MessageInterface $message): self
+    /**
+     * @param array<string,string>|array{} $lowerCasedHeaders
+     */
+    public function __construct(array $lowerCasedHeaders = [])
     {
-        $normalizedHeader = array_map(fn(array $value): string => implode(', ', $value), $message->getHeaders());
-
-        return self::fromArray($normalizedHeader);
+        $this->addMany($lowerCasedHeaders);
     }
 
     /**
-     * @param array{string:string} $headerItems
+     * @param array{string:string}|array{} $headerItems
+     *
      */
-    public static function fromArray(array $headerItems): self
+    private function addMany(array $headerItems): self
     {
-        $instance = new self();
         foreach ($headerItems as $name => $value) {
-            $instance->add($name, $value);
+            $this->add($name, $value);
         }
 
-        return $instance;
+        return $this;
     }
 
     private function add(string $name, string $value = ''): void
@@ -45,8 +44,24 @@ final class HeaderItems
         $this->lowerCasedHeaders[$this->normalizeName($name)] = $value;
     }
 
+    public static function fromInterface(MessageInterface $message): self
+    {
+        /** @var array<string,string> $normalizedHeader */
+        $normalizedHeader = array_map(fn (array $value): string => implode(', ', $value), $message->getHeaders());
+
+        return self::fromArray($normalizedHeader);
+    }
+
     /**
-     * @return array{string:string}|array{}
+     * @param array<string,string> $headerItems
+     */
+    public static function fromArray(array $headerItems): self
+    {
+        return new self()->addMany($headerItems);
+    }
+
+    /**
+     * @return array<string,string> |array{}
      */
     public function toArray(): array
     {

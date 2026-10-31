@@ -11,14 +11,14 @@ trait LowerCaseHeaderTrait
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      */
-    public function getTrimmedHeader(string $headerName): string
+    public function getTrimmedHeaderValue(string $headerName): string
     {
         $headerName = $this->normalizeName($headerName);
         if (array_key_exists($this->normalizeName($headerName), $this->lowerCasedHeaders)) {
             return trim($this->lowerCasedHeaders[$headerName]);
         }
 
-        throw new InvalidHeaderKeyException($headerName);
+        throw  InvalidHeaderKeyException::headerNotExists($headerName);
     }
 
     private function normalizeName(string $name): string

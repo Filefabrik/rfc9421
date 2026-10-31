@@ -16,14 +16,20 @@ final readonly class HeaderItemsDto
     use LowerCaseHeaderTrait;
 
     /**
-     * @param array{string:string}|array{} $lowerCasedHeaders
+     * @var array<string,string>|array{}
      */
-    private function __construct(private(set) array $lowerCasedHeaders = [])
+    private(set) array $lowerCasedHeaders;
+
+    private function __construct(HeaderItems $headerItems)
     {
+        $this->lowerCasedHeaders = $headerItems->toArray();
     }
 
     /**
      * bridge durch den validator
+     *
+     * @param array<string,string> $headerItems
+     *
      */
     public static function fromArray(array $headerItems): self
     {
@@ -32,7 +38,7 @@ final readonly class HeaderItemsDto
 
     public static function fromHeaderItems(HeaderItems $headerItems): self
     {
-        return new self($headerItems->toArray());
+        return new self(headerItems: $headerItems);
     }
 
     public static function fromMessageInterface(MessageInterface $message): self

@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InvalidHeaderKeyException::class)]
 final class InvalidHeaderKeyExceptionTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     */
     public function testHeaderNotExists(): void
     {
         $this->expectExceptionObject(
