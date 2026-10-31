@@ -61,10 +61,10 @@ final readonly class DestructHeaders
                 $processedComponents[] = $httpValue;
 
                 $instance = new CompileEntry(
-                    componentItemDto    : ComponentItemDto::fromFieldItem($item),
-                    signingConfiguration: $this->signingConfiguration,
-                    headerItemsDto      : $this->headerItemsDto,
                     messageInterface    : $this->message,
+                    signingConfiguration: $this->signingConfiguration,
+                    componentItemDto    : ComponentItemDto::fromFieldItem($item),
+                    headerItemsDto      : $this->headerItemsDto,
                 );
 
                 // todo check what happens with null
