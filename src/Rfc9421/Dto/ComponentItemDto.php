@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Dto;
 
+use Bakame\Http\StructuredFields\Bytes;
+use Bakame\Http\StructuredFields\DisplayString;
 use Bakame\Http\StructuredFields\Item;
+use Bakame\Http\StructuredFields\Token;
+use DateTimeImmutable;
 use Exception;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
+use UnexpectedValueException;
 
 /**
  * Ensured FieldItem read in during the componentNames method
@@ -38,14 +43,33 @@ final readonly class ComponentItemDto
 
     public static function fromFieldItem(Item $item): self
     {
-        return new self(FieldNameDto::fromItem($item)->fieldName, $item->toHttpValue(), $item);
+        return new self(self::validFieldName($item), $item->toHttpValue(), $item);
     }
 
     public function getItem(): Item
     {
         return $this->item;
     }
+    /**
+     * From Bakame Structured Field as string
+     */
+    public static function validFieldName(Item $item): string
+    {
+        $v = $item->value(validate: fn ($value): bool => is_string($value));
 
+        return self::ensureStringValue($v);
+    }
+
+    /**
+     * Pressing the $v into a string
+     */
+    private static function ensureStringValue(
+        Bytes|Token|DisplayString|DateTimeImmutable|string|int|float|bool $v,
+    ): string {
+        return is_string($v) ? $v : throw new UnexpectedValueException(
+            sprintf('Expected string, got "%s"', gettype($v)),
+        );
+    }
     public function getHttpValue(): string
     {
         return $this->httpValue;
