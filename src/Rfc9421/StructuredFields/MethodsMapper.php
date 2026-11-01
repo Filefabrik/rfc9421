@@ -10,11 +10,7 @@ use Bakame\Http\StructuredFields\Item;
 use Bakame\Http\StructuredFields\OuterList;
 use Bakame\Http\StructuredFields\Parameters;
 use Closure;
-use Filefabrik\Rfc9421\Exceptions\MethodException;
 use Filefabrik\Rfc9421\Methods\StructuredFieldEtag;
-use ReflectionException;
-use ReflectionFunction;
-use Throwable;
 use UnexpectedValueException;
 
 /**
@@ -23,11 +19,9 @@ use UnexpectedValueException;
 final class MethodsMapper
 {
     /**
-     * @var array{string:\Filefabrik\Rfc9421\StructuredFields\MethodItem}|array{}|null
+     * @var array{string:\Filefabrik\Rfc9421\StructuredFields\MethodItem}|array{}
      */
-    private(set) ?array $methods = null {
-        get => $this->methods ??= [];
-    }
+    private(set) array $methods = [];
 
     public static function getDefaultMapper(): self
     {
@@ -67,7 +61,7 @@ final class MethodsMapper
             'parameters' => fn (string $fieldValue): Parameters => Parameters::fromHttpValue($fieldValue),
             'dictionary' => fn (string $fieldValue): Dictionary => Dictionary::fromHttpValue($fieldValue),
             'item'       => fn (string $fieldValue): Item => Item::fromHttpValue($fieldValue),
-            'etag'       => StructuredFieldEtag::handle(...),
+            'etag'       => fn (string $fieldValue): string => StructuredFieldEtag::handle($fieldValue),
             'url'        => fn (string $fieldValue): string => '"'.$fieldValue.'"',
             'date'       => fn (string $fieldValue): string => '@'.strtotime($fieldValue),
         ];
@@ -78,34 +72,14 @@ final class MethodsMapper
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @return mixed Mixed because of unknown of the given method/method-return
      */
-    public function callMethod(string $methodName, ...$params): mixed
+    public function callMethod(string $methodName, array $params = []): mixed
     {
         $entry = $this->methods[$methodName] ?? throw new UnexpectedValueException(
             sprintf('Method "%s" does not exist', $methodName),
         );
 
-        try {
-            $isAnonymous = new ReflectionFunction($entry->closure)->isAnonymous();
-        } catch (ReflectionException $reflectionException) {
-            throw MethodException::reflectionCallError($reflectionException->getMessage());
-        }
+        $closure = $entry->closure;
 
-        /*
-         * fixing static
-         */
-        if (!$isAnonymous) {
-            $c = $entry->closure;
-            try {
-                return $c(...$params);
-            } catch (Throwable$throwable) {
-                throw MethodException::closureCallError($throwable->getMessage());
-            }
-        }
-
-        try {
-            return $entry->closure->call($this, ...$params);
-        } catch (Throwable $throwable) {
-            throw MethodException::closureCallError($throwable->getMessage());
-        }
+        return $closure(...$params);
     }
 }
