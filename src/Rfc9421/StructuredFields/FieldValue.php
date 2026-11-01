@@ -10,22 +10,22 @@ use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use UnexpectedValueException;
 
 /**
  * try to detect field with value
+ * signature component: '"example-dict": sf' will be '"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d'
+ * Header: 'Example-Dict'  => 'a=1,    b=2;x=1;y=2,   c=(a   b   c), d '
  */
 final readonly class FieldValue
 {
     public function __construct(
+        private(set) RequestInterface|ResponseInterface $messageInterface,
         private(set) SigningConfiguration $signingConfiguration,
-        private(set) InitialContentsParameters $initialContentsParameters,
         private(set) HeaderItemsDto $headerItemsDto,
         private(set) ComponentItemDto $componentItemDto,
-        private(set) MessageInterface $messageInterface,
+        private(set) InitialContentsParameters $initialContentsParameters,
     ) {
     }
 
@@ -35,17 +35,13 @@ final readonly class FieldValue
      */
     public function getFieldValue(): Entry
     {
-        if ($this->messageInterface instanceof RequestInterface) {
-            return $this->handleRequestInterface();
-        }
+        $entry = $this->handleRequestInterface();
 
         if ($this->messageInterface instanceof ResponseInterface) {
-            return $this->handleResponseInterface();
+            return $this->prepareHandleREQ($entry);
         }
 
-        throw new UnexpectedValueException(
-            sprintf('Unexpected message interface "%s"', $this->messageInterface::class),
-        );
+        return $entry;
     }
 
     /**
@@ -66,7 +62,7 @@ final readonly class FieldValue
             $entry = $this->getDefaultEntry();
         }
 
-        return $this->handleREQ($entry);
+        return $entry;
     }
 
     /**
@@ -75,10 +71,11 @@ final readonly class FieldValue
     private function getDefaultEntry(): Entry
     {
         // todo header field not found
+        // todo check why no parameter was set
 
         $fieldName = $this->componentItemDto->fieldName;
-        if ($this->headerItemsDto->hasHeader($fieldName)) {
-            return new Entry($fieldName, $this->headerItemsDto->getTrimmedHeader($fieldName));
+        if ($this->headerItemsDto->hasHeader(headerName: $fieldName)) {
+            return new Entry($fieldName, $this->headerItemsDto->getTrimmedHeaderValue($fieldName));
         }
 
         throw InvalidHeaderKeyException::headerNotExists($fieldName);
@@ -86,10 +83,11 @@ final readonly class FieldValue
 
     /**
      * Todo req only on response signing
+     * todo check in which combination it is possible
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    private function handleREQ(Entry $entry): Entry
+    private function prepareHandleREQ(Entry $entry): Entry
     {
         // todo req is only attachable if others not set
         if ($this->initialContentsParameters->has(InitialContentsEnum::req)) {
@@ -99,25 +97,4 @@ final readonly class FieldValue
         return $entry;
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     */
-    private function handleResponseInterface(): Entry
-    {
-        $fieldName = $this->componentItemDto->fieldName;
-        if ($this->signingConfiguration->signingMethods?->hasMethod($fieldName) ?? false) {
-            $entry = $this->signingConfiguration->signingMethods->callWith(
-                $fieldName,
-                [
-                    $this->messageInterface,
-                    $this->initialContentsParameters,
-                ],
-            );
-        } else {
-            $entry = $this->getDefaultEntry();
-        }
-
-        return $this->handleREQ($entry);
-    }
 }
