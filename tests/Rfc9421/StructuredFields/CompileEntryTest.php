@@ -17,14 +17,22 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CompileEntry::class)]
 final class CompileEntryTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
     public function testHandle(): void
     {
         $request  = new Request('GET', 'my', ['test' => 'testValue']);
         $instance = new CompileEntry(
-            componentItemDto    : ComponentName::fromString('test'),
-            signingConfiguration: new SigningConfiguration(),
-            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
             messageInterface    : $request,
+            signingConfiguration: new SigningConfiguration(),
+            componentItemDto    : ComponentName::fromString('test'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled  = $instance->handle();
 
@@ -43,10 +51,10 @@ final class CompileEntryTest extends TestCase
     {
         $request     = new Request('GET', 'my', ['test' => 'testValue']);
         $instance    = new CompileEntry(
-            componentItemDto    : ComponentName::fromString('"test";bs'),
-            signingConfiguration: new SigningConfiguration(),
-            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
             messageInterface    : $request,
+            signingConfiguration: new SigningConfiguration(),
+            componentItemDto    : ComponentName::fromString('"test";bs'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
         $targetEntry = new Entry('test', ':dGVzdFZhbHVl:', InitialContentsEnum::bs);
@@ -70,10 +78,10 @@ final class CompileEntryTest extends TestCase
         ;
         $request     = new Request('GET', 'my', ['test' => 'testValue']);
         $instance    = new CompileEntry(
-            componentItemDto    : ComponentName::fromString('"test";sf'),
-            signingConfiguration: $config,
-            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
             messageInterface    : $request,
+            signingConfiguration: $config,
+            componentItemDto    : ComponentName::fromString('"test";sf'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
         $targetEntry = new Entry('test', 'testValue', InitialContentsEnum::sf);
@@ -98,10 +106,10 @@ final class CompileEntryTest extends TestCase
         ;
         $request     = new Request('GET', 'my', ['test' => '  a=1,    b=2;x=1;y=2,   d ']);
         $instance    = new CompileEntry(
-            componentItemDto    : ComponentName::fromString('"test";key="a"'),
-            signingConfiguration: $config,
-            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
             messageInterface    : $request,
+            signingConfiguration: $config,
+            componentItemDto    : ComponentName::fromString('"test";key="a"'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
         $targetEntry = new Entry('test', '"a": 1', InitialContentsEnum::key);
@@ -129,13 +137,13 @@ final class CompileEntryTest extends TestCase
             ['test' => '  a=1,    b=2;x=1;y=2,   d '],
         );
         $instance    = new CompileEntry(
-            componentItemDto    : ComponentName::fromString('"@query-param";name="baz"'),
-            signingConfiguration: $config,
-            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
             messageInterface    : $request,
+            signingConfiguration: $config,
+            componentItemDto    : ComponentName::fromString('"@query-param";name="baz"'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
-        $targetEntry = new Entry('baz', '"bat-man"', InitialContentsEnum::key);
+        $targetEntry = new Entry('baz', '"bat-man"', InitialContentsEnum::name);
         self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
     }
 }

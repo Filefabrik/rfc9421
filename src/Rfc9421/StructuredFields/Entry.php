@@ -8,28 +8,50 @@ use Closure;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
+// in response the req parameter
 /**
- * Compile from Header values with the wanted format into a line
+ * todo the content-digest;req and the content-digest regular
+ * NOTE: '\' line wrapping per RFC 8792
+ *
+ * "@status": 503
+ * "content-digest": sha-512=:0Y6iCBzGg5rZtoXS95Ijz03mslf6KAMCloESHObf\
+ * wnHJDbkkWWQz6PhhU9kxsTbARtY2PTBOzq24uJFpHsMuAg==:
+ * "content-type": application/json
+ * "@authority";req: example.com
+ * "@method";req: POST
+ * "@path";req: /foo
+ * "content-digest";req: sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A\
+ * 2svX+TaPm+AbwAgBWnrIiYllu7BNNyealdVLvRwEmTHWXvJwew==:
+ * "@signature-params": ("@status" "content-digest" "content-type" \
+ * "@authority";req "@method";req "@path";req "content-digest";req)\
+ * ;created=1618884479;keyid="test-key-ecc-p256"
+ */
+/**
+ * Makes the line with there values they are in the signature-input
+ * todo check logic with req
+ * Formats everything except the value
+ * something like "testkey";sf: VALUE
  */
 final class Entry
 {
-    public const string colon = ': ';
+    public const string colonWithSpace = ': ';
 
     public const string semicolon = ';';
 
     public const string equals = '=';
-
-    private(set) bool $reqEnum = false;
-
     /**
-     * @var array{Closure}|null
+     * @var array{Closure}|array{}
      */
-    private(set) array|null $keyMethods = null;
+    private(set) array $keyMethods = [];
+    private bool       $reqEnum    = false;
 
     public function __construct(
         private(set) readonly string $key,
         /**
+         * The value will not be formatted
+         *
          * @var string|int|null int while content length
+         *
          */
         private(set) readonly null|string|int $value = null,
         private(set) null|InitialContentsEnum $initialContents = null,
@@ -66,9 +88,13 @@ final class Entry
         return $this;
     }
 
+    /**
+     * Special method for pa
+     *
+
+     */
     public function withKeyMethod(Closure $method): self
     {
-        $this->keyMethods   ??= [];
         $this->keyMethods[] = $method;
 
         return $this;
@@ -76,25 +102,40 @@ final class Entry
 
     /**
      * Todo Extra Parser from Outside
-     *
+     * Parsing the expression for signature component
      */
     public function parse(): string
     {
         $parts = [];
 
+        // the key quoted
         $parts[] = $this->parseKeyMethods();
 
+        /*
+         * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3
+         * todo bs allowed with some byte sequences (base_encode64)
+         * Example-Header: value, with, lots
+         * Example-Header: of, commas
+         * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
+         */
+        /*
+         * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.1-8
+         * "However, if the sf parameter is added, the value is reserialized as follows:"
+         * "example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c)
+         * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHMsIG9mLCBjb21tYXM=:
+         */
         if ($this->initialContents instanceof InitialContentsEnum) {
+            // todo check req
             $parts[] = self::semicolon;
             $parts[] = $this->initialContents->name;
 
             if (InitialContentsEnum::sf === $this->initialContents || InitialContentsEnum::bs === $this->initialContents) {
-                $parts[] = self::colon;
-            } elseif (InitialContentsEnum::key === $this->initialContents) {
+                $parts[] = self::colonWithSpace;
+            } elseif (InitialContentsEnum::key === $this->initialContents||InitialContentsEnum::name === $this->initialContents) {
                 $parts[] = self::equals;
             }
         } else {
-            $parts[] = self::colon;
+            $parts[] = self::colonWithSpace;
         }
 
         $parts[] = $this->value;
@@ -104,10 +145,12 @@ final class Entry
 
     private function parseKeyMethods(): string
     {
-        if (null === $this->keyMethods) {
+        if (0 === count($this->keyMethods)) {
             return UnquoteHelper::quote($this->key);
         }
 
+        // iterate for key
+        // todo cover error
         $key = $this->key;
         foreach ($this->keyMethods as $keyMethod) {
             $key = $keyMethod($key);

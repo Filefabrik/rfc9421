@@ -10,8 +10,8 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Destructing and recompile the whole signature ("") expression
@@ -27,7 +27,7 @@ final readonly class DestructHeaders
          * ("example-dict" "some-thing;req")
          */
         private(set) string $signatureParamsLine,
-        private(set) MessageInterface $message,
+        private(set) RequestInterface|ResponseInterface $message,
         /**
          * only need if response signing
          *

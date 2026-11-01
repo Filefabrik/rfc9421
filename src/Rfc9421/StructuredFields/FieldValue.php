@@ -75,7 +75,7 @@ final readonly class FieldValue
 
         $fieldName = $this->componentItemDto->fieldName;
         if ($this->headerItemsDto->hasHeader(headerName: $fieldName)) {
-            return new Entry($fieldName, $this->headerItemsDto->getTrimmedHeaderValue($fieldName));
+            return new Entry(key: $fieldName, value: $this->headerItemsDto->getTrimmedHeaderValue($fieldName));
         }
 
         throw InvalidHeaderKeyException::headerNotExists($fieldName);

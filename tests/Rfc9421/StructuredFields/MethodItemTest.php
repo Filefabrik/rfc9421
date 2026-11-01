@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Filefabrik\Rfc9421Test\StructuredFields;
+
+use Filefabrik\Rfc9421\StructuredFields\MethodItem;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\MessageInterface;
+
+#[CoversClass(MethodItem::class)]
+final class MethodItemTest extends TestCase
+{
+    public function test__construct(): void
+    {
+        $closure    = function (MessageInterface $message) {
+        };
+        $methodItem = new MethodItem('methodName', $closure);
+        self::assertSame('methodName', $methodItem->method);
+    }
+}

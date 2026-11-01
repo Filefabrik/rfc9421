@@ -13,7 +13,8 @@ use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Bs;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Key;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Sf;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Create the Signing Key Value
@@ -26,7 +27,7 @@ final readonly class CompileEntry
     private(set) RequestInterface|null $originalRequest = null;
 */
     public function __construct(
-        private(set) MessageInterface $messageInterface,
+        private(set) RequestInterface|ResponseInterface $messageInterface,
         private(set) SigningConfiguration $signingConfiguration,
         private(set) ComponentItemDto $componentItemDto,
         private(set) HeaderItemsDto $headerItemsDto,
