@@ -7,7 +7,12 @@ namespace Filefabrik\Rfc9421\Support;
 use Psr\Http\Message\MessageInterface;
 
 /**
+ * Header Items are lower casing headers to work internal.
+ * That prevents the access to the MessageInterface's getHeaders()
  * for internal usage
+ * Example-Header: value, with, lots
+ * Example-Header: of, commas
+ * todo "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==: with
  */
 final class HeaderItems
 {
