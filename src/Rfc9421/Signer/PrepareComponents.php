@@ -181,7 +181,10 @@ final class PrepareComponents
              */
             ->add(
                 key    : DerivedComponentEnum::queryParam,
-                closure: fn (MessageInterface $messageInterface, InitialContentsParameters$parameters): Entry => MessageQueryParams::handle(
+                closure: fn (
+                    MessageInterface $messageInterface,
+                    InitialContentsParameters $parameters,
+                ): Entry => MessageQueryParams::handle(
                     message  : $messageInterface,
                     fieldName: $parameters->getValueOrThrow(InitialContentsEnum::name),
                 ),
