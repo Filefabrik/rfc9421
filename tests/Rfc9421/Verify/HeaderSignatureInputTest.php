@@ -14,6 +14,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(HeaderSignatureInput::class)]
 final class HeaderSignatureInputTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testExtract(): void
     {
         $expectedComponents   = new SigningComponents()->addName('@method')
@@ -31,10 +37,16 @@ final class HeaderSignatureInputTest extends TestCase
 
         $headerSignatureInput->extract();
 
-        self::assertEquals($expectedComponents, $headerSignatureInput->extractedComponents);
+        self::assertEquals($expectedComponents, $headerSignatureInput->getExtractedComponents());
         self::assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testExtractWithoutKey(): void
     {
         $expectedComponents   = new SigningComponents()->addName('@method')
@@ -52,7 +64,7 @@ final class HeaderSignatureInputTest extends TestCase
 
         $headerSignatureInput->extract();
 
-        self::assertEquals($expectedComponents, $headerSignatureInput->extractedComponents);
+        self::assertEquals($expectedComponents, $headerSignatureInput->getExtractedComponents());
         self::assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 
