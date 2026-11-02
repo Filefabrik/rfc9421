@@ -10,8 +10,8 @@ use Bakame\Http\StructuredFields\Item;
 use Bakame\Http\StructuredFields\OuterList;
 use Bakame\Http\StructuredFields\Parameters;
 use Closure;
+use Filefabrik\Rfc9421\Exceptions\MethodException;
 use Filefabrik\Rfc9421\Methods\StructuredFieldEtag;
-use UnexpectedValueException;
 
 /**
  * Methods for Structured Field types
@@ -19,7 +19,7 @@ use UnexpectedValueException;
 final class MethodsMapper
 {
     /**
-     * @var array{string:\Filefabrik\Rfc9421\StructuredFields\MethodItem}|array{}
+     * @var array<string,\Filefabrik\Rfc9421\StructuredFields\MethodItem>|array{}
      */
     private(set) array $methods = [];
 
@@ -29,7 +29,7 @@ final class MethodsMapper
     }
 
     /**
-     * @param array{string:Closure}|array{list: Closure, innerlist: Closure, parameters: Closure, dictionary: Closure, item: Closure, etag: Closure, url: Closure, date: Closure} $methods
+     * @param array<string,Closure>|array{list: Closure, innerlist: Closure, parameters: Closure, dictionary: Closure, item: Closure, etag: Closure, url: Closure, date: Closure} $methods
      */
     public function addMany(array $methods): self
     {
@@ -74,10 +74,7 @@ final class MethodsMapper
      */
     public function callMethod(string $methodName, array $params = []): mixed
     {
-        $entry = $this->methods[$methodName] ?? throw new UnexpectedValueException(
-            sprintf('Method "%s" does not exist', $methodName),
-        );
-
+        $entry   = $this->methods[$methodName] ?? throw MethodException::notFoundInMethodsMapper($methodName);
         $closure = $entry->closure;
 
         return $closure(...$params);
