@@ -215,4 +215,5 @@ final class PrepareComponentsTest extends TestCase
 
         self::assertSame(62, $prepareInstance->processValue('content-length')->value);
     }
+
 }
