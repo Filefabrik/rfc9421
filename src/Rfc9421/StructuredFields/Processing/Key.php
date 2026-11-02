@@ -16,23 +16,25 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  */
 final readonly class Key
 {
-    public function __construct(private(set) MethodsMapper $methodsMapper, private(set) StructuredFields $structuredFieldTypes)
-    {
-
+    public function __construct(
+        private(set) MethodsMapper $methodsMapper,
+        private(set) StructuredFields $structuredFieldTypes,
+    ) {
     }
 
     /**
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      */
-    public function handle(Entry $entry, $childName): Entry
+    public function handle(Entry $entry, string $keyName): Entry
     {
-        $value         = $this->applySingleKeyValue($entry->key, $childName, $entry->value);
-        $modifiedValue = UnquoteHelper::quoteKEYValue($childName, $value);
+        // todo check fieldValue cast because only strings allowed
+        $entryValue    = (string)$entry->value;
+        $value         = $this->applySingleKeyValue(name: $entry->key, key: $keyName, fieldValue: $entryValue);
+        $modifiedValue = UnquoteHelper::quoteKEYValue(keyName: $keyName, value: $value);
 
         // important re-build the value
-        return new Entry($entry->key, $modifiedValue, InitialContentsEnum::key);
+        return new Entry(key: $entry->key, value: $modifiedValue, initialContents: InitialContentsEnum::key);
     }
-
 
     /**
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
