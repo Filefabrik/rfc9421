@@ -56,10 +56,12 @@ final class ComponentsTest extends TestCase
         $line = implode(' ', $validateable);
 
         self::assertEquals($input, $line);
-    }/**
- * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
- * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
- */
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testExtractToComponentsWithBrace(): void
     {
         $input = [/*
