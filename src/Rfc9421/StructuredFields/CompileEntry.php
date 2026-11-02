@@ -46,6 +46,7 @@ final readonly class CompileEntry
     {
         $parameters = $this->extractParameters($this->componentItemDto->getItem());
 
+        // todo check parameters duplicated is allowed or not
         // throws
         //  $this->checkParametersConflict($parameters);
         /*
@@ -88,8 +89,8 @@ final readonly class CompileEntry
                 methodsMapper       : $this->signingConfiguration->getMethodsMapper(),
                 structuredFieldTypes: $this->signingConfiguration->getStructuredFields(),
             )->handle(
-                entry    : $entry,
-                childName: $parameters->getValueOrThrow(InitialContentsEnum::key),
+                entry  : $entry,
+                keyName: $parameters->getValueOrThrow(InitialContentsEnum::key),
             );
         }
 
