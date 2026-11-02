@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields;
 
-use UnexpectedValueException;
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 
 /**
  * Header fields in lower cases they will process with the<value> from MethodsMapper
@@ -135,11 +135,12 @@ final class StructuredFields
         return self::$list;
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
     public function getOrThrow(string $key): string
     {
-        return $this->getOrNull($key) ?? throw new UnexpectedValueException(
-            sprintf('Field "%s" does not exist.', $key),
-        );
+        return $this->getOrNull($key) ?? throw StructuredFieldException::notMapped($key);
     }
 
     public function getOrNull(string $key): ?string
