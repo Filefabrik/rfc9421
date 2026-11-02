@@ -129,7 +129,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeaders(['foo', 'bar', ComponentName::fromNameAndInitialContent('new', 'key')]);
+        $i->signHeaders(['Foo', 'bar', ComponentName::fromNameAndInitialContent('new', 'key')]);
 
         self::assertEquals(
             [
@@ -258,7 +258,7 @@ final class SigningConfigurationTest extends TestCase
         self::assertSame($c, $i->signatureComponents);
     }
 
-    public function testGetStructuredFields()
+    public function testGetStructuredFields(): void
     {
         $i = new SigningConfiguration();
         self::assertEquals(StructuredFields::getDefaultList(),$i->getStructuredFields()->fields);
