@@ -10,8 +10,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * todo bs
- * https://www.rfc-editor.org/info/rfc9421/#section-2.1.3-4
+ * @see 2.1.3. Binary-Wrapped HTTP Fields
+ * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3-4
  * Example-Header: value, with, lots
  * Example-Header: of, commas
  * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
