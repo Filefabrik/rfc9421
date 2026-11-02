@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 // Specify the URL and data
+use Bakame\Http\StructuredFields\StructuredFieldError;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -65,7 +67,7 @@ try {
         // for signing needs private
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
-} catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
+} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException $e) {
     echo $e->getMessage();
 
     return;
@@ -85,6 +87,9 @@ $prepareMethods = [
  */
 displayLogger('We are signing the @authority with $message->getHeaderLine(\'x-Origin-host\').');
 displayLogger('// So Bob\'s Server must also set this method to getting the correct @authority value from header.');
+/*
+ * Todo check response was signed with expected ;req frrom something
+ */
 $signingConfiguration->addSigningMethods($prepareMethods);
 /**
  * Prepare the Request
@@ -113,7 +118,7 @@ $psrRequest     = $psrHttpFactory->createRequest($symfonyRequest);
 $signer = new RequestSigner(message: $psrRequest, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AlreadySetException|SignatureException|InvalidHeaderKeyException|InvalidDerivedKeyException|ContentDigestException $e) {
+} catch (AlreadySetException|SignatureException|ContentDigestException|StructuredFieldError|EnumTypeException|UnProcessableSignatureException|SignatureExtractionException  $e) {
     echo $e->getMessage();
 
     return;
