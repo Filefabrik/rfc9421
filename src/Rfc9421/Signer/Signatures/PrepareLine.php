@@ -8,22 +8,23 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * prepares a single Line
+ * todo tell what prepare line means
  */
 final readonly class PrepareLine
 {
     public function __construct(
         private(set) SigningConfiguration $signingConfiguration,
         private(set) ComponentItemDto $componentItemDto,
-        private(set) MessageInterface $message,
+        private(set) RequestInterface|ResponseInterface $message,
     ) {
     }
 
     /**
-     * @return \Filefabrik\Rfc9421\Signer\Signatures\Line
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
@@ -34,10 +35,10 @@ final readonly class PrepareLine
     {
         // todo getting signature component which is compiling
         $destruct = new CompileEntry(
-            componentItemDto    : $this->componentItemDto,
-            signingConfiguration: $this->signingConfiguration,
-            headerItemsDto      : HeaderItemsDto::fromMessageInterface($this->message),
             messageInterface    : $this->message,
+            signingConfiguration: $this->signingConfiguration,
+            componentItemDto    : $this->componentItemDto,
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($this->message),
         );
         $entry    = $destruct->handle();
 
