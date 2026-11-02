@@ -109,7 +109,7 @@ final class PreparedMethodsTest extends TestCase
         $prepareMethods = new PreparedMethods();
         $prepareMethods->adds(
             [
-                'content-length' => fn (MessageInterface $messageInterface) => strlen(
+                'content-length' => fn (MessageInterface $messageInterface): int => strlen(
                     (string)$messageInterface->getBody(),
                 ),
             ],
@@ -130,7 +130,7 @@ final class PreparedMethodsTest extends TestCase
         $prepareMethods = new PreparedMethods();
         $prepareMethods->adds(
             [
-                'content-length' => fn (MessageInterface $messageInterface) => new Entry(
+                'content-length' => fn (MessageInterface $messageInterface): \Filefabrik\Rfc9421\StructuredFields\Entry => new Entry(
                     'content-length',
                     strlen((string)$messageInterface->getBody()),
                 ),

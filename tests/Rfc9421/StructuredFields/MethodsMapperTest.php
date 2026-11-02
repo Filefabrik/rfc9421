@@ -15,14 +15,14 @@ final class MethodsMapperTest extends TestCase
     public function testAdd(): void
     {
         $mapper = new MethodsMapper();
-        $mapper->add('testMethod', fn () => true);
+        $mapper->add('testMethod', fn (): true => true);
         self::assertCount(1, $mapper->methods);
     }
 
     public function testAddMany(): void
     {
         $mapper = new MethodsMapper();
-        $mapper->addMany(['testMethod' => fn () => 'testMethodResult', 'testMethod2' => fn () => 'testMethod2Result']);
+        $mapper->addMany(['testMethod' => fn (): string => 'testMethodResult', 'testMethod2' => fn (): string => 'testMethod2Result']);
         self::assertCount(2, $mapper->methods);
         self::assertSame('testMethod', $mapper->methods['testMethod']->method);
         $m = $mapper->methods['testMethod']->closure;
@@ -38,7 +38,7 @@ final class MethodsMapperTest extends TestCase
     public function testCallMethod(): void
     {
         $mapper = new MethodsMapper();
-        $mapper->add('testMethod', fn (string $param) => $param.' returnVal');
+        $mapper->add('testMethod', fn (string $param): string => $param.' returnVal');
         self::assertSame('prefiggs returnVal', $mapper->callMethod('testMethod', ['prefiggs']));
     }
 

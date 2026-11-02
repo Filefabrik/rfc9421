@@ -27,6 +27,7 @@ final class DerivedComponentEnumTest extends TestCase
         foreach (DerivedComponentEnum::cases() as $item) {
             $expected[] = $item->value;
         }
+
         self::assertEquals(
             [
                 '@signature-params',

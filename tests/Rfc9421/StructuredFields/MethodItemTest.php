@@ -14,7 +14,7 @@ final class MethodItemTest extends TestCase
 {
     public function test__construct(): void
     {
-        $closure    = function (MessageInterface $message) {
+        $closure    = function (MessageInterface $message): void {
         };
         $methodItem = new MethodItem('methodName', $closure);
         self::assertSame('methodName', $methodItem->method);

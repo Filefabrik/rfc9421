@@ -28,6 +28,7 @@ final class KeyTest extends TestCase
     {
         $structuredFields = new StructuredFields();
         $structuredFields->add('example-dict', 'list');
+
         $keyInstance = new Key(structuredFieldTypes: $structuredFields);
 
         $entry = new Entry('example-dict', 'a=1,    b=2;x=1;y=2,   d ');

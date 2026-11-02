@@ -26,6 +26,7 @@ final class ResponseSignerTest extends TestCase
 
     /**
      * todo missing tests
+     * todo with req
      *
      * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -72,11 +73,12 @@ final class ResponseSignerTest extends TestCase
                 // singing the response body
                 ->setContentDigestAlgo('sha256')
             ;
-        } catch (AbstractRfc9421Exception $e) {
-            echo 'response signing configuration error: '.$e->getMessage();
+        } catch (AbstractRfc9421Exception $rfc9421Exception) {
+            echo 'response signing configuration error: '.$rfc9421Exception->getMessage();
 
             return;
         }
+
         $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
 
         $signedResponse = $responseSigner->sign();

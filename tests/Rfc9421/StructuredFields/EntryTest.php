@@ -39,7 +39,7 @@ final class EntryTest extends TestCase
 
     public function testWithKeyMethod(): void
     {
-        $entry = new Entry('testkey')->withKeyMethod(fn ($string) => $string.'#');
+        $entry = new Entry('testkey')->withKeyMethod(fn ($string): string => $string.'#');
         self::assertSame('testkey#: ', $entry->parse());
     }
 

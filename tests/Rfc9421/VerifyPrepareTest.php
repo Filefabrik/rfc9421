@@ -21,6 +21,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Todo Tests are bad and not enough
+ */
 #[CoversClass(VerifyPrepare::class)]
 final class VerifyPrepareTest extends TestCase
 {
@@ -49,6 +52,17 @@ final class VerifyPrepareTest extends TestCase
         ];
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerify(string|SigningEnum $signingAlgo, string $cert): void
     {
@@ -90,7 +104,10 @@ final class VerifyPrepareTest extends TestCase
         /*
          * todo only with library Openssl test
          */
-        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
+        if (
+            PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnTypeOrThrow($signingAlgo)
+                                                                 ->getName()
+        ) {
             $this->expectExceptionObject(
                 new BadMethodCallException(
                     'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
@@ -113,13 +130,16 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws JsonException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     *
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws JsonException
      */
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerifyWithContentDigest(string|SigningEnum $signingAlgo, string $cert): void
@@ -163,7 +183,10 @@ final class VerifyPrepareTest extends TestCase
         /*
          * todo only with library Openssl test
          */
-        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnType($signingAlgo)->name) {
+        if (
+            PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnTypeOrThrow($signingAlgo)
+                                                                 ->getName()
+        ) {
             $this->expectExceptionObject(
                 new BadMethodCallException(
                     'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
@@ -186,9 +209,11 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     public function testValidateThrowMissingSignatureInput(): void
     {
@@ -252,11 +277,15 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
+     * todo not nice enough test
+     *
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws JsonException
      */
@@ -278,7 +307,7 @@ final class VerifyPrepareTest extends TestCase
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
             /*
-             * check duplicate content-digest
+             * todo check duplicate content-digest
              * ->withHeader('content-digest')
              */
                       ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)

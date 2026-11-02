@@ -80,7 +80,7 @@ final class ComponentNameTest extends TestCase
                 '"@test" is not a valid enumeration of "'.DerivedComponentEnum::class.'" Enum.',
             ),
         );
-        $t = ComponentName::fromComponentName('@test');
+        ComponentName::fromComponentName('@test');
     }
 
     /**
@@ -93,7 +93,7 @@ final class ComponentNameTest extends TestCase
                 '"@test" is not a valid enumeration of "'.DerivedComponentEnum::class.'" Enum.',
             ),
         );
-        $t = ComponentName::fromComponentName('"@test"');
+        ComponentName::fromComponentName('"@test"');
     }
 
     /**
@@ -136,7 +136,7 @@ final class ComponentNameTest extends TestCase
      */
     public function testFromRegexThrow(): void
     {
-        $this->expectExceptionObject(new SignatureExtractionException(sprintf('Segment has unknown format ";"')));
+        $this->expectExceptionObject(new SignatureExtractionException('Segment has unknown format ";"'));
         ComponentName::fromString(';');
     }
 }

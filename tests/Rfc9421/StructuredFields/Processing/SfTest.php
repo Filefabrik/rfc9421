@@ -26,8 +26,10 @@ final class SfTest extends TestCase
     {
         $mMapper = new MethodsMapper();
         $mMapper->add('dictionary', fn (string $fieldValue): Dictionary => Dictionary::fromHttpValue($fieldValue));
+
         $structuredFields = new StructuredFields();
         $structuredFields->add('Example-Dict', 'dictionary');
+
         $sfInstance = new Sf($mMapper, structuredFields: $structuredFields);
         $entry      = new Entry('example-dict', '  a=1, b=2;x=1;y=2, c=(a   b    c), d ');
 
@@ -36,7 +38,7 @@ final class SfTest extends TestCase
         self::assertSame('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $res->parse());
     }
 
-    public function testHandleThrowsNotNiceProceeded()
+    public function testHandleThrowsNotNiceProceeded(): void
     {
         $this->expectExceptionObject(
             new UnProcessableSignatureException('Unknown or unregistered structured field type for "example-dict"'),
@@ -44,12 +46,14 @@ final class SfTest extends TestCase
 
         $mMapper = new MethodsMapper();
         $mMapper->add('dictionary', fn (): null => null);
+
         $structuredFields = new StructuredFields();
         $structuredFields->add('Example-Dict', 'dictionary');
+
         $sfInstance = new Sf($mMapper, structuredFields: $structuredFields);
         $entry      = new Entry('example-dict', '  a=1, b=2;x=1;y=2, c=(a   b    c), d ');
 
-        $res = $sfInstance->handle($entry);
+        $sfInstance->handle($entry);
     }
 
     /**
@@ -64,6 +68,7 @@ final class SfTest extends TestCase
         $mMapper          = new MethodsMapper();
         $structuredFields = new StructuredFields();
         $structuredFields->add('Example-Dict', 'dictionary');
+
         $sfInstance = new Sf($mMapper, structuredFields: $structuredFields);
         $entry      = new Entry('example-dict', 'a=1, b=2;x=1;y=2, c=(a   b    c), d ');
 
