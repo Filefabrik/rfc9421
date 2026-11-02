@@ -45,7 +45,7 @@ final class Entry
      */
     private(set) array $keyMethods = [];
 
-    private bool       $reqEnum    = false;
+    private bool $reqEnum = false;
 
     public function __construct(
         /**
@@ -55,6 +55,7 @@ final class Entry
         private(set) readonly string $key,
         /**
          * The value will not be formatted
+         * todo check specs which types are valid
          *
          * @var string|int|null int while content length
          *
@@ -138,7 +139,6 @@ final class Entry
             if (InitialContentsEnum::sf === $this->initialContents || InitialContentsEnum::bs === $this->initialContents) {
                 $parts[] = self::colonWithSpace;
             } elseif (InitialContentsEnum::key === $this->initialContents) {
-
                 // todo check "name" has to be parsed via a special method InitialContentsEnum::name === $this->initialContents
                 $parts[] = self::equals;
             }

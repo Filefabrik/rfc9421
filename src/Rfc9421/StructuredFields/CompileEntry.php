@@ -24,8 +24,8 @@ final readonly class CompileEntry
     /* todo
      * Required only if we are handle a signed response where we want to use the req field
 
-    private(set) RequestInterface|null $originalRequest = null;
-*/
+       private(set) RequestInterface|null $originalRequest = null;
+    */
     public function __construct(
         private(set) RequestInterface|ResponseInterface $messageInterface,
         private(set) SigningConfiguration $signingConfiguration,
@@ -42,7 +42,7 @@ final readonly class CompileEntry
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
-    public function handle(): ?Entry
+    public function handle(): Entry
     {
         $parameters = $this->extractParameters($this->componentItemDto->getItem());
 
@@ -83,6 +83,7 @@ final readonly class CompileEntry
                 entry: $entry,
             );
         } elseif ($parameters->has(InitialContentsEnum::key)) {
+            // todo intense testing
             $entry = new Key(
                 methodsMapper       : $this->signingConfiguration->getMethodsMapper(),
                 structuredFieldTypes: $this->signingConfiguration->getStructuredFields(),
@@ -95,7 +96,6 @@ final readonly class CompileEntry
         /*
          * todo req
          */
-
         return $entry;
     }
 

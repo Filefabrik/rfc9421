@@ -84,6 +84,7 @@ final class StructuredFields
         'x-frame-options'                  => 'item',
         'x-xss-protection'                 => 'list',
     ];
+
     /**
      * @var array<string,string>|array{}
      */
