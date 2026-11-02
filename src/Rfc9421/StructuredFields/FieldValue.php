@@ -51,18 +51,15 @@ final readonly class FieldValue
     private function handleRequestInterface(): Entry
     {
         // first test the method is in the configuration stack
-
+        // todo log later if there is no method. No Method is ok but maybe an configuration error
         if ($this->signingConfiguration->signingMethods?->hasMethod($this->componentItemDto->fieldName) ?? false) {
-            $callableParams = [$this->messageInterface, $this->initialContentsParameters];
-            $entry          = $this->signingConfiguration->signingMethods->callWith(
+            return $this->signingConfiguration->signingMethods->callWith(
                 key   : $this->componentItemDto->fieldName,
-                params: $callableParams,
+                params: [$this->messageInterface, $this->initialContentsParameters],
             );
-        } else {
-            $entry = $this->getDefaultEntry();
         }
 
-        return $entry;
+        return $this->getDefaultEntry();
     }
 
     /**
