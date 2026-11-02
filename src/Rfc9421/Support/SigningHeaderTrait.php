@@ -14,7 +14,7 @@ trait SigningHeaderTrait
     /**
      * Signing header Parameter
      *
-     * @param array{string:string|InitialContentsEnum|ComponentItemDto} $headerKeys
+     * @param array<string|InitialContentsEnum|ComponentItemDto> $headerKeys
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
@@ -47,6 +47,7 @@ trait SigningHeaderTrait
             // the setter
 
         }
+
         $this->signatureComponents->set($setter);
 
         return $this;
