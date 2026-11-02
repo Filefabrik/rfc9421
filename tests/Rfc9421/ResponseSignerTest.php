@@ -15,6 +15,9 @@ use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * todo signing with ;req
+ */
 #[CoversClass(ResponseSigner::class)]
 final class ResponseSignerTest extends TestCase
 {
@@ -64,7 +67,7 @@ final class ResponseSignerTest extends TestCase
                 ->setSignatureKeyName('responseSig=')
                 // singing the status as relevant information for the requester Alice, to ensure the status
                 ->signHeader(DerivedComponentEnum::status)
-                // todo header exists and must not be set separate as header
+                // content-length is covered by a $this->addSigningMethod()
                 ->signHeader('content-length')
                 // the sender of the request expects an algo that Bob can check while receive this signed response
                 ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
