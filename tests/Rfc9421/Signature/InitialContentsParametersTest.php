@@ -47,7 +47,7 @@ final class InitialContentsParametersTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function testGetValueOrThrowTThrows(): void
+    public function testGetValueOrThrowThrows(): void
     {
         $this->expectExceptionObject(new UnexpectedValueException('Initial contents enum: "key" was not set before.'));
         $t = new InitialContentsParameters();
@@ -58,6 +58,9 @@ final class InitialContentsParametersTest extends TestCase
         self::assertNull($t->getValueOrThrow(InitialContentsEnum::key));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     public function testHas(): void
     {
         $t = new InitialContentsParameters();

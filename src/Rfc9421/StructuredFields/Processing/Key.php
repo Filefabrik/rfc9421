@@ -7,7 +7,6 @@ namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 use Bakame\Http\StructuredFields\Dictionary;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
-use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
@@ -16,10 +15,8 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  */
 final readonly class Key
 {
-    public function __construct(
-        private(set) MethodsMapper $methodsMapper,
-        private(set) StructuredFields $structuredFieldTypes,
-    ) {
+    public function __construct(private(set) StructuredFields $structuredFieldTypes)
+    {
     }
 
     /**

@@ -86,7 +86,6 @@ final readonly class CompileEntry
         } elseif ($parameters->has(InitialContentsEnum::key)) {
             // todo intense testing
             $entry = new Key(
-                methodsMapper       : $this->signingConfiguration->getMethodsMapper(),
                 structuredFieldTypes: $this->signingConfiguration->getStructuredFields(),
             )->handle(
                 entry  : $entry,
