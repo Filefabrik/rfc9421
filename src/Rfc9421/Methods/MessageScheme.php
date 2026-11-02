@@ -10,6 +10,8 @@ use Psr\Http\Message\MessageInterface;
 final class MessageScheme
 {
     /**
+     * todo check allowed schemes
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      */
     public static function handle(MessageInterface $message): string
