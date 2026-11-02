@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421;
 
 use Filefabrik\Rfc9421\Cryptography\VerifyRegistry;
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
@@ -37,16 +33,18 @@ final class VerifyRequest
     /**
      * Main method to validate
      *
-     * @throws ContentDigestException
-     * @throws InvalidHeaderKeyException
-     * @throws VerifyHeaderSignatureException
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException|Exceptions\SignatureException|Exceptions\SignatureExtractionException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     public function verifying(): bool
     {
         $this->signingConfiguration->setComponents(
-            components: $this->preparedVerify->getSignatureInputInstance()->extractedComponents,
+            components: $this->preparedVerify->getSignatureInputInstance()->getExtractedComponents(),
         );
 
         // Validates the Content digest if needed from signature-line sig1=(content-digest)
@@ -109,10 +107,10 @@ final class VerifyRequest
     /**
      * Getting the Signer instance to rebuild the received message
      *
-     * @throws InvalidDerivedKeyException
-     * @throws InvalidHeaderKeyException
-     * @throws AlreadySetException
-     * @throws ContentDigestException|\Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     private function getSigner(): RequestSigner
     {

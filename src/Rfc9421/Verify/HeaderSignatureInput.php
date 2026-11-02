@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Verify;
 
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\Components;
 use Filefabrik\Rfc9421\Extractors\Metadata;
@@ -21,7 +22,7 @@ final class HeaderSignatureInput
     /**
      * only if validatedSignatureParts was successfully
      */
-    private(set) ?SigningComponents $extractedComponents = null;
+    private ?SigningComponents $extractedComponents = null;
 
     /**
      * only if validatedSignatureParts was successfully
@@ -54,9 +55,6 @@ final class HeaderSignatureInput
             throw new InvalidArgumentException('missing components');
         }
 
-        /*
-         * todo with structured fields
-         */
         $this->extractedComponents = new Components(componentsString: $this->signatureInput->components)
             ->extractToComponentsObject()
         ;
@@ -85,6 +83,14 @@ final class HeaderSignatureInput
         }
 
         return $this->headerSignatureInputValue;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function getExtractedComponents(): SigningComponents
+    {
+        return $this->extractedComponents ?? throw SignatureExtractionException::notProceeded();
     }
 
 }
