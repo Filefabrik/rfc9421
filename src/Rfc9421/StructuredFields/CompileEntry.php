@@ -71,14 +71,14 @@ final readonly class CompileEntry
         if ($parameters->has(InitialContentsEnum::bs)) {
             $entry = new Bs()
                 ->handle(
-                    entry       : $entry,
-                    whichRequest: $this->messageInterface,
+                    entry           : $entry,
+                    messageInterface: $this->messageInterface,
                 )
             ;
         } elseif ($parameters->has(InitialContentsEnum::sf)) {
             $entry = new Sf(
-                methodsMapper       : $this->signingConfiguration->getMethodsMapper(),
-                structuredFieldTypes: $this->signingConfiguration->getStructuredFields(),
+                methodsMapper   : $this->signingConfiguration->getMethodsMapper(),
+                structuredFields: $this->signingConfiguration->getStructuredFields(),
             )->handle(
                 entry: $entry,
             );
