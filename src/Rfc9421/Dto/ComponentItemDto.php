@@ -50,6 +50,7 @@ final readonly class ComponentItemDto
     {
         return $this->item;
     }
+
     /**
      * From Bakame Structured Field as string
      */
@@ -70,6 +71,7 @@ final readonly class ComponentItemDto
             sprintf('Expected string, got "%s"', gettype($v)),
         );
     }
+
     public function getHttpValue(): string
     {
         return $this->httpValue;
