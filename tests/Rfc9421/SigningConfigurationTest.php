@@ -10,6 +10,7 @@ use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -261,7 +262,14 @@ final class SigningConfigurationTest extends TestCase
     public function testGetStructuredFields(): void
     {
         $i = new SigningConfiguration();
-        self::assertEquals(StructuredFields::getDefaultList(),$i->getStructuredFields()->fields);
+        self::assertEquals(StructuredFields::getDefaultList(), $i->getStructuredFields()->fields);
+    }
+
+    public function testMethodsMapper(): void
+    {
+        $i = new SigningConfiguration();
+
+        self::assertEquals(MethodsMapper::getDefaultMapper()->methods, $i->getMethodsMapper()->methods);
     }
 
 }

@@ -45,24 +45,18 @@ final class SigningConfiguration
      */
     private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
 
-    /**
-     * @param \Filefabrik\Rfc9421\Signer\Metadata $metadata
-     */
     public function __construct(
         private(set) readonly Metadata $metadata = new Metadata(),
         private(set) SigningComponents $signatureComponents = new SigningComponents(),
         /**
          * Methods for extracting the header and recompile the component
          */
-        private(set) ?MethodsMapper $methodsMapper = null,
+        private ?MethodsMapper $methodsMapper = null,
         // todo with prepared config factory
         private ?StructuredFields $structuredFields = null,
     ) {
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     */
     public function getStructuredFields(): StructuredFields
     {
         return $this->structuredFields ??= StructuredFields::fromDefaultList();
