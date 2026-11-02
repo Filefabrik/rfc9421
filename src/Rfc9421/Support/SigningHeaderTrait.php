@@ -13,8 +13,9 @@ trait SigningHeaderTrait
 {
     /**
      * Signing header Parameter
+     * todo documentation
      *
-     * @param array<string|InitialContentsEnum|ComponentItemDto> $headerKeys
+     * @param array<int, ComponentItemDto|DerivedComponentEnum|string $headerKeys
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
@@ -54,6 +55,8 @@ trait SigningHeaderTrait
     }
 
     /**
+     * todo documentation
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */

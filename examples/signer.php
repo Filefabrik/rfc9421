@@ -14,7 +14,9 @@ use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
+use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421\VerifyRequest;
@@ -47,14 +49,53 @@ $extraParser = ['example-dict' => 'dictionary'];
  * Prepare signingConfiguration
  */
 $currentDateTime = new DateTime()->getTimestamp();
+/*
+ * Programmatically tell which components has to into signing process
+ */
+try {
+    $signingHeaders = [
+        'content-type',
+        'content-length',
+        DerivedComponentEnum::query,
+        DerivedComponentEnum::method,
+        /*
+         * as string will evaluate
+         */
+        '"@query-param";name="baz"',
+        /*
+         * programmatically add
+         * '"example-dict";sf'
+         */
+        ComponentName::fromNameAndInitialContent(name: 'example-dict', initialContentsEnum: InitialContentsEnum::sf),
+        DerivedComponentEnum::authority,
+        ComponentName::fromNameAndInitialContentEnumWithValue(
+            name               : 'example-dict',
+            initialContentsEnum: InitialContentsEnum::key,
+            value              : 'a',
+        ),
+        ComponentName::fromNameAndInitialContentEnumWithValue(
+            name               : 'example-dict',
+            initialContentsEnum: InitialContentsEnum::key,
+            value              : 'c',
+        ),
+        /*
+         * '"example-dict";key="d"'
+         */
+        ComponentName::fromNameAndInitialContentEnumWithValue(
+            name               : 'example-dict',
+            initialContentsEnum: InitialContentsEnum::key,
+            value              : 'd',
+        ),
+    ];
+} catch (SignatureExtractionException $e) {
+    echo $e->getMessage();
 
+    return;
+}
 try {
     $signingConfiguration = new SigningConfiguration()
         /*
          * content-type will be injected after signing so configure that we are signing manuell the content-type
-         */
-      //  ->processWithoutExistingHeader('content-type')
-        /*
          * the method we are generating the content-type value (simply via header line)
          */
         ->addSigningMethod(
@@ -64,19 +105,14 @@ try {
         /*
          * tell the signing process that content-type has to be signed
          */
-        ->signHeader('content-type')
-        ->signHeader('content-length')
-        ->signHeader(DerivedComponentEnum::query)
-        ->signHeader(DerivedComponentEnum::method)
-        ->signHeader('"@query-param";name="baz"')
+        //->signHeader('"@query-param";name="baz"')
         ->signHeader('x-Origin-host')
         ->signHeader('test-header')
         ->signHeader('"example-dict"')
-        ->signHeader('"example-dict";sf')
-        ->signHeader('"example-dict";key="a"')
-        ->signHeader('"example-dict";key="c"')
-        ->signHeader('"example-dict";key="d"')
-        ->signHeader(DerivedComponentEnum::authority)
+        /*
+         * Setting a bundle of prepared components
+         */
+        ->signHeaders(headerKeys: $signingHeaders)
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated($currentDateTime)
         ->setExpires($currentDateTime + 7200)

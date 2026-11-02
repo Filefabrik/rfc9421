@@ -91,7 +91,11 @@ final class ComponentName
         preg_match('#'.$pattern.'#', $segment, $matches);
 
         if (4 === count($matches)) {
-            return new ComponentName($matches[1], $matches[2], $matches[3]);
+            return self::withKeyInitialContentValue(
+                name           : $matches[1],
+                initialContents: $matches[2],
+                keyOrNameValue : $matches[3],
+            );
         }
 
         $s = implode('|', InitialContentsEnum::names());
@@ -113,6 +117,17 @@ final class ComponentName
         }
 
         throw new SignatureExtractionException(sprintf('Segment has unknown format "%s"', $segment));
+    }
+
+    /**
+     * 3-Parts such as '"example-dict";key="a"'
+     */
+    public static function withKeyInitialContentValue(
+        string|DerivedComponentEnum $name,
+        string|InitialContentsEnum $initialContents,
+        string|null $keyOrNameValue,
+    ): self {
+        return new ComponentName(name: $name, initialContents: $initialContents, keyOrNameValue: $keyOrNameValue);
     }
 
     /**
@@ -145,7 +160,13 @@ final class ComponentName
         InitialContentsEnum $initialContentsEnum,
         null|string $value,
     ): ComponentItemDto {
-        return ComponentItemDto::fromComponentName(componentName: new self($name, $initialContentsEnum, $value));
+        return ComponentItemDto::fromComponentName(
+            componentName: self::withKeyInitialContentValue(
+                name           : $name,
+                initialContents: $initialContentsEnum,
+                keyOrNameValue : $value,
+            ),
+        );
     }
 
     /**
