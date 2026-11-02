@@ -117,12 +117,20 @@ final class ComponentNameTest extends TestCase
         $i = ComponentName::fromNameAndInitialContentEnumWithValue('caramba', InitialContentsEnum::name, 'myName');
         self::assertEquals('"caramba";name="myName"', $i->httpValue);
     }
-    public  function testFromRegex4Segments(): void
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testFromRegex4Segments(): void
     {
         $i = ComponentName::fromNameAndInitialContentEnumWithValue('caramba', InitialContentsEnum::name, 'myName')->httpValue;
-       self::assertSame( '"caramba";name="myName"',ComponentName::fromString($i)->httpValue);
+        self::assertSame('"caramba";name="myName"', ComponentName::fromString($i)->httpValue);
     }
-    public  function testFromRegexThrow(): void
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testFromRegexThrow(): void
     {
         $this->expectExceptionObject(new SignatureExtractionException(sprintf('Segment has unknown format ";"')));
         ComponentName::fromString(';');

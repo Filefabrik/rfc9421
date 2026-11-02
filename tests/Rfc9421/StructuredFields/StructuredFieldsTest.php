@@ -12,27 +12,18 @@ use UnexpectedValueException;
 #[CoversClass(StructuredFields::class)]
 final class StructuredFieldsTest extends TestCase
 {
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     */
     public function testGetDefaultList(): void
     {
         self::assertCount(66, StructuredFields::getDefaultList());
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     */
     public function testFromDefaultList(): void
     {
         $instance = StructuredFields::fromDefaultList();
-        self::assertInstanceOf(StructuredFields::class, $instance);
+
         self::assertCount(66, $instance->fields);
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     */
     public function testGetOrNull(): void
     {
         $instance = StructuredFields::fromDefaultList();
