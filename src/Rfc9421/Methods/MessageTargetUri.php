@@ -8,6 +8,11 @@ use Psr\Http\Message\RequestInterface;
 
 final class MessageTargetUri
 {
+    /**
+     * todo check trailing slash
+     *
+     *
+     */
     public static function handle(RequestInterface $requestInterface): string
     {
         $uri = $requestInterface->getUri();

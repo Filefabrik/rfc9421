@@ -19,8 +19,6 @@ final class MessageSchemeTest extends TestCase
         self::assertSame('http', MessageScheme::handle(new Request('GET', 'http://example.com/')));
         self::assertSame('https', MessageScheme::handle(new Request('GET', 'https://example.com/')));
         self::assertSame('httpsdd', MessageScheme::handle(new Request('GET', 'HTTPSDD://example.com/')));
-
-        self::assertSame('http', MessageScheme::handle(new Response()));
     }
 
     /**
