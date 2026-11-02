@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Support;
 
 use Closure;
+use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
+use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
@@ -94,6 +96,49 @@ final class PreparedMethodsTest extends TestCase
         );
         $i->add('poster2', fn (MessageInterface $message) => $message->getMethod());
         self::assertTrue($i->hasMethod('poster2'));
+    }
+
+    public function testCallWith(): void
+    {
+        $r = new Request(
+            'post',
+            'https://Test.com/var/pathy/?qer=var',
+            body: '{"busy": true, "message": "Your call is very important to us"}',
+        );
+
+        $prepareMethods = new PreparedMethods();
+        $prepareMethods->adds(
+            [
+                'content-length' => fn (MessageInterface $messageInterface) => strlen(
+                    (string)$messageInterface->getBody(),
+                ),
+            ],
+        );
+        $calledEntry = $prepareMethods->callWith('content-length', [$r]);
+        self::assertSame(62, $calledEntry->value);
+        self::assertSame('content-length', $calledEntry->key);
+    }
+
+    public function testCallWithReturnEntry(): void
+    {
+        $r = new Request(
+            'post',
+            'https://Test.com/var/pathy/?qer=var',
+            body: '{"busy": true, "message": "Your call is very important to us"}',
+        );
+
+        $prepareMethods = new PreparedMethods();
+        $prepareMethods->adds(
+            [
+                'content-length' => fn (MessageInterface $messageInterface) => new Entry(
+                    'content-length',
+                    strlen((string)$messageInterface->getBody()),
+                ),
+            ],
+        );
+        $calledEntry = $prepareMethods->callWith('content-length', [$r]);
+        self::assertSame(62, $calledEntry->value);
+        self::assertSame('content-length', $calledEntry->key);
     }
 
 }

@@ -11,7 +11,7 @@ use UnexpectedValueException;
 
 /**
  * Stack which is configurable for each request/response to process the Derived Components or regular headers they are non-normative
- *
+ * todo tell what prepare methods do
  */
 final class PreparedMethods
 {
@@ -52,10 +52,8 @@ final class PreparedMethods
     /**
      * Return Entry ensures the correctly handled Processing
      *
-     * @param string|\Filefabrik\Rfc9421\Signature\DerivedComponentEnum $key
-     * @param array                                                     $params
+     * @param array<int,mixed> $params
      *
-     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      */
     public function callWith(string|DerivedComponentEnum $key, array $params = []): Entry
     {
