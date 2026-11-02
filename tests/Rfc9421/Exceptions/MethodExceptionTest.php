@@ -43,4 +43,12 @@ final class MethodExceptionTest extends TestCase
         );
         throw MethodException::closureCallError('some bug');
     }
+
+    public function testNotFoundInMethodsMapper(): void
+    {
+        $this->expectExceptionObject(
+            new MethodException('There is no registered Method "example-dict" to process the value.'),
+        );
+        throw MethodException::notFoundInMethodsMapper('example-dict');
+    }
 }

@@ -20,4 +20,9 @@ final class MethodException extends AbstractRfc9421Exception
     {
         return new self(sprintf('Closure Call Reflection Error with Message "%s"', $message));
     }
+
+    public static function notFoundInMethodsMapper(string $methodName): self
+    {
+        return new self(sprintf('There is no registered Method "%s" to process the value.', $methodName));
+    }
 }

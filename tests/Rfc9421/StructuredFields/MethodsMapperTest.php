@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\StructuredFields;
 
+use Filefabrik\Rfc9421\Exceptions\MethodException;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -31,16 +32,31 @@ final class MethodsMapperTest extends TestCase
         self::assertSame('testMethod2Result', $m());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
     public function testCallMethod(): void
     {
         $mapper = new MethodsMapper();
         $mapper->add('testMethod', fn (string $param) => $param.' returnVal');
         self::assertSame('prefiggs returnVal', $mapper->callMethod('testMethod', ['prefiggs']));
+    }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
+    public function testCallMethodThrows(): void
+    {
+        $this->expectExceptionObject(
+            new MethodException('There is no registered Method "testMethod" to process the value.'),
+        );
+        $mapper = new MethodsMapper();
+
+        self::assertSame('prefiggs returnVal', $mapper->callMethod('testMethod', ['prefiggs']));
     }
 
     public function testGetDefaultMapper(): void
     {
-        self::assertCount(8,MethodsMapper::getDefaultMapper()->methods);
+        self::assertCount(8, MethodsMapper::getDefaultMapper()->methods);
     }
 }
