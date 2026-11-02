@@ -39,13 +39,19 @@ final class Entry
     public const string semicolon = ';';
 
     public const string equals = '=';
+
     /**
      * @var array{Closure}|array{}
      */
     private(set) array $keyMethods = [];
+
     private bool       $reqEnum    = false;
 
     public function __construct(
+        /**
+         * string without quotes and lower case
+         * todo check @query-param with lower case
+         */
         private(set) readonly string $key,
         /**
          * The value will not be formatted
@@ -131,7 +137,9 @@ final class Entry
 
             if (InitialContentsEnum::sf === $this->initialContents || InitialContentsEnum::bs === $this->initialContents) {
                 $parts[] = self::colonWithSpace;
-            } elseif (InitialContentsEnum::key === $this->initialContents||InitialContentsEnum::name === $this->initialContents) {
+            } elseif (InitialContentsEnum::key === $this->initialContents) {
+
+                // todo check "name" has to be parsed via a special method InitialContentsEnum::name === $this->initialContents
                 $parts[] = self::equals;
             }
         } else {
@@ -143,6 +151,9 @@ final class Entry
         return implode('', $parts);
     }
 
+    /**
+     * For @query-param use a special method
+     */
     private function parseKeyMethods(): string
     {
         if (0 === count($this->keyMethods)) {

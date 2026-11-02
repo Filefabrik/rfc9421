@@ -52,6 +52,8 @@ final class EntryTest extends TestCase
         //  $entry = new Entry('cramaba', '"myName"', InitialContentsEnum::name);
         //self::assertSame('"cramaba";name="myName" ', $entry->parse());
 
+        $targetEntry = new Entry('testkey', '"a": 1', InitialContentsEnum::key);
+        self::assertSame('"testkey";key="a": 1', $targetEntry->parse());
     }
 
     public function test__construct(): void
