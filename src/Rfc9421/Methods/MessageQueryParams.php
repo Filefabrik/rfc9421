@@ -34,7 +34,7 @@ final class MessageQueryParams
 
         // todo, wenn not exists $queryParams[$fieldNameDto], check what is expected
         $value = '';
-        if (is_array($queryParams) && isset($queryParams[$fieldName]) && '' !== $queryParams[$fieldName]) {
+        if (array_key_exists($fieldName, $queryParams) && '' !== $queryParams[$fieldName]) {
             $value = UnquoteHelper::quote($queryParams[$fieldName]);
         }
 
@@ -47,18 +47,14 @@ final class MessageQueryParams
     /**
      * todo comment
      *
-     * @return non-empty-array<string, string>|null
+     * @return non-empty-array<string, string>
      *
      * Should not use PHP's parse_str function here, as it has some issues with
      * spaces and dots in parameter names. The following function treats them as
      * opaque strings rather than as variable names.
      */
-    private static function parseQueryString(string $query): array|null
+    private static function parseQueryString(string $query): array
     {
-        if ('' === $query) {
-            return null;
-        }
-
         $result      = [];
         $queryParams = explode('&', $query);
         foreach ($queryParams as $param) {

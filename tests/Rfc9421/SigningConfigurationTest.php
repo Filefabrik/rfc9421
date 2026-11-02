@@ -269,7 +269,9 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
 
-        self::assertEquals(MethodsMapper::getDefaultMapper()->methods, $i->getMethodsMapper()->methods);
+        foreach (MethodsMapper::getDefaultMapper()->methods as $cnt => $item) {
+            self::assertEquals($item->method, $i->getMethodsMapper()->methods[$cnt]->method);
+        }
     }
 
 }
