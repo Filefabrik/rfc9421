@@ -6,16 +6,25 @@ namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
-use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
+/**
+ * todo bs
+ * https://www.rfc-editor.org/info/rfc9421/#section-2.1.3-4
+ * Example-Header: value, with, lots
+ * Example-Header: of, commas
+ * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
+ */
 final class Bs
 {
-    public function handle(Entry $entry, MessageInterface $whichRequest): Entry|null
+    public function handle(Entry $entry, ResponseInterface|RequestInterface $messageInterface): Entry
     {
-        $values = $whichRequest->getHeader($entry->key);
+        $values = $messageInterface->getHeader($entry->key);
         // nothing to handle so return empty
+        // todo check if it is an error that no http-header value found and whats happened with the zero value
         if (0 === count($values)) {
-            return null;
+            return $entry->setInitialContents(InitialContentsEnum::bs);
         }
 
         $valuesSegments = [];
