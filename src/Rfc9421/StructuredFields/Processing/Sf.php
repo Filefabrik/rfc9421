@@ -16,11 +16,16 @@ use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 
+/**
+ * Serial Field
+ *
+ * @see 2.1.2. Dictionary Structured Field Members
+ */
 final readonly class Sf
 {
     public function __construct(
         private(set) MethodsMapper $methodsMapper,
-        private(set) StructuredFields $structuredFieldTypes,
+        private(set) StructuredFields $structuredFields,
     ) {
     }
 
@@ -46,24 +51,28 @@ final readonly class Sf
          * Make sure the Header-Key is mapped in structured FieldTypes.
          * That tells, how we extract/process the value
          */
-        $type = $this->structuredFieldTypes->getOrThrow($entry->key);
+        $type = $this->structuredFields->getOrThrow($entry->key);
 
         /**
          * Calling/executing the field
          */
-        $field = $this->methodsMapper->callMethod($type, $entry->value);
+        $field = $this->methodsMapper->callMethod($type, [$entry->value]);
 
         if (null === $field) {
-            throw new UnProcessableSignatureException(sprintf('Unknown or unregistered structured field type for "%s"', $entry->key));
+            throw new UnProcessableSignatureException(
+                sprintf('Unknown or unregistered structured field type for "%s"', $entry->key),
+            );
         }
 
         /*
          * Working with Bakame Structured Fields
          */
+
         return array_any(
             [OuterList::class, InnerList::class, Parameters::class, Dictionary::class, Item::class],
             fn (string $className): bool => $field instanceof $className,
         )
-            ? $field->toHttpValue() : $field;
+            ? $field->toHttpValue()
+            : $field;
     }
 }
