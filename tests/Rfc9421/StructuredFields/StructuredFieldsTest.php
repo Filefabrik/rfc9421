@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\StructuredFields;
 
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 #[CoversClass(StructuredFields::class)]
 final class StructuredFieldsTest extends TestCase
@@ -46,9 +46,14 @@ final class StructuredFieldsTest extends TestCase
         self::assertSame(['test' => 'me', 'neggst' => 'some'], $instance->fields);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
     public function testGetOrThrow(): void
     {
-        $this->expectExceptionObject(new UnexpectedValueException('Field "some" does not exist.'));
+        $this->expectExceptionObject(
+            new StructuredFieldException('The field "some" is not mapped into StructuredFields.'),
+        );
         $instance = StructuredFields::fromDefaultList();
         self::assertNull($instance->getOrThrow('some'));
     }
