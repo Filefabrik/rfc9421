@@ -102,17 +102,6 @@ final class SigningConfiguration
     }
 
     /**
-     * todo maybe bullshit
-     */
-    public function processWithoutExistingHeader(null|string $withoutExistingHeader): self
-    {
-        $this->withoutExistingHeaders   ??= [];
-        $this->withoutExistingHeaders[] = $withoutExistingHeader;
-
-        return $this;
-    }
-
-    /**
      * Hashing the content-digest|body with algo
      * if set, the header line "content-digest" will be created and the hash value will be stored into the header
      *

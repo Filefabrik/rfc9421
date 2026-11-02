@@ -35,7 +35,9 @@ final class BaseTest extends TestCase
         $sc->signHeader('not-ExistinG')
            ->signHeader('@method')
         ;
-        $sc->getStructuredFields()->add('not-existing', 'etag');
+        $sc->getStructuredFields()
+           ->add('not-existing', 'etag')
+        ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 
@@ -66,7 +68,7 @@ final class BaseTest extends TestCase
         $i     = new Base($r, $sc);
         $lines = $i->createSignatureLines();
         self::assertEquals(
-                new Line('"not-existing"', '"not-existing": hm'),
+            new Line('"not-existing"', '"not-existing": hm'),
             $lines->getLineNumber(0),
         );
         self::assertEquals(
@@ -175,7 +177,9 @@ final class BaseTest extends TestCase
            ->signHeader('@authority')
         ;
 
-        $sc->getStructuredFields()->add('not-existing', 'etag');
+        $sc->getStructuredFields()
+           ->add('not-existing', 'etag')
+        ;
         $sc->addSigningMethod(componentName: '@authority', closure: fn (MessageInterface $message): string => 'game');
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);

@@ -17,6 +17,6 @@ final class EnumTypeExceptionTest extends TestCase
         $this->expectExceptionObject(
             new EnumTypeException('"something" is not a valid enumeration of "'.InitialContentsEnum::class.'" Enum.'),
         );
-        throw EnumTypeException::TypeError('something',InitialContentsEnum::class);
+        throw EnumTypeException::TypeError('something', InitialContentsEnum::class);
     }
 }

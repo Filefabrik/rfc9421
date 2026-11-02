@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
+use Bakame\Http\StructuredFields\StructuredFieldError;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
@@ -50,7 +53,7 @@ try {
         /*
          * content-type will be injected after signing so configure that we are signing manuell the content-type
          */
-        ->processWithoutExistingHeader('content-type')
+      //  ->processWithoutExistingHeader('content-type')
         /*
          * the method we are generating the content-type value (simply via header line)
          */
@@ -66,7 +69,8 @@ try {
         ->signHeader(DerivedComponentEnum::query)
         ->signHeader(DerivedComponentEnum::method)
         ->signHeader('"@query-param";name="baz"')
-        ->signHeader('x-Origin-host')->signHeader('test-header')
+        ->signHeader('x-Origin-host')
+        ->signHeader('test-header')
         ->signHeader('"example-dict"')
         ->signHeader('"example-dict";sf')
         ->signHeader('"example-dict";key="a"')
@@ -85,8 +89,10 @@ try {
         // for signing needs private
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
-    $signingConfiguration->structuredFields->addMany($extraParser);
-} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException $e) {
+    $signingConfiguration->getStructuredFields()
+                         ->addMany($extraParser)
+    ;
+} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException$e) {
     echo $e->getMessage();
 
     return;
@@ -123,7 +129,7 @@ $request = new Request(
     headers: [
         'x-origin-host' => 'mytest.com',
         'content-type'  => 'application/json',
-        'test-header'=>'playmobile',
+        'test-header'   => 'playmobile',
         'Example-Dict'  => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
     ],
     body   : $bodyJson,
@@ -132,12 +138,11 @@ $request = new Request(
 $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AlreadySetException|SignatureException|ContentDigestException $e) {
+} catch (AlreadySetException|SignatureException|ContentDigestException|StructuredFieldError|UnProcessableSignatureException|SignatureExtractionException|EnumTypeException $e) {
     echo $e->getMessage();
 
     return;
 }
-
 /*
  * @noinspection \PhpFullyQualifiedNameUsageInspection
  * $response = new \GuzzleHttp\Client()->send($signedRequest);
@@ -146,7 +151,9 @@ try {
  * Now decrypt the Request
  */
 $verifierConfiguration = new SigningConfiguration();
-$verifierConfiguration->structuredFields->addMany($extraParser);
+$verifierConfiguration->getStructuredFields()
+                      ->addMany($extraParser)
+;
 $verifierConfiguration->addSigningMethods($prepareMethods);
 $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
 
@@ -272,12 +279,11 @@ if (null !== $keyId) {
     $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
     try {
         $signedResponse = $responseSigner->sign();
-    } catch (AbstractRfc9421Exception $e) {
+    } catch (AbstractRfc9421Exception|StructuredFieldError $e) {
         echo 'response signing error: '.$e->getMessage();
 
         return;
     }
-
     echo 'response is successfully signed and can be response to the sender'.PHP_EOL;
 
     //... next step the receiver of this response verifies this response

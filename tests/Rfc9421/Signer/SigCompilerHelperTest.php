@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Signer;
 
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

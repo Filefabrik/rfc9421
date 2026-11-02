@@ -123,7 +123,11 @@ final class ComponentNameTest extends TestCase
      */
     public function testFromRegex4Segments(): void
     {
-        $i = ComponentName::fromNameAndInitialContentEnumWithValue('caramba', InitialContentsEnum::name, 'myName')->httpValue;
+        $i = ComponentName::fromNameAndInitialContentEnumWithValue(
+            'caramba',
+            InitialContentsEnum::name,
+            'myName',
+        )->httpValue;
         self::assertSame('"caramba";name="myName"', ComponentName::fromString($i)->httpValue);
     }
 

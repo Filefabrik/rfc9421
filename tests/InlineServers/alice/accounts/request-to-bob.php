@@ -37,10 +37,7 @@ $currentDateTime = new DateTime()->getTimestamp();
 
 try {
     $signingConfiguration = new SigningConfiguration()
-        /*
-         * content-type will be injected after signing so configure that we are signing manuell the content-type
-         */
-        ->processWithoutExistingHeader('content-type')
+
         /*
          * the method we are generating the content-type value (simply via header line)
          */

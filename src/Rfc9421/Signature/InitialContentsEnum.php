@@ -39,7 +39,6 @@ enum InitialContentsEnum
      */
     case tr;
     /**
-
      * req
      * Related request indicator
      * Section 2.4 of RFC 9421

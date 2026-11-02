@@ -218,7 +218,7 @@ if ($verifier->hasValidatedBody) {
 <?php 
 use Filefabrik\Rfc9421\SigningConfiguration;
 
-$configuration   = new SigningConfiguration();
+$signingConfiguration   = new SigningConfiguration();
 ?>
 ```
 
@@ -230,6 +230,7 @@ valid and not tempered/fixed/hacked from somewhere
 ```php
 <?php 
 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->signHeader('@method')
     ->signHeader('x-Origin-host');
 ?>
@@ -240,8 +241,21 @@ or:
 ```php
 <?php 
 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->signHeaders(['@method','x-Origin-host']);
 ?>
+```
+
+Other Formats to set Component Headers
+TODO:
+Use for the Derived Components the Derived Component Enum `DerivedComponentEnum`
+
+Fore easier handling you can specify
+
+```php
+
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
+$signingConfiguration->signHeaderNameInitialContent()
 ```
 
 ### Signing Algorithm (required)
@@ -250,6 +264,7 @@ The algorithm must be implemented at your server and at the target-server.
 
 ```php
 <?php 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512);
 ?>
 ```
@@ -270,7 +285,7 @@ That makes sure, the body was never tempered.
 ```php
 <?php 
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
-
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha512);
 ?>
 ```
@@ -279,7 +294,8 @@ other forms of writings are also valid:
 
 ```php
 <?php 
- 
+
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setContentDigestAlgo('sha256');
 // or
 $signingConfiguration->setContentDigestAlgo('sha-256');
@@ -307,6 +323,7 @@ qmtY4EdmScMucHmOtfo4SovgL47u0jReWH/X8DVYCQW+BtU/LEXIVIoMBeXkxac=
 
 ```php
 <?php 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setPrivatePem(file_get_contents('the-private-key.pem'));
 ?>
 ```
@@ -480,10 +497,12 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
     * 2.2.7. Query
     * 2.4. Signing Request Components in a Response Message
 * check https://github.com/bakame-php/http-structured-fields
-  * [structured-fields.md](docs/structured-fields.md)
+    * [structured-fields.md](docs/structured-fields.md)
 * for symfony composer require symfony/psr-http-message-bridge
     * `"symfony/http-foundation": "^v8.1.8",
       "symfony/psr-http-message-bridge": "^v8.1.0",
       "nyholm/psr7": "^1.8"`
 * documentation: whenever possible use DerivedComponentEnum, every @-component-name is cased in DerivedComponentEnum or
   throws 
+* docu structured field types and mappers need for "Key" "Sf"
+* docu "./Methods" default handling and how to change 

@@ -13,6 +13,7 @@ use GuzzleHttp\Psr7\Request;
 use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use UnexpectedValueException;
 
 #[CoversClass(RequestSigner::class)]
@@ -42,24 +43,38 @@ final class RequestSignerTest extends TestCase
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
-        $signingConfiguration = new SigningConfiguration()->signHeader('"@query-param";name="baz"')
-                                                          ->signHeader('@method')
-                                                          ->signHeader('x-Origin-host')
-                                                          ->signHeader('"example-dict";sf')
-                                                          ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-                                                          ->setCreated($currentDateTime)
-                                                          ->setExpires($currentDateTime + 7200)
-                                                          ->setTag('mastodon')
-                                                          ->setKeyid('http://127.0.0.1:8001/actor#main-key')
-                                                          ->withNonce('nonce-now')
-                                                          ->setContentDigestAlgo('sha512')
+        $signingConfiguration = new SigningConfiguration()
+            /*
+             * todo documentation for addSigningMethod for content-type
+             */
+
+            ->addSigningMethod(
+                componentName: 'content-type',
+                closure      : fn (
+                    RequestInterface $request,
+                ): string => $request->getHeaderLine('content-type'),
+            )
+            ->signHeader('content-type')
+            ->signHeader('"@query-param";name="baz"')
+            ->signHeader('@method')
+            ->signHeader('x-Origin-host')
+            ->signHeader('"example-dict";sf')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->withNonce('nonce-now')
+            ->setContentDigestAlgo('sha512')
             // content digest signer key
-                                                          ->setSignatureKeyName('testValue=')
+            ->setSignatureKeyName('testValue=')
             // for signing needs private
-                                                          ->setPrivatePem($certInstance->getPrivatPemContent())
+            ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
-        $signingConfiguration->getStructuredFields()->add('example-dict', 'dictionary');
+        $signingConfiguration->getStructuredFields()
+                             ->add('example-dict', 'dictionary')
+        ;
         /**
          * Prepare the Request
          */
@@ -68,7 +83,11 @@ final class RequestSignerTest extends TestCase
         $request    = new Request(
             method : 'POST',
             uri    : $targetUrl,
-            headers: ['x-origin-host' => 'mytest.com', 'Example-Dict' => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d '],
+            headers: [
+                'x-origin-host' => 'mytest.com',
+                'Example-Dict'  => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
+                'content-type'  => 'application/json',
+            ],
             body   : $bodyJson,
         );
 
@@ -91,6 +110,8 @@ final class RequestSignerTest extends TestCase
 
         self::assertContains('"example-dict";sf', $signingLinesKeys);
         self::assertContains('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $signingLinesValues);
+
+        self::assertContains('"content-type": application/json', $signingLinesValues);
     }
 
     /**
@@ -204,6 +225,7 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws JsonException
      */

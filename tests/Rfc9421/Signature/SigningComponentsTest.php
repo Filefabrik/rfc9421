@@ -6,8 +6,8 @@ namespace Filefabrik\Rfc9421Test\Signature;
 
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -42,8 +42,8 @@ final class SigningComponentsTest extends TestCase
     {
         $this->expectExceptionObject(new AlreadySetException('The Component "test2" already exists.'));
         new SigningComponents()->addName('test')
-                            ->addName('test2')
-                            ->addName('test2')
+                               ->addName('test2')
+                               ->addName('test2')
         ;
     }
 

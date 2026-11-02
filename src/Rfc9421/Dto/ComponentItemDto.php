@@ -46,11 +46,6 @@ final readonly class ComponentItemDto
         return new self(self::validFieldName($item), $item->toHttpValue(), $item);
     }
 
-    public function getItem(): Item
-    {
-        return $this->item;
-    }
-
     /**
      * From Bakame Structured Field as string
      */
@@ -70,6 +65,11 @@ final readonly class ComponentItemDto
         return is_string($v) ? $v : throw new UnexpectedValueException(
             sprintf('Expected string, got "%s"', gettype($v)),
         );
+    }
+
+    public function getItem(): Item
+    {
+        return $this->item;
     }
 
     public function getHttpValue(): string

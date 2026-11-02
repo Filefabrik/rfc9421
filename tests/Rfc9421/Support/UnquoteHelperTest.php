@@ -128,7 +128,7 @@ final class UnquoteHelperTest extends TestCase
 
     public function testQuoteKEYValue(): void
     {
-      self::assertSame(  '"play": name',UnquoteHelper::quoteKEYValue('play', 'name'));
+        self::assertSame('"play": name', UnquoteHelper::quoteKEYValue('play', 'name'));
     }
 
     public function testStartsWithQuote(): void

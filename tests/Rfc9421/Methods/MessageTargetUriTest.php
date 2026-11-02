@@ -23,6 +23,5 @@ final class MessageTargetUriTest extends TestCase
 
         $res = MessageTargetUri::handle(new Request('GET', 'https://test.com/var/pathy/?qer=var'));
         self::assertSame('https://test.com/var/pathy/?qer=var', $res);
-
     }
 }

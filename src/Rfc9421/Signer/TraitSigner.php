@@ -28,7 +28,7 @@ trait TraitSigner
      */
     private(set) ?string $signingParametersString = null;
 
-    private null|string $signatureBase = null;
+    private(set) null|string $signatureBase = null;
 
     public function getSignedLines(): WriteLines
     {

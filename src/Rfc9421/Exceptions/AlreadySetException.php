@@ -20,11 +20,12 @@ final class AlreadySetException extends AbstractRfc9421Exception
 
     public static function ComponentExists(string|DerivedComponentEnum $componentName): self
     {
-        $v=$componentName instanceof DerivedComponentEnum ? sprintf('"%s"',$componentName->value) : $componentName;
+        $v = $componentName instanceof DerivedComponentEnum ? sprintf('"%s"', $componentName->value) : $componentName;
+
         return new self(
             sprintf(
                 'The Component %s already exists.',
-$v
+                $v,
             ),
         );
     }

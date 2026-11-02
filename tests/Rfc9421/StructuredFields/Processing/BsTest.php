@@ -28,7 +28,7 @@ final class BsTest extends TestCase
     {
         $request = new Request('POST', '');
         $request = $request->withAddedHeader('example-header', 'my test value first');
-        
+
         $entry       = new Entry('example-header');
         $bs          = new Bs();
         $returnEntry = $bs->handle($entry, $request);
