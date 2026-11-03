@@ -41,6 +41,9 @@ final class MetadataTest extends TestCase
         ];
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testSet(): void
     {
         $this->expectExceptionObject(
@@ -49,6 +52,9 @@ final class MetadataTest extends TestCase
         new Metadata()->set('crea', '');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testToString(): void
     {
         $now         = new DateTime()->getTimestamp();
@@ -68,6 +74,9 @@ final class MetadataTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testToStringEmpty(): void
     {
         $stringified = Metadata::fromArray([])
@@ -111,6 +120,9 @@ final class MetadataTest extends TestCase
         self::assertEquals($ts, new Metadata()->setCreated($ts)->created);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testSetAlg(): void
     {
         self::assertEquals(SigningEnum::ecdsa_p_384_sha_384, new Metadata()->setAlg('ecdsa_p_384_sha_384')->alg);

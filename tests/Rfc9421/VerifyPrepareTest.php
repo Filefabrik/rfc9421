@@ -16,7 +16,6 @@ use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
-use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -53,6 +52,7 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
+     *
      * @param string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo
      * @param string                                              $cert
      *
@@ -135,6 +135,7 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
+     *
      *
      * @param string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo
      * @param string                                              $cert
@@ -246,6 +247,13 @@ final class VerifyPrepareTest extends TestCase
         self::assertTrue($prepareVerifierInstance->prepareVerification());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testValidateThrowMissingSignature(): void
     {
         $this->expectExceptionObject(new VerifyHeaderSignatureException('Missing signature'));

@@ -30,6 +30,6 @@ final class DictionaryTest extends TestCase
             new StructuredFieldException('The HTTP textual representation is missing an excepted comma.'),
         );
 
-        Dictionary::fromHttpValue('  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ###;;afds');
+        Dictionary::fromHttpValue('  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ###;;shit');
     }
 }

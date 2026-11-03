@@ -23,6 +23,9 @@ final class SignaturInputTest extends TestCase
         SignaturInput::extract($s);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testComponentsOnly(): void
     {
         $s        = '("@method" "content-digest")';
@@ -33,6 +36,9 @@ final class SignaturInputTest extends TestCase
         self::assertSame('', $instance->metadata);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testExtractingWithoutMetadataNaked(): void
     {
         $s        =
@@ -47,6 +53,9 @@ final class SignaturInputTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testExtractingWithoutMetadata(): void
     {
         $s        = 'testValue=("@method" "content-digest");';

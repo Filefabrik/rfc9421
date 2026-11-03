@@ -13,6 +13,9 @@ use UnexpectedValueException;
 #[CoversClass(SignatureRegistry::class)]
 final class SignatureRegistryTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testSigning(): void
     {
         SignatureRegistry::registerMethod(
@@ -23,6 +26,9 @@ final class SignatureRegistryTest extends TestCase
         self::assertSame('isSigned', SignatureRegistry::signing(SigningEnum::ed25519, '', ''));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testRegisterSigningMethods(): void
     {
         $this->expectNotToPerformAssertions();
@@ -34,6 +40,9 @@ final class SignatureRegistryTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testRegisterSigning(): void
     {
         $this->expectNotToPerformAssertions();
@@ -43,6 +52,9 @@ final class SignatureRegistryTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testSigningNotRegisteredThrow(): void
     {
         SignatureRegistry::clearRegistry();

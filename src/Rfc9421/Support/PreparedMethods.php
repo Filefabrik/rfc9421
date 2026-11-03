@@ -16,12 +16,12 @@ use UnexpectedValueException;
 final class PreparedMethods
 {
     /**
-     * @var array{string:Closure}|array{}
+     * @var array<string, Closure>|array{}
      */
     private(set) array $methods = [];
 
     /**
-     * @param array{string:Closure}|array{} $methods
+     * @param array<string, Closure>|array{} $methods
      */
     public function adds(array $methods): self
     {

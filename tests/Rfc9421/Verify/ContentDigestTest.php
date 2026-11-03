@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(\Filefabrik\Rfc9421\Verify\ContentDigest::class)]
 final class ContentDigestTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testFromContentDigestExtractor(): void
     {
         $body                     = '{"recipient":"Alex","amount":900000000}';

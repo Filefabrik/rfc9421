@@ -11,10 +11,14 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SignBody::class)]
 final class SignBodyTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \JsonException
+     */
     public function testGetContentDigest(): void
     {
         $arr  = ['recipient' => 'Alex', 'amount' => 900000000];
-        $body = json_encode($arr);
+        $body = json_encode($arr, JSON_THROW_ON_ERROR);
         $sig  = new SignBody($body, 'sha512')->getContentDigest();
         self::assertSame(
             'sha-512=:PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==:',
@@ -22,10 +26,14 @@ final class SignBodyTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \JsonException
+     */
     public function testCalculateSignature(): void
     {
         $arr  = ['recipient' => 'Alex', 'amount' => 900000000];
-        $body = json_encode($arr);
+        $body = json_encode($arr, JSON_THROW_ON_ERROR);
         $sig  = new SignBody($body, 'sha512')->calculateSignature();
         self::assertSame(
             'PlrIZYU3M76B30wGsL0h6O79BoxHTdAG+RnMPjOyECTSJCN/KnYdOrSCCWjxV3ckkyvdRmZ52//M3WbehCXcPw==',
@@ -33,10 +41,14 @@ final class SignBodyTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \JsonException
+     */
     public function testGetContentDigestHeaderArray(): void
     {
         $arr  = ['recipient' => 'Alex', 'amount' => 900000000];
-        $body = json_encode($arr);
+        $body = json_encode($arr, JSON_THROW_ON_ERROR);
         $sig  = new SignBody($body, 'sha512')->getContentDigestHeaderArray();
         self::assertSame(
             [

@@ -39,6 +39,11 @@ final class SfTest extends TestCase
         self::assertSame('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $res->parse());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
     public function testHandleThrowsNotNiceProceeded(): void
     {
         $this->expectExceptionObject(

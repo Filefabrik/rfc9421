@@ -13,6 +13,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MessageQueryParams::class)]
 final class MessageQueryParamsTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
     public function testHandle(): void
     {
         $request     = new Request('GET', 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman');
@@ -21,6 +25,10 @@ final class MessageQueryParamsTest extends TestCase
         $this->assertSame('"_baz_": "bat-man"', $returnEntry->parse());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
     public function testHandleEmpty(): void
     {
         $this->expectExceptionObject(new UnProcessableSignatureException('Query string named parameter not set'));

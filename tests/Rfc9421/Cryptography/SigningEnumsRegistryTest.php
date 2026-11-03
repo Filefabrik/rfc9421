@@ -17,6 +17,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SigningEnumsRegistry::class)]
 final class SigningEnumsRegistryTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testFindEnumOrThrow(): void
     {
         $this->expectExceptionObject(
@@ -27,6 +30,9 @@ final class SigningEnumsRegistryTest extends TestCase
         SigningEnumsRegistry::findEnumOrThrow('throws');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testFindEnumOrThrowThrows(): void
     {
         self::assertSame(

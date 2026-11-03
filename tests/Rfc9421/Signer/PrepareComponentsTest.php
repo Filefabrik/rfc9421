@@ -153,6 +153,7 @@ final class PrepareComponentsTest extends TestCase
 
         self::assertSame('https', $prepareInstance->processValue('@scheme')->value);
 
+        /** @noinspection HttpUrlsUsage */
         $r = new Request('post', 'http://www.Test.com/var/pathy/?qer=var');
 
         self::assertSame('http', new PrepareComponents($r)->processValue('@scheme')->value);
@@ -170,6 +171,7 @@ final class PrepareComponentsTest extends TestCase
                             ->parse(),
         );
 
+        /** @noinspection HttpUrlsUsage */
         $r = new Request('post', 'http://www.Test.com');
 
         self::assertSame(

@@ -50,6 +50,9 @@ final class SigningEnumTest extends TestCase
         ];
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     #[DataProvider('dataSigningEnums')]
     public function testIsOwnTypeOrThrow(
         SigningEnum|string $signingEnum,

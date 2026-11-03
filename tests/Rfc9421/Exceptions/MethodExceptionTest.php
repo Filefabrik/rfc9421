@@ -44,6 +44,9 @@ final class MethodExceptionTest extends TestCase
         throw MethodException::closureCallError('some bug');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
     public function testNotFoundInMethodsMapper(): void
     {
         $this->expectExceptionObject(

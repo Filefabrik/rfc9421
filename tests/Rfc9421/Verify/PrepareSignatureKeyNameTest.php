@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(PrepareSignatureKeyName::class)]
 final class PrepareSignatureKeyNameTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testPrepare(): void
     {
         $sc  = new SigningConfiguration();
@@ -28,6 +31,9 @@ final class PrepareSignatureKeyNameTest extends TestCase
         self::assertSame('testValue=', $sc->signatureKeyName);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testPrepareWithoutSignatureKeyExtraction(): void
     {
         $sc  = new SigningConfiguration();
@@ -43,6 +49,9 @@ final class PrepareSignatureKeyNameTest extends TestCase
         self::assertSame('katze=', $sc->signatureKeyName);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testPrepareThrow(): void
     {
         $sc  = new SigningConfiguration();

@@ -11,12 +11,18 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(VerifyHeaderSignatureException::class)]
 final class VerifyHeaderSignatureExceptionTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testInvalidSignatureLine(): void
     {
         $this->expectExceptionObject(new VerifyHeaderSignatureException('Invalid signature line "playcs"'));
         throw VerifyHeaderSignatureException::invalidSignatureLine('playcs');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testKeynameNotExtracted(): void
     {
         $this->expectExceptionObject(
@@ -25,6 +31,9 @@ final class VerifyHeaderSignatureExceptionTest extends TestCase
         throw VerifyHeaderSignatureException::keynameNotExtracted();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testMissingSignatureInput(): void
     {
         $this->expectExceptionObject(
@@ -33,6 +42,9 @@ final class VerifyHeaderSignatureExceptionTest extends TestCase
         throw VerifyHeaderSignatureException::missingSignatureInput();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testMissingSignature(): void
     {
         $this->expectExceptionObject(
@@ -41,6 +53,9 @@ final class VerifyHeaderSignatureExceptionTest extends TestCase
         throw VerifyHeaderSignatureException::missingSignature();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     */
     public function testInvalidSignatureKeyName(): void
     {
         $this->expectExceptionObject(

@@ -14,12 +14,20 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MessageInterfaceHelper::class)]
 final class MessageInterfaceHelperTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
     public function testHasGetUri(): void
     {
+        /** @noinspection HttpUrlsUsage */
         $request = new Request('POST', 'http://example.com/pl?some=task');
+        /** @noinspection HttpUrlsUsage */
         self::assertSame('http://example.com/pl?some=task', (string)MessageInterfaceHelper::hasGetUri($request));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
     public function testHasGetUriThrow(): void
     {
         $this->expectExceptionObject(

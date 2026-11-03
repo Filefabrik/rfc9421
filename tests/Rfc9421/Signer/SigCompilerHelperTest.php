@@ -16,6 +16,7 @@ final class SigCompilerHelperTest extends TestCase
 {
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testMakeSig1fromComponents(): void
     {
@@ -32,6 +33,7 @@ final class SigCompilerHelperTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testMakeSig1fromSignatureParams(): void
     {
@@ -50,6 +52,7 @@ final class SigCompilerHelperTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testMakeSig1fromConstructWithInitial(): void
     {
@@ -67,6 +70,7 @@ final class SigCompilerHelperTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testMakeSig1fromConstructThrows(): void
     {

@@ -70,6 +70,9 @@ final class HeaderSignatureTest extends TestCase
         self::assertEquals([], $s);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testGetBinarySignatureValue(): void
     {
         //todo not clear, test deeper

@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(VerifyContentDigest::class)]
 final class VerifyContentDigestTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testVerify(): void
     {
         $CD   = 'sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:';
@@ -22,6 +25,9 @@ final class VerifyContentDigestTest extends TestCase
         self::assertTrue($verify->verify());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testVerifyFalse(): void
     {
         $CD   = 'sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:';
@@ -31,6 +37,9 @@ final class VerifyContentDigestTest extends TestCase
         self::assertFalse($verify->verify());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testVerifyThrowsFormatIssue(): void
     {
         $this->expectExceptionObject(new ContentDigestException('Wrong content digest format'));
@@ -41,6 +50,9 @@ final class VerifyContentDigestTest extends TestCase
         $verify->prepare();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testPrepare(): void
     {
         $CD   = 'sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:';

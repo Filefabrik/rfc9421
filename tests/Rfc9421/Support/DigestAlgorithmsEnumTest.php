@@ -81,9 +81,8 @@ final class DigestAlgorithmsEnumTest extends TestCase
     #[DataProvider('invalidDigestAlgorithms')]
     public function testIsOwnTypeNull(...$datas): void
     {
-        self::assertSame(
-            null,
-            DigestAlgorithmsEnum::isOwnType($datas[0]),
+        self::assertNull(
+            DigestAlgorithmsEnum::isOwnType($datas[0])
         );
     }
 

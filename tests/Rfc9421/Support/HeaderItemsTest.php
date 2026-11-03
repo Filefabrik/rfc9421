@@ -81,7 +81,7 @@ final class HeaderItemsTest extends TestCase
             'Host'          => 'localhost:8001',
             'x-oriGin-host' => 'mytest.com',
             'Example-Dict'  => 'a=1,    b=2;x=1;y=2,   c=(a   b   c), d',
-        ], );
+        ]);
         self::assertSame(
             [
                 'host'          => 'localhost:8001',

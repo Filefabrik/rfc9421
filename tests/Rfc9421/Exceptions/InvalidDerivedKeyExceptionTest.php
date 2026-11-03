@@ -11,6 +11,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(InvalidDerivedKeyException::class)]
 final class InvalidDerivedKeyExceptionTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException
+     */
     public function testInvalidDerivedKey(): void
     {
         $this->expectExceptionObject(new InvalidDerivedKeyException('Derived component name must start with "@"'));

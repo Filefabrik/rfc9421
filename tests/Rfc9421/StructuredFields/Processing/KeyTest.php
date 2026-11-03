@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Key::class)]
 final class KeyTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
     public function testHandleWithEmptyValue(): void
     {
         $structuredFields = new StructuredFields();
@@ -24,6 +27,9 @@ final class KeyTest extends TestCase
         self::assertSame('"example-dict";key="b": ', $returnEntry->parse());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
     public function testHandleWithValue(): void
     {
         $structuredFields = new StructuredFields();

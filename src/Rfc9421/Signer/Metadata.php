@@ -14,7 +14,7 @@ use Filefabrik\Rfc9421\Support\AbstractMetadata;
 final class Metadata extends AbstractMetadata
 {
     /**
-     * @param array{string:int|string} $metadata
+     * @param array<string,int|string> $metadata
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */

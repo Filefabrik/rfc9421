@@ -12,6 +12,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(VerifyRegistry::class)]
 final class VerifyRegistryTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testRegisterVerifyingMethods(): void
     {
         $this->expectNotToPerformAssertions();
@@ -22,6 +25,9 @@ final class VerifyRegistryTest extends TestCase
         ]);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testRegisterVerifying(): void
     {
         $this->expectNotToPerformAssertions();
@@ -31,6 +37,9 @@ final class VerifyRegistryTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testVerifying(): void
     {
         VerifyRegistry::registerMethods([

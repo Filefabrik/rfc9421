@@ -68,6 +68,12 @@ final class HeaderSignatureInputTest extends TestCase
         self::assertSame($expectedMetadata, $headerSignatureInput->extractedMetadata->toArray());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testExtractWithSigKeyThrowsException(): void
     {
         $this->expectExceptionObject(
@@ -81,6 +87,12 @@ final class HeaderSignatureInputTest extends TestCase
         $headerSignatureInput->extract();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testExtractMissingSignatureComponents(): void
     {
         $this->expectExceptionObject(new InvalidArgumentException('missing components'));
@@ -92,6 +104,12 @@ final class HeaderSignatureInputTest extends TestCase
         $headerSignatureInput->extract();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
     public function testExtractInvalidSignature(): void
     {
         $this->expectExceptionObject(
