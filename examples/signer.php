@@ -59,7 +59,7 @@ try {
         DerivedComponentEnum::query,
         DerivedComponentEnum::method,
         /*
-         * as string will evaluate
+         * as component-string will be evaluated
          */
         '"@query-param";name="baz"',
         /*
@@ -73,6 +73,9 @@ try {
             initialContentsEnum: InitialContentsEnum::key,
             value              : 'a',
         ),
+        /*
+         * '"example-dict";key="c"'
+         */
         ComponentName::fromNameAndInitialContentEnumWithValue(
             name               : 'example-dict',
             initialContentsEnum: InitialContentsEnum::key,

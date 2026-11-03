@@ -59,6 +59,7 @@ final class RequestSignerTest extends TestCase
             ->signHeader('@method')
             ->signHeader('x-Origin-host')
             ->signHeader('"example-dict";sf')
+            ->signHeader('"example-dict";key="d"')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
             ->setExpires($currentDateTime + 7200)
@@ -93,7 +94,7 @@ final class RequestSignerTest extends TestCase
 
         $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signedRequest = $signer->sign();
-        self::assertInstanceOf(Request::class, $signedRequest);
+
         self::assertTrue($signedRequest->hasHeader('content-digest'));
 
         $signingLinesValues = $signer->signingLines->values();
@@ -110,6 +111,9 @@ final class RequestSignerTest extends TestCase
 
         self::assertContains('"example-dict";sf', $signingLinesKeys);
         self::assertContains('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $signingLinesValues);
+
+        self::assertContains('"example-dict";key="d"', $signingLinesKeys);
+        self::assertContains('"example-dict";key="d": ?1', $signingLinesValues);
 
         self::assertContains('"content-type": application/json', $signingLinesValues);
     }
@@ -261,9 +265,8 @@ final class RequestSignerTest extends TestCase
             body   : $bodyJson,
         );
 
-        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
-        $signedRequest = $signer->sign();
-        self::assertInstanceOf(Request::class, $signedRequest);
+        $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
+        $signer->sign();
 
         self::assertCount(1, $signer->getSignedLines()->lines);
     }
