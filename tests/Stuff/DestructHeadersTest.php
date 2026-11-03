@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421Test\StructuredFields;
+namespace Stuff;
 
 use Bakame\Http\StructuredFields\Item;
 use Exception;
@@ -11,7 +11,7 @@ use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
-use Filefabrik\Rfc9421\StructuredFields\DestructHeaders;
+use Filefabrik\Rfc9421\Stuff\DestructHeaders;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;

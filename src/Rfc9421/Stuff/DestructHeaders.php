@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\StructuredFields;
+namespace Filefabrik\Rfc9421\Stuff;
 
 use Bakame\Http\StructuredFields\Dictionary;
 use Bakame\Http\StructuredFields\InnerList;
@@ -10,6 +10,7 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
