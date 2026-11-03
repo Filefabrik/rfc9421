@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
+/**
+ * Lines as \Filefabrik\Rfc9421\Signer\Signatures\Line[]. They are the most relevant part of the signing process
+ */
 abstract class AbstractLines
 {
     /**
