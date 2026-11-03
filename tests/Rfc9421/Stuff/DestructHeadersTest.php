@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Stuff;
+namespace Filefabrik\Rfc9421Test\Stuff;
 
 use Bakame\Http\StructuredFields\Item;
 use Exception;
