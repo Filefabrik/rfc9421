@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
+use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
+
 /**
  * during the VerificationHeaderSignature
  */
@@ -16,7 +18,7 @@ final class VerifyHeaderSignatureException extends AbstractRfc9421Exception
 
     public static function missingSignatureInput(): self
     {
-        return new self('Missing signature-input');
+        return new self(sprintf('Missing %s', HeaderKeysEnum::signature_input->value));
     }
 
     public static function keynameNotExtracted(): self
@@ -28,7 +30,8 @@ final class VerifyHeaderSignatureException extends AbstractRfc9421Exception
     {
         return new self(
             sprintf(
-                'Error during extracting the signatureKeyName from signature-input. Expects the keyname: "%s" in header: "%s"',
+                'Error during extracting the signatureKeyName from %s. Expects the keyname: "%s" in header: "%s"',
+                HeaderKeysEnum::signature_input->value,
                 $keyname,
                 $header,
             ),

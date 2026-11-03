@@ -9,5 +9,8 @@ namespace Filefabrik\Rfc9421\Enums;
  */
 enum HeaderKeysEnum: string
 {
-    case content_digest = 'content-digest';
+    case content_digest  = 'content-digest';
+    case signature_input = 'signature-input';
+
+    case signature = 'signature';
 }

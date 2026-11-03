@@ -19,7 +19,7 @@ final class AlreadySetExceptionTest extends TestCase
     {
         $this->expectExceptionObject(
             new AlreadySetException(
-                'Signature-Input parameter "my-var-was-set" was set before and can not be set again.',
+                'signature-input parameter "my-var-was-set" was set before and can not be set again.',
             ),
         );
 

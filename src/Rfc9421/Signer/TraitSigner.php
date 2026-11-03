@@ -61,8 +61,8 @@ trait TraitSigner
         $cryptedBaseSigString = $this->crypt(signingParametersString: $this->getSigningParametersStringOrThrow());
 
         // setting the signature header into the request
-        $this->updateHeader('signature-input', $this->signatureBase)
-             ->updateHeader('signature', $cryptedBaseSigString)
+        $this->updateHeader(HeaderKeysEnum::signature_input->value, $this->signatureBase)
+             ->updateHeader(HeaderKeysEnum::signature->value, $cryptedBaseSigString)
         ;
 
         return $this->message;

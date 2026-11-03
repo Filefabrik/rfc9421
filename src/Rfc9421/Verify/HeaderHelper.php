@@ -9,6 +9,7 @@ use Psr\Http\Message\MessageInterface;
 
 /**
  * fixed methods to extract header lines from Message-Interface
+ * todo maybe header helper should decoupled from Message-Interface
  */
 final readonly class HeaderHelper
 {
@@ -22,12 +23,12 @@ final readonly class HeaderHelper
      */
     public function getSignatureLine(): string
     {
-        return $this->message->getHeaderLine('signature');
+        return $this->message->getHeaderLine(HeaderKeysEnum::signature->value);
     }
 
     public function hasSignatureLine(): bool
     {
-        return $this->message->hasHeader('signature');
+        return $this->message->hasHeader(HeaderKeysEnum::signature->value);
     }
 
     /**
@@ -36,12 +37,12 @@ final readonly class HeaderHelper
      */
     public function getSignatureInputLine(): string
     {
-        return $this->message->getHeaderLine('signature-input');
+        return $this->message->getHeaderLine(HeaderKeysEnum::signature_input->value);
     }
 
     public function hasSignatureInputLine(): bool
     {
-        return $this->message->hasHeader('signature-input');
+        return $this->message->hasHeader(HeaderKeysEnum::signature_input->value);
     }
 
     public function getContentDigestLine(): string
