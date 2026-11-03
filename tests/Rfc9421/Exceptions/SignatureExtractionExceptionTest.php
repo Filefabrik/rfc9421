@@ -18,7 +18,7 @@ final class SignatureExtractionExceptionTest extends TestCase
     {
         $this->expectExceptionObject(
             new SignatureExtractionException(
-                'Signature is not proceeded. Call before \Filefabrik\Rfc9421\Verify\HeaderSignatureInput::extract',
+                'Signature is not proceeded. Call before Filefabrik\Rfc9421\Verify\HeaderSignatureInput::extract',
             ),
         );
         throw SignatureExtractionException::notProceeded();
