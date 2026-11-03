@@ -54,9 +54,6 @@ final readonly class CompileEntry
         if ($parameters->has(InitialContentsEnum::tr)) {
               return $responseInterface->getTrailers();
           }*/
-        /*
-         * $headerItemsDto = $this->prepareheaderItemsDto($parameters);
-         */
 
         $entry = new FieldValue(
             messageInterface         : $this->messageInterface,

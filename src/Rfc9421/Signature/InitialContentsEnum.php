@@ -81,11 +81,11 @@ enum InitialContentsEnum
             return $key;
         }
 
-        if (($found = self::isOwnTypeOrNull($key)) instanceof self) {
+        if (($found = self::isOwnTypeOrNull((string)$key)) instanceof self) {
             return $found;
         }
 
-        throw EnumTypeException::TypeError($key, self::class);
+        throw EnumTypeException::TypeError($key ?? 'key is null', self::class);
     }
 
     /**

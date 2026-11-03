@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
-use Bakame\Http\StructuredFields\Dictionary;
-use Bakame\Http\StructuredFields\StructuredFieldError;
-use Exception;
-use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
+use Filefabrik\Rfc9421\Bakame\Dictionary;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
@@ -43,11 +40,7 @@ final readonly class Key
     {
         $type = $this->structuredFieldTypes->getOrNull($name);
         if ((null !== $type && '' !== $type)) {
-            try {
-                $dictionary = Dictionary::fromHttpValue($fieldValue);
-            } catch (StructuredFieldError|Exception$e) {
-                throw new StructuredFieldException(...$e);
-            }
+            $dictionary = Dictionary::fromHttpValue(headerValue: $fieldValue);
             if ($dictionary->isNotEmpty() && isset($dictionary[$key])) {
                 return $dictionary[$key]->toHttpValue();
             }

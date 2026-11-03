@@ -43,9 +43,11 @@ final class Base
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
+     * @return \Filefabrik\Rfc9421\Signer\Signatures\WriteLines
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */

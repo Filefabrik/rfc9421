@@ -26,11 +26,15 @@ final class RequestSigner
     }
 
     /**
+     * @return \Psr\Http\Message\RequestInterface
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function sign(): RequestInterface

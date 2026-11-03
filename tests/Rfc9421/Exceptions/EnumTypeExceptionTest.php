@@ -12,6 +12,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(EnumTypeException::class)]
 final class EnumTypeExceptionTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     public function testTypeError(): void
     {
         $this->expectExceptionObject(

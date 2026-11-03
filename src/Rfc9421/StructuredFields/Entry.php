@@ -30,7 +30,7 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  * Makes the line with there values they are in the signature-input
  * todo check logic with req
  * Formats everything except the value
- * something like "testkey";sf: VALUE
+ * something like "test-header";sf: VALUE
  */
 final class Entry
 {

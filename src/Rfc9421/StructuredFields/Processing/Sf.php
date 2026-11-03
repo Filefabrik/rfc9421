@@ -29,9 +29,7 @@ final readonly class Sf
     }
 
     /**
-     * @param \Filefabrik\Rfc9421\StructuredFields\Entry $entry
      *
-     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -44,9 +42,7 @@ final readonly class Sf
     }
 
     /**
-     * @param \Filefabrik\Rfc9421\StructuredFields\Entry $entry
      *
-     * @return string
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -73,7 +69,6 @@ final readonly class Sf
         /*
          * Working with Bakame Structured Fields
          */
-
         return array_any(
             [OuterList::class, InnerList::class, Parameters::class, Dictionary::class, Item::class],
             fn (string $className): bool => $field instanceof $className,

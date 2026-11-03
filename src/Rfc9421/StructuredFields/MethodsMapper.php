@@ -70,7 +70,7 @@ final class MethodsMapper
     /**
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
-     * @return mixed Mixed because of unknown of the given method/method-return
+     * @return OuterList::class|InnerList::class| Parameters::class|Dictionary::class|Item::class|string|null Mixed because of unknown of the given method/method-return
      */
     public function callMethod(string $methodName, array $params = []): mixed
     {

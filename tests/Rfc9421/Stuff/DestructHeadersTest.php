@@ -8,6 +8,7 @@ use Bakame\Http\StructuredFields\Item;
 use Exception;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
@@ -20,9 +21,9 @@ use PHPUnit\Framework\TestCase;
 final class DestructHeadersTest extends TestCase
 {
     /**
-
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
@@ -116,7 +117,6 @@ final class DestructHeadersTest extends TestCase
     }
 
     /**
-
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
@@ -161,9 +161,9 @@ final class DestructHeadersTest extends TestCase
     }
 
     /**
-
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
@@ -184,6 +184,63 @@ final class DestructHeadersTest extends TestCase
                 * @see https://www.rfc-editor.org/info/rfc9421/#name-strict-serialization-of-htt
                 */
                 'Example-Dict' => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
+            ],
+        );
+
+        $config = new SigningConfiguration();
+        $config->getStructuredFields()
+               ->add('example-dict', 'dictionary')
+        ;
+        /**
+         * Use $request->withAddedHeader() method to provide an additional header with same name as an existing header.
+         */
+        $request = $request->withHeader('Example-Header', 'value, with, lots');
+        $request = $request->withAddedHeader('Example-Header', 'of, commas');
+        $request = $request->withHeader('If-None-Match', 'W/"abcdef", "ghijkl", *');
+
+        $signingParts = [
+            '"example-dict";key="b"',
+            '"example-dict";key="b"',
+
+        ];
+
+        $signatureParamsLine = '('.implode(' ', $signingParts).')';
+
+        $destructHeaders = new DestructHeaders(
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
+            signatureParamsLine : $signatureParamsLine,
+            message             : $request,
+            originalRequest     : $request,
+            signingConfiguration: $config,
+        );
+
+        $destructHeaders->start();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
+    public function testThrows(): void
+    {
+        $this->expectExceptionObject(
+            new StructuredFieldException('The HTTP textual representation is missing an excepted comma.'),
+        );
+        $date    = gmdate('D, d M Y H:i:s T');
+        $request = new Request(
+            'GET',
+            'https://api.example.com/resource?bat&baz=3',
+            [
+                'Host'         => 'api.example.com',
+                'Date'         => $date,
+                'x-test'       => '',
+                /*
+                * @see https://www.rfc-editor.org/info/rfc9421/#name-strict-serialization-of-htt
+                */
+                'Example-Dict' => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ###;;afds',
             ],
         );
 

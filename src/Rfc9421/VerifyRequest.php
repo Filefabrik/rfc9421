@@ -33,10 +33,14 @@ final class VerifyRequest
     /**
      * Main method to validate
      *
+     * @return bool
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
@@ -112,6 +116,7 @@ final class VerifyRequest
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */

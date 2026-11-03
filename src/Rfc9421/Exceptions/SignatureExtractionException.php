@@ -8,7 +8,7 @@ final class SignatureExtractionException extends AbstractRfc9421Exception
 {
     public static function notProceeded(): self
     {
-        /** @noinspection PhpFullyQualifiedNameUsageInspection */
+        /* @noinspection PhpFullyQualifiedNameUsageInspection */
         return new self(
             sprintf(
                 'Signature is not proceeded. Call before %s::extract',
