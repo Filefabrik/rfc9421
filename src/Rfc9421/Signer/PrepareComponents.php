@@ -23,40 +23,9 @@ use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
 
 /**
- * todo make an mechanism for decoding the incoming request
- * Specific Request Headers has to be prepared
+ * Specific Request|Response Headers has to be prepared
  */
-/*
- * foreach ($componentNames as $name) {
-      $components[$name] = match ($name) {
-        // 2.2.1. Note that the method name is case-sensitive as per HTTP,
-        // Section 9.1. While conventionally standardized names are uppercase,
-        // no transformation to the input method value's case is performed.
-        '@method' => '',
-        // The URL should be considered case-sensitive due to operating system
-        // issues and query string percent-encoded octets.
-        '@target-uri' => $fullSchemeHostPathQueryString,
-        // Normalized to lowercase and the default port is omitted. This could
-        // also be in X-Original-Host rather than Host header for verification.
-        '@authority' => strtolower($host),
-        // The scheme MUST be normalized to lowercase.
-        '@scheme' => strtolower($scheme),
-        // The request target is path AND the query string, if provided.
-        '@request-target' => $requestTarget,
-        // The path is only the path, and not the query string.
-        '@path' => $path,
-        // The raw query string or empty. The simplest thing. Use this
-        // instead of @query-param, please.
-        '@query' => $queryString,
-        // Section 2.2.8, the dumbest signature component that nobody should
-        // fucking use ever. Please don’t do this. It is too annoying to
-        // even think about.
-        '@query-param' => $parsedAndEncodedQueryParameters,
-        // Default is an HTTP field name.
-        default => $headerValueCorrespondingToHeaderName,
-        }
-      };
- */
+
 /**
  * todo closure processing
  */
@@ -202,16 +171,16 @@ final class PrepareComponents
             ->add(
                 key    : 'content-length',
                 closure: fn (RequestInterface|ResponseInterface $message): Entry => new Entry(
-                    'content-length',
-                    strlen((string)$message->getBody()),
+                    key  : 'content-length',
+                    value: strlen((string)$message->getBody()),
                 ),
             )
             /*
              * @see 2.3. Signature Parameters @Important after Processing all other components
              */
             ->add(
-                DerivedComponentEnum::signatureParams,
-                fn () => throw new UnexpectedValueException(
+                key    : DerivedComponentEnum::signatureParams,
+                closure: fn () => throw new UnexpectedValueException(
                     'remove before processing signatureParams',
                 ),
             )
