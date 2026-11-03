@@ -46,7 +46,7 @@ final readonly class CompileEntry
     {
         $parameters = $this->extractParameters($this->componentItemDto->getItem());
 
-        // todo check parameters duplicated is allowed or not
+        // todo check parameters duplicated is allowed or not in RFC
         // throws
         //  $this->checkParametersConflict($parameters);
         /*
@@ -94,7 +94,7 @@ final readonly class CompileEntry
         }
 
         /*
-         * todo req
+         * todo ;req only during response signing a request part
          */
 
         return $entry;
