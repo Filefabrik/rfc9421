@@ -191,8 +191,9 @@ final class BaseTest extends TestCase
             ['"@authority"', '"@authority": game'],
         ];
         foreach ($expectations as $cnt => $item) {
-            self::assertSame($item[0], $arr[$cnt]->signatureComponent);
-            self::assertSame($item[1], $arr[$cnt]->valueToSign);
+            $line = $arr[$cnt];
+            self::assertSame($item[0], $line->signatureComponent);
+            self::assertSame($item[1], $line->valueToSign);
         }
     }
 
