@@ -37,6 +37,9 @@ you like to take a look at the code in advance? If so, please open a ticket.
 PHP Error Messages(Throwable's)
 * [errors.md](docs/errors.md)
 
+Contribute/Listing for other HTTP Signing Interfaces
+* [Contribute.md](docs/Contribute.md)
+
 ## Getting started
 
 ### Install with composer
