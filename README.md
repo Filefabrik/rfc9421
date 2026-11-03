@@ -25,6 +25,7 @@ PHP RFC9421 HTTP Message Signing and Verify
 ✅ Dependencies for live usage
 
     PSR-7 "psr/http-message"
+    RFC9561 and RFC8941 bakame/http-structured-fields
 
 ## Release
 
