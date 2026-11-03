@@ -268,7 +268,7 @@ final class RequestSignerTest extends TestCase
         $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->sign();
 
-        self::assertCount(1, $signer->getSignedLines()->lines);
+        self::assertCount(1, $signer->getSignedLines()->getLines());
     }
 
     /**

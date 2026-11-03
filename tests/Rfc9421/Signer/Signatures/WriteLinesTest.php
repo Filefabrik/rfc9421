@@ -23,21 +23,21 @@ final class WriteLinesTest extends TestCase
     {
         $sl = new WriteLines();
         $sl->add(new Line('foo', 'bar'));
-        self::assertEquals(new Line('foo', 'bar'), $sl->getLineNumber(0));
+        self::assertEquals(new Line('foo', 'bar'), $sl->getLines()[0]);
     }
 
     public function testAdd(): void
     {
         $sl = new WriteLines();
         $sl->add(new Line('foo', 'bar'));
-        self::assertEquals(new Line('foo', 'bar'), $sl->getLineNumber(0));
+        self::assertEquals(new Line('foo', 'bar'), $sl->getLines()[0]);
     }
 
     public function testAddEntry(): void
     {
         $sl = new WriteLines();
         $sl->addEntry('foo', 'bar');
-        self::assertEquals(new Line('foo', 'bar'), $sl->getLineNumber(0));
+        self::assertEquals(new Line('foo', 'bar'), $sl->getLines()[0]);
     }
 
     public function testKeys(): void

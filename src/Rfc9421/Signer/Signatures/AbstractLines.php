@@ -10,9 +10,9 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 abstract class AbstractLines
 {
     /**
-     * @var \Filefabrik\Rfc9421\Signer\Signatures\Line[]
+     * @var \Filefabrik\Rfc9421\Signer\Signatures\Line[]|array{}
      */
-    private(set) array $lines = [];
+    private array $lines = [];
 
     /**
      * for testing
@@ -27,6 +27,14 @@ abstract class AbstractLines
         }
 
         return $array;
+    }
+
+    /**
+     * @return \Filefabrik\Rfc9421\Signer\Signatures\Line[]|array{}
+     */
+    public function getLines(): array
+    {
+        return $this->lines;
     }
 
     /**

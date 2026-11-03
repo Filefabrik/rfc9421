@@ -69,13 +69,13 @@ final class BaseTest extends TestCase
         $lines = $i->createSignatureLines();
         self::assertEquals(
             new Line('"not-existing"', '"not-existing": hm'),
-            $lines->getLineNumber(0),
+            $lines->getLines()[0],
         );
         self::assertEquals(
             new Line('"@method"', '"@method": POST'),
-            $lines->getLineNumber(1),
+            $lines->getLines()[1],
         );
-        self::assertEquals('content-digest', $lines->getLineNumber(2)->signatureComponent);
+        self::assertEquals('content-digest', $lines->getLines()[2]->signatureComponent);
     }
 
     /**
@@ -184,7 +184,7 @@ final class BaseTest extends TestCase
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 
-        $arr          = $i->createSignatureLines()->lines;
+        $arr          = $i->createSignatureLines()->getLines();
         $expectations = [
             ['"not-existing"', '"not-existing": hm'],
             ['"@method"', '"@method": POST'],
