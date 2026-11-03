@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-use Bakame\Http\StructuredFields\StructuredFieldError;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
+use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Exceptions\MethodException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
@@ -177,7 +179,7 @@ $request = new Request(
 $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AlreadySetException|SignatureException|ContentDigestException|StructuredFieldError|UnProcessableSignatureException|SignatureExtractionException|EnumTypeException $e) {
+} catch (AlreadySetException|SignatureException|ContentDigestException|InvalidHeaderKeyException|StructuredFieldException|MethodException|UnProcessableSignatureException|SignatureExtractionException|EnumTypeException $e) {
     echo $e->getMessage();
 
     return;
@@ -318,7 +320,7 @@ if (null !== $keyId) {
     $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
     try {
         $signedResponse = $responseSigner->sign();
-    } catch (AbstractRfc9421Exception|StructuredFieldError $e) {
+    } catch (AbstractRfc9421Exception $e) {
         echo 'response signing error: '.$e->getMessage();
 
         return;

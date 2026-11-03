@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Bakame\Http\StructuredFields\StructuredFieldError;
 use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
@@ -38,8 +37,13 @@ $currentDateTime = new DateTime()->getTimestamp();
 $fromGlobals = Request::createFromGlobals();
 
 $psr17Factory   = new Psr17Factory();
-$psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
-$psr7Request    = $psrHttpFactory->createRequest($fromGlobals);
+$psrHttpFactory = new PsrHttpFactory(
+    serverRequestFactory: $psr17Factory,
+    streamFactory       : $psr17Factory,
+    uploadedFileFactory : $psr17Factory,
+    responseFactory     : $psr17Factory,
+);
+$psr7Request    = $psrHttpFactory->createRequest(symfonyRequest: $fromGlobals);
 
 $prepareMethods        = [
     '@authority' => fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
@@ -112,7 +116,7 @@ if (null !== $keyId) {
     $verifier = new VerifyRequest($verifyPrepareInstance);
     try {
         $res = $verifier->verifying();
-    } catch (AbstractRfc9421Exception|StructuredFieldError  $e) {
+    } catch (AbstractRfc9421Exception  $e) {
         displayLogger('Verify the Signed Request Error: '.$e->getMessage());
 
         return;
