@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use Bakame\Http\StructuredFields\StructuredFieldError;
 use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
+use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyPrepare;
@@ -51,8 +54,8 @@ $verifyPrepareInstance = new VerifyPrepare(message: $psr7Request, signingConfigu
  */
 try {
     $verifyPrepareInstance->prepareVerification();
-} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException $e) {
-    echo $e->getMessage();
+} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException|AlreadySetException|SignatureExtractionException $e) {
+    displayLogger('Prepare Verification Error '.$e->getMessage());
 
     return;
 }
@@ -81,7 +84,7 @@ if (null !== $keyId) {
                                     ->getBody()
         ;
     } catch (GuzzleException $e) {
-        echo $e->getMessage();
+        displayLogger('Getting Certificate from Bob Error: '.$e->getMessage());
 
         return;
     }
@@ -109,12 +112,11 @@ if (null !== $keyId) {
     $verifier = new VerifyRequest($verifyPrepareInstance);
     try {
         $res = $verifier->verifying();
-    } catch (AbstractRfc9421Exception $e) {
-        displayLogger('result false: '.$e->getMessage());
+    } catch (AbstractRfc9421Exception|StructuredFieldError  $e) {
+        displayLogger('Verify the Signed Request Error: '.$e->getMessage());
 
         return;
     }
-
     displayLogger('During the verify process there was no exception thrown.');
 
     displayLogger('The Verify process has endet with the result: '.($res ? 'true' : 'false'));

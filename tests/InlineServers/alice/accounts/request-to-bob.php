@@ -16,6 +16,7 @@ use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
@@ -37,7 +38,6 @@ $currentDateTime = new DateTime()->getTimestamp();
 
 try {
     $signingConfiguration = new SigningConfiguration()
-
         /*
          * the method we are generating the content-type value (simply via header line)
          */
@@ -65,8 +65,8 @@ try {
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
 } catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException $e) {
-    echo $e->getMessage();
 
+    displayLogger('signing configuration error: '.$e->getMessage());
     return;
 }
 displayLogger('The Signing configuration is without errors.');
@@ -95,7 +95,7 @@ $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'some tex
 try {
     $bodyJson = json_encode($bodyParams, JSON_THROW_ON_ERROR);
 } catch (JsonException $jsonException) {
-    echo $jsonException->getMessage();
+    displayLogger('json encode error: '.$jsonException->getMessage());
 
     return;
 }
@@ -116,13 +116,21 @@ $signer = new RequestSigner(message: $psrRequest, signingConfiguration: $signing
 try {
     $signedRequest = $signer->sign();
 } catch (AlreadySetException|SignatureException|ContentDigestException|StructuredFieldError|EnumTypeException|UnProcessableSignatureException|SignatureExtractionException  $e) {
-    echo $e->getMessage();
+    displayLogger('The Signing Process has Errors:');
+    displayLogger($e->getMessage());
 
     return;
 }
 displayLogger('During request signing at Alice Server there was no exception thrown.');
 displayLogger('Now, send the Request to Bob', 2);
-$bobsResponse = new Client()->send($signedRequest);
+try {
+    $bobsResponse = new Client()->send($signedRequest);
+} catch (GuzzleException $e) {
+    displayLogger('There was a problem with sending the Request to Bob.');
+    displayLogger($e->getMessage());
+
+    return;
+}
 displayLogger('Response is back from Bob to Alice Server. Shows the Response-Body from Bob.', 2);
 
 echo $bobsResponse->getBody();
