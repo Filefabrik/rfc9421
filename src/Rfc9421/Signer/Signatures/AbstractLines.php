@@ -14,7 +14,7 @@ abstract class AbstractLines
     /**
      * for testing
      *
-     * @return array<string,string|int>|array{}
+     * @return array<string,string>|array{}
      */
     public function toKeyValueArray(): array
     {
@@ -54,9 +54,9 @@ abstract class AbstractLines
         return $array;
     }
 
-    protected function protectedAddEntry(string $key, string|int $value): static
+    protected function protectedAddEntry(string $key, string $value): static
     {
-        return $this->protectedAdd(new Line($key, $value));
+        return $this->protectedAdd(signatureLine: new Line(signatureComponent: $key, valueToSign: $value));
     }
 
     protected function protectedAdd(Line $signatureLine): static

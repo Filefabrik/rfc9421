@@ -11,9 +11,9 @@ final readonly class Line
 {
     /**
      * @param string $signatureComponent the component name "@method"
-     * @param string|int $valueToSign the extracted value representation "@method": POST
+     * @param string $valueToSign the extracted value representation "@method": POST
      */
-    public function __construct(private(set) string $signatureComponent, private(set) string|int $valueToSign)
+    public function __construct(private(set) string $signatureComponent, private(set) string $valueToSign)
     {
     }
 

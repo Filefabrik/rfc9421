@@ -10,7 +10,7 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 final class ReadLines extends AbstractLines
 {
     /**
-     * @param array<string,string|int>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
+     * @param array<string,string>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
      */
     public function __construct(array|WriteLines $lines)
     {
@@ -18,7 +18,7 @@ final class ReadLines extends AbstractLines
     }
 
     /**
-     * @param array<string,string|int>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
+     * @param array<string,string>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
      */
     private function setup(array|WriteLines $lines): void
     {
