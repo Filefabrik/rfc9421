@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Verify;
 
+use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Signer\SignBody;
-use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 
 /**
  * Validate the content-digest against tempering

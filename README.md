@@ -290,7 +290,7 @@ That makes sure, the body was never tempered.
 
 ```php
 <?php 
-use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
+use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha512);
 ?>

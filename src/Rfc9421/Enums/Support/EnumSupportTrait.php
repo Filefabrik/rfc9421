@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Support;
+namespace Filefabrik\Rfc9421\Enums\Support;
 
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 

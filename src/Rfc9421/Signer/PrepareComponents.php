@@ -7,16 +7,13 @@ namespace Filefabrik\Rfc9421\Signer;
 use Closure;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Support\DefaultPrepareComponentMethodsTrait;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Specific Request|Response Headers has to be prepared
- */
-
-/**
- * todo closure processing
  */
 final class PrepareComponents
 {

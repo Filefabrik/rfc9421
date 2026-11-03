@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421Test\Support;
+namespace Filefabrik\Rfc9421Test\Enums;
 
+use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
