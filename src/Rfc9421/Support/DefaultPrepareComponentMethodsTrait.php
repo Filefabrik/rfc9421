@@ -40,10 +40,6 @@ trait DefaultPrepareComponentMethodsTrait
                 key  : DerivedComponentEnum::method->value,
                 value: strtoupper($messageInterface->getMethod()),
             ),
-            DerivedComponentEnum::method->value        => fn (RequestInterface $messageInterface): Entry => new Entry(
-                key  : DerivedComponentEnum::method->value,
-                value: strtoupper($messageInterface->getMethod()),
-            ),
             DerivedComponentEnum::targetUri->value     => fn (RequestInterface $messageInterface): Entry => new Entry(
                 key  : DerivedComponentEnum::targetUri->value,
                 value: MessageTargetUri::handle($messageInterface),
