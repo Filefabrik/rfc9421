@@ -32,6 +32,11 @@ PHP RFC9421 HTTP Message Signing and Verify
 The package is still on the developer instance while the final touches are being made before its first release. Would
 you like to take a look at the code in advance? If so, please open a ticket.
 
+## Documentation Details
+
+PHP Error Messages(Throwable's)
+* [errors.md](docs/errors.md)
+
 ## Getting started
 
 ### Install with composer

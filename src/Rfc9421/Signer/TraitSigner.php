@@ -92,7 +92,7 @@ trait TraitSigner
         // setting the last header before we are signing the "SignatureSigns"
         $this->signatureBase = $base->makeSignatureInput();
 
-        // now set the signature-params ONLY into the signature-base line.
+        // now set the signature-params ONLY into the signature-base line NOT into the HTTP-Header.
         $this->signingLines->add(
             new Line(
                 signatureComponent: DerivedComponentEnum::signatureParams->value,
