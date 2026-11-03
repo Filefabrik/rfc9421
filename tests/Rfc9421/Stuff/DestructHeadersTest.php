@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 final class DestructHeadersTest extends TestCase
 {
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
@@ -116,7 +116,7 @@ final class DestructHeadersTest extends TestCase
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
@@ -161,7 +161,7 @@ final class DestructHeadersTest extends TestCase
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException

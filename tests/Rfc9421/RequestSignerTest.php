@@ -28,7 +28,6 @@ final class RequestSignerTest extends TestCase
     /**
      * Just a running Test
      *
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -101,8 +100,12 @@ final class RequestSignerTest extends TestCase
 
         self::assertTrue($signedRequest->hasHeader('content-digest'));
 
-        $signingLinesValues = $signer->getSignedLines()->values();
-        $signingLinesKeys   = $signer->getSignedLines()->keys();
+        $signingLinesValues = $signer->getSignedLines()
+                                     ->values()
+        ;
+        $signingLinesKeys   = $signer->getSignedLines()
+                                     ->keys()
+        ;
 
         self::assertContains('"@query-param";name="baz"', $signingLinesKeys);
         self::assertContains('"_baz_": "bat-man"', $signingLinesValues);
@@ -118,7 +121,7 @@ final class RequestSignerTest extends TestCase
 
         self::assertContains('"example-dict";key="d"', $signingLinesKeys);
         self::assertContains('"example-dict";key="d": ?1', $signingLinesValues);
-        /**
+        /*
          * BS Test with two fields
          */
         self::assertContains(
@@ -132,7 +135,6 @@ final class RequestSignerTest extends TestCase
     /**
      * Just a running Test
      *
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -181,7 +183,6 @@ final class RequestSignerTest extends TestCase
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -235,7 +236,6 @@ final class RequestSignerTest extends TestCase
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException

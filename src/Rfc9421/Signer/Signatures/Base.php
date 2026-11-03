@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
-use Exception;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
@@ -44,11 +43,11 @@ final class Base
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws Exception
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function createSignatureLines(): WriteLines
     {
@@ -113,7 +112,6 @@ final class Base
      * Concat the signatureKey with the components part in braces and with the Metadata
      * Signature-Input: sig1=("@method" "@authority" "@path" "content-type" "content-length");created=1618884475;keyid="test-key"
      *
-     * @throws Exception
      */
     public function makeSignatureInput(): string
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
-use Exception;
 use Filefabrik\Rfc9421\Signature\SigningComponents;
 
 /**
@@ -23,7 +22,6 @@ final readonly class SigCompilerHelper
     /**
      *
      *
-     * @throws Exception
      * @return string sig1=("@method";req "@authority" "@path" "content-type" "content-length");
      */
     public function makeSig1fromSignatureParams(): string
@@ -33,7 +31,6 @@ final readonly class SigCompilerHelper
 
     /**
      *
-     * @throws Exception
      * @return string sig1=("@method" "@authority";req "@path" "content-type" "content-length")
      * @todo during concat with Metadata to signature-params don't forget the trailing semicolon
      */
@@ -57,7 +54,6 @@ final readonly class SigCompilerHelper
     /**
      * todo that is wrong, must use the component-parser
      *
-     * @throws Exception
      */
     public static function compileFromArrayComponent(SigningComponents $components): string
     {

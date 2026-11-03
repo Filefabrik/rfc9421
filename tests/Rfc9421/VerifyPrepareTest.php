@@ -56,7 +56,6 @@ final class VerifyPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws JsonException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
@@ -131,7 +130,6 @@ final class VerifyPrepareTest extends TestCase
 
     /**
      *
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -279,7 +277,6 @@ final class VerifyPrepareTest extends TestCase
     /**
      * todo not nice enough test
      *
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException

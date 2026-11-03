@@ -9,7 +9,6 @@ use Bakame\Http\StructuredFields\InnerList;
 use Bakame\Http\StructuredFields\Item;
 use Bakame\Http\StructuredFields\OuterList;
 use Bakame\Http\StructuredFields\Parameters;
-use Exception;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
@@ -30,7 +29,11 @@ final readonly class Sf
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @param \Filefabrik\Rfc9421\StructuredFields\Entry $entry
+     *
+     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function handle(Entry $entry): Entry
@@ -41,9 +44,12 @@ final readonly class Sf
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @param \Filefabrik\Rfc9421\StructuredFields\Entry $entry
+     *
+     * @return string
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws Exception
      */
     private function processValue(Entry $entry): string
     {

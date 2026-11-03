@@ -6,8 +6,10 @@ namespace Filefabrik\Rfc9421\Stuff;
 
 use Bakame\Http\StructuredFields\Dictionary;
 use Bakame\Http\StructuredFields\InnerList;
+use Bakame\Http\StructuredFields\StructuredFieldError;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
@@ -39,11 +41,10 @@ final readonly class DestructHeaders
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @return array<string> all lines they are proceeded
      */
     public function start(): array
@@ -82,15 +83,19 @@ final readonly class DestructHeaders
     }
 
     /**
-     * @throws \Bakame\Http\StructuredFields\StructuredFieldError
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
     private function parseStructuredDict(string $headerValue): Dictionary|InnerList
     {
         $trimmedHeaderValue = trim($headerValue);
 
-        return str_starts_with($trimmedHeaderValue, '(') && str_ends_with($trimmedHeaderValue, ')') ?
-            InnerList::fromHttpValue($headerValue) :
-            Dictionary::fromHttpValue($headerValue);
+        try {
+            return str_starts_with($trimmedHeaderValue, '(') && str_ends_with($trimmedHeaderValue, ')') ?
+                InnerList::fromHttpValue($headerValue) :
+                Dictionary::fromHttpValue($headerValue);
+        } catch (StructuredFieldError $e) {
+            throw new StructuredFieldException(...$e);
+        }
     }
 
 }
