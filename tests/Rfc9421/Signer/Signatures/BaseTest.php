@@ -184,18 +184,16 @@ final class BaseTest extends TestCase
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 
-        $arr = $i->createSignatureLines()
-                 ->toArray()
-        ;
-
-        self::assertEquals(
-            [
-                ['"not-existing"', '"not-existing": hm'],
-                ['"@method"', '"@method": POST'],
-                ['"@authority"', '"@authority": game'],
-            ],
-            $arr,
-        );
+        $arr          = $i->createSignatureLines()->lines;
+        $expectations = [
+            ['"not-existing"', '"not-existing": hm'],
+            ['"@method"', '"@method": POST'],
+            ['"@authority"', '"@authority": game'],
+        ];
+        foreach ($expectations as $cnt => $item) {
+            self::assertSame($item[0], $arr[$cnt]->signatureComponent);
+            self::assertSame($item[1], $arr[$cnt]->valueToSign);
+        }
     }
 
 }

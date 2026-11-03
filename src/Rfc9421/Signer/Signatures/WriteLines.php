@@ -21,20 +21,6 @@ final class WriteLines extends AbstractLines
         return $this->protectedAdd($signatureLine);
     }
 
-    /**
-     * @return list<array{string,string|int}>
-     * @deprecated make array key value paired
-     */
-    public function toArray(): array
-    {
-        $array = [];
-        foreach ($this->lines as $line) {
-            $array[] = [$line->signatureComponent, $line->valueToSign];
-        }
-
-        return $array;
-    }
-
     public function getLineNumber(int $lineNumber): Line
     {
         return $this->lines[$lineNumber] ?? throw new UnexpectedValueException(
