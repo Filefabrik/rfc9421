@@ -4,16 +4,7 @@ declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
-use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
-use Filefabrik\Rfc9421\Exceptions\MethodException;
-use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
-use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
-use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
-use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
@@ -133,7 +124,7 @@ try {
     $signingConfiguration->getStructuredFields()
                          ->addMany($extraParser)
     ;
-} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException$e) {
+} catch (AbstractRfc9421Exception$e) {
     echo $e->getMessage();
 
     return;
@@ -179,7 +170,7 @@ $request = new Request(
 $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AlreadySetException|SignatureException|ContentDigestException|InvalidHeaderKeyException|StructuredFieldException|MethodException|UnProcessableSignatureException|SignatureExtractionException|EnumTypeException $e) {
+} catch (AbstractRfc9421Exception $e) {
     echo $e->getMessage();
 
     return;
@@ -205,7 +196,7 @@ $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguratio
  */
 try {
     $verifyPrepareInstance->prepareVerification();
-} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException|AlreadySetException|SignatureExtractionException $e) {
+} catch (AbstractRfc9421Exception $e) {
     echo $e->getMessage();
 
     return;
