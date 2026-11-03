@@ -231,9 +231,9 @@ if (null !== $keyId) {
     /**
      * Verify the generated request from above(receiver-side)
      */
-    $verifier = new VerifyRequest($verifyPrepareInstance);
+    $VerifyRequest = new VerifyRequest($verifyPrepareInstance);
     try {
-        $res = $verifier->verifying();
+        $res = $VerifyRequest->verifying();
     } catch (AbstractRfc9421Exception|StructuredFieldError $e) {
         echo 'result false: '.$e->getMessage();
 
@@ -249,12 +249,12 @@ if (null !== $keyId) {
         /**
          * here are all the headers they were in the singing process from requester and are validated and valued at this point
          */
-        $signedHeaderLines = $verifier->signedHeaderLines;
+        $signedHeaderLines = $VerifyRequest->signedHeaderLines;
 
         /*
          * Also the $metadata are verified
          */
-        $metadata = $verifier->signingConfiguration->metadata;
+        $metadata = $VerifyRequest->signingConfiguration->metadata;
 
         /*
          * or something
@@ -264,10 +264,10 @@ if (null !== $keyId) {
             echo 'created: '.$metadata->created.PHP_EOL;
         }
 
-        if ($verifier->hasValidatedBody) {
+        if ($VerifyRequest->hasValidatedBody) {
             echo 'Cool, body verified'.PHP_EOL;
-            $body = (string)$verifier->getMessage()
-                                     ->getBody()
+            $body = (string)$VerifyRequest->getMessage()
+                                          ->getBody()
             ;
         } else {
             echo 'body was not part of verifying process'.PHP_EOL;
