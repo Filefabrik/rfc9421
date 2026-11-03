@@ -19,7 +19,6 @@ trait SigningHeaderTrait
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function signHeaders(array $headerKeys): self
     {
@@ -38,16 +37,9 @@ trait SigningHeaderTrait
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    public function signHeader(
-        DerivedComponentEnum|string|ComponentItemDto $headerKey,
-    ): self {
-        if ($headerKey instanceof ComponentItemDto) {
-            $setter = $headerKey;
-        } else {
-            $setter = ComponentName::fromString($headerKey);
-            // the setter
-
-        }
+    public function signHeader(DerivedComponentEnum|string|ComponentItemDto $headerKey): self
+    {
+        $setter = $headerKey instanceof ComponentItemDto ? $headerKey : ComponentName::fromString($headerKey);
 
         $this->signatureComponents->set($setter);
 
