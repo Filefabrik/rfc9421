@@ -7,6 +7,7 @@ namespace Filefabrik\Rfc9421\Signer;
 use Exception;
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Cryptography\SigningEnum;
+use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
@@ -51,7 +52,7 @@ trait TraitSigner
     {
         // set up the content digest into rendering if the ContentDigestAlgo exists
         if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
-            $this->signingConfiguration->signatureComponents->addName('content-digest');
+            $this->signingConfiguration->signatureComponents->addName(HeaderKeysEnum::content_digest->value);
         }
 
         $this->prepareSigning();
@@ -78,10 +79,10 @@ trait TraitSigner
      */
     public function prepareSigning(): void
     {
-        $base = new Base($this->message, $this->signingConfiguration);
+        $base = new Base(message: $this->message, configuration: $this->signingConfiguration);
 
         /*
-         * Signing line is an array of Lines with the component representation and the calculated value
+         * Signing line is an array of Lines with the component representation and the calculated values
          */
         $this->signingLines = $base->createSignatureLines();
 

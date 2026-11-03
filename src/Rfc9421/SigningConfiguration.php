@@ -36,11 +36,6 @@ final class SigningConfiguration
     private(set) ?string $signatureKeyName = null;
 
     /**
-     * @var array{int:string}|array{}|null
-     */
-    private(set) array|null $withoutExistingHeaders = null;
-
-    /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      */
     private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;

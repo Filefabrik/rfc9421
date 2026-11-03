@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Verify;
 
+use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Psr\Http\Message\MessageInterface;
 
 /**
@@ -45,12 +46,12 @@ final readonly class HeaderHelper
 
     public function getContentDigestLine(): string
     {
-        return $this->message->getHeaderLine('content-digest');
+        return $this->message->getHeaderLine(HeaderKeysEnum::content_digest->value);
     }
 
     public function hasContentDigestLine(): bool
     {
-        return $this->message->hasHeader('content-digest');
+        return $this->message->hasHeader(HeaderKeysEnum::content_digest->value);
     }
 
 }

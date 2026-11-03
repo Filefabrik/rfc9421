@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
 use Exception;
+use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
@@ -64,7 +65,7 @@ final class Base
          * todo, that is the place where to link into the Structured Fields
          */
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
-            if ('content-digest' === $signatureComponent->fieldName) {
+            if (HeaderKeysEnum::content_digest->value === $signatureComponent->fieldName) {
                 $line = $this->handleSignBody();
             } else {
                 $line = new PrepareLine(
@@ -109,7 +110,7 @@ final class Base
     }
 
     /**
-     * Concat the signatureKey with the components part in braces with the Metadata
+     * Concat the signatureKey with the components part in braces and with the Metadata
      * Signature-Input: sig1=("@method" "@authority" "@path" "content-type" "content-length");created=1618884475;keyid="test-key"
      *
      * @throws Exception

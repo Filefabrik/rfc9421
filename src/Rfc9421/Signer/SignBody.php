@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
+use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Support\DigestAlgorithmsEnum;
 
 /**
@@ -31,7 +32,7 @@ final readonly class SignBody
      */
     public function getContentDigestHeaderArray(): array
     {
-        return ['content-digest', $this->getContentDigest()];
+        return [HeaderKeysEnum::content_digest->value, $this->getContentDigest()];
     }
 
     /**

@@ -231,7 +231,7 @@ if (null !== $keyId) {
     $verifier = new VerifyRequest($verifyPrepareInstance);
     try {
         $res = $verifier->verifying();
-    } catch (AbstractRfc9421Exception $e) {
+    } catch (AbstractRfc9421Exception|StructuredFieldError $e) {
         echo 'result false: '.$e->getMessage();
 
         return;

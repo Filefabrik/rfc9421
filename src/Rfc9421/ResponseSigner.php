@@ -7,6 +7,10 @@ namespace Filefabrik\Rfc9421;
 use Filefabrik\Rfc9421\Signer\TraitSigner;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Only for signing the Response
+ * todo how to handle ;req from the request
+ */
 final class ResponseSigner
 {
     use TraitSigner {

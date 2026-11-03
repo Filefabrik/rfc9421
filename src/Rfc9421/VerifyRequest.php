@@ -50,6 +50,7 @@ final class VerifyRequest
         // Validates the Content digest if needed from signature-line sig1=(content-digest)
         if ($this->signingConfiguration->hasContentDigestHashAlgo()) {
             if (!$this->validateContentDigest()) {
+                // todo logging the error that validate content digest is wrong
                 return false;
             }
 
