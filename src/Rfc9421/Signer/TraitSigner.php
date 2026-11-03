@@ -22,7 +22,7 @@ trait TraitSigner
     /**
      * Data for signing the relevant header data
      */
-    private(set) null|WriteLines $signingLines = null;
+    private null|WriteLines $signingLines = null;
 
     /**
      * @var string|null null throws an error

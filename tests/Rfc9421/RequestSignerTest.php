@@ -60,6 +60,7 @@ final class RequestSignerTest extends TestCase
             ->signHeader('x-Origin-host')
             ->signHeader('"example-dict";sf')
             ->signHeader('"example-dict";key="d"')
+            ->signHeader('"example-header";bs')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
             ->setExpires($currentDateTime + 7200)
@@ -92,13 +93,16 @@ final class RequestSignerTest extends TestCase
             body   : $bodyJson,
         );
 
+        $request       = $request->withAddedHeader('example-header', 'value, with, lots')
+                                 ->withAddedHeader('example-header', 'of, commas')
+        ;
         $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signedRequest = $signer->sign();
 
         self::assertTrue($signedRequest->hasHeader('content-digest'));
 
-        $signingLinesValues = $signer->signingLines->values();
-        $signingLinesKeys   = $signer->signingLines->keys();
+        $signingLinesValues = $signer->getSignedLines()->values();
+        $signingLinesKeys   = $signer->getSignedLines()->keys();
 
         self::assertContains('"@query-param";name="baz"', $signingLinesKeys);
         self::assertContains('"_baz_": "bat-man"', $signingLinesValues);
@@ -114,6 +118,13 @@ final class RequestSignerTest extends TestCase
 
         self::assertContains('"example-dict";key="d"', $signingLinesKeys);
         self::assertContains('"example-dict";key="d": ?1', $signingLinesValues);
+        /**
+         * BS Test with two fields
+         */
+        self::assertContains(
+            '"example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:',
+            $signingLinesValues,
+        );
 
         self::assertContains('"content-type": application/json', $signingLinesValues);
     }
@@ -268,7 +279,11 @@ final class RequestSignerTest extends TestCase
         $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->sign();
 
-        self::assertCount(1, $signer->getSignedLines()->getLines());
+        self::assertCount(
+            1,
+            $signer->getSignedLines()
+                   ->getLines(),
+        );
     }
 
     /**
