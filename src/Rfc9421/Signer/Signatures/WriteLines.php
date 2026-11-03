@@ -18,5 +18,4 @@ final class WriteLines extends AbstractLines
     {
         return $this->protectedAdd($signatureLine);
     }
-
 }
