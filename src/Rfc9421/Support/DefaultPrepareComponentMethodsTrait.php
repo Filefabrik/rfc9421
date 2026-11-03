@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Support;
 
 use Closure;
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Methods\MessageAuthority;
 use Filefabrik\Rfc9421\Methods\MessagePath;
 use Filefabrik\Rfc9421\Methods\MessageQueryParams;
 use Filefabrik\Rfc9421\Methods\MessageScheme;
 use Filefabrik\Rfc9421\Methods\MessageTargetUri;
 use Filefabrik\Rfc9421\Methods\MesssageRequestTarget;
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Psr\Http\Message\MessageInterface;

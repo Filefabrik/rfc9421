@@ -6,8 +6,8 @@ namespace Filefabrik\Rfc9421Test;
 
 use BadMethodCallException;
 use DateTime;
-use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
+use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -53,8 +53,8 @@ final class VerifyPrepareTest extends TestCase
 
     /**
      *
-     * @param string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo
-     * @param string                                              $cert
+     * @param string|\Filefabrik\Rfc9421\Enums\SigningEnum $signingAlgo
+     * @param string                                       $cert
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
@@ -137,8 +137,8 @@ final class VerifyPrepareTest extends TestCase
     /**
      *
      *
-     * @param string|\Filefabrik\Rfc9421\Cryptography\SigningEnum $signingAlgo
-     * @param string                                              $cert
+     * @param string|\Filefabrik\Rfc9421\Enums\SigningEnum $signingAlgo
+     * @param string                                       $cert
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException

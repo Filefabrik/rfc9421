@@ -8,6 +8,7 @@ use Bakame\Http\StructuredFields\Bytes;
 use Bakame\Http\StructuredFields\DisplayString;
 use Bakame\Http\StructuredFields\Token;
 use DateTimeImmutable;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use UnexpectedValueException;
 
 /**

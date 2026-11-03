@@ -7,6 +7,8 @@ namespace Filefabrik\Rfc9421\Signature;
 use Bakame\Http\StructuredFields\Item;
 use Exception;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;

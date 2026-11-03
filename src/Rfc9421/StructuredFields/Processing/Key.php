@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
 use Filefabrik\Rfc9421\Bakame\Dictionary;
-use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;

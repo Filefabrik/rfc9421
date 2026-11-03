@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Support;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Signature\InitialContentsEnum;
 
 trait SigningHeaderTrait
 {

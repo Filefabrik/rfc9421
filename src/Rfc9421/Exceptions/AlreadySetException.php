@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 
 final class AlreadySetException extends AbstractRfc9421Exception
 {

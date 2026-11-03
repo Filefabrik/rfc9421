@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 // Specify the URL and data
 use Bakame\Http\StructuredFields\StructuredFieldError;
-use Filefabrik\Rfc9421\Cryptography\SigningEnum;
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
-use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
-use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Exceptions\SignatureException;
-use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
-use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
+use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, SigningEnum};
+use Filefabrik\Rfc9421\Exceptions\{AlreadySetException,
+    ContentDigestException,
+    EnumTypeException,
+    SignatureException,
+    SignatureExtractionException,
+    UnProcessableSignatureException};
 use Filefabrik\Rfc9421\RequestSigner;
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Client;
@@ -65,8 +64,8 @@ try {
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
 } catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException $e) {
-
     displayLogger('signing configuration error: '.$e->getMessage());
+
     return;
 }
 displayLogger('The Signing configuration is without errors.');

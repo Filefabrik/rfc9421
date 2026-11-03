@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Support;
 
 use Closure;
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 
 /**

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
-use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Cryptography\VerifyRegistry;
+use Filefabrik\Rfc9421\Enums\SigningEnum;
 
 $signings = [
     // php native openssl

@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Cryptography;
+namespace Filefabrik\Rfc9421\Enums;
 
+use Filefabrik\Rfc9421\Cryptography\SigningTrait;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface as SigningEnumInterfaceAlias;
 
 /**

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test;
 
-use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
+use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
@@ -98,7 +98,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $this->expectExceptionObject(
             new EnumTypeException(
-                '"@foo" is not a valid enumeration of "Filefabrik\Rfc9421\Signature\DerivedComponentEnum" Enum.',
+                '"@foo" is not a valid enumeration of "Filefabrik\Rfc9421\Enums\DerivedComponentEnum" Enum.',
             ),
         );
         $i = new SigningConfiguration();
@@ -114,7 +114,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $this->expectExceptionObject(
             new EnumTypeException(
-                '"@bullshit" is not a valid enumeration of "Filefabrik\Rfc9421\Signature\DerivedComponentEnum" Enum.',
+                '"@bullshit" is not a valid enumeration of "Filefabrik\Rfc9421\Enums\DerivedComponentEnum" Enum.',
             ),
         );
         $i = new SigningConfiguration();

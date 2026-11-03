@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Cryptography;
 
 use Closure;
+use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 
 trait SharedRegistryTrait

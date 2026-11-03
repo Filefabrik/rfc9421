@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421Test\Signature;
+namespace Filefabrik\Rfc9421Test\Enums;
 
-use Filefabrik\Rfc9421\Signature\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

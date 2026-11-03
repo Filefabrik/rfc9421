@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
-use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
-use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
+use Filefabrik\Rfc9421\Enums\{DigestAlgorithmsEnum, HeaderKeysEnum};
 
 /**
  * After setting all relevant parameters/body sign the body for header["content-digest"]

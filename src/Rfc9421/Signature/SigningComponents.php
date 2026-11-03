@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Signature;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 
 /**

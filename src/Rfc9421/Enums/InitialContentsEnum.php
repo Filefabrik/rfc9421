@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Signature;
+namespace Filefabrik\Rfc9421\Enums;
 
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 

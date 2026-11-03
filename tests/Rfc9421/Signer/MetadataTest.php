@@ -6,7 +6,7 @@ namespace Filefabrik\Rfc9421Test\Signer;
 
 use BadMethodCallException;
 use DateTime;
-use Filefabrik\Rfc9421\Cryptography\SigningEnum;
+use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

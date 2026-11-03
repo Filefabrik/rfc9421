@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Cryptography;
 
-use Filefabrik\Rfc9421\Cryptography\SigningEnum;
 use Filefabrik\Rfc9421\Cryptography\SigningEnumsRegistry;
+use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 use Filefabrik\Rfc9421Test\Tools\ExtraSigningEnum;
