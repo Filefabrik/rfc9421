@@ -24,6 +24,9 @@ use UnexpectedValueException;
 #[CoversClass(PrepareComponents::class)]
 final class PrepareComponentsTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testSetDefaultDerivedStack(): void
     {
         $arr = [
@@ -38,9 +41,12 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents(new Request('post', 'https://Test.com'));
         $prepareInstance->addMappingValues($arr);
 
-        self::assertSame('PosB', $prepareInstance->processValue('@method'));
+        self::assertSame('PosB', $prepareInstance->processValue('@method')->value);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testSetDerivedMapper(): void
     {
         $arr = [
@@ -51,7 +57,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->addMappingValues($arr);
-        self::assertSame('Post', $prepareInstance->processValue('@method'));
+        self::assertSame('Post', $prepareInstance->processValue('@method')->value);
     }
 
     public function testSetPreparedMethods(): void
@@ -132,13 +138,19 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance->processValue('missing');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessAtMethod(): void
     {
-        $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+        $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $prepareInstance = new PrepareComponents($r, signingConfiguration: new SigningConfiguration());
         self::assertSame('POST', $prepareInstance->processValue('@method')->value);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessAuthority(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -152,6 +164,9 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority')->value);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessScheme(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -166,6 +181,9 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame('http', new PrepareComponents($r)->processValue('@scheme')->value);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessPath(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -202,6 +220,9 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance->processValue('@method_notset');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testSetMappingValues(): void
     {
         $arr = [
@@ -212,7 +233,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->addMappingValues($arr);
-        self::assertSame('Post', $prepareInstance->processValue('@methodsss'));
+        self::assertSame('Post', $prepareInstance->processValue('@methodsss')->value);
     }
 
     /**
@@ -242,7 +263,7 @@ final class PrepareComponentsTest extends TestCase
 
         $r = new Request('post', 'https://Test.com');
 
-        $prepareInstance = new PrepareComponents(message: $r,preparedMethods: new PreparedMethods());
+        $prepareInstance = new PrepareComponents(message: $r, preparedMethods: new PreparedMethods());
         $prepareInstance->preparedMethods->add(
             'testing',
             fn ($method) => throw new UnexpectedValueException('is a bug'),

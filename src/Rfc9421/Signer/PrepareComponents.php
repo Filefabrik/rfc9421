@@ -12,8 +12,6 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Signer;
 
 use Closure;
-use Exception;
-use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\DefaultPrepareComponentMethodsTrait;
@@ -83,19 +81,11 @@ final class PrepareComponents
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
-    public function processValue(string $key): int|string|Entry
+    public function processValue(string $key): Entry
     {
-        $closureMethod = $this->getMethodStack()
-                              ->getMethod($key)
+        return $this->getMethodStack()
+                    ->callWith($key, [$this->message])
         ;
-
-        try {
-            $result = $closureMethod($this->message);
-        } catch (Exception $exception) {
-            throw PrepareMethodsException::errorFromCalling($key, $exception);
-        }
-
-        return $result;
     }
 
 }
