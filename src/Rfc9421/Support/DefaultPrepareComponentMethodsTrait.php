@@ -116,7 +116,7 @@ trait DefaultPrepareComponentMethodsTrait
              * @see 2.3. Signature Parameters @Important after Processing all other components
              */
             DerivedComponentEnum::signatureParams->value =>
-                fn () => throw new UnexpectedValueException(
+                fn (): never => throw new UnexpectedValueException(
                     'remove before processing signatureParams',
                 ),
 

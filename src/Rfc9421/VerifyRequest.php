@@ -20,7 +20,13 @@ final class VerifyRequest
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
     private(set) null|ReadLines $signedHeaderLines = null;
+
+    /**
+     * Flag if the body was part of the requester signing and the body has not tampered
+     *
+     */
     private(set) bool $hasValidatedBody = false;
+
     private ?SigningConfiguration $signingConfiguration = null;
 
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
