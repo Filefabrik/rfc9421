@@ -42,11 +42,13 @@ final readonly class CompileEntry
 
     /**
      *
+     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      */
     public function handle(): Entry
     {
