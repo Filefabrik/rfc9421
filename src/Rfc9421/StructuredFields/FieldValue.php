@@ -36,8 +36,10 @@ final readonly class FieldValue
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     public function getFieldValue(): Entry
     {
@@ -51,8 +53,9 @@ final readonly class FieldValue
     }
 
     /**
+     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     private function handleRequestInterface(): Entry
     {
