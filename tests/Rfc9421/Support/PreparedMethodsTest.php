@@ -11,14 +11,15 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Support;
 
 use Closure;
+use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use GuzzleHttp\Psr7\Request;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
 use TypeError;
-use UnexpectedValueException;
 
 #[CoversClass(PreparedMethods::class)]
 final class PreparedMethodsTest extends TestCase
@@ -35,9 +36,12 @@ final class PreparedMethodsTest extends TestCase
         self::assertInstanceOf(Closure::class, $i->getMethod('poster'));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testGetMethodThrow(): void
     {
-        $this->expectExceptionObject(new UnexpectedValueException('Method "poster2" not registered.'));
+        $this->expectExceptionObject(new PrepareMethodsException('Method "poster2" not registered.'));
         $i = new PreparedMethods();
         $i->adds(
             [
@@ -46,9 +50,21 @@ final class PreparedMethodsTest extends TestCase
             ],
         );
 
-        self::assertFalse($i->getMethod('poster2'));
+        $i->getMethod('poster2');
     }
+    public function testCallWithThrowMessag(): void
+    {
+        $this->expectExceptionObject(new PrepareMethodsException('Error during calling the method with key: "texst": something buggy inside'));
+        $i = new PreparedMethods();
+        $i->adds(
+            [
+                'texst'  => fn (): string => throw new InvalidArgumentException('something buggy inside'),
+                'poster' => fn (MessageInterface $message): string => $message->getMethod(),
+            ],
+        );
 
+        $i->callWith('texst',[]);
+    }
     public function testAdds(): void
     {
         $arr = [

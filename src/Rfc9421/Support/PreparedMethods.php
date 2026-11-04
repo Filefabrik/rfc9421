@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -11,9 +12,10 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Support;
 
 use Closure;
+use Exception;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
+use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
-use UnexpectedValueException;
 
 /**
  * Stack which is configurable for each request/response to process the Derived Components or regular headers they are non-normative
@@ -60,12 +62,20 @@ final class PreparedMethods
      *
      * @param array<int,mixed> $params
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     public function callWith(string|DerivedComponentEnum $key, array $params = []): Entry
     {
-        $nKey   = $this->normalizeKey($key);
-        $result = $this->getMethod($nKey)(...$params);
+        $nKey = $this->normalizeKey($key);
+        // todo cover error exception
+        $closureMethod = $this->getMethod($nKey);
 
+        try {
+            $result = $closureMethod(...$params);
+        } catch (Exception$exception) {
+            // binding throwable
+            throw PrepareMethodsException::errorFromCalling($nKey, $exception);
+        }
         if (!$result instanceof Entry) {
             return new Entry($nKey, $result);
         }
@@ -73,11 +83,14 @@ final class PreparedMethods
         return $result;
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function getMethod(string|DerivedComponentEnum $key): Closure
     {
         $key = $this->normalizeKey($key);
 
-        return $this->methods[$key] ?? throw new UnexpectedValueException(sprintf('Method "%s" not registered.', $key));
+        return $this->methods[$key] ?? throw PrepareMethodsException::methodNotRegistered($key);
     }
 
     public function hasMethod(string|DerivedComponentEnum $key): bool

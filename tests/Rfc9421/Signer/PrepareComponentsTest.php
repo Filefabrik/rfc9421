@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -10,9 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Signer;
 
-use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
-use Filefabrik\Rfc9421\Exceptions\InvalidDerivedKeyException;
-use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
@@ -67,8 +66,7 @@ final class PrepareComponentsTest extends TestCase
      * Overall Method to check the System
      *
      *
-     * @throws AlreadySetException
-     * @throws InvalidDerivedKeyException|InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     public function testProcessValue(): void
     {
@@ -121,9 +119,12 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame('https://test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri')->value);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessingThrow(): void
     {
-        $this->expectExceptionObject(new UnexpectedValueException('Method "missing" not registered.'));
+        $this->expectExceptionObject(new PrepareMethodsException('Method "missing" not registered.'));
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
 
         $prepareInstance = new PrepareComponents($r);
@@ -133,7 +134,7 @@ final class PrepareComponentsTest extends TestCase
 
     public function testProcessAtMethod(): void
     {
-        $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
+        $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $prepareInstance = new PrepareComponents($r, signingConfiguration: new SigningConfiguration());
         self::assertSame('POST', $prepareInstance->processValue('@method')->value);
     }
@@ -187,10 +188,13 @@ final class PrepareComponentsTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessValueNotCallable(): void
     {
         $this->expectExceptionObject(
-            new UnexpectedValueException('Method "@method_notset" not registered.'),
+            new PrepareMethodsException('Method "@method_notset" not registered.'),
         );
         $r = new Request('post', 'https://Test.com');
 
@@ -211,6 +215,9 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame('Post', $prepareInstance->processValue('@methodsss'));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessContentLength(): void
     {
         $r = new Request(
@@ -222,6 +229,25 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents($r);
 
         self::assertSame(62, $prepareInstance->processValue('content-length')->value);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
+    public function testPrepareMethodsException(): void
+    {
+        $this->expectExceptionObject(
+            new PrepareMethodsException('Error during calling the method with key: "testing": is a bug'),
+        );
+
+        $r = new Request('post', 'https://Test.com');
+
+        $prepareInstance = new PrepareComponents(message: $r,preparedMethods: new PreparedMethods());
+        $prepareInstance->preparedMethods->add(
+            'testing',
+            fn ($method) => throw new UnexpectedValueException('is a bug'),
+        );
+        $prepareInstance->processValue('testing');
     }
 
 }
