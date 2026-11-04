@@ -3,7 +3,7 @@
 # e-mail: rt@filefabrik.com
 # mastodon: filefabrik@phpc.social
 # License: proprietary
-# todo insert correct copyright
+# State: under development
 #
 
 openssl genrsa -out ../Keys/rsa-private.pem 4096

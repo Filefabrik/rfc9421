@@ -3,7 +3,7 @@
 # e-mail: rt@filefabrik.com
 # mastodon: filefabrik@phpc.social
 # License: proprietary
-# todo insert correct copyright
+# State: under development
 #
 
 # https://mojoauth.com/security-guides/generate-keypair-using-ed25519-with-shell#how-to-generate-an-ed25519-ssh-key-with-ssh-keygen

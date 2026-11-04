@@ -4,7 +4,7 @@
  * e-mail: rt@filefabrik.com
  * mastodon: filefabrik@phpc.social
  * License: proprietary
- * todo insert correct copyright
+ * State: under development
  */
 
 $standaloneDir = dirname(__DIR__).'/vendor/autoload.php';

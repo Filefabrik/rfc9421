@@ -3,7 +3,7 @@
 # e-mail: rt@filefabrik.com
 # mastodon: filefabrik@phpc.social
 # License: proprietary
-# todo insert correct copyright
+# State: under development
 #
 
 openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out ../Keys/ecdsaP256-private.pem
