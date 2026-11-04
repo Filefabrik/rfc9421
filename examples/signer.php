@@ -289,7 +289,6 @@ if ($VerifyRequest->hasValidatedBody) {
 // after processing give back a signed response, that the sender can be sure the response is valid
 
 $responseBodyJson = JsonToString::toString(['account' => 'Alex', 'new-amount' => 1290.09, 'currency' => 'EUR']);
-$contentLength    = ['content-length' => (string)strlen($responseBodyJson)];
 $response         = new Response(headers: [], body: $responseBodyJson);
 
 //... now sign the response
@@ -299,7 +298,7 @@ try {
         ->setSignatureKeyName('responseSig=')
         // singing the status as relevant information for the requester Alice, to ensure the status
         ->signHeader(DerivedComponentEnum::status)
-        // todo header exists and must not be set separate as header
+        // Content-Length has a default method to calculate the length of the body
         ->signHeader('content-length')
         // the sender of the request expects an algo that Bob can check while receive this signed response
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
