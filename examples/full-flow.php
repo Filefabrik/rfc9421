@@ -1,8 +1,10 @@
 <?php
 
 /*
- * Copyright (c) 2026.  rt@filefabrik.com
- * proprietary
+ * Copyright (c) 2026.
+ * e-mail: rt@filefabrik.com
+ * mastodon: filefabrik@phpc.social
+ * License: proprietary
  * todo insert correct copyright
  */
 declare(strict_types=1);
