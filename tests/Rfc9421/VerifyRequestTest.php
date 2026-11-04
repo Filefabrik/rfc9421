@@ -145,7 +145,7 @@ final class VerifyRequestTest extends TestCase
         $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
-        $signerConfiguration = $verifier->signingConfiguration;
+        $signerConfiguration = $verifier->getSigningConfiguration();
         //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
@@ -263,7 +263,7 @@ final class VerifyRequestTest extends TestCase
         $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
-        $signerConfiguration = $verifier->signingConfiguration;
+        $signerConfiguration = $verifier->getSigningConfiguration();
         //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
@@ -364,7 +364,7 @@ final class VerifyRequestTest extends TestCase
         $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
-        $signerConfiguration = $verifier->signingConfiguration;
+        $signerConfiguration = $verifier->getSigningConfiguration();
         //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
@@ -474,7 +474,7 @@ final class VerifyRequestTest extends TestCase
         $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
-        $signerConfiguration = $verifier->signingConfiguration;
+        $signerConfiguration = $verifier->getSigningConfiguration();
         //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());

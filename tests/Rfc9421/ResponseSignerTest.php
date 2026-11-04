@@ -58,13 +58,7 @@ final class ResponseSignerTest extends TestCase
         //... now sign the response
         try {
             $responseSigningConfiguration = new SigningConfiguration()
-                /*
-                 * Content Length as a special method
-                 *
-                 * The content-length will be created to header by guzzle or something AFTER we are signing the request/response. So we have to calculate the length before.
-                 * @important, when the receiver of this response verifies this response the `->processWithoutExistingHeaders(['content-length'])` never set.
-                */
-                //   ->processWithoutExistingHeaders(['content-length'])
+
                 // make sure the receiver Alice expects the following response Key
                 ->setSignatureKeyName('responseSig=')
                 // singing the status as relevant information for the requester Alice, to ensure the status

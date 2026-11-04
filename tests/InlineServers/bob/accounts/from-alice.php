@@ -135,7 +135,7 @@ if (null !== $keyId) {
         /*
          * Also the $metadata are verified
          */
-        $metadata = $verifier->signingConfiguration->metadata;
+        $metadata = $verifier->getSigningConfiguration()->metadata;
 
         /*
          * or something

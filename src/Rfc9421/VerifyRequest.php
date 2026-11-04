@@ -20,14 +20,11 @@ final class VerifyRequest
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
     private(set) null|ReadLines $signedHeaderLines = null;
-
-    private(set) SigningConfiguration $signingConfiguration;
-
     private(set) bool $hasValidatedBody = false;
+    private ?SigningConfiguration $signingConfiguration = null;
 
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
     {
-        $this->signingConfiguration = $this->preparedVerify->signingConfiguration;
     }
 
     /**
@@ -45,13 +42,14 @@ final class VerifyRequest
      */
     public function verifying(): bool
     {
-        $this->signingConfiguration->setComponents(
+        $signingConfiguration = $this->getSigningConfiguration();
+        $signingConfiguration->setComponents(
             components: $this->preparedVerify->getSignatureInputInstance()
                                              ->getExtractedComponents(),
         );
 
         // Validates the Content digest if needed from signature-line sig1=(content-digest)
-        if ($this->signingConfiguration->hasContentDigestHashAlgo()) {
+        if ($signingConfiguration->hasContentDigestHashAlgo()) {
             if (!$this->validateContentDigest()) {
                 // todo logging the error that validate content digest is wrong
                 return false;
@@ -65,13 +63,14 @@ final class VerifyRequest
         // base_decoded signature to get binary
 
         $verified = VerifyRegistry::verifying(
-            signingEnum: $this->signingConfiguration->metadata->getAlgOrThrow(),
+            signingEnum: $signingConfiguration->metadata->getAlgOrThrow(),
             data       : $signer->getSigningParametersStringOrThrow(),
             signature  : $this->getBinarySignatureValue(),
-            publicKey  : $this->signingConfiguration->getPublicPem(),
+            publicKey  : $signingConfiguration->getPublicPem(),
         );
 
         if ($verified) {
+            // todo get also back if not verified for diagnostics
             // getting back validated parameters non-tempered parameters
             $this->signedHeaderLines = new ReadLines($signer->getSignedLines());
         }
@@ -79,7 +78,13 @@ final class VerifyRequest
         return $verified;
     }
 
+    public function getSigningConfiguration(): SigningConfiguration
+    {
+        return $this->signingConfiguration ??= $this->preparedVerify->signingConfiguration;
+    }
+
     /**
+     * Validates the content-digest if the content-digest was created by the requester
      *
      * @throws ContentDigestException
      */
@@ -94,9 +99,11 @@ final class VerifyRequest
         if ($verified = $verifyInstance->verify()) {
             // rebind the extracted php hash-algo
             // later in verify process, during rebuild the content-digest the algo is needed
-            $this->signingConfiguration->setContentDigestAlgo(
-                contentDigestAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
-            );
+            $this->getSigningConfiguration()
+                 ->setContentDigestAlgo(
+                     contentDigestAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
+                 )
+            ;
         }
 
         // no validation of the body
@@ -122,7 +129,7 @@ final class VerifyRequest
     {
         $signer = new RequestSigner(
             message             : clone $this->preparedVerify->message,
-            signingConfiguration: $this->signingConfiguration,
+            signingConfiguration: $this->getSigningConfiguration(),
         );
 
         $signer->prepareSigning();
