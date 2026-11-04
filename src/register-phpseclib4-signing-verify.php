@@ -1,5 +1,9 @@
 <?php
-
+/*
+ * Copyright (c) 2026.  rt@filefabrik.com
+ * proprietary
+ * todo insert correct copyright
+ */
 declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;

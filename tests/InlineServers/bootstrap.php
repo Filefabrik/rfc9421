@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2026.  rt@filefabrik.com
+ * proprietary
+ * todo insert correct copyright
+ */
 
 $standaloneDir = dirname(__DIR__).'/vendor/autoload.php';
 if (file_exists($standaloneDir)) {
