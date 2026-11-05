@@ -66,7 +66,7 @@ final readonly class CompileEntry
         $entry = new FieldValue(
             messageInterface         : $this->messageInterface,
             signingConfiguration     : $this->signingConfiguration,
-            headerItemsDto           : $this->headerItemsDto,//$headerItemsDto,
+            headerItemsDto           : $this->headerItemsDto,
             componentItemDto         : $this->componentItemDto,
             initialContentsParameters: $parameters,
         )->getFieldValue();
