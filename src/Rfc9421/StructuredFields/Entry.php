@@ -13,6 +13,7 @@ namespace Filefabrik\Rfc9421\StructuredFields;
 
 use Closure;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 // in response the req parameter
@@ -57,7 +58,6 @@ final class Entry
     public function __construct(
         /**
          * string without quotes and lower case
-         * todo check @query-param with lower case
          */
         private(set) readonly string $key,
         /**
@@ -69,6 +69,11 @@ final class Entry
          */
         private(set) readonly null|string|int $value = null,
         private(set) null|InitialContentsEnum $initialContents = null,
+        /**
+         * Special need for key and name `"@query-param";name="Pet": dog` takes the PET
+         *
+         */
+        private(set) readonly string|null $nameOrKeyValue = null,
     ) {
     }
 
@@ -103,25 +108,18 @@ final class Entry
     }
 
     /**
-     * Special method for @query-param
-     */
-    public function withKeyMethod(Closure $method): self
-    {
-        $this->keyMethods[] = $method;
-
-        return $this;
-    }
-
-    /**
      * Todo Extra Parser from Outside
      * Parsing the expression for signature component
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
     public function parse(): string
     {
         $parts = [];
 
         // the key quoted
-        $parts[] = $this->parseKeyMethods();
+        $parts[] = UnquoteHelper::quote($this->key);
 
         /*
          * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3
@@ -143,9 +141,8 @@ final class Entry
 
             if (InitialContentsEnum::sf === $this->initialContents || InitialContentsEnum::bs === $this->initialContents) {
                 $parts[] = self::colonWithSpace;
-            } elseif (InitialContentsEnum::key === $this->initialContents) {
-                // todo check "name" has to be parsed via a special method InitialContentsEnum::name === $this->initialContents
-                $parts[] = self::equals;
+            } elseif (InitialContentsEnum::key === $this->initialContents || InitialContentsEnum::name === $this->initialContents) {
+                $parts = $this->handleKeyOrName($parts);
             }
         } else {
             $parts[] = self::colonWithSpace;
@@ -157,21 +154,26 @@ final class Entry
     }
 
     /**
-     * For @query-param use a special method
+     * @param string[] $parts
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @return string[]
      */
-    private function parseKeyMethods(): string
+    private function handleKeyOrName(array $parts): array
     {
-        if (0 === count($this->keyMethods)) {
-            return UnquoteHelper::quote($this->key);
+        if (null === $this->nameOrKeyValue) {
+            throw StructuredFieldException::missingKeyOrName(
+                key                : $this->key,
+                initialContentsEnum: InitialContentsEnum::isOwnTypeOrThrow($this->initialContents),
+            );
         }
 
-        // iterate for key
-        // todo cover error
-        $key = $this->key;
-        foreach ($this->keyMethods as $keyMethod) {
-            $key = $keyMethod($key);
-        }
+        $parts[] = self::equals;
+        // todo check already quoted and exists
+        $parts[] = UnquoteHelper::quote($this->nameOrKeyValue);
+        $parts[] = self::colonWithSpace;
 
-        return $key;
+        return $parts;
     }
 }

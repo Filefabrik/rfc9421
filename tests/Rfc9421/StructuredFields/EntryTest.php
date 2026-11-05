@@ -104,7 +104,7 @@ final class EntryTest extends TestCase
     public function testKeyParseThrows(): void
     {
         $this->expectExceptionObject(new StructuredFieldException('For the Entry-Field "testkey" there was no ;key="#missing#" key given.'));
-         new Entry(
+        new Entry(
             key            : 'testkey',
             value          : '1',
             initialContents: InitialContentsEnum::key,
