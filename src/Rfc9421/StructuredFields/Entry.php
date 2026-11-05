@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -102,9 +103,7 @@ final class Entry
     }
 
     /**
-     * Special method for pa
-     *
-
+     * Special method for @query-param
      */
     public function withKeyMethod(Closure $method): self
     {
