@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -119,6 +120,7 @@ final class ComponentsTest extends TestCase
         $this->expectExceptionObject(
             new SignatureExtractionException('Segment has unknown format ""content-length";"'),
         );
+        // content-length semicolon without a InitialContents Flag
         $input = '"content-length"; "@query-param";bs "example-dict";tr';
 
         new Components($input)->extractToComponentsObject();
