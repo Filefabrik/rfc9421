@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -43,6 +44,13 @@ final class MessageQueryParams
         if (array_key_exists($fieldName, $queryParams) && '' !== $queryParams[$fieldName]) {
             $value = UnquoteHelper::quote($queryParams[$fieldName]);
         }
+        /**
+         * Make "qux" trailing space
+         * "@query-param";name="baz": batman
+         * "@query-param";name="qux":(SP)
+         * "@query-param";name="param": value
+         */
+        $value = '' === $value ? ' ' : $value;
 
         // special of the key _baz_ with underscore before and after baz
         return new Entry($fieldName, $value)->withKeyMethod(

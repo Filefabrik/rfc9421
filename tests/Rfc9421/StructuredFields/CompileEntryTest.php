@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -27,6 +28,7 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -49,6 +51,7 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -71,6 +74,7 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -98,6 +102,7 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -126,6 +131,7 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -139,7 +145,7 @@ final class CompileEntryTest extends TestCase
          */
         $request     = new Request(
             'GET',
-            'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman',
+            'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman&qux=',
             ['test' => '  a=1,    b=2;x=1;y=2,   d '],
         );
         $instance    = new CompileEntry(
@@ -150,6 +156,36 @@ final class CompileEntryTest extends TestCase
         );
         $handled     = $instance->handle();
         $targetEntry = new Entry('baz', '"bat-man"', InitialContentsEnum::name);
+        self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
+    }
+
+    /**
+     * @see https://www.rfc-editor.org/info/rfc9421/#section-2.2.8-6
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
+    public function testHandleNameQux(): void
+    {
+        $config = new SigningConfiguration();
+
+        $request     = new Request(
+            'GET',
+            'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman&qux=',
+            ['test' => '  a=1,    b=2;x=1;y=2,   d '],
+        );
+        $instance    = new CompileEntry(
+            messageInterface    : $request,
+            signingConfiguration: $config,
+            componentItemDto    : ComponentName::fromString('"@query-param";name="qux"'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
+        );
+        $handled     = $instance->handle();
+        $targetEntry = new Entry('qux', ' ', InitialContentsEnum::name);
         self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
     }
 }
