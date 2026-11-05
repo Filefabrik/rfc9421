@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -14,7 +15,6 @@ use Filefabrik\Rfc9421\Bakame\Dictionary;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
-use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
  * Special Method to handle the InitialContentsEnum Key
@@ -33,10 +33,15 @@ final readonly class Key
         // todo check fieldValue cast because only strings allowed
         $entryValue    = (string)$entry->value;
         $value         = $this->applySingleKeyValue(name: $entry->key, key: $keyName, fieldValue: $entryValue);
-        $modifiedValue = UnquoteHelper::quoteKEYValue(keyName: $keyName, value: $value);
+
 
         // important re-build the value
-        return new Entry(key: $entry->key, value: $modifiedValue, initialContents: InitialContentsEnum::key);
+        return new Entry(
+            key            : $entry->key,
+            value          : $value,
+            initialContents: InitialContentsEnum::key,
+            nameOrKeyValue : $keyName,
+        );
     }
 
     /**
