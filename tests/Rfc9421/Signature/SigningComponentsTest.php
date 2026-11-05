@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -34,7 +35,7 @@ final class SigningComponentsTest extends TestCase
                                     ->addWithContentsEnum('test2', InitialContentsEnum::req)
         ;
 
-        $this->assertEquals([
+        self::assertEquals([
             ComponentName::fromComponentName('test'),
             ComponentName::fromNameAndInitialContent('test2', 'req'),
         ], $t->getComponents());
