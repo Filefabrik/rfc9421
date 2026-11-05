@@ -257,8 +257,8 @@ if (!$verifiedRequestBool) {
  * After successfully verifying you have access to HTTP Header Lines/Parts
  * they were in the singing process from requester and are validated and valued at this Point
  */
-echo PHP_EOL.'signed headers:'.PHP_EOL;
-print_r($VerifyRequest->signedHeaderLines->toKeyValueArray());
+echo PHP_EOL.'signing params lines with there values:'.PHP_EOL;
+print_r($VerifyRequest->signedHeaderLines->values());
 
 /*
  * Also the $metadata are verified
