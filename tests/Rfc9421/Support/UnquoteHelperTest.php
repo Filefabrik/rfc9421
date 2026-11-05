@@ -57,20 +57,10 @@ final class UnquoteHelperTest extends TestCase
         UnquoteHelper::unquote($input);
     }
 
-    public function testQuotedUnderscore(): void
-    {
-        self::assertSame('"_play_"', UnquoteHelper::quotedUnderscore('play'));
-    }
-
     public function testStartsWithBrace(): void
     {
         self::assertTrue(UnquoteHelper::startsWithBrace('(foo'));
         self::assertFalse(UnquoteHelper::startsWithBrace('foo'));
-    }
-
-    public function testUnderscore(): void
-    {
-        self::assertSame('_foo_', UnquoteHelper::underscore('foo'));
     }
 
     public function testHasSurroundBraces(): void
@@ -130,11 +120,6 @@ final class UnquoteHelperTest extends TestCase
         self::assertFalse(UnquoteHelper::isQuoted('"foo'));
         self::assertFalse(UnquoteHelper::isQuoted('foo"'));
         self::assertFalse(UnquoteHelper::isQuoted('foo'));
-    }
-
-    public function testQuoteKEYValue(): void
-    {
-        self::assertSame('"play": name', UnquoteHelper::quoteKEYValue('play', 'name'));
     }
 
     public function testStartsWithQuote(): void

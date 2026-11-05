@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -39,6 +40,7 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
@@ -47,10 +49,10 @@ final class RequestSignerTest extends TestCase
      */
     public function testSign(): void
     {
-        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
-        $certInstance    = new CertHelper('rsa');
-        $currentDateTime = new DateTime()->getTimestamp();
-
+        $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
+        $certInstance         = new CertHelper('rsa');
+        $currentDateTime      = new DateTime()->getTimestamp();
+        $expireDateTime       = $currentDateTime + 7200;
         $signingConfiguration = new SigningConfiguration()
             /*
              * todo documentation for addSigningMethod for content-type
@@ -71,7 +73,7 @@ final class RequestSignerTest extends TestCase
             ->signHeader('"example-header";bs')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
-            ->setExpires($currentDateTime + 7200)
+            ->setExpires($expireDateTime)
             ->setTag('mastodon')
             ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
@@ -88,9 +90,7 @@ final class RequestSignerTest extends TestCase
         /**
          * Prepare the Request
          */
-        $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'fdawsfs'];
-        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-        $request    = new Request(
+        $request = new Request(
             method : 'POST',
             uri    : $targetUrl,
             headers: [
@@ -98,7 +98,7 @@ final class RequestSignerTest extends TestCase
                 'Example-Dict'  => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
                 'content-type'  => 'application/json',
             ],
-            body   : $bodyJson,
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
         );
 
         $request       = $request->withAddedHeader('example-header', 'value, with, lots')
@@ -117,7 +117,8 @@ final class RequestSignerTest extends TestCase
         ;
 
         self::assertContains('"@query-param";name="baz"', $signingLinesKeys);
-        self::assertContains('"_baz_": "bat-man"', $signingLinesValues);
+        // todo _baz_ with underscores is wrong it should be as @query-param
+        self::assertContains('"@query-param";name="baz": bat-man', $signingLinesValues);
 
         self::assertContains('"@method"', $signingLinesKeys);
         self::assertContains('"@method": POST', $signingLinesValues);
@@ -130,6 +131,12 @@ final class RequestSignerTest extends TestCase
 
         self::assertContains('"example-dict";key="d"', $signingLinesKeys);
         self::assertContains('"example-dict";key="d": ?1', $signingLinesValues);
+
+        self::assertContains('"content-digest"', $signingLinesKeys);
+        self::assertContains(
+            '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
+            $signingLinesValues,
+        );
         /*
          * BS Test with two fields
          */
@@ -137,8 +144,19 @@ final class RequestSignerTest extends TestCase
             '"example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:',
             $signingLinesValues,
         );
-
         self::assertContains('"content-type": application/json', $signingLinesValues);
+        $signatureLines = <<<TEXT
+            "content-type": application/json
+            "@query-param";name="baz": bat-man
+            "@method": POST
+            "x-origin-host": mytest.com
+            "example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d
+            "example-dict";key="d": ?1
+            "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
+            "content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:
+            "@signature-params": testValue=("content-type" "@query-param";name="baz" "@method" "x-origin-host" "example-dict";sf "example-dict";key="d" "example-header";bs "content-digest");created=$currentDateTime;expires=$expireDateTime;nonce="nonce-now";keyid="http://127.0.0.1:8001/actor#main-key";alg="rsa-v1-5-sha512";tag="mastodon"
+            TEXT;
+        self::assertSame($signatureLines, $signer->signingParametersString);
     }
 
     /**
@@ -149,6 +167,7 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
@@ -180,13 +199,11 @@ final class RequestSignerTest extends TestCase
         /**
          * Prepare the Request
          */
-        $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'fdawsfs'];
-        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-        $request    = new Request(
+        $request = new Request(
             method : 'POST',
             uri    : $targetUrl,
             headers: ['x-origin-host' => 'mytest.com'],
-            body   : $bodyJson,
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
         );
 
         $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
@@ -201,11 +218,11 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws JsonException
      */
     public function testGetSignedLines(): void
     {
@@ -232,13 +249,11 @@ final class RequestSignerTest extends TestCase
         /**
          * Prepare the Request
          */
-        $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'fdawsfs'];
-        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-        $request    = new Request(
+        $request = new Request(
             method : 'POST',
             uri    : $targetUrl,
             headers: ['x-origin-host' => 'mytest.com'],
-            body   : $bodyJson,
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
         );
 
         $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
@@ -258,11 +273,11 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
-     * @throws JsonException
      */
     public function testGetSignedLinesOne(): void
     {
@@ -287,13 +302,11 @@ final class RequestSignerTest extends TestCase
         /**
          * Prepare the Request
          */
-        $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'fdawsfs'];
-        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-        $request    = new Request(
+        $request = new Request(
             method : 'POST',
             uri    : $targetUrl,
             headers: ['x-origin-host' => 'mytest.com'],
-            body   : $bodyJson,
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
         );
 
         $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
@@ -308,7 +321,6 @@ final class RequestSignerTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws JsonException
      */
     public function testGetSignedLinesThrow(): void
     {
@@ -339,13 +351,11 @@ final class RequestSignerTest extends TestCase
         /**
          * Prepare the Request
          */
-        $bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'fdawsfs'];
-        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-        $request    = new Request(
+        $request = new Request(
             method : 'POST',
             uri    : $targetUrl,
             headers: ['x-origin-host' => 'mytest.com'],
-            body   : $bodyJson,
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
         );
 
         $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);

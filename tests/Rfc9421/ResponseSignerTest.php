@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -46,6 +47,7 @@ final class ResponseSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     public function testSign(): void
     {
@@ -102,8 +104,8 @@ final class ResponseSignerTest extends TestCase
         self::assertSame(
             '"@status": 200
 "content-length": 41
-sha-256=:ZCEnsqX7hCc+COMsU1B7wNyKEdBqHR0ItAHl8HsEbus=:
-responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"',
+"content-digest": sha-256=:ZCEnsqX7hCc+COMsU1B7wNyKEdBqHR0ItAHl8HsEbus=:
+"@signature-params": responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"',
             $responseSigner->signingParametersString,
         );
     }

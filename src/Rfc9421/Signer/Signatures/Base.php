@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -16,7 +17,9 @@ use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
+use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 
@@ -49,7 +52,6 @@ final class Base
     /**
      * Compiles all configured signature relevant keys with their values. except @signature-params
      *
-     * @return \Filefabrik\Rfc9421\Signer\Signatures\WriteLines
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
@@ -70,7 +72,7 @@ final class Base
         }
 
         /*
-         * todo, that is the place where to link into the Structured Fields
+         * todo prepare method for content-digest
          */
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
             if (HeaderKeysEnum::content_digest->value === $signatureComponent->fieldName) {
@@ -94,6 +96,8 @@ final class Base
      * todo move out as special method
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
     private function handleSignBody(): Line
     {
@@ -105,13 +109,19 @@ final class Base
             )->getContentDigestHeaderArray();
 
             /*
+             * Todo the rebind into header should be more smart
              * !! @important
              * rebind the MessageInterface because of cloned change
              */
             $this->message = $this->message->withHeader($headerKey, $value);
 
-            // later to compile
-            return new Line($headerKey, $value);
+            /**
+             * in the signature lines the content-digest as to be quoted such as a normal signature-line entry "content-digest": sha-.....
+             * So wie use the Entry class for parsing the value
+             */
+            $entry = new Entry($headerKey, $value);
+
+            return new Line(UnquoteHelper::quote($entry->key), $entry->parse());
         }
 
         throw ContentDigestException::canNotHashWithoutAlgorithm();

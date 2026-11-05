@@ -30,6 +30,7 @@ final class DestructHeadersTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
@@ -118,8 +119,8 @@ final class DestructHeadersTest extends TestCase
         self::assertContains('"date";sf: @'.strtotime($date), $parsedArray);
         self::assertContains('"@request-target": /resource?bat&baz=3', $parsedArray);
         self::assertContains('"@target-uri": https://api.example.com/resource?bat&baz=3', $parsedArray);
-        self::assertContains('"_baz_": "3"', $parsedArray);
-        self::assertContains('"_bat_": ', $parsedArray);
+        self::assertContains('"@query-param";name="baz": 3', $parsedArray);
+        self::assertContains('"@query-param";name="bat": ', $parsedArray);
     }
 
     /**
@@ -170,6 +171,7 @@ final class DestructHeadersTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
@@ -227,6 +229,7 @@ final class DestructHeadersTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */

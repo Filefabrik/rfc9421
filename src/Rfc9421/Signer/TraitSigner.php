@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -18,6 +19,8 @@ use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
+use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
@@ -25,16 +28,14 @@ use UnexpectedValueException;
 trait TraitSigner
 {
     /**
-     * Data for signing the relevant header data
-     */
-    private null|WriteLines $signingLines = null;
-
-    /**
      * @var string|null null throws an error
      */
     private(set) ?string $signingParametersString = null;
-
     private(set) null|string $signatureBase = null;
+    /**
+     * Data for signing the relevant header data
+     */
+    private null|WriteLines $signingLines = null;
 
     public function getSignedLines(): WriteLines
     {
@@ -45,7 +46,6 @@ trait TraitSigner
     }
 
     /**
-     * @return \Psr\Http\Message\ResponseInterface|\Psr\Http\Message\RequestInterface
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -103,11 +103,14 @@ trait TraitSigner
         // setting the last header before we are signing the "SignatureSigns"
         $this->signatureBase = $base->makeSignatureInput();
 
+
         // now set the signature-params ONLY into the signature-base line NOT into the HTTP-Header.
+        $signatureParamsEntry = new Entry(DerivedComponentEnum::signatureParams->value, $this->signatureBase);
         $this->signingLines->add(
             new Line(
-                signatureComponent: DerivedComponentEnum::signatureParams->value,
-                valueToSign       : $this->signatureBase,
+                // important to quote
+                signatureComponent: UnquoteHelper::quote($signatureParamsEntry->key),
+                valueToSign       : $signatureParamsEntry->parse(),
             ),
         );
 

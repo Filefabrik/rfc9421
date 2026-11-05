@@ -27,6 +27,7 @@ final class PrepareLineTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -48,6 +49,7 @@ final class PrepareLineTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -71,6 +73,7 @@ final class PrepareLineTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
@@ -95,4 +98,26 @@ final class PrepareLineTest extends TestCase
         self::assertEquals($targetEntry, $line);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
+    public function testHandleNameMultiline(): void
+    {
+        $request  = new Request('GET', 'http://my.com/parameters?var=this%20is%20a%20big%0Amultiline%20value&\
+  bar=with+plus+whitespace&fa%C3%A7ade%22%3A%20=something', ['test' => 'testValue']);
+        $instance = new PrepareLine(
+            signingConfiguration: new SigningConfiguration(),
+            componentItemDto    : ComponentName::fromString('"@query-param";name="var"'),
+            message             : $request,
+        );
+        $line     = $instance->handle();
+
+        self::assertEquals(new Line('"@query-param";name="var"', '"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value'), $line);
+    }
 }

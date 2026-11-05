@@ -56,6 +56,29 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
+    public function testHandleMethod(): void
+    {
+        $request  = new Request('GET', 'my', ['test' => 'testValue']);
+        $instance = new CompileEntry(
+            messageInterface    : $request,
+            signingConfiguration: new SigningConfiguration(),
+            componentItemDto    : ComponentName::fromString('@method'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
+        );
+        $handled  = $instance->handle();
+
+        self::assertEquals(new Entry('@method', 'GET'), $handled);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
     public function testHandleBS(): void
     {
         $request     = new Request('GET', 'my', ['test' => 'testValue']);
@@ -66,7 +89,7 @@ final class CompileEntryTest extends TestCase
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
-        $targetEntry = new Entry('test', ':dGVzdFZhbHVl:', InitialContentsEnum::bs);
+        $targetEntry = new Entry(key: 'test', value: ':dGVzdFZhbHVl:', initialContents: InitialContentsEnum::bs);
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -94,7 +117,11 @@ final class CompileEntryTest extends TestCase
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
-        $targetEntry = new Entry('test', 'testValue', InitialContentsEnum::sf);
+        $targetEntry = new Entry(
+            key            : 'test',
+            value          : 'testValue',
+            initialContents: InitialContentsEnum::sf,
+        );
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -123,7 +150,12 @@ final class CompileEntryTest extends TestCase
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
-        $targetEntry = new Entry('test', '"a": 1', InitialContentsEnum::key);
+        $targetEntry = new Entry(
+            key            : 'test',
+            value          : '1',
+            initialContents: InitialContentsEnum::key,
+            nameOrKeyValue : 'a',
+        );
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -155,7 +187,14 @@ final class CompileEntryTest extends TestCase
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
-        $targetEntry = new Entry('baz', '"bat-man"', InitialContentsEnum::name);
+        $targetEntry = new Entry(
+            key            : '@query-param',
+            value          : 'bat-man',
+            initialContents: InitialContentsEnum::name,
+            nameOrKeyValue : 'baz',
+        );
+        $parsed      = $targetEntry->parse();
+        self::assertSame('"@query-param";name="baz": bat-man', $parsed);
         self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
     }
 
@@ -173,19 +212,62 @@ final class CompileEntryTest extends TestCase
     {
         $config = new SigningConfiguration();
 
-        $request     = new Request(
+        $request  = new Request(
             'GET',
             'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman&qux=',
             ['test' => '  a=1,    b=2;x=1;y=2,   d '],
         );
-        $instance    = new CompileEntry(
+        $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
             componentItemDto    : ComponentName::fromString('"@query-param";name="qux"'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
-        $handled     = $instance->handle();
-        $targetEntry = new Entry('qux', ' ', InitialContentsEnum::name);
+        $handled  = $instance->handle();
+        // note: empty value will be later parsed with space
+        $targetEntry = new Entry(
+            key            : '@query-param',
+            value          : '',
+            initialContents: InitialContentsEnum::name,
+            nameOrKeyValue : 'qux',
+        );
         self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
     }
+
+    /**
+     * @see https://www.rfc-editor.org/info/rfc9421/#section-2.2.8-6
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
+    public function testHandleNameMultiline(): void
+    {
+        $config = new SigningConfiguration();
+
+        $request     = new Request(
+            'GET',
+            'http://localhost:8001//parameters?var=this%20is%20a%20big%0Amultiline%20value&\
+  bar=with+plus+whitespace&fa%C3%A7ade%22%3A%20=something',
+            ['test' => '  a=1,    b=2;x=1;y=2,   d '],
+        );
+        $instance    = new CompileEntry(
+            messageInterface    : $request,
+            signingConfiguration: $config,
+            componentItemDto    : ComponentName::fromString('"@query-param";name="var"'),
+            headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
+        );
+        $handled     = $instance->handle();
+        $targetEntry = new Entry(
+            key            : '@query-param',
+            value          : 'this%20is%20a%20big%0Amultiline%20value',
+            initialContents: InitialContentsEnum::name,
+            nameOrKeyValue : 'var',
+        );
+        self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
+    }
+
 }

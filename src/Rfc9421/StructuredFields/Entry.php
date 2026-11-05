@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields;
 
-use Closure;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
@@ -47,11 +46,6 @@ final class Entry
     public const string semicolon = ';';
 
     public const string equals = '=';
-
-    /**
-     * @var array{Closure}|array{}
-     */
-    private(set) array $keyMethods = [];
 
     private bool $reqEnum = false;
 
@@ -156,8 +150,8 @@ final class Entry
     /**
      * @param string[] $parts
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @return string[]
      */
     private function handleKeyOrName(array $parts): array

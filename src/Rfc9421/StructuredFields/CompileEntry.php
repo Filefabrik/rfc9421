@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -18,6 +19,7 @@ use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Bs;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Key;
+use Filefabrik\Rfc9421\StructuredFields\Processing\Name;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Sf;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -42,7 +44,6 @@ final readonly class CompileEntry
 
     /**
      *
-     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
@@ -72,6 +73,7 @@ final readonly class CompileEntry
         )->getFieldValue();
 
         /*
+         * todo maybe it will be good to handle the parameter-processing classes via a closures
          * handle InitialContentsEnum part
          */
         if ($parameters->has(InitialContentsEnum::bs)) {
@@ -96,6 +98,14 @@ final readonly class CompileEntry
                 entry  : $entry,
                 keyName: $parameters->getValueOrThrow(InitialContentsEnum::key),
             );
+        } elseif ($parameters->has(InitialContentsEnum::name)) {
+            // todo testing
+            $entry = new Name()
+                ->handle(
+                    entry  : $entry,
+                    keyName: $parameters->getValueOrThrow(InitialContentsEnum::name),
+                )
+            ;
         }
 
         /*
