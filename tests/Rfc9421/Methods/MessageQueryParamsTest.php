@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Methods;
 
-use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
+use Filefabrik\Rfc9421\Exceptions\QueryParamsException;
 use Filefabrik\Rfc9421\Methods\MessageQueryParams;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -23,8 +23,8 @@ final class MessageQueryParamsTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandle(): void
     {
@@ -37,8 +37,8 @@ final class MessageQueryParamsTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleQux(): void
     {
@@ -51,8 +51,8 @@ final class MessageQueryParamsTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testMultiline(): void
     {
@@ -67,12 +67,15 @@ final class MessageQueryParamsTest extends TestCase
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      */
     public function testHandleEmpty(): void
     {
-        $this->expectExceptionObject(new UnProcessableSignatureException('Query string named parameter not set'));
+        /*
+         * Todo check if the @query-params string is need during the setHeader but not exists
+         */
+        $this->expectExceptionObject(QueryParamsException::emptyQueryString());
         $request = new Request('GET', 'http://localhost:8001/mastodon');
         MessageQueryParams::handle($request, 'baz');
     }
@@ -80,13 +83,42 @@ final class MessageQueryParamsTest extends TestCase
     /**
      * todo intensive query params handler
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      */
     public function testParseQueryString(): void
     {
-        self::assertTrue(true);
+        $this->expectExceptionObject(
+            QueryParamsException::keyException(
+                '\
+  bar',
+            ),
+        );
         $s = 'var=this%20is%20a%20big%0Amultiline%20value&\
   bar=with+plus+whitespace&fa%C3%A7ade%22%3A%20=something';
 
+        MessageQueryParams::parseQueryString($s);
+    }
+
+    /**
+     * todo intensive query params handler
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
+     */
+    public function testParseQueryStringFasch(): void
+    {
+        $s = 'fa%C3%A7ade%22%3A%20=something';
+
+        self::assertSame(['fa%C3%A7ade%22%3A%20' => 'something'], MessageQueryParams::parseQueryString($s));
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
+     */
+    public function testParseQueryStringEmptyValue(): void
+    {
+        $s = 'var=';
+
         $parsed = MessageQueryParams::parseQueryString($s);
+        self::assertSame(['var' => ''], $parsed);
     }
 }

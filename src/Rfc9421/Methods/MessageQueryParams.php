@@ -13,7 +13,7 @@ namespace Filefabrik\Rfc9421\Methods;
 
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
-use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
+use Filefabrik\Rfc9421\Exceptions\QueryParamsException;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\MessageInterfaceHelper;
 use Psr\Http\Message\MessageInterface;
@@ -25,8 +25,10 @@ final class MessageQueryParams
      *
      * Find one query parameter by name (which must be supplied as parameters in the covered field list).
      *
+     *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      */
     public static function handle(MessageInterface $message, string $fieldName): Entry
     {
@@ -34,7 +36,7 @@ final class MessageQueryParams
                                              ->getQuery()
         ;
         if ('' === $queryString) {
-            throw new UnProcessableSignatureException('Query string named parameter not set');
+            throw QueryParamsException::emptyQueryString();
         }
 
         $queryParams = self::parseQueryString($queryString);
@@ -78,6 +80,8 @@ final class MessageQueryParams
      * "@query-param";name="bar": with%20plus%20whitespace
      * "@query-param";name="fa%C3%A7ade%22%3A%20": something
      *
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @return non-empty-array<string, string>
      *
      * Should not use PHP's parse_str function here, as it has some issues with
@@ -92,9 +96,23 @@ final class MessageQueryParams
             // The '=' character is not required and indicates a boolean true value if unset.
             [$key, $value] = explode('=', $param, 2);
 
-            $modKey = urldecode($key);
+            $KeyDecoded   = rawurldecode($key);
+            $KeyReEncoded = rawurlencode($KeyDecoded);
+
+            if ($KeyReEncoded !== $key) {
+                throw QueryParamsException::keyException($key);
+            }
+
+            /** @noinspection UnnecessaryCastingInspection */
+            $ValueDecoded = urldecode((string)$value);
+            /* $ValueReEncoded = urlencode($ValueDecoded);
+
+             if ($ValueReEncoded !== $value) {
+               //  throw QueryParamsException::valueException($value);
+             }*/
+
             // fa%C3%A7ade%22%3A%20
-            $result[$modKey] = urldecode($value ?? '');
+            $result[$KeyReEncoded] = $ValueDecoded;
             // $result[rawurldecode($element[0])] = isset($element[1]) ? urldecode($element[1]) : '';
         }
 
