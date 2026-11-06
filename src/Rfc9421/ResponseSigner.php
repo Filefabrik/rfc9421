@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -28,6 +29,12 @@ final class ResponseSigner
     public function __construct(
         ResponseInterface $message,
         private(set) readonly SigningConfiguration $signingConfiguration,
+        /*
+         * Todo, if the request verifier set, it is also possible to handle some ;req headers
+         * Todo check we should use another object to handle the ;req for the signed response from a request or signed request
+         *
+         * private(set) readonly ?VerifyRequest $verifyRequest = null,
+         * */
     ) {
         $this->message = $message;
     }

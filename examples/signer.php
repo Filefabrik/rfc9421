@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -292,6 +293,7 @@ $responseBodyJson = JsonToString::toString(['account' => 'Alex', 'new-amount' =>
 $response         = new Response(headers: [], body: $responseBodyJson);
 
 //... now sign the response
+// todo also add ;req parameters
 try {
     $responseSigningConfiguration = new SigningConfiguration()
         // make sure the receiver Alice expects the following response Key
@@ -301,10 +303,12 @@ try {
         // Content-Length has a default method to calculate the length of the body
         ->signHeader('content-length')
         // the sender of the request expects an algo that Bob can check while receive this signed response
+        // todo use different signing for response
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         // set alice private pem to encrypt the response
         ->setPrivatePem($certInstance->getPrivatPemContent())
         // singing the response body
+        // todo use different signing for response
         ->setContentDigestAlgo('sha256')
     ;
 } catch (AbstractRfc9421Exception $e) {
