@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -94,30 +95,11 @@ final class ComponentName
      */
     private static function extractWithRegex(string $segment): self
     {
-        $s       = implode('|', [InitialContentsEnum::key->name, InitialContentsEnum::name->name]);
-        $pattern = '^"(.*?)";('.$s.')="(.*?)"$';
-        preg_match('#'.$pattern.'#', $segment, $matches);
-
-        if (4 === count($matches)) {
-            return self::withKeyInitialContentValue(
-                name           : $matches[1],
-                initialContents: $matches[2],
-                keyOrNameValue : $matches[3],
-            );
-        }
-
-        $s = implode('|', InitialContentsEnum::names());
-        preg_match('#^"(.*?)";('.$s.')$#', $segment, $matches);
-
-        if (3 === count($matches)) {
-            return new ComponentName($matches[1], $matches[2]);
-        }
-
-        $simple = '#^"(.*?)"$#';
-        preg_match($simple, $segment, $matches);
-
-        if (2 === count($matches)) {
-            return new ComponentName($matches[1]);
+        foreach (['extract4', 'extract3', 'extract2'] as $method) {
+            $result = self::$method($segment);
+            if ($result instanceof self) {
+                return $result;
+            }
         }
 
         if (!str_contains($segment, ';')) { // else normal format
@@ -125,17 +107,6 @@ final class ComponentName
         }
 
         throw new SignatureExtractionException(sprintf('Segment has unknown format "%s"', $segment));
-    }
-
-    /**
-     * 3-Parts such as '"example-dict";key="a"'
-     */
-    public static function withKeyInitialContentValue(
-        string|DerivedComponentEnum $name,
-        string|InitialContentsEnum $initialContents,
-        string|null $keyOrNameValue,
-    ): self {
-        return new ComponentName(name: $name, initialContents: $initialContents, keyOrNameValue: $keyOrNameValue);
     }
 
     /**
@@ -178,6 +149,47 @@ final class ComponentName
     }
 
     /**
+     * 3-Parts such as '"example-dict";key="a"'
+     */
+    public static function withKeyInitialContentValue(
+        string|DerivedComponentEnum $name,
+        string|InitialContentsEnum $initialContents,
+        string|null $keyOrNameValue,
+    ): self {
+        return new ComponentName(name: $name, initialContents: $initialContents, keyOrNameValue: $keyOrNameValue);
+    }
+
+    private static function extract4(string $segment): ?self
+    {
+        $s       = implode('|', [InitialContentsEnum::key->name, InitialContentsEnum::name->name]);
+        $pattern = '^"(.*?)";('.$s.')="(.*?)"$';
+        preg_match('#'.$pattern.'#', $segment, $matches);
+
+        return (4 === count($matches)) ?
+            self::withKeyInitialContentValue(
+                name           : $matches[1],
+                initialContents: $matches[2],
+                keyOrNameValue : $matches[3],
+            ) : null;
+    }
+
+    private static function extract3(string $segment): ?self
+    {
+        $s = implode('|', InitialContentsEnum::names());
+        preg_match('#^"(.*?)";('.$s.')$#', $segment, $matches);
+
+        return 3 === count($matches) ? new ComponentName($matches[1], $matches[2]) : null;
+    }
+
+    private static function extract2(string $segment): ?self
+    {
+        $simple = '#^"(.*?)"$#';
+        preg_match($simple, $segment, $matches);
+
+        return 2 === count($matches) ? new ComponentName($matches[1]) : null;
+    }
+
+    /**
      * Item makes sure it is validated during the Bakame Class
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
@@ -193,7 +205,7 @@ final class ComponentName
 
     /**
      * important parser for the signature component part
-     *
+     * Build a clear expression from the parts
      */
     public function toString(): string
     {
@@ -209,10 +221,10 @@ final class ComponentName
 
         if ($hasInitialContents) {
             $parts[] = ';'.$this->initialContents->name;
-        }
-
-        if (null !== $this->keyOrNameValue) {
-            $parts[] = '='.UnquoteHelper::quote($this->keyOrNameValue);
+            // only if we have initial contents enum
+            if (null !== $this->keyOrNameValue) {
+                $parts[] = '='.UnquoteHelper::quote($this->keyOrNameValue);
+            }
         }
 
         return implode('', $parts);
