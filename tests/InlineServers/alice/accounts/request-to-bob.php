@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -87,8 +88,6 @@ $signingConfiguration->addSigningMethods($prepareMethods);
 /**
  * Prepare the Request
  */
-
-
 $symfonyRequest = Request::create(
     uri    : $url,
     method : 'POST',
@@ -121,7 +120,7 @@ try {
     return;
 }
 displayLogger('Response is back from Bob to Alice Server. Shows the Response-Body from Bob.', 2);
-/**
+/*
  * todo getting the signed response and handle it
  */
 echo $bobsResponse->getBody();
