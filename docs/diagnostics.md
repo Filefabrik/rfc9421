@@ -4,7 +4,7 @@ During the implementation of the message signing and verification process it can
 will not work properly.
 
 There can be hundreds of things they are getting wrong.
-So we have created some usefully tools they should help you find errors.
+So we have created some usefully tools they should help us find errors.
 
 * Diagnose your local request-signing configuration and the request
 
