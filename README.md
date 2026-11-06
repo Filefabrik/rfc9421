@@ -533,8 +533,8 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
   throws
 * todo diagnose/testmethods to implement faster a new requester/vendor to check there stuff and also explain detailed
   what happens during your or there processing
-* docu structured field types and mappers need for "Key" "Sf"
-* docu "./Methods" default handling and how to change
+* doc structured field types and mappers need for "Key" "Sf"
+* doc "./Methods" default handling and how to change
 * query param and key handler is really buggy.  
   can also not work at `macgirvin/http-message-signer`
 
