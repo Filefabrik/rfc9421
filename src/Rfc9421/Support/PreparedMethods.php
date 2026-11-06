@@ -72,9 +72,9 @@ final class PreparedMethods
 
         try {
             $result = $closureMethod(...$params);
-        } catch (Throwable$exception) {
+        } catch (Throwable$throwable) {
             // binding throwable
-            throw PrepareMethodsException::errorFromCalling($nKey, $exception);
+            throw PrepareMethodsException::errorFromCalling($nKey, $throwable);
         }
 
         if (!$result instanceof Entry) {

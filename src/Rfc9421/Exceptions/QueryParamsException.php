@@ -26,6 +26,7 @@ final class QueryParamsException extends AbstractRfc9421Exception
             ),
         );
     }
+
     public static function valueException(string $value): self
     {
         return new self(

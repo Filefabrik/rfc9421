@@ -29,10 +29,12 @@ final class VerifyRequest
      *
      */
     private(set) bool $hasValidatedBody = false;
+
     /**
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
     private null|ReadLines        $signedHeaderLines    = null;
+
     private ?SigningConfiguration $signingConfiguration = null;
 
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
