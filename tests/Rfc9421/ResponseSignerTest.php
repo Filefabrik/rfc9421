@@ -38,6 +38,7 @@ final class ResponseSignerTest extends TestCase
      * todo missing tests
      * todo with req
      * todo empty @query-params
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -101,12 +102,14 @@ final class ResponseSignerTest extends TestCase
             'responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"',
             $responseSigner->signatureBase,
         );
-        self::assertSame(
-            '"@status": 200
-"content-length": 41
-"content-digest": sha-256=:ZCEnsqX7hCc+COMsU1B7wNyKEdBqHR0ItAHl8HsEbus=:
-"@signature-params": responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"',
-            $responseSigner->signingParametersString,
-        );
+
+        $signedLinesText = <<<text
+            "@status": 200
+            "content-length": 41
+            "content-digest": sha-256=:ZCEnsqX7hCc+COMsU1B7wNyKEdBqHR0ItAHl8HsEbus=:
+            "@signature-params": responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"
+            text;
+
+        self::assertSame($signedLinesText, $responseSigner->signingParametersString);
     }
 }
