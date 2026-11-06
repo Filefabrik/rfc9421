@@ -178,6 +178,9 @@ if (null !== $keyId) {
             );
             displayLogger($explanation, 2, false);
 
+            /**
+             * todo check ;req is possible and it is only allowed if some parameter was signed by Alice (if it must be, @see the documentation of ;req)
+             */
             displayLogger('*** todo, signing the response that alice can validate the signed response ***', 2);
         } else {
             displayLogger('The body was not signed by Alice.');
