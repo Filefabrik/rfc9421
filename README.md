@@ -513,5 +513,14 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
       "nyholm/psr7": "^1.8"`
 * documentation: whenever possible use DerivedComponentEnum, every @-component-name is cased in DerivedComponentEnum or
   throws 
+* todo diagnose/testmethods to implement faster a new requester/vendor to check there stuff and also explain detailed what happens during your or there processing  
 * docu structured field types and mappers need for "Key" "Sf"
 * docu "./Methods" default handling and how to change 
+* query param and key handler is really buggy.  
+    can also not work at `macgirvin/http-message-signer`
+
+```php
+<?php 
+use Filefabrik\Rfc9421\Methods\MessageQueryParams;MessageQueryParams::handle()
+?>
+```

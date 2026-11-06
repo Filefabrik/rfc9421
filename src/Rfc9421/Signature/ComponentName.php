@@ -64,7 +64,7 @@ final class ComponentName
     private function setValidatedName(string $name): string|DerivedComponentEnum
     {
         // todo validate value against unwanted chars/expressions
-        $lower = strtolower($name);
+        $lower = strtolower(trim($name));
 
         // todo fine-style this setter
 

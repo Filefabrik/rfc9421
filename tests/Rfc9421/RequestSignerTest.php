@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test;
 
 use DateTime;
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
@@ -362,5 +364,59 @@ final class RequestSignerTest extends TestCase
         $signer->getSignedLines()
                ->toKeyValueArray()
         ;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
+     */
+    public function testSignThrowsEmptyQueryParam(): void
+    {
+        $this->expectExceptionObject(
+            // todo more descriptive error message
+            new PrepareMethodsException(
+                'Error during calling the method with key: "@query-param": Initial contents enum: "name" was not set before.',
+            ),
+        );
+
+        $targetUrl       = 'http://localhost:8001/mastodon';
+        $certInstance    = new CertHelper('rsa');
+        $currentDateTime = new DateTime()->getTimestamp();
+
+        $signingConfiguration = new SigningConfiguration()
+            ->signHeader(DerivedComponentEnum::queryParam)
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->withNonce('nonce-now')
+
+            // content digest signer key
+            ->setSignatureKeyName('testValue=')
+            // for signing needs private
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+        ;
+
+        /**
+         * Prepare the Request
+         */
+        $request = new Request(
+            method : 'POST',
+            uri    : $targetUrl,
+            headers: ['x-origin-host' => 'mytest.com'],
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
+        );
+
+        $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
+        $signer->sign();
     }
 }

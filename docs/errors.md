@@ -11,3 +11,7 @@ So you are able to cover all errors they will be thrown during the HTTP Message 
 ## PrepareMethodsException
 
 The PrepareMethods Class is responsible for holding/configuring Methods where component names will get there values from the HTTP Header
+
+## QueryParamsException
+
+The QueryParamsException are used if there are something went wrong while checking the QueryParams in combination with the Derived`@query-params`
