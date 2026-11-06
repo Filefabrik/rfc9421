@@ -10,7 +10,7 @@
 declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, InitialContentsEnum, SigningEnum};
-use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception, SignatureExtractionException};
+use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception, ProcessingException, SignatureExtractionException};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
@@ -259,7 +259,16 @@ if (!$verifiedRequestBool) {
  * they were in the singing process from requester and are validated and valued at this Point
  */
 echo PHP_EOL.'signing params lines with there values:'.PHP_EOL;
-print_r($VerifyRequest->signedHeaderLines->values());
+try {
+    echo implode(
+        "\n",
+        $VerifyRequest->getSignedHeaderLines()
+                      ->values(),
+    );
+} catch (ProcessingException $e) {
+    echo $e->getMessage();
+    return;
+}
 
 /*
  * Also the $metadata are verified

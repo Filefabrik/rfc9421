@@ -12,6 +12,7 @@ declare(strict_types=1);
 use Filefabrik\Rfc9421\Exceptions\AbstractRfc9421Exception;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
@@ -137,7 +138,13 @@ if (null !== $keyId) {
      */
 
     if ($res) {
-        $signedHeaderLines = $verifier->signedHeaderLines;
+        try {
+            $signedHeaderLines = $verifier->getSignedHeaderLines();
+        } catch (ProcessingException $e) {
+            echo $e->getMessage();
+
+            return;
+        }
 
         /*
          * Also the $metadata are verified
@@ -178,7 +185,7 @@ if (null !== $keyId) {
             );
             displayLogger($explanation, 2, false);
 
-            /**
+            /*
              * todo check ;req is possible and it is only allowed if some parameter was signed by Alice (if it must be, @see the documentation of ;req)
              */
             displayLogger('*** todo, signing the response that alice can validate the signed response ***', 2);

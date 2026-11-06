@@ -15,6 +15,7 @@ use BadMethodCallException;
 use DateTime;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyPrepare;
@@ -344,7 +345,7 @@ final class VerifyRequestTest extends TestCase
         /*
          * todo only with library Openssl test
          */
-        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::nameOrThrow($signingAlgo)){
+        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::nameOrThrow($signingAlgo)) {
             $this->expectExceptionObject(
                 new BadMethodCallException(
                     'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
@@ -506,5 +507,16 @@ final class VerifyRequestTest extends TestCase
                                              ->getUri()
                                              ->__toString(),
         );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
+    public function testGetSignedHeaderLines(): void
+    {
+        $this->expectExceptionObject(ProcessingException::SignedHeaderLines());
+        $request       = new Request('GET', 'https://target-host.com?play=something');
+        $verifyPrepare = new VerifyPrepare($request, new SigningConfiguration());
+        new VerifyRequest($verifyPrepare)->getSignedHeaderLines();
     }
 }

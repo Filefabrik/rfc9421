@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -12,6 +13,7 @@ namespace Filefabrik\Rfc9421;
 
 use Filefabrik\Rfc9421\Cryptography\VerifyRegistry;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\VerifyContentDigest;
@@ -23,20 +25,26 @@ use Psr\Http\Message\RequestInterface;
 final class VerifyRequest
 {
     /**
-     * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
-     */
-    private(set) null|ReadLines $signedHeaderLines = null;
-
-    /**
      * Flag if the body was part of the requester signing and the body has not tampered
      *
      */
     private(set) bool $hasValidatedBody = false;
-
+    /**
+     * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
+     */
+    private null|ReadLines        $signedHeaderLines    = null;
     private ?SigningConfiguration $signingConfiguration = null;
 
     public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
     {
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
+    public function getSignedHeaderLines(): ReadLines
+    {
+        return $this->signedHeaderLines ?? throw ProcessingException::SignedHeaderLines();
     }
 
     /**

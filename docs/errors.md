@@ -15,3 +15,7 @@ The PrepareMethods Class is responsible for holding/configuring Methods where co
 ## QueryParamsException
 
 The QueryParamsException are used if there are something went wrong while checking the QueryParams in combination with the Derived`@query-params`
+
+## ProcessingException
+
+If you want a public object that was not created before. 
