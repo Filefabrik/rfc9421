@@ -52,7 +52,7 @@ final class ComponentName
         /**
          * name and Key have a value
          * sf and bs does not have a value
-         *
+         * todo check against quotas
          */
         private(set) readonly ?string $keyOrNameValue = null,
     ) {
@@ -96,7 +96,7 @@ final class ComponentName
     private static function extractWithRegex(string $segment): self
     {
         foreach (['extract4', 'extract3', 'extract2'] as $method) {
-            $result = self::$method($segment);
+            $result = call_user_func([self::class, $method], $segment);
             if ($result instanceof self) {
                 return $result;
             }
