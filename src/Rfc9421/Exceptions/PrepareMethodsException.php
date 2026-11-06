@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
-use Exception;
+use Throwable;
 
 final class PrepareMethodsException extends AbstractRfc9421Exception
 {
@@ -21,7 +21,7 @@ final class PrepareMethodsException extends AbstractRfc9421Exception
         return new self(sprintf('Method "%s" not registered.', $key));
     }
 
-    public static function errorFromCalling(string $key, Exception $exception): self
+    public static function errorFromCalling(string $key, Throwable $exception): self
     {
         return new self(
             sprintf('Error during calling the method with key: "%s": %s', $key, $exception->getMessage()),

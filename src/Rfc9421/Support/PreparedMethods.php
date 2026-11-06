@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Support;
 
 use Closure;
-use Exception;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Throwable;
 
 /**
  * Stack which is configurable for each request/response to process the Derived Components or regular headers they are non-normative
@@ -72,7 +72,7 @@ final class PreparedMethods
 
         try {
             $result = $closureMethod(...$params);
-        } catch (Exception$exception) {
+        } catch (Throwable$exception) {
             // binding throwable
             throw PrepareMethodsException::errorFromCalling($nKey, $exception);
         }

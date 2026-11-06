@@ -80,7 +80,8 @@ trait TraitSigner
     }
 
     /**
-     * für das verify auch verwenden
+     * Todo, derived components not allowed during request and some not during response
+     * Für das verify auch verwenden
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
