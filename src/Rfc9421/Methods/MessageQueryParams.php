@@ -46,6 +46,7 @@ final class MessageQueryParams
             // multiline or problematic chars
             $value = rawurlencode($fValue);
         }
+
         /*
          * Make "qux" trailing space will be added during compile with Entry->parse()
          * "@query-param";name="baz": batman

@@ -31,7 +31,9 @@ trait TraitSigner
      * @var string|null null throws an error
      */
     private(set) ?string $signingParametersString = null;
+
     private(set) null|string $signatureBase = null;
+
     /**
      * Data for signing the relevant header data
      */

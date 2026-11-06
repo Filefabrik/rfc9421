@@ -31,7 +31,6 @@ final readonly class PrepareLine
     }
 
     /**
-     * @return \Filefabrik\Rfc9421\Signer\Signatures\Line
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException

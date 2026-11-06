@@ -42,7 +42,6 @@ final class VerifyRequest
     /**
      * Main method to validate
      *
-     * @return bool
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
@@ -132,7 +131,6 @@ final class VerifyRequest
     /**
      * Getting the Signer instance to rebuild the received message
      *
-     * @return \Filefabrik\Rfc9421\RequestSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException

@@ -76,6 +76,7 @@ final class PreparedMethods
             // binding throwable
             throw PrepareMethodsException::errorFromCalling($nKey, $exception);
         }
+
         if (!$result instanceof Entry) {
             return new Entry($nKey, $result);
         }

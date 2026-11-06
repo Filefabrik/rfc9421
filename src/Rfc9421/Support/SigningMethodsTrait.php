@@ -22,20 +22,23 @@ trait SigningMethodsTrait
     /**
      * for signing methods
      */
-    private(set) ?PreparedMethods $signingMethods = null {
-        get => $this->signingMethods ??= PrepareComponents::defaultMapperClosure();
-    }
+    private ?PreparedMethods $signingMethods = null;
+
+public function getSigningMethodsWithDefaults()
+{
+   return $this->signingMethods ??= PrepareComponents::defaultMapperClosure();
+}
 
     public function addSigningMethod(DerivedComponentEnum|string $componentName, Closure $closure): self
     {
-        $this->signingMethods->add($componentName, $closure);
+        $this->getSigningMethodsWithDefaults()->add($componentName, $closure);
 
         return $this;
     }
 
     public function addSigningMethods(array $methods): self
     {
-        $this->signingMethods->adds($methods);
+        $this->getSigningMethodsWithDefaults()->adds($methods);
 
         return $this;
     }

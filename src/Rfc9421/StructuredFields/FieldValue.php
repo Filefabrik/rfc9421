@@ -36,7 +36,6 @@ final readonly class FieldValue
     }
 
     /**
-     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
@@ -53,7 +52,6 @@ final readonly class FieldValue
     }
 
     /**
-     * @return \Filefabrik\Rfc9421\StructuredFields\Entry
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
@@ -61,8 +59,9 @@ final readonly class FieldValue
     {
         // first test the method is in the configuration stack
         // todo log later if there is no method. No Method is ok but maybe an configuration error
-        if ($this->signingConfiguration->signingMethods?->hasMethod($this->componentItemDto->fieldName) ?? false) {
-            return $this->signingConfiguration->signingMethods->callWith(
+        $signingMethods=$this->signingConfiguration->getSigningMethodsWithDefaults();
+        if ($signingMethods->hasMethod($this->componentItemDto->fieldName) ?? false) {
+            return $signingMethods->callWith(
                 key   : $this->componentItemDto->fieldName,
                 params: [$this->messageInterface, $this->initialContentsParameters],
             );

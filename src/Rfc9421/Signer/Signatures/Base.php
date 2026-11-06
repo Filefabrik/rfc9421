@@ -67,7 +67,7 @@ final class Base
         /*
          * Prepare methods they must render your signature-params and singing parameters
          */
-        if (($preparedComponentMethods = $this->configuration->signingMethods) instanceof PreparedMethods) {
+        if (($preparedComponentMethods = $this->configuration->getSigningMethodsWithDefaults()) instanceof PreparedMethods) {
             $components->setPreparedMethods($preparedComponentMethods);
         }
 
