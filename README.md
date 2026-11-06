@@ -32,6 +32,14 @@ PHP RFC9421 HTTP Message Signing and Verify
 The package is still on the developer instance while the final touches are being made before its first release. Would
 you like to take a look at the code in advance? If so, please open a ticket.
 
+## Diagnostic Tools
+
+Fresh implementation of message singing and verifying can be hard.
+So we have some Tools to check step by step the signing/verifiying process
+
+* [diagnostics.md](docs/diagnostics.md)
+
+
 ## Documentation Details
 
 PHP Error Messages(Throwable's)
