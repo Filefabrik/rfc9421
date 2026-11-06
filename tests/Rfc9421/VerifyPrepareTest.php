@@ -41,7 +41,7 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
-     * @return array<string,string>
+     * @return array<int, list<\Filefabrik\Rfc9421\Enums\SigningEnum|string>>
      */
     public static function withSigningMethods(): array
     {
@@ -116,10 +116,7 @@ final class VerifyPrepareTest extends TestCase
         /*
          * todo only with library Openssl test
          */
-        if (
-            PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnTypeOrThrow($signingAlgo)
-                                                                 ->getName()
-        ) {
+        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::nameOrThrow($signingAlgo)) {
             $this->expectExceptionObject(
                 new BadMethodCallException(
                     'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',
@@ -200,10 +197,7 @@ final class VerifyPrepareTest extends TestCase
         /*
          * todo only with library Openssl test
          */
-        if (
-            PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::isOwnTypeOrThrow($signingAlgo)
-                                                                 ->getName()
-        ) {
+        if (PHP_VERSION < 8.5 && 'rsa_pss_sha512' === SigningEnum::nameOrThrow($signingAlgo)){
             $this->expectExceptionObject(
                 new BadMethodCallException(
                     'rsa_pss_sha512 needs PHP 8.5+. Please see https://www.php.net/manual/en/openssl.padding.php#constant.openssl-pkcs1-pss-padding',

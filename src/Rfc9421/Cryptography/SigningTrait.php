@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -20,6 +21,16 @@ use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 trait SigningTrait
 {
     use EnumSupportTrait;
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public static function nameOrThrow(SigningEnumInterface|string|null $key): string
+    {
+        return self::isOwnTypeOrThrow($key)
+                   ->getName()
+        ;
+    }
 
     /**
      * @throws SignatureException
