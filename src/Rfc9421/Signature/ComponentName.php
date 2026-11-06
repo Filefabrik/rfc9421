@@ -180,7 +180,7 @@ final class ComponentName
         $s = implode('|', InitialContentsEnum::names());
         preg_match('#^"(.*?)";('.$s.')$#', $segment, $matches);
 
-        return 3 === count($matches) ? new ComponentName($matches[1], $matches[2]) : null;
+        return 3 === count($matches) ? new self($matches[1], $matches[2]) : null;
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -189,7 +189,7 @@ final class ComponentName
         $simple = '#^"(.*?)"$#';
         preg_match($simple, $segment, $matches);
 
-        return 2 === count($matches) ? new ComponentName($matches[1]) : null;
+        return 2 === count($matches) ? new self($matches[1]) : null;
     }
 
     /**
