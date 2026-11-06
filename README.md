@@ -8,7 +8,7 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 ✅ PHP-8.4|PHP-8.5
 
-✅ CodeCoverage 100% over 422< Tests and 700< assertions
+✅ CodeCoverage 100% over 440< Tests and 780< Assertions
 
 ✅ easy to use.
 
@@ -30,7 +30,7 @@ PHP RFC9421 HTTP Message Signing and Verify
 ## Release
 
 The package is still on the developer instance while the final touches are being made before its first release. Would
-you like to take a look at the code in advance? If so, please open a ticket.
+you like to take a look at the code in advance? If so, please write a ticket.
 
 ## Diagnostic Tools
 
@@ -72,19 +72,22 @@ composer install filefabrik/rfc9421
 
 ### Full HTTP Signing and Verify Example over two Servers
 
-To help you understand and test all the processes in RFC 9421, we have provided a complete example.
+To help you to understand and test all the processes in RFC 9421, we have provided a complete example.
 
 All processes
 
-* Creating a request
-* Signing a request
-* Sending the signed request
-* Receiving the signed request
-* Verifying the signed request
-* Processing the verified request
-* Signing the response
-* Returning the signed response
-* Verifying the signed response
+* Alice-Server
+  * Creating a request
+  * Signing a request
+  * Sending the signed request
+* Bob's Server
+  * Receiving the signed request
+  * Verifying the signed request
+  * Processing the verified request
+  * Signing the response for Alice
+  * Response the signed response
+* Alice Server
+  * Verifying the signed response
 
 are provided as a transparent and easy-to-follow example.
 
@@ -129,13 +132,11 @@ _typical request object_
 <?php 
 use GuzzleHttp\Psr7\Request;
 
-$bodyParams = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];
-$bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
 $request    = new Request(
     method : 'POST',
     uri    : 'https://target-host.com',
     headers: ['x-origin-host' => 'target-host.com'],
-    body   : $bodyJson,
+    body   : '{"recipient":"Alex","amount":900,"currency":"EUR"}',
 );
 
 ?>
