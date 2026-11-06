@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -159,7 +160,25 @@ if (null !== $keyId) {
             $body = (string)$verifier->getMessage()
                                      ->getBody()
             ;
-            displayLogger($body, 1, false);
+
+            displayLogger($body, 2, false);
+
+            try {
+                $requestBodyParams = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                displayLogger('Request body params is not valid. '.$e->getMessage());
+
+                return;
+            }
+            /* @var array<string,string> $requestBodyParams */
+            $explanation = sprintf(
+                'Alice Server wants to "add-to-balance" for the User-Account: "%s" %s€ on Bobs Server.',
+                $requestBodyParams['recipient'],
+                $requestBodyParams['add-to-balance'],
+            );
+            displayLogger($explanation, 2, false);
+
+            displayLogger('*** todo, signing the response that alice can validate the signed response ***', 2);
         } else {
             displayLogger('The body was not signed by Alice.');
         }

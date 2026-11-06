@@ -9,14 +9,12 @@
 declare(strict_types=1);
 
 // Specify the URL and data
-use Bakame\Http\StructuredFields\StructuredFieldError;
 use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, SigningEnum};
-use Filefabrik\Rfc9421\Exceptions\{AlreadySetException,
+use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
+    AlreadySetException,
     ContentDigestException,
-    EnumTypeException,
     SignatureException,
-    SignatureExtractionException,
-    UnProcessableSignatureException};
+    SignatureExtractionException};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
@@ -43,13 +41,6 @@ $currentDateTime = new DateTime()->getTimestamp();
 
 try {
     $signingConfiguration = new SigningConfiguration()
-        /*
-         * the method we are generating the content-type value (simply via header line)
-         */
-        ->addSigningMethod(
-            componentName: 'content-type',
-            closure      : fn (RequestInterface $request): string => $request->getHeaderLine('content-type'),
-        )
         /*
          * tell the signing process that content-type has to be signed
          */
@@ -96,19 +87,12 @@ $signingConfiguration->addSigningMethods($prepareMethods);
 /**
  * Prepare the Request
  */
-$bodyParams = ['recipient' => 'Alex', 'amount' => 900000000, 'text' => 'some text'];
-try {
-    $bodyJson = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-} catch (JsonException $jsonException) {
-    displayLogger('json encode error: '.$jsonException->getMessage());
 
-    return;
-}
 
 $symfonyRequest = Request::create(
     uri    : $url,
     method : 'POST',
-    content: $bodyJson,
+    content: '{"recipient":"Alex","add-to-balance":200,"text":"some text"}',
 );
 $symfonyRequest->headers->add(['x-origin-host' => 'This-is-From-Bob.com', 'content-type' => 'application/json']);
 // The HTTP_HOST server key must be set to avoid an unexpected error
@@ -120,7 +104,7 @@ $psrRequest     = $psrHttpFactory->createRequest($symfonyRequest);
 $signer = new RequestSigner(message: $psrRequest, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AlreadySetException|SignatureException|ContentDigestException|StructuredFieldError|EnumTypeException|UnProcessableSignatureException|SignatureExtractionException  $e) {
+} catch (AbstractRfc9421Exception  $e) {
     displayLogger('The Signing Process has Errors:');
     displayLogger($e->getMessage());
 
@@ -137,7 +121,9 @@ try {
     return;
 }
 displayLogger('Response is back from Bob to Alice Server. Shows the Response-Body from Bob.', 2);
-
+/**
+ * todo getting the signed response and handle it
+ */
 echo $bobsResponse->getBody();
 
 displayLogger('', 1, false);
