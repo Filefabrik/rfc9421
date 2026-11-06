@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -127,7 +128,7 @@ final class FieldValueTest extends TestCase
             ),
         );
         $handled     = $instance->getFieldValue();
-        $targetEntry = new Entry("@query-param", 'bat-man', InitialContentsEnum::name,'baz');
+        $targetEntry = new Entry('@query-param', 'bat-man', InitialContentsEnum::name, 'baz');
         self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
     }
 

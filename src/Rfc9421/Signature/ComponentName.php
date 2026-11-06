@@ -159,6 +159,7 @@ final class ComponentName
         return new ComponentName(name: $name, initialContents: $initialContents, keyOrNameValue: $keyOrNameValue);
     }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     private static function extract4(string $segment): ?self
     {
         $s       = implode('|', [InitialContentsEnum::key->name, InitialContentsEnum::name->name]);
@@ -173,6 +174,7 @@ final class ComponentName
             ) : null;
     }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     private static function extract3(string $segment): ?self
     {
         $s = implode('|', InitialContentsEnum::names());
@@ -181,6 +183,7 @@ final class ComponentName
         return 3 === count($matches) ? new ComponentName($matches[1], $matches[2]) : null;
     }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     private static function extract2(string $segment): ?self
     {
         $simple = '#^"(.*?)"$#';

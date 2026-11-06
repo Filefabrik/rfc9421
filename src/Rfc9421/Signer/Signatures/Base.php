@@ -18,7 +18,6 @@ use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\Signer\SignBody;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
-use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
@@ -67,9 +66,8 @@ final class Base
         /*
          * Prepare methods they must render your signature-params and singing parameters
          */
-        if (($preparedComponentMethods = $this->configuration->getSigningMethodsWithDefaults()) instanceof PreparedMethods) {
-            $components->setPreparedMethods($preparedComponentMethods);
-        }
+
+        $components->setPreparedMethods($this->configuration->getSigningMethodsWithDefaults());
 
         /*
          * todo prepare method for content-digest

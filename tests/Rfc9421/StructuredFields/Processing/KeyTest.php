@@ -20,6 +20,7 @@ use PHPUnit\Framework\TestCase;
 final class KeyTest extends TestCase
 {
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
     public function testHandleWithEmptyValue(): void
@@ -34,6 +35,7 @@ final class KeyTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
     public function testHandleWithValue(): void

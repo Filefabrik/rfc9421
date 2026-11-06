@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -24,6 +25,9 @@ use TypeError;
 #[CoversClass(PreparedMethods::class)]
 final class PreparedMethodsTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testGetMethod(): void
     {
         $i = new PreparedMethods();
@@ -52,6 +56,10 @@ final class PreparedMethodsTest extends TestCase
 
         $i->getMethod('poster2');
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testCallWithThrowMessag(): void
     {
         $this->expectExceptionObject(new PrepareMethodsException('Error during calling the method with key: "texst": something buggy inside'));
@@ -63,8 +71,9 @@ final class PreparedMethodsTest extends TestCase
             ],
         );
 
-        $i->callWith('texst',[]);
+        $i->callWith('texst', []);
     }
+
     public function testAdds(): void
     {
         $arr = [
@@ -120,6 +129,9 @@ final class PreparedMethodsTest extends TestCase
         self::assertTrue($i->hasMethod('poster2'));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testCallWith(): void
     {
         $r = new Request(
@@ -141,6 +153,9 @@ final class PreparedMethodsTest extends TestCase
         self::assertSame('content-length', $calledEntry->key);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testCallWithReturnEntry(): void
     {
         $r = new Request(

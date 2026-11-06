@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -22,6 +23,7 @@ use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -59,8 +61,6 @@ final class VerifyPrepareTest extends TestCase
 
     /**
      *
-     * @param string|\Filefabrik\Rfc9421\Enums\SigningEnum $signingAlgo
-     * @param string                                       $cert
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
@@ -72,7 +72,8 @@ final class VerifyPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \JsonException
+     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerify(string|SigningEnum $signingAlgo, string $cert): void
@@ -143,8 +144,6 @@ final class VerifyPrepareTest extends TestCase
     /**
      *
      *
-     * @param string|\Filefabrik\Rfc9421\Enums\SigningEnum $signingAlgo
-     * @param string                                       $cert
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
@@ -156,7 +155,8 @@ final class VerifyPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \JsonException
+     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerifyWithContentDigest(string|SigningEnum $signingAlgo, string $cert): void
@@ -313,7 +313,8 @@ final class VerifyPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \JsonException
+     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     public function testGetSignatureInputInstance(): void
     {

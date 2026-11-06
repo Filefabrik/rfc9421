@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -24,21 +25,25 @@ trait SigningMethodsTrait
      */
     private ?PreparedMethods $signingMethods = null;
 
-public function getSigningMethodsWithDefaults()
-{
-   return $this->signingMethods ??= PrepareComponents::defaultMapperClosure();
-}
-
     public function addSigningMethod(DerivedComponentEnum|string $componentName, Closure $closure): self
     {
-        $this->getSigningMethodsWithDefaults()->add($componentName, $closure);
+        $this->getSigningMethodsWithDefaults()
+             ->add($componentName, $closure)
+        ;
 
         return $this;
     }
 
+    public function getSigningMethodsWithDefaults(): PreparedMethods
+    {
+        return $this->signingMethods ??= PrepareComponents::defaultMapperClosure();
+    }
+
     public function addSigningMethods(array $methods): self
     {
-        $this->getSigningMethodsWithDefaults()->adds($methods);
+        $this->getSigningMethodsWithDefaults()
+             ->adds($methods)
+        ;
 
         return $this;
     }

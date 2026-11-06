@@ -109,6 +109,7 @@ final class PrepareLineTest extends TestCase
      */
     public function testHandleNameMultiline(): void
     {
+        /** @noinspection HttpUrlsUsage */
         $request  = new Request('GET', 'http://my.com/parameters?var=this%20is%20a%20big%0Amultiline%20value&\
   bar=with+plus+whitespace&fa%C3%A7ade%22%3A%20=something', ['test' => 'testValue']);
         $instance = new PrepareLine(

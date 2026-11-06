@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -24,7 +25,7 @@ final class SignatureExtractionExceptionTest extends TestCase
     {
         $this->expectExceptionObject(
             new SignatureExtractionException(
-                'Signature is not proceeded. Call before Filefabrik\Rfc9421\Verify\HeaderSignatureInput::extract',
+                'Signature is not proceeded. Call before '.\Filefabrik\Rfc9421\Verify\HeaderSignatureInput::class.'::extract',
             ),
         );
         throw SignatureExtractionException::notProceeded();

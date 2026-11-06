@@ -283,14 +283,14 @@ final class RequestSignerTest extends TestCase
      */
     public function testGetSignedLinesOne(): void
     {
-        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
-        $certInstance    = new CertHelper('rsa');
-        $currentDateTime = new DateTime()->getTimestamp();
-
+        $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
+        $certInstance         = new CertHelper('rsa');
+        $currentDateTime      = new DateTime()->getTimestamp();
+        $expiredDate          = $currentDateTime + 7200;
         $signingConfiguration = new SigningConfiguration()
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
-            ->setExpires($currentDateTime + 7200)
+            ->setExpires($expiredDate)
             ->setTag('mastodon')
             ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
@@ -314,10 +314,18 @@ final class RequestSignerTest extends TestCase
         $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->sign();
 
+        $signatureParamsText = <<<text
+            "@signature-params": testValue=();created=$currentDateTime;expires=$expiredDate;nonce="nonce-now";keyid="http://127.0.0.1:8001/actor#main-key";alg="rsa-v1-5-sha512";tag="mastodon"
+            text;
         self::assertCount(
             1,
             $signer->getSignedLines()
                    ->getLines(),
+        );
+        self::assertSame(
+            $signatureParamsText,
+            $signer->getSignedLines()
+                   ->getLines()[0]->valueToSign,
         );
     }
 

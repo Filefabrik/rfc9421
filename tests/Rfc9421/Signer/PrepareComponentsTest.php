@@ -72,7 +72,9 @@ final class PrepareComponentsTest extends TestCase
      * Overall Method to check the System
      *
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
     public function testProcessValue(): void
     {
@@ -116,6 +118,9 @@ final class PrepareComponentsTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     */
     public function testProcessTargetUri(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
@@ -182,7 +187,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
     public function testProcessPath(): void
     {
@@ -266,7 +273,7 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents(message: $r, preparedMethods: new PreparedMethods());
         $prepareInstance->preparedMethods->add(
             'testing',
-            fn ($method) => throw new UnexpectedValueException('is a bug'),
+            fn ($method): never => throw new UnexpectedValueException('is a bug'),
         );
         $prepareInstance->processValue('testing');
     }

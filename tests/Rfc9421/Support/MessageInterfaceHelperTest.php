@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -27,7 +28,7 @@ final class MessageInterfaceHelperTest extends TestCase
     {
         /** @noinspection HttpUrlsUsage */
         $request = new Request('POST', 'http://example.com/pl?some=task');
-        /** @noinspection HttpUrlsUsage */
+        /* @noinspection HttpUrlsUsage */
         self::assertSame('http://example.com/pl?some=task', (string)MessageInterfaceHelper::hasGetUri($request));
     }
 

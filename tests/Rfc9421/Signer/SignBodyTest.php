@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -11,6 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Signer;
 
 use Filefabrik\Rfc9421\Signer\SignBody;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +21,7 @@ final class SignBodyTest extends TestCase
 {
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testGetContentDigest(): void
     {
@@ -34,7 +36,7 @@ final class SignBodyTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testCalculateSignature(): void
     {
@@ -49,7 +51,7 @@ final class SignBodyTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testGetContentDigestHeaderArray(): void
     {

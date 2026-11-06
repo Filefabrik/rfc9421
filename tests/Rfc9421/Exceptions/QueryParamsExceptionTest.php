@@ -44,6 +44,7 @@ final class QueryParamsExceptionTest extends TestCase
         );
         throw QueryParamsException::keyException('//buggy key');
     }
+
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      */

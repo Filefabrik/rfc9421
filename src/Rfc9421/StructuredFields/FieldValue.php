@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -59,8 +60,8 @@ final readonly class FieldValue
     {
         // first test the method is in the configuration stack
         // todo log later if there is no method. No Method is ok but maybe an configuration error
-        $signingMethods=$this->signingConfiguration->getSigningMethodsWithDefaults();
-        if ($signingMethods->hasMethod($this->componentItemDto->fieldName) ?? false) {
+        $signingMethods = $this->signingConfiguration->getSigningMethodsWithDefaults();
+        if ($signingMethods->hasMethod($this->componentItemDto->fieldName)) {
             return $signingMethods->callWith(
                 key   : $this->componentItemDto->fieldName,
                 params: [$this->messageInterface, $this->initialContentsParameters],

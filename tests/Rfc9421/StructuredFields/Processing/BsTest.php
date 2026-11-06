@@ -19,6 +19,10 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Bs::class)]
 final class BsTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
     public function testHandleEmpty(): void
     {
         $request = new Request('POST', '');
@@ -30,6 +34,10 @@ final class BsTest extends TestCase
         self::assertSame('"example-header";bs: ', $returnEntry->parse());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
     public function testHandleWithOne(): void
     {
         $request = new Request('POST', '');
@@ -42,6 +50,10 @@ final class BsTest extends TestCase
         self::assertSame('"example-header";bs: :bXkgdGVzdCB2YWx1ZSBmaXJzdA==:', $returnEntry->parse());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
     public function testHandleWithTwo(): void
     {
         $request = new Request('POST', '');

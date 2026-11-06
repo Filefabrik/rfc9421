@@ -35,7 +35,7 @@ final class MethodsMapper
     }
 
     /**
-     * @param array<string,Closure>|array{list: Closure, innerlist: Closure, parameters: Closure, dictionary: Closure, item: Closure, etag: Closure, url: Closure, date: Closure} $methods
+     * @param array<string,Closure>|array{list: Closure, innerlist: Closure, parameters: Closure, dictionary: Closure, item: Closure, etag: Closure, url: Closure, date: Closure, string: Closure} $methods
      */
     public function addMany(array $methods): self
     {

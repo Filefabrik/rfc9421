@@ -104,6 +104,7 @@ final class MessageQueryParams
             }
 
             /** @noinspection UnnecessaryCastingInspection */
+            /** @noinspection PhpCastIsUnnecessaryInspection */
             $ValueDecoded = urldecode((string)$value);
             /* $ValueReEncoded = urlencode($ValueDecoded);
 
