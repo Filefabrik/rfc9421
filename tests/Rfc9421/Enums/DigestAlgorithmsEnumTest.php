@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -20,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 final class DigestAlgorithmsEnumTest extends TestCase
 {
     /**
-     * @return array[]
+     * @return array<int, list<\Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum|string>>
      */
     public static function validDigestAlgorithms(): array
     {
@@ -33,6 +34,9 @@ final class DigestAlgorithmsEnumTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<list<null|string>>
+     */
     public static function invalidDigestAlgorithms(): array
     {
         return [
@@ -42,7 +46,9 @@ final class DigestAlgorithmsEnumTest extends TestCase
     }
 
     /**
-     * @throws ContentDigestException
+     * @param array<null|string> ...$datas
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
     #[DataProvider('validDigestAlgorithms')]
     public function testIsOwnTypeOrThrow(...$datas): void
@@ -75,6 +81,10 @@ final class DigestAlgorithmsEnumTest extends TestCase
         DigestAlgorithmsEnum::isOwnTypeOrThrow('never mind');
     }
 
+    /**
+     * @param array<\Filefabrik\Rfc9421\Enums\Support\EnumSupportTrait|\Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum|string,\Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum> ...$datas
+     *
+     */
     #[DataProvider('validDigestAlgorithms')]
     public function testIsOwnType(...$datas): void
     {
@@ -88,7 +98,7 @@ final class DigestAlgorithmsEnumTest extends TestCase
     public function testIsOwnTypeNull(...$datas): void
     {
         self::assertNull(
-            DigestAlgorithmsEnum::isOwnType($datas[0])
+            DigestAlgorithmsEnum::isOwnType($datas[0]),
         );
     }
 
