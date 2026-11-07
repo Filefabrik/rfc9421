@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -26,11 +27,9 @@ final class ContentDigestException extends AbstractRfc9421Exception
 
     public static function hashAlgoNotSupported(string $alg): self
     {
-        return new self(sprintf('Hash algorithm "%s" for the %s not supported.', $alg, HeaderKeysEnum::content_digest->value));
+        return new self(
+            sprintf('Hash algorithm "%s" for the %s not supported.', $alg, HeaderKeysEnum::content_digest->value),
+        );
     }
 
-    public static function canNotHashWithoutAlgorithm(): self
-    {
-        return new self(sprintf('%s header is set but the ContentDigestHashAlgo was not configuration.', HeaderKeysEnum::content_digest->value));
-    }
 }
