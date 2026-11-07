@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -28,16 +29,6 @@ final class SignatureRegistry
      * @var array<callable>
      */
     private static array $stack = [];
-
-    /**
-     * only static class
-     *
-     * @codeCoverageIgnore
-     * @noinspection PhpUnused
-     */
-    private function __construct()
-    {
-    }
 
     /**
      * @throws SignatureException

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -11,6 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Enums;
 
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -65,6 +67,23 @@ final class SigningEnumTest extends TestCase
         ?SigningEnum $exp = null,
     ): void {
         self::assertSame($exp ?? $signingEnum, SigningEnum::isOwnTypeOrThrow($signingEnum));
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testNameOrThrowHas(): void
+    {
+        self::assertSame('rsa_pss_sha512', SigningEnum::nameOrThrow(SigningEnum::rsa_pss_sha512));
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testNameOrThrowThrows(): void
+    {
+        $this->expectExceptionObject(SignatureException::signatureEnumNotFound('bullshit'));
+        SigningEnum::nameOrThrow('bullshit');
     }
 
     #[DataProvider('dataSigningEnums')]

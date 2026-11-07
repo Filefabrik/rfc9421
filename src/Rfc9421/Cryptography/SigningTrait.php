@@ -15,9 +15,6 @@ use Filefabrik\Rfc9421\Enums\Support\EnumSupportTrait;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 
-/**
- * @codeCoverageIgnore
- */
 trait SigningTrait
 {
     use EnumSupportTrait;
