@@ -33,8 +33,9 @@ final class ResponseSigner
          * Todo, if the request verifier set, it is also possible to handle some ;req headers
          * Todo check we should use another object to handle the ;req for the signed response from a request or signed request
          *
-         * private(set) readonly ?VerifyRequest $verifyRequest = null,
+         *
          * */
+        private(set) readonly ?VerifyRequest $verifyRequest = null,
     ) {
         $this->message = $message;
     }

@@ -13,8 +13,8 @@ namespace Filefabrik\Rfc9421\Signer;
 
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
@@ -61,11 +61,13 @@ trait TraitSigner
      */
     private function sign(): ResponseInterface|RequestInterface
     {
+        // todo if ;req make "content-digest";req:
+        // todo move the content_digest as regular signHeader() because of the possible ;req on response signing
         // set up the content digest into rendering if the ContentDigestAlgo exists
-        if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
-            $this->signingConfiguration->signatureComponents->addName(HeaderKeysEnum::content_digest->value);
-        }
-
+        /*     if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
+                 $this->signingConfiguration->signatureComponents->addName(HeaderKeysEnum::content_digest->value);
+             }*/
+        // todo with ;req if it ist Response Signer
         $this->prepareSigning();
 
         // last phase, crypt and base64_encode. get back header key value  sig1=:base64_signature:
@@ -93,6 +95,10 @@ trait TraitSigner
      */
     public function prepareSigning(): void
     {
+        // signing the content-digest into header
+
+        $this->updateHeadersBeforePrepare();
+
         $base = new Base(message: $this->message, configuration: $this->signingConfiguration);
 
         /*
@@ -101,11 +107,10 @@ trait TraitSigner
         $this->signingLines = $base->createSignatureLines();
 
         // rebind because the header maybe changed in signature base class
-        $this->message = $base->message;
+        // $this->message = $base->message;
 
         // setting the last header before we are signing the "SignatureSigns"
         $this->signatureBase = $base->makeSignatureInput();
-
 
         // now set the signature-params ONLY into the signature-base line NOT into the HTTP-Header.
         $signatureParamsEntry = new Entry(DerivedComponentEnum::signatureParams->value, $this->signatureBase);
@@ -120,6 +125,42 @@ trait TraitSigner
         // makes the array of signingLines to a string. The string kann be base64EncodedValue
         // keep the $this->signingParametersString public readable. maybe for testing and other stuff
         $this->signingParametersString = Base::compileSignatureInputToString($this->signingLines);
+    }
+
+    /**
+     * Method for the content-digest which will be pushed into the header if not exists
+     * todo move out as extra service
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    private function updateHeadersBeforePrepare(): void
+    {
+        foreach ($this->signingConfiguration->signatureComponents->getComponents() as $item) {
+            /*
+             * yes we have to prepare the content-digest if not exists
+             * todo check ;req flag then not insert into
+             */
+            if (
+                ($item->fieldName === HeaderKeysEnum::content_digest->value) &&
+                !$this->message->hasHeader(HeaderKeysEnum::content_digest->value) &&
+                $this->signingConfiguration->hasContentDigestHashAlgo() &&
+                !$item->getItem()
+                      ->parameters()
+                      ->hasKeys(InitialContentsEnum::req->name)
+            ) {
+                // set the body digest into the header
+                [$headerKey, $value] = new SignBody(
+                    body     : (string)$this->message->getBody(),
+                    algorithm: $this->signingConfiguration->getContentDigestHashAlgoOrThrow(),
+                )->getContentDigestHeaderArray();
+
+                /*
+                 * Todo the rebind into header should be more smart
+                 * !! @important
+                 * rebind the MessageInterface because of cloned change
+                 */
+                $this->message = $this->message->withHeader($headerKey, $value);
+            }
+        }
     }
 
     /**

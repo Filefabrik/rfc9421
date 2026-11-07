@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -12,7 +13,6 @@ namespace Filefabrik\Rfc9421Test\Signer\Signatures;
 
 use DateTime;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
-use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
@@ -75,7 +75,7 @@ final class BaseTest extends TestCase
            ->signHeader('content-digest')
            ->setContentDigestAlgo('sha256')
         ;
-        $r     = new Request('post', '', ['noT-exIsting' => 'hm']);
+        $r     = new Request('post', '', ['noT-exIsting' => 'hm', 'content-digest' => 'an value']);
         $i     = new Base($r, $sc);
         $lines = $i->createSignatureLines();
         self::assertEquals(
@@ -103,8 +103,8 @@ final class BaseTest extends TestCase
     public function testHandleSignBodyThrowConfig(): void
     {
         $this->expectExceptionObject(
-            new ContentDigestException(
-                'content-digest header is set but the ContentDigestHashAlgo was not configuration.',
+            new InvalidHeaderKeyException(
+                'The header "content-digest" does not exist in the message. Note:headers can only be a part of the signing process if they are existing. $message->withHeader("content-digest", \'your value\')',
             ),
         );
         $sc = new SigningConfiguration();
@@ -203,7 +203,9 @@ final class BaseTest extends TestCase
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 
-        $arr          = $i->createSignatureLines()->getLines();
+        $arr          = $i->createSignatureLines()
+                          ->getLines()
+        ;
         $expectations = [
             ['"not-existing"', '"not-existing": hm'],
             ['"@method"', '"@method": POST'],

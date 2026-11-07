@@ -91,10 +91,6 @@ final class VerifyRequestTest extends TestCase
         $configuration   = new SigningConfiguration();
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
-            /*
-             * check duplicate content-digest
-             * ->withHeader('content-digest')
-             */
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
@@ -140,13 +136,9 @@ final class VerifyRequestTest extends TestCase
             '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
-        $tamperedRequest = clone $signedRequest;
-        $tamperedBody    = $bodyParams;
-        #$tamperedBody['mod'] = 'hasModiefied';
-        $tamperedRequest =
-            $tamperedRequest->withBody(Utils::streamFor(json_encode($tamperedBody, JSON_THROW_ON_ERROR)));
 
-        $verifyPrepare = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
+
+        $verifyPrepare = new VerifyPrepare($signedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
         $verifier = new VerifyRequest($verifyPrepare);
@@ -316,11 +308,8 @@ final class VerifyRequestTest extends TestCase
         $configuration   = new SigningConfiguration();
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
+                      ->signHeader('content-digest')
                       ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
-            /*
-             * check duplicate content-digest
-             * ->withHeader('content-digest')
-             */
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
@@ -381,8 +370,6 @@ final class VerifyRequestTest extends TestCase
      * todo with tampered body
      *
      *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -413,6 +400,7 @@ final class VerifyRequestTest extends TestCase
 
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
+                      ->signHeader('content-digest')
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)

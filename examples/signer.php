@@ -123,6 +123,7 @@ try {
         ->signHeader('x-Origin-host')
         ->signHeader('test-header')
         ->signHeader('"example-dict"')
+        ->signHeader('content-digest')
         /*
          * Setting a bundle of prepared components
          */

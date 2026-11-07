@@ -67,6 +67,8 @@ final class RequestSignerTest extends TestCase
                 ): string => $request->getHeaderLine('content-type'),
             )
             ->signHeader('content-type')
+            ->signHeader('content-digest')
+           // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::req))
             ->signHeader('"@query-param";name="baz"')
             ->signHeader('@method')
             ->signHeader('x-Origin-host')
@@ -149,14 +151,14 @@ final class RequestSignerTest extends TestCase
         self::assertContains('"content-type": application/json', $signingLinesValues);
         $signatureLines = <<<TEXT
             "content-type": application/json
+            "content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:
             "@query-param";name="baz": bat-man
             "@method": POST
             "x-origin-host": mytest.com
             "example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d
             "example-dict";key="d": ?1
             "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
-            "content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:
-            "@signature-params": testValue=("content-type" "@query-param";name="baz" "@method" "x-origin-host" "example-dict";sf "example-dict";key="d" "example-header";bs "content-digest");created=$currentDateTime;expires=$expireDateTime;nonce="nonce-now";keyid="http://127.0.0.1:8001/actor#main-key";alg="rsa-v1-5-sha512";tag="mastodon"
+            "@signature-params": testValue=("content-type" "content-digest" "@query-param";name="baz" "@method" "x-origin-host" "example-dict";sf "example-dict";key="d" "example-header";bs);created=$currentDateTime;expires=$expireDateTime;nonce="nonce-now";keyid="http://127.0.0.1:8001/actor#main-key";alg="rsa-v1-5-sha512";tag="mastodon"
             TEXT;
         self::assertSame($signatureLines, $signer->signingParametersString);
     }
@@ -233,7 +235,7 @@ final class RequestSignerTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
 
         $signingConfiguration = new SigningConfiguration()
-            ->signHeader('@method')
+            ->signHeader('@method')->signHeader('content-digest')
             ->signHeader('x-Origin-host')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)

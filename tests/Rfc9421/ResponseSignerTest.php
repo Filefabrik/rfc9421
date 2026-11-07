@@ -66,6 +66,7 @@ final class ResponseSignerTest extends TestCase
             ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
             ->signHeader('content-length')
+            ->signHeader('content-digest')
             // the sender of the request expects an algo that Bob can check while receive this signed response
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             // set alice private pem to encrypt the response

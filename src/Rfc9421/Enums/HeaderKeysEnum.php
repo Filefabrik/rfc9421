@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -15,7 +16,14 @@ namespace Filefabrik\Rfc9421\Enums;
  */
 enum HeaderKeysEnum: string
 {
-    case content_digest  = 'content-digest';
+    /*
+     * Content-Digest is for the Body
+     */
+    case content_digest = 'content-digest';
+
+    /*
+     * fixed values
+     */
     case signature_input = 'signature-input';
 
     case signature = 'signature';
