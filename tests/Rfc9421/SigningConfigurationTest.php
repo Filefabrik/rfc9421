@@ -338,7 +338,6 @@ final class SigningConfigurationTest extends TestCase
         $i = new SigningConfiguration()->setPrivatePem('shiddy private');
 
         self::assertSame('shiddy private', $i->getPrivatePemOrThrow());
-        ;
     }
 
     /**

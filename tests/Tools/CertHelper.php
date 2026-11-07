@@ -14,7 +14,7 @@ use UnexpectedValueException;
 
 final class CertHelper
 {
-    public function __construct(public private(set) readonly string $name, private(set) ?string $dir = null)
+    public function __construct(private(set) readonly string $name, private(set) ?string $dir = null)
     {
     }
 

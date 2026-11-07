@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -57,6 +58,7 @@ if (null === $route) {
 }
 
 if (file_exists($route)) {
+    /* @noinspection ForgottenDebugOutputInspection */
     print_r($route);
     include $route;
     exit(0);

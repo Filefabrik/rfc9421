@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -23,11 +24,11 @@ if (str_starts_with(php_uname(), 'Windows')) {
 }
 require_once __DIR__.'/account_bootstrap.php';
 $webservers = [
-    'alice'   => [
+    'alice' => [
         'host' => 'localhost',
         'port' => 8000,
     ],
-    'bob' => [
+    'bob'   => [
         'host' => 'localhost',
         'port' => 8001,
     ],
@@ -42,7 +43,7 @@ foreach ($webservers as $name => $config) {
         'php -d xdebug.profiler_enable=On -S %s:%d %s >/dev/null 2>&1 & echo $!',
         $host,
         $port,
-        __DIR__."/{$name}/router.php",
+        __DIR__."/$name/router.php",
     );
 
     // Execute the command and store the process ID
@@ -66,8 +67,7 @@ echo 'target-scripts here:' , PHP_EOL, PHP_EOL;
 
 // Kill web servers when the process ends
 register_shutdown_function(function () use ($webservers) {
-
-    echo  PHP_EOL,PHP_EOL, 'end target-scripts', PHP_EOL;
+    echo PHP_EOL, PHP_EOL, 'end target-scripts', PHP_EOL;
     foreach ($webservers as $name => $config) {
         extract($config);
         echo sprintf(

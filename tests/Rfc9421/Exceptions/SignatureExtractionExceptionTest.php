@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Exceptions;
 
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +26,7 @@ final class SignatureExtractionExceptionTest extends TestCase
     {
         $this->expectExceptionObject(
             new SignatureExtractionException(
-                'Signature is not proceeded. Call before '.\Filefabrik\Rfc9421\Verify\HeaderSignatureInput::class.'::extract',
+                'Signature is not proceeded. Call before '.HeaderSignatureInput::class.'::extract',
             ),
         );
         throw SignatureExtractionException::notProceeded();

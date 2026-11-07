@@ -23,7 +23,6 @@ use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Utils;
-use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -64,19 +63,20 @@ final class VerifyRequestTest extends TestCase
      *
      *
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws JsonException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     #[DataProvider('withSigningMethods')]
     public function testValidate(string|SigningEnum $signingAlgo, string $cert): void
@@ -168,19 +168,20 @@ final class VerifyRequestTest extends TestCase
      *
      *
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws JsonException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     #[DataProvider('withSigningMethods')]
     public function testValidateWithoutBody(
@@ -279,19 +280,20 @@ final class VerifyRequestTest extends TestCase
      *
      *
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws JsonException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     #[DataProvider('withSigningMethods')]
     public function testValidateWithContentDigest(string|SigningEnum $signingAlgo, string $cert): void
@@ -369,19 +371,20 @@ final class VerifyRequestTest extends TestCase
      * todo with tampered body
      *
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws JsonException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      */
     #[DataProvider('withSigningMethods')]
     public function testValidateTemperedBody(

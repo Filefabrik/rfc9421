@@ -71,7 +71,7 @@ final class PreparedMethodsTest extends TestCase
             ],
         );
 
-        $i->callWith('texst', []);
+        $i->callWith('texst');
     }
 
     public function testAdds(): void
