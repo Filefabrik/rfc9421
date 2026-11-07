@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -280,4 +281,38 @@ final class SigningConfigurationTest extends TestCase
         }
     }
 
+    public function testMustCreateContentDigest(): void
+    {
+        $i = new SigningConfiguration();
+
+        //$instance = new GenerateContentDigestFaked();
+        self::assertFalse($i->isMustGenerateContentDigest());
+        $i->mustCreateContentDigest();
+        self::assertTrue($i->isMustGenerateContentDigest());
+    }
+
+    public function testAddSigningMethod(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertCount(11, $i->getSigningMethodsWithDefaults()->methods);
+        $i->addSigningMethod('foo', fn () => 'play');
+        self::assertCount(12, $i->getSigningMethodsWithDefaults()->methods);
+        $i->addSigningMethod('foo', fn () => 'play');
+        self::assertCount(12, $i->getSigningMethodsWithDefaults()->methods);
+    }
+
+    public function testGetSigningMethodsWithDefaults(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertCount(11, $i->getSigningMethodsWithDefaults()->methods);
+    }
+
+    public function testAddSigningMethods(): void
+    {
+        $i = new SigningConfiguration();
+        $i->addSigningMethods(
+            ['foo' => fn () => 'play foo', 'bar' => fn () => 'bar play', 'baz' => fn () => 'play baz'],
+        );
+        self::assertCount(14, $i->getSigningMethodsWithDefaults()->methods);
+    }
 }

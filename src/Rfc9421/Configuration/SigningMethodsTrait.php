@@ -9,20 +9,18 @@
  */
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Support;
+namespace Filefabrik\Rfc9421\Configuration;
 
 use Closure;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
+use Filefabrik\Rfc9421\Support\PreparedMethods;
 
 /**
- * @codeCoverageIgnore
+ * for signing methods
  */
 trait SigningMethodsTrait
 {
-    /**
-     * for signing methods
-     */
     private ?PreparedMethods $signingMethods = null;
 
     public function addSigningMethod(DerivedComponentEnum|string $componentName, Closure $closure): self

@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Support;
+namespace Filefabrik\Rfc9421\Configuration;
 
 trait MetadataTrait
 {
