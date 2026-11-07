@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -57,5 +58,18 @@ final class ContentDigestExceptionTest extends TestCase
             ),
         );
         throw ContentDigestException::canNotHashWithoutAlgorithm();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    public function testHeaderContentDigestAlreadySet(): void
+    {
+        $this->expectExceptionObject(
+            new ContentDigestException(
+                'The HTTP Message Header "content-digest" exists. So the "content-digest" can not be written again.',
+            ),
+        );
+        throw ContentDigestException::headerContentDigestAlreadySet();
     }
 }

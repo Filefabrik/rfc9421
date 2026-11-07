@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Support;
+namespace Filefabrik\Rfc9421\Configuration;
 
 /**
  * in the Signers Configuration allowed
@@ -21,8 +21,6 @@ trait GenerateContentDigestTrait
 
     /**
      * Explizit Command that the content-digest has to be rendered from the message body and MUST be set into the HTTP Message Header as ["content-digest" => 'sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:']
-     *
-     * @return \Filefabrik\Rfc9421\Support\GenerateContentDigestTrait|\Filefabrik\Rfc9421\SigningConfiguration
      */
     public function mustCreateContentDigest(): self
     {

@@ -77,17 +77,17 @@ To help you to understand and test all the processes in RFC 9421, we have provid
 All processes
 
 * Alice-Server
-  * Creating a request
-  * Signing a request
-  * Sending the signed request
+    * Creating a request
+    * Signing a request
+    * Sending the signed request
 * Bob's Server
-  * Receiving the signed request
-  * Verifying the signed request
-  * Processing the verified request
-  * Signing the response for Alice
-  * Response the signed response
+    * Receiving the signed request
+    * Verifying the signed request
+    * Processing the verified request
+    * Signing the response for Alice
+    * Response the signed response
 * Alice Server
-  * Verifying the signed response
+    * Verifying the signed response
 
 are provided as a transparent and easy-to-follow example.
 
@@ -306,16 +306,30 @@ not modified.
 
 The reason of the RFC9421 is to make sure, some information's of the request are not modified after signing.
 I think a signedBody is mandatory for Post Requests.
-Per default the body will be automatically signed.
-That makes sure, the body was never tempered.
+Per default the body will NOT be automatically signed.
 
 ```php
 <?php 
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-$signingConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha512);
+$signingConfiguration
+    ->mustCreateContentDigest()
+    ->signHeader('content-digest')
+    ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512);
 ?>
 ```
+
+To sign the body as content-digest you have to made 3 configuration entries
+
+1. Tell that the content-digest has to be created and inserted as HTTP Message header into the existing HTTP Message
+   Interface  `$signingConfiguration->mustCreateContentDigest()`
+2. Such as you are regular configuring a singing-component, set the signHeader with 'content-digest'
+   `$signingConfiguration->signHeader('content-digest')`
+3. The Setter `$signingConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)` is needed two times. 
+   1. For the generation of the HTTP Message Header such as `sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:`
+   2. And will be inserted into the Metadata-Part of the Signed Message
+
+Note: The ordering of the configuration-steps is not relevant.
 
 other forms of writings are also valid:
 

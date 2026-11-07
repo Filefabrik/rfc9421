@@ -46,7 +46,7 @@ final class ContentDigestException extends AbstractRfc9421Exception
     {
         return new self(
             sprintf(
-                'The HTTP Message Header %s exists. So the %s can not be written again',
+                'The HTTP Message Header "%s" exists. So the "%s" can not be written again.',
                 HeaderKeysEnum::content_digest->value,
                 HeaderKeysEnum::content_digest->value,
             ),
