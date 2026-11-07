@@ -31,7 +31,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandle(): void
     {
@@ -54,7 +53,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleMethod(): void
     {
@@ -77,7 +75,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleBS(): void
     {
@@ -100,7 +97,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleSF(): void
     {
@@ -132,7 +128,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleKey(): void
     {
@@ -166,7 +161,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleName(): void
     {
@@ -206,7 +200,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleNameQux(): void
     {
@@ -242,7 +235,6 @@ final class CompileEntryTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleNameMultiline(): void
     {

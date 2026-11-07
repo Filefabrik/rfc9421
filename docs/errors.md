@@ -28,3 +28,8 @@ Note: This error does NOT tell you that the certificate is valid
 
 * `privatePemIsEmpty`
 * `publicPemIsEmpty`
+
+## StructuredFieldException
+
+* `unknownStructuredFieldType` An structured field was proceeded and returns null. Null as return is not allowed during
+  the handling a structured field because that means with the value can not be proceeded

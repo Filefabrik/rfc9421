@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -10,13 +11,9 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
-use Bakame\Http\StructuredFields\Dictionary;
-use Bakame\Http\StructuredFields\InnerList;
-use Bakame\Http\StructuredFields\Item;
-use Bakame\Http\StructuredFields\OuterList;
-use Bakame\Http\StructuredFields\Parameters;
+use Bakame\Http\StructuredFields\{Dictionary, InnerList, Item, OuterList, Parameters};
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
-use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
+use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
@@ -38,7 +35,6 @@ final readonly class Sf
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function handle(Entry $entry): Entry
     {
@@ -51,7 +47,6 @@ final readonly class Sf
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     private function processValue(Entry $entry): string
     {
@@ -67,14 +62,13 @@ final readonly class Sf
         $field = $this->methodsMapper->callMethod($type, [$entry->value]);
 
         if (null === $field) {
-            throw new UnProcessableSignatureException(
-                sprintf('Unknown or unregistered structured field type for "%s"', $entry->key),
-            );
+            throw StructuredFieldException::unknownStructuredFieldType($entry->key);
         }
 
         /*
          * Working with Bakame Structured Fields
          */
+
         return array_any(
             [OuterList::class, InnerList::class, Parameters::class, Dictionary::class, Item::class],
             fn (string $className): bool => $field instanceof $className,

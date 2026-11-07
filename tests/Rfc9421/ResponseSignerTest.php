@@ -49,7 +49,6 @@ final class ResponseSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testSign(): void
     {
@@ -73,7 +72,8 @@ final class ResponseSignerTest extends TestCase
             // set alice private pem to encrypt the response
             ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-            ->setContentDigestAlgo('sha256')->mustCreateContentDigest()
+            ->setContentDigestAlgo('sha256')
+            ->mustCreateContentDigest()
         ;
 
         $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
@@ -117,7 +117,6 @@ final class ResponseSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testSignCanNotSignQuery(): void
     {

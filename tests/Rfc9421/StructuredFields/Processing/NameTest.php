@@ -33,10 +33,10 @@ final class NameTest extends TestCase
         $handledEntry = new Name()->handle($firstEntry, 'thats-the-key');
         self::assertEquals(
             new Entry(
-                key           : 'query-param',
-                value         : 'no-value',
+                key            : 'query-param',
+                value          : 'no-value',
                 initialContents: InitialContentsEnum::name,
-                nameOrKeyValue: 'thats-the-key',
+                nameOrKeyValue : 'thats-the-key',
             ),
             $handledEntry,
         );

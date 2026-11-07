@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -13,7 +14,6 @@ namespace Filefabrik\Rfc9421Test\StructuredFields\Processing;
 use Bakame\Http\StructuredFields\Dictionary;
 use Filefabrik\Rfc9421\Exceptions\MethodException;
 use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
-use Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException;
 use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Sf;
@@ -27,7 +27,6 @@ final class SfTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
     public function testHandle(): void
@@ -49,12 +48,11 @@ final class SfTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleThrowsNotNiceProceeded(): void
     {
         $this->expectExceptionObject(
-            new UnProcessableSignatureException('Unknown or unregistered structured field type for "example-dict"'),
+            StructuredFieldException::unknownStructuredFieldType('example-dict'),
         );
 
         $mMapper = new MethodsMapper();
@@ -72,7 +70,6 @@ final class SfTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleThrowsMissingMethod(): void
     {
@@ -92,7 +89,6 @@ final class SfTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleThrowsNotMapped(): void
     {

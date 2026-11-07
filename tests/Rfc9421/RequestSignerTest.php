@@ -46,7 +46,6 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testSign(): void
     {
@@ -64,10 +63,11 @@ final class RequestSignerTest extends TestCase
                 closure      : fn (
                     RequestInterface $request,
                 ): string => $request->getHeaderLine('content-type'),
-            )->mustCreateContentDigest()
+            )
+            ->mustCreateContentDigest()
             ->signHeader('content-type')
             ->signHeader('content-digest')
-           // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::req))
+            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::req))
             ->signHeader('"@query-param";name="baz"')
             ->signHeader('@method')
             ->signHeader('x-Origin-host')
@@ -175,7 +175,6 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testSignWithoutContentDigest(): void
     {
@@ -226,7 +225,6 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testGetSignedLines(): void
     {
@@ -235,7 +233,9 @@ final class RequestSignerTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
 
         $signingConfiguration = new SigningConfiguration()
-            ->signHeader('@method')->signHeader('content-digest')->mustCreateContentDigest()
+            ->signHeader('@method')
+            ->signHeader('content-digest')
+            ->mustCreateContentDigest()
             ->signHeader('x-Origin-host')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
@@ -280,7 +280,6 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testGetSignedLinesOne(): void
     {
@@ -386,7 +385,6 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testSignThrowsEmptyQueryParam(): void
     {

@@ -62,7 +62,9 @@ final class PreparedMethodsTest extends TestCase
      */
     public function testCallWithThrowMessag(): void
     {
-        $this->expectExceptionObject(new PrepareMethodsException('Error during calling the method with key: "texst": something buggy inside'));
+        $this->expectExceptionObject(
+            new PrepareMethodsException('Error during calling the method with key: "texst": something buggy inside'),
+        );
         $i = new PreparedMethods();
         $i->adds(
             [

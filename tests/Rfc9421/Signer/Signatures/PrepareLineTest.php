@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -30,7 +31,6 @@ final class PrepareLineTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandle(): void
     {
@@ -52,7 +52,6 @@ final class PrepareLineTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleBS(): void
     {
@@ -76,7 +75,6 @@ final class PrepareLineTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleSF(): void
     {
@@ -105,13 +103,16 @@ final class PrepareLineTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      */
     public function testHandleNameMultiline(): void
     {
         /** @noinspection HttpUrlsUsage */
-        $request  = new Request('GET', 'http://my.com/parameters?var=this%20is%20a%20big%0Amultiline%20value&\
-  bar=with+plus+whitespace&fa%C3%A7ade%22%3A%20=something', ['test' => 'testValue']);
+        $request  = new Request(
+            'GET',
+            'http://my.com/parameters?var=this%20is%20a%20big%0Amultiline%20value&\
+  bar=with+plus+whitespace&fa%C3%A7ade%22%3A%20=something',
+            ['test' => 'testValue'],
+        );
         $instance = new PrepareLine(
             signingConfiguration: new SigningConfiguration(),
             componentItemDto    : ComponentName::fromString('"@query-param";name="var"'),
@@ -119,6 +120,9 @@ final class PrepareLineTest extends TestCase
         );
         $line     = $instance->handle();
 
-        self::assertEquals(new Line('"@query-param";name="var"', '"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value'), $line);
+        self::assertEquals(
+            new Line('"@query-param";name="var"', '"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value'),
+            $line,
+        );
     }
 }

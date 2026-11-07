@@ -30,4 +30,9 @@ final class StructuredFieldException extends AbstractRfc9421Exception
             ),
         );
     }
+
+    public static function unknownStructuredFieldType(string $fieldType): self
+    {
+        return new self(sprintf('Unknown or unregistered structured field type for "%s".', $fieldType));
+    }
 }

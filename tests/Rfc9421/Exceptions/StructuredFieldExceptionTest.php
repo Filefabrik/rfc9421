@@ -53,4 +53,17 @@ final class StructuredFieldExceptionTest extends TestCase
         );
         throw StructuredFieldException::missingKeyOrName('@query-param', InitialContentsEnum::name);
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
+    public function testUnknownStructuredFieldType(): void
+    {
+        $this->expectExceptionObject(
+            new StructuredFieldException(
+                'Unknown or unregistered structured field type for "example-dict".',
+            ),
+        );
+        throw StructuredFieldException::unknownStructuredFieldType('example-dict');
+    }
 }

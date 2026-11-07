@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -28,7 +29,9 @@ final class MethodsMapperTest extends TestCase
     public function testAddMany(): void
     {
         $mapper = new MethodsMapper();
-        $mapper->addMany(['testMethod' => fn (): string => 'testMethodResult', 'testMethod2' => fn (): string => 'testMethod2Result']);
+        $mapper->addMany(
+            ['testMethod' => fn (): string => 'testMethodResult', 'testMethod2' => fn (): string => 'testMethod2Result'],
+        );
         self::assertCount(2, $mapper->methods);
         self::assertSame('testMethod', $mapper->methods['testMethod']->method);
         $m = $mapper->methods['testMethod']->closure;
