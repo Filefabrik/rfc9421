@@ -18,7 +18,6 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
  * Extracting the Signing Fields from signature
- * Todo with structured fields extractor
  */
 final class Components
 {
