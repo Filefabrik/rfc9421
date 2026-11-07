@@ -64,7 +64,11 @@ final readonly class FieldValue
         if ($signingMethods->hasMethod($this->componentItemDto->fieldName)) {
             return $signingMethods->callWith(
                 key   : $this->componentItemDto->fieldName,
-                params: [$this->messageInterface, $this->initialContentsParameters],
+                // todo more bootable parameters
+                params: [
+                    $this->messageInterface,
+                    $this->initialContentsParameters,
+                ],
             );
         }
 
