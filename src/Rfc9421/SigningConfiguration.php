@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -18,6 +19,7 @@ use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
+use Filefabrik\Rfc9421\Support\GenerateContentDigestTrait;
 use Filefabrik\Rfc9421\Support\MetadataTrait;
 use Filefabrik\Rfc9421\Support\PrivatePemTrait;
 use Filefabrik\Rfc9421\Support\PublicPemTrait;
@@ -35,6 +37,7 @@ final class SigningConfiguration
     use SigningMethodsTrait;
     use MetadataTrait;
     use SigningHeaderTrait;
+    use GenerateContentDigestTrait;
 
     /**
      * Prefix the signature value

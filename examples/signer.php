@@ -120,6 +120,7 @@ try {
          * tell the signing process that content-type has to be signed
          */
         //->signHeader('"@query-param";name="baz"')
+        ->mustCreateContentDigest()
         ->signHeader('x-Origin-host')
         ->signHeader('test-header')
         ->signHeader('"example-dict"')
@@ -268,6 +269,7 @@ try {
     );
 } catch (ProcessingException $e) {
     echo $e->getMessage();
+
     return;
 }
 

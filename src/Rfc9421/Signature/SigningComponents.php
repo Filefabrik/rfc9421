@@ -33,6 +33,10 @@ final class SigningComponents
         return $this->components;
     }
 
+    public function findComponentByName(string $name): ?ComponentItemDto
+    {
+        return array_find($this->components, fn ($component) => $component->fieldName === $name);
+    }
     /**
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException

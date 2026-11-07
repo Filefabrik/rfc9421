@@ -48,6 +48,8 @@ try {
         ->signHeader('content-type')
         ->signHeader('@method')
         ->signHeader('x-Origin-host')
+        ->signHeader('content-digest')
+        ->mustCreateContentDigest()
         ->signHeader('@authority')
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated($currentDateTime)

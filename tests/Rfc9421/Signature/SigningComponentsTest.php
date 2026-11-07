@@ -54,4 +54,34 @@ final class SigningComponentsTest extends TestCase
         ;
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testFindComponentByName(): void
+    {
+        $t = new SigningComponents()->addName('test')
+                                    ->addWithContentsEnum('test2', InitialContentsEnum::req)
+        ;
+
+        self::assertEquals(
+            ComponentName::fromNameAndInitialContent('test2', 'req'),
+            $t->findComponentByName(ComponentName::fromNameAndInitialContent('test2', 'req')->fieldName),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testFindComponentByNameNotFound(): void
+    {
+        $t = new SigningComponents()->addName('test')
+                                    ->addWithContentsEnum('test2', InitialContentsEnum::req)
+        ;
+
+        self::assertNull(
+            $t->findComponentByName(ComponentName::fromNameAndInitialContent('test4', 'req')->fieldName),
+        );
+    }
 }

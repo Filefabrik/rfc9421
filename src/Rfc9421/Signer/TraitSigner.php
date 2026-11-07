@@ -14,7 +14,6 @@ namespace Filefabrik\Rfc9421\Signer;
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
@@ -130,36 +129,17 @@ trait TraitSigner
     /**
      * Method for the content-digest which will be pushed into the header if not exists
      * todo move out as extra service
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
     private function updateHeadersBeforePrepare(): void
     {
-        foreach ($this->signingConfiguration->signatureComponents->getComponents() as $item) {
-            /*
-             * yes we have to prepare the content-digest if not exists
-             * todo check ;req flag then not insert into
-             */
-            if (
-                ($item->fieldName === HeaderKeysEnum::content_digest->value) &&
-                !$this->message->hasHeader(HeaderKeysEnum::content_digest->value) &&
-                $this->signingConfiguration->hasContentDigestHashAlgo() &&
-                !$item->getItem()
-                      ->parameters()
-                      ->hasKeys(InitialContentsEnum::req->name)
-            ) {
-                // set the body digest into the header
-                [$headerKey, $value] = new SignBody(
-                    body     : (string)$this->message->getBody(),
-                    algorithm: $this->signingConfiguration->getContentDigestHashAlgoOrThrow(),
-                )->getContentDigestHeaderArray();
-
-                /*
-                 * Todo the rebind into header should be more smart
-                 * !! @important
-                 * rebind the MessageInterface because of cloned change
-                 */
-                $this->message = $this->message->withHeader($headerKey, $value);
-            }
+        if ($this->signingConfiguration->isMustGenerateContentDigest()) {
+            $contentDigestHeader = new ContentDigestHeader(
+                message             : $this->message,
+                signingConfiguration: $this->signingConfiguration,
+            );
+            $this->message       = $contentDigestHeader->handle();
         }
     }
 

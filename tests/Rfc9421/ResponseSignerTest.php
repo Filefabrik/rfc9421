@@ -72,7 +72,7 @@ final class ResponseSignerTest extends TestCase
             // set alice private pem to encrypt the response
             ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-            ->setContentDigestAlgo('sha256')
+            ->setContentDigestAlgo('sha256')->mustCreateContentDigest()
         ;
 
         $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);

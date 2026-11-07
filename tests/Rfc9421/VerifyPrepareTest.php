@@ -168,7 +168,7 @@ final class VerifyPrepareTest extends TestCase
         $configuration   = new SigningConfiguration();
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
-                      ->signHeader('content-digest')
+                      ->signHeader('content-digest')->mustCreateContentDigest()
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)

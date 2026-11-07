@@ -64,9 +64,6 @@ final class Base
 
         $components->setPreparedMethods($this->configuration->getSigningMethodsWithDefaults());
 
-        /*
-         * todo prepare method for content-digest
-         */
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
             $line = new PrepareLine(
                 signingConfiguration: $this->configuration,

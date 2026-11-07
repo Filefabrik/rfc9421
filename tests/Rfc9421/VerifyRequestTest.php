@@ -136,8 +136,6 @@ final class VerifyRequestTest extends TestCase
             '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
-
-
         $verifyPrepare = new VerifyPrepare($signedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
@@ -309,6 +307,7 @@ final class VerifyRequestTest extends TestCase
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
                       ->signHeader('content-digest')
+                      ->mustCreateContentDigest()
                       ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
@@ -401,6 +400,7 @@ final class VerifyRequestTest extends TestCase
         $configuration->signHeader('@method')
                       ->signHeader('@authority')
                       ->signHeader('content-digest')
+                      ->mustCreateContentDigest()
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)

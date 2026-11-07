@@ -65,7 +65,7 @@ final class RequestSignerTest extends TestCase
                 closure      : fn (
                     RequestInterface $request,
                 ): string => $request->getHeaderLine('content-type'),
-            )
+            )->mustCreateContentDigest()
             ->signHeader('content-type')
             ->signHeader('content-digest')
            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::req))
@@ -235,7 +235,7 @@ final class RequestSignerTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
 
         $signingConfiguration = new SigningConfiguration()
-            ->signHeader('@method')->signHeader('content-digest')
+            ->signHeader('@method')->signHeader('content-digest')->mustCreateContentDigest()
             ->signHeader('x-Origin-host')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)

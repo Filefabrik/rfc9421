@@ -32,4 +32,24 @@ final class ContentDigestException extends AbstractRfc9421Exception
         );
     }
 
+    public static function canNotHashWithoutAlgorithm(): self
+    {
+        return new self(
+            sprintf(
+                '%s header is set but the ContentDigestHashAlgo was not configuration.',
+                HeaderKeysEnum::content_digest->value,
+            ),
+        );
+    }
+
+    public static function headerContentDigestAlreadySet(): self
+    {
+        return new self(
+            sprintf(
+                'The HTTP Message Header %s exists. So the %s can not be written again',
+                HeaderKeysEnum::content_digest->value,
+                HeaderKeysEnum::content_digest->value,
+            ),
+        );
+    }
 }
