@@ -14,6 +14,7 @@ namespace Filefabrik\Rfc9421Test;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+use Filefabrik\Rfc9421\Exceptions\EmptyException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signature\SigningComponents;
@@ -314,5 +315,96 @@ final class SigningConfigurationTest extends TestCase
             ['foo' => fn () => 'play foo', 'bar' => fn () => 'bar play', 'baz' => fn () => 'play baz'],
         );
         self::assertCount(14, $i->getSigningMethodsWithDefaults()->methods);
+    }
+
+    public function testSetPrivatePem(): void
+    {
+        $i = new SigningConfiguration();
+        $i->setPrivatePem('foo');
+        self::assertSame('foo', $i->getPrivatePem());
+    }
+
+    public function testGetPrivatePem(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertNull($i->getPrivatePem());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     */
+    public function testGetPrivatePemOrThrowHas(): void
+    {
+        $i = new SigningConfiguration()->setPrivatePem('shiddy private');
+
+        self::assertSame('shiddy private', $i->getPrivatePemOrThrow());
+        ;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     */
+    public function testGetPrivatePemOrThrowNull(): void
+    {
+        $this->expectExceptionObject(EmptyException::privatePemIsEmpty());
+        $i = new SigningConfiguration();
+
+        $i->getPrivatePemOrThrow();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     */
+    public function testGetPrivatePemOrThrowEmpty(): void
+    {
+        $this->expectExceptionObject(EmptyException::privatePemIsEmpty());
+        $i = new SigningConfiguration();
+        $i->setPrivatePem('');
+        $i->getPrivatePemOrThrow();
+    }
+
+    public function testSetPublicPem(): void
+    {
+        $i = new SigningConfiguration();
+        $i->setPublicPem('foo');
+        self::assertSame('foo', $i->getPublicPem());
+    }
+
+    public function testGetPublicPem(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertNull($i->getPublicPem());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     */
+    public function testGetPublicPemOrThrowHas(): void
+    {
+        $i = new SigningConfiguration()->setPublicPem('shiddy content');
+
+        self::assertSame('shiddy content', $i->getPublicPemOrThrow());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     */
+    public function testGetPublicPemOrThrowNull(): void
+    {
+        $this->expectExceptionObject(EmptyException::publicPemIsEmpty());
+        $i = new SigningConfiguration();
+
+        $i->getPublicPemOrThrow();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     */
+    public function testGetPublicPemOrThrowEmpty(): void
+    {
+        $this->expectExceptionObject(EmptyException::publicPemIsEmpty());
+        $i = new SigningConfiguration();
+        $i->setPublicPem('');
+        $i->getPublicPemOrThrow();
     }
 }

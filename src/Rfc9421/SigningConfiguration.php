@@ -11,9 +11,10 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421;
 
-use Filefabrik\Rfc9421\Configuration\GenerateContentDigestTrait;
-use Filefabrik\Rfc9421\Configuration\MetadataTrait;
-use Filefabrik\Rfc9421\Configuration\SigningMethodsTrait;
+use Filefabrik\Rfc9421\Configuration\{GenerateContentDigestTrait, MetadataTrait, SigningMethodsTrait};
+use Filefabrik\Rfc9421\Configuration\PrivatePemTrait;
+use Filefabrik\Rfc9421\Configuration\PublicPemTrait;
+use Filefabrik\Rfc9421\Configuration\SigningHeaderTrait;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
@@ -22,9 +23,6 @@ use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
-use Filefabrik\Rfc9421\Support\PrivatePemTrait;
-use Filefabrik\Rfc9421\Support\PublicPemTrait;
-use Filefabrik\Rfc9421\Support\SigningHeaderTrait;
 
 /**
  * Signer Configuration can be configured at different position on your code, such as in a bootstrap file or something

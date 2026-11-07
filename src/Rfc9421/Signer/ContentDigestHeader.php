@@ -31,9 +31,8 @@ final readonly class ContentDigestHeader
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-
      */
-    public function handle():RequestInterface|ResponseInterface
+    public function handle(): RequestInterface|ResponseInterface
     {
         if ($this->message->hasHeader(HeaderKeysEnum::content_digest->value)) {
             // throw already set content-digest
@@ -45,7 +44,7 @@ final readonly class ContentDigestHeader
         }
 
         // set the body digest into the header
-        [$header,$value]= new SignBody(
+        [$header,$value] = new SignBody(
             body     : (string)$this->message->getBody(),
             algorithm: $this->signingConfiguration->getContentDigestHashAlgoOrThrow(),
         )->getContentDigestHeaderArray();

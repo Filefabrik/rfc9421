@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-namespace Filefabrik\Rfc9421\Support;
+namespace Filefabrik\Rfc9421\Configuration;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;

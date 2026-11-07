@@ -33,7 +33,7 @@ final class VerifyRequest
     /**
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
-    private null|ReadLines        $signedHeaderLines    = null;
+    private null|ReadLines $signedHeaderLines = null;
 
     private ?SigningConfiguration $signingConfiguration = null;
 
@@ -62,6 +62,7 @@ final class VerifyRequest
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnProcessableSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      */
     public function verifying(): bool
     {
@@ -89,7 +90,7 @@ final class VerifyRequest
             signingEnum: $signingConfiguration->metadata->getAlgOrThrow(),
             data       : $signer->getSigningParametersStringOrThrow(),
             signature  : $this->getBinarySignatureValue(),
-            publicKey  : $signingConfiguration->getPublicPem(),
+            publicKey  : $signingConfiguration->getPublicPemOrThrow(),
         );
 
         if ($verified) {

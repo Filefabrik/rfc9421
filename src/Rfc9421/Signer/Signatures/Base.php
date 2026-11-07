@@ -22,15 +22,15 @@ use Psr\Http\Message\RequestInterface;
  * The given Signing Components via setHeader('@method') will be prepared into "@method: POST" Lines.
  * This Lines will be used as signing-parameters
  */
-final class Base
+final readonly class Base
 {
     public function __construct(
         private(set) RequestInterface|Response $message,
-        private(set) readonly SigningConfiguration $configuration,
+        private(set) SigningConfiguration $configuration,
         /**
          * ready prepared lines they will be part of the signature
          */
-        private(set) readonly WriteLines $signatureLines = new WriteLines(),
+        private(set) WriteLines $signatureLines = new WriteLines(),
     ) {
     }
 

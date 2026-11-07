@@ -551,7 +551,7 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
 * doc "./Methods" default handling and how to change
 * query param and key handler is really buggy.  
   can also not work at `macgirvin/http-message-signer`
-
+* todo more strict header enums for singing components with an extra validator "I expect the following signed parameters"
 ```php
 <?php 
 use Filefabrik\Rfc9421\Methods\MessageQueryParams;MessageQueryParams::handle()
