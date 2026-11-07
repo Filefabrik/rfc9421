@@ -23,6 +23,7 @@ use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Utils;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -60,10 +61,6 @@ final class VerifyRequestTest extends TestCase
     }
 
     /**
-     *
-     *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
@@ -165,10 +162,6 @@ final class VerifyRequestTest extends TestCase
     }
 
     /**
-     *
-     *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
@@ -277,10 +270,6 @@ final class VerifyRequestTest extends TestCase
     }
 
     /**
-     *
-     *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
@@ -369,8 +358,6 @@ final class VerifyRequestTest extends TestCase
 
     /**
      * todo with tampered body
-     *
-     *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException

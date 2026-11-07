@@ -101,11 +101,12 @@ try {
             value              : 'd',
         ),
     ];
-} catch (SignatureExtractionException $e) {
-    echo $e->getMessage();
+} catch (SignatureExtractionException $signatureExtractionException) {
+    echo $signatureExtractionException->getMessage();
 
     return;
 }
+
 try {
     $signingConfiguration = new SigningConfiguration()
         /*
@@ -144,8 +145,8 @@ try {
     $signingConfiguration->getStructuredFields()
                          ->addMany($extraParser)
     ;
-} catch (AbstractRfc9421Exception$e) {
-    echo $e->getMessage();
+} catch (AbstractRfc9421Exception$rfc9421Exception) {
+    echo $rfc9421Exception->getMessage();
 
     return;
 }
@@ -191,8 +192,8 @@ $request = new Request(
 $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AbstractRfc9421Exception $e) {
-    echo $e->getMessage();
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo $rfc9421Exception->getMessage();
 
     return;
 }
@@ -215,11 +216,12 @@ $verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguratio
  */
 try {
     $verifyPrepareInstance->prepareVerification();
-} catch (AbstractRfc9421Exception $e) {
-    echo $e->getMessage();
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo $rfc9421Exception->getMessage();
 
     return;
 }
+
 /*
  * with the keyId you should be able to download the public pem
  */
@@ -230,6 +232,7 @@ if (null === $keyId) {
 
     return;
 }
+
 $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
 
 /*
@@ -246,8 +249,8 @@ $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemConte
 $VerifyRequest = new VerifyRequest($verifyPrepareInstance);
 try {
     $verifiedRequestBool = $VerifyRequest->verifying();
-} catch (AbstractRfc9421Exception $e) {
-    echo 'result false: '.$e->getMessage();
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo 'result false: '.$rfc9421Exception->getMessage();
 
     return;
 }
@@ -267,8 +270,8 @@ try {
         $VerifyRequest->getSignedHeaderLines()
                       ->values(),
     );
-} catch (ProcessingException $e) {
-    echo $e->getMessage();
+} catch (ProcessingException $processingException) {
+    echo $processingException->getMessage();
 
     return;
 }
@@ -295,6 +298,7 @@ if ($VerifyRequest->hasValidatedBody) {
 } else {
     echo 'body was not part of verifying process'.PHP_EOL;
 }
+
 /*
  * Let us start a signed response
  */
@@ -323,20 +327,22 @@ try {
         // todo use different signing for response
         ->setContentDigestAlgo('sha256')
     ;
-} catch (AbstractRfc9421Exception $e) {
-    echo 'response signing configuration error: '.$e->getMessage();
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo 'response signing configuration error: '.$rfc9421Exception->getMessage();
 
     return;
 }
+
 /**
  * Signing the Response if need signed response
  */
 $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
 try {
     $signedResponse = $responseSigner->sign();
-} catch (AbstractRfc9421Exception $e) {
-    echo 'response signing error: '.$e->getMessage();
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo 'response signing error: '.$rfc9421Exception->getMessage();
 
     return;
 }
+
 echo 'response is successfully signed and can be response to the sender'.PHP_EOL;

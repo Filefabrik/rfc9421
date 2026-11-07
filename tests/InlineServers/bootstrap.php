@@ -1,4 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2026.
+ * e-mail: rt@filefabrik.com
+ * mastodon: filefabrik@phpc.social
+ * License: proprietary
+ * State: under development
+ */
+
+declare(strict_types=1);
 
 /*
  * Copyright (c) 2026.
@@ -8,7 +17,7 @@
  * State: under development
  */
 
-$standaloneDir = dirname(__DIR__).'/vendor/autoload.php';
+$standaloneDir = __DIR__.'/../vendor/autoload.php';
 if (file_exists($standaloneDir)) {
     require $standaloneDir;
 } else {
@@ -22,6 +31,7 @@ if (file_exists($standaloneDir)) {
 if (str_starts_with(php_uname(), 'Windows')) {
     throw new RuntimeException('Does not work on Windows machines');
 }
+
 require_once __DIR__.'/account_bootstrap.php';
 $webservers = [
     'alice' => [
@@ -62,11 +72,12 @@ foreach ($webservers as $name => $config) {
 
     $webservers[$name]['pid'] = $pid;
 }
+
 echo PHP_EOL;
 echo 'target-scripts here:' , PHP_EOL, PHP_EOL;
 
 // Kill web servers when the process ends
-register_shutdown_function(function () use ($webservers) {
+register_shutdown_function(function () use ($webservers): void {
     echo PHP_EOL, PHP_EOL, 'end target-scripts', PHP_EOL;
     foreach ($webservers as $name => $config) {
         extract($config);

@@ -28,7 +28,7 @@ use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Symfony\Component\HttpFoundation\Request;
 
 displayLogger('', 2);
-displayLogger('Here is Bob\'s Server', 2);
+displayLogger("Here is Bob's Server", 2);
 
 // Specify the URL and data
 $url = 'http://localhost:8001/accounts/from-alice';
@@ -71,7 +71,8 @@ try {
 
     return;
 }
-displayLogger('prepareVerification from Alice Request at Bob\'s Server without Errors');
+
+displayLogger("prepareVerification from Alice Request at Bob's Server without Errors");
 /*
  * with the keyId you should be able to download the public pem
  */
@@ -129,6 +130,7 @@ if (null !== $keyId) {
 
         return;
     }
+
     displayLogger('During the verify process there was no exception thrown.');
 
     displayLogger('The Verify process has endet with the result: '.($res ? 'true' : 'false'));
@@ -177,6 +179,7 @@ if (null !== $keyId) {
 
                 return;
             }
+
             /* @var array<string,string> $requestBodyParams */
             $explanation = sprintf(
                 'Alice Server wants to "add-to-balance" for the User-Account: "%s" %s€ on Bobs Server.',

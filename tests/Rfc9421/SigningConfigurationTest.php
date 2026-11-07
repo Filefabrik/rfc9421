@@ -296,9 +296,9 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         self::assertCount(11, $i->getSigningMethodsWithDefaults()->methods);
-        $i->addSigningMethod('foo', fn () => 'play');
+        $i->addSigningMethod('foo', fn (): string => 'play');
         self::assertCount(12, $i->getSigningMethodsWithDefaults()->methods);
-        $i->addSigningMethod('foo', fn () => 'play');
+        $i->addSigningMethod('foo', fn (): string => 'play');
         self::assertCount(12, $i->getSigningMethodsWithDefaults()->methods);
     }
 
@@ -312,7 +312,7 @@ final class SigningConfigurationTest extends TestCase
     {
         $i = new SigningConfiguration();
         $i->addSigningMethods(
-            ['foo' => fn () => 'play foo', 'bar' => fn () => 'bar play', 'baz' => fn () => 'play baz'],
+            ['foo' => fn (): string => 'play foo', 'bar' => fn (): string => 'bar play', 'baz' => fn (): string => 'play baz'],
         );
         self::assertCount(14, $i->getSigningMethodsWithDefaults()->methods);
     }

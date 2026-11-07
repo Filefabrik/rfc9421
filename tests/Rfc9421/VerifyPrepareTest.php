@@ -23,6 +23,7 @@ use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
+use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -59,9 +60,6 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
-     *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
@@ -140,10 +138,6 @@ final class VerifyPrepareTest extends TestCase
     }
 
     /**
-     *
-     *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException

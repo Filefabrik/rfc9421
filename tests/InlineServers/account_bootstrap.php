@@ -18,6 +18,7 @@ function displayLogger(string $message, int $cnt = 1, bool $showLines = true): v
 
         return;
     }
+
     $parts = debug_backtrace()[0];
 
     $p = explode('/tests/InlineServers', $parts['file'] ?? '');

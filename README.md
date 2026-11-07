@@ -8,7 +8,7 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 ✅ PHP-8.4|PHP-8.5
 
-✅ CodeCoverage 100% over 440< Tests and 780< Assertions
+✅ CodeCoverage 100% over 460< Tests and 830< Assertions
 
 ✅ easy to use.
 

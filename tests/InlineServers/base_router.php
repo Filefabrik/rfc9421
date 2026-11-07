@@ -46,16 +46,15 @@ if ('/public-pem' === $sPath) {
     echo $certInstance->getPublicPemContent();
     exit(0);
 }
+
 if (str_starts_with(''.$sPath, '/accounts')) {
     $route = $scriptServerDir.$sPath.'.php';
 }
 
-if (null === $route) {
-    $route = match ($sPath) {
-        '/.well-known/webfinger' => $scriptServerDir.'/webfinger/response.php',
-        default                  => $scriptServerDir.'/404.php',
-    };
-}
+$route ??= match ($sPath) {
+    '/.well-known/webfinger' => $scriptServerDir.'/webfinger/response.php',
+    default                  => $scriptServerDir.'/404.php',
+};
 
 if (file_exists($route)) {
     /* @noinspection ForgottenDebugOutputInspection */

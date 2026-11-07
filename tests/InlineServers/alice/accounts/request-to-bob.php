@@ -34,7 +34,7 @@ $url = 'http://localhost:8001/accounts/from-alice?XDEBUG_SESSION=PHPSTORM';
 
 $certInstance = new CertHelper('rsa', __DIR__.'/../Keys/');
 
-displayLogger('Here is Alice\'s Server');
+displayLogger("Here is Alice's Server");
 /*
  * Prepare signingConfiguration
  */
@@ -68,6 +68,7 @@ try {
 
     return;
 }
+
 displayLogger('The Signing configuration is without errors.');
 /*
  * Make sure to use the same methods in signer and verifier!
@@ -82,7 +83,7 @@ $prepareMethods = [
  * don't forget to use thís prepared component in the verifier
  */
 displayLogger('We are signing the @authority with $message->getHeaderLine(\'x-Origin-host\').');
-displayLogger('// So Bob\'s Server must also set this method to getting the correct @authority value from header.');
+displayLogger("// So Bob's Server must also set this method to getting the correct @authority value from header.");
 /*
  * Todo check response was signed with expected ;req from something
  */
@@ -105,22 +106,24 @@ $psrRequest     = $psrHttpFactory->createRequest($symfonyRequest);
 $signer = new RequestSigner(message: $psrRequest, signingConfiguration: $signingConfiguration);
 try {
     $signedRequest = $signer->sign();
-} catch (AbstractRfc9421Exception  $e) {
+} catch (AbstractRfc9421Exception  $rfc9421Exception) {
     displayLogger('The Signing Process has Errors:');
-    displayLogger($e->getMessage());
+    displayLogger($rfc9421Exception->getMessage());
 
     return;
 }
+
 displayLogger('During request signing at Alice Server there was no exception thrown.');
 displayLogger('Now, send the Request to Bob', 2);
 try {
     $bobsResponse = new Client()->send($signedRequest);
-} catch (GuzzleException $e) {
+} catch (GuzzleException $guzzleException) {
     displayLogger('There was a problem with sending the Request to Bob.');
-    displayLogger($e->getMessage());
+    displayLogger($guzzleException->getMessage());
 
     return;
 }
+
 displayLogger('Response is back from Bob to Alice Server. Shows the Response-Body from Bob.', 2);
 /*
  * todo getting the signed response and handle it
@@ -128,4 +131,4 @@ displayLogger('Response is back from Bob to Alice Server. Shows the Response-Bod
 echo $bobsResponse->getBody();
 
 displayLogger('', 1, false);
-displayLogger('All Finished at Bob\'s Server');
+displayLogger("All Finished at Bob's Server");
