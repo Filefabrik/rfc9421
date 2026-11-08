@@ -17,8 +17,8 @@ use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421\VerifyRequest;
+use Filefabrik\Rfc9421\VerifyRequestPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -57,7 +57,7 @@ $prepareMethods        = [
     '@authority' => fn (RequestInterface $message): string => $message->getHeaderLine('x-Origin-host'),
 ];
 $verifierConfiguration = new SigningConfiguration()->addSigningMethods($prepareMethods);
-$verifyPrepareInstance = new VerifyPrepare(message: $psr7Request, signingConfiguration: $verifierConfiguration);
+$verifyPrepareInstance = new VerifyRequestPrepare(message: $psr7Request, signingConfiguration: $verifierConfiguration);
 
 /*
  * Prepare the incoming Request for verifying

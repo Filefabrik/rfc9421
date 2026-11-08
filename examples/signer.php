@@ -15,8 +15,8 @@ use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421\VerifyRequest;
+use Filefabrik\Rfc9421\VerifyRequestPrepare;
 use Filefabrik\Rfc9421Test\Examples\Tools\JsonToString;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
@@ -207,7 +207,7 @@ $verifierConfiguration->getStructuredFields()
                       ->addMany($extraParser)
 ;
 $verifierConfiguration->addSigningMethods($prepareMethods);
-$verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
+$verifyPrepareInstance = new VerifyRequestPrepare($signedRequest, $verifierConfiguration);
 
 /*
  * Prepare the incoming Request for verifying

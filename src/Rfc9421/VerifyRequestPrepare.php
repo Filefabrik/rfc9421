@@ -24,7 +24,7 @@ use UnexpectedValueException;
  * Outside from the verify process read only the incoming request
  * After the prepareVerification method call, the request was fully "decoded"
  */
-final class VerifyPrepare
+final class VerifyRequestPrepare
 {
     private(set) ?HeaderSignature $headerSignatureExtractor = null;
 

@@ -18,8 +18,8 @@ use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\VerifyPrepare;
 use Filefabrik\Rfc9421\VerifyRequest;
+use Filefabrik\Rfc9421\VerifyRequestPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Utils;
@@ -132,7 +132,7 @@ final class VerifyRequestTest extends TestCase
             '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
-        $verifyPrepare = new VerifyPrepare($signedRequest, new SigningConfiguration());
+        $verifyPrepare = new VerifyRequestPrepare($signedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
         $verifier = new VerifyRequest($verifyPrepare);
@@ -243,7 +243,7 @@ final class VerifyRequestTest extends TestCase
                 json_encode($tamperedBody, JSON_THROW_ON_ERROR),
             ),
         );
-        $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
+        $verifyPrepare       = new VerifyRequestPrepare($tamperedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
         $verifier = new VerifyRequest($verifyPrepare);
@@ -335,7 +335,7 @@ final class VerifyRequestTest extends TestCase
         /**
          * Now decrypt the Request
          */
-        $verifyPrepare = new VerifyPrepare($signedRequest, new SigningConfiguration());
+        $verifyPrepare = new VerifyRequestPrepare($signedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
         $verifier = new VerifyRequest($verifyPrepare);
@@ -442,7 +442,7 @@ final class VerifyRequestTest extends TestCase
                 json_encode($tamperedBody, JSON_THROW_ON_ERROR),
             ),
         );
-        $verifyPrepare       = new VerifyPrepare($tamperedRequest, new SigningConfiguration());
+        $verifyPrepare       = new VerifyRequestPrepare($tamperedRequest, new SigningConfiguration());
         $verifyPrepare->prepareVerification();
 
         $verifier = new VerifyRequest($verifyPrepare);
@@ -473,7 +473,7 @@ final class VerifyRequestTest extends TestCase
     public function testGetMessage(): void
     {
         $request       = new Request('GET', 'https://target-host.com?play=something');
-        $verifyPrepare = new VerifyPrepare($request, new SigningConfiguration());
+        $verifyPrepare = new VerifyRequestPrepare($request, new SigningConfiguration());
 
         self::assertSame(
             'https://target-host.com?play=something',
@@ -490,7 +490,7 @@ final class VerifyRequestTest extends TestCase
     {
         $this->expectExceptionObject(ProcessingException::SignedHeaderLines());
         $request       = new Request('GET', 'https://target-host.com?play=something');
-        $verifyPrepare = new VerifyPrepare($request, new SigningConfiguration());
+        $verifyPrepare = new VerifyRequestPrepare($request, new SigningConfiguration());
         new VerifyRequest($verifyPrepare)->getSignedHeaderLines();
     }
 }

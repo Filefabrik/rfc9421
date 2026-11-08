@@ -20,7 +20,7 @@ use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
-use Filefabrik\Rfc9421\VerifyPrepare;
+use Filefabrik\Rfc9421\VerifyRequestPrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
 use JsonException;
@@ -31,8 +31,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Todo Tests are bad and not enough
  */
-#[CoversClass(VerifyPrepare::class)]
-final class VerifyPrepareTest extends TestCase
+#[CoversClass(VerifyRequestPrepare::class)]
+final class VerifyRequestPrepareTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -125,7 +125,7 @@ final class VerifyPrepareTest extends TestCase
         $signer        = new RequestSigner($request, $configuration);
         $signedRequest = $signer->sign();
 
-        $prepareVerifierInstance = new VerifyPrepare(
+        $prepareVerifierInstance = new VerifyRequestPrepare(
             message             : $signedRequest,
             signingConfiguration: new SigningConfiguration(),
         );
@@ -201,7 +201,7 @@ final class VerifyPrepareTest extends TestCase
         $signer        = new RequestSigner($request, $configuration);
         $signedRequest = $signer->sign();
 
-        $prepareVerifierInstance = new VerifyPrepare(
+        $prepareVerifierInstance = new VerifyRequestPrepare(
             message             : $signedRequest,
             signingConfiguration: new SigningConfiguration(),
         );
@@ -229,7 +229,7 @@ final class VerifyPrepareTest extends TestCase
                 'signature' => 'test=:crypt:',
             ],
         );
-        $prepareVerifierInstance = new VerifyPrepare(
+        $prepareVerifierInstance = new VerifyRequestPrepare(
             message             : $r,
             signingConfiguration: new SigningConfiguration(),
         );
@@ -256,7 +256,7 @@ final class VerifyPrepareTest extends TestCase
             headers: [
             ],
         );
-        $prepareVerifierInstance = new VerifyPrepare(
+        $prepareVerifierInstance = new VerifyRequestPrepare(
             message             : $r,
             signingConfiguration: new SigningConfiguration(),
         );
@@ -280,7 +280,7 @@ final class VerifyPrepareTest extends TestCase
                 'signature' => 'test=:crypt:',
             ],
         );
-        $prepareVerifierInstance = new VerifyPrepare(
+        $prepareVerifierInstance = new VerifyRequestPrepare(
             message             : $r,
             signingConfiguration: new SigningConfiguration(),
         );
@@ -337,7 +337,7 @@ final class VerifyPrepareTest extends TestCase
 
         $signer                  = new RequestSigner($request, $configuration);
         $signedRequest           = $signer->sign();
-        $prepareVerifierInstance = new VerifyPrepare(
+        $prepareVerifierInstance = new VerifyRequestPrepare(
             message             : $signedRequest,
             signingConfiguration: new SigningConfiguration(),
         );
@@ -347,7 +347,7 @@ final class VerifyPrepareTest extends TestCase
 
     public function testGetHeaderHelper(): void
     {
-        $prepareVerifierInstance = new VerifyPrepare(
+        $prepareVerifierInstance = new VerifyRequestPrepare(
             message             : new Request('post', 'https://test'),
             signingConfiguration: new SigningConfiguration(),
         );

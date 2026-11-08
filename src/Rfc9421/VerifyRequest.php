@@ -37,7 +37,7 @@ final class VerifyRequest
 
     private ?SigningConfiguration $signingConfiguration = null;
 
-    public function __construct(private(set) readonly VerifyPrepare $preparedVerify)
+    public function __construct(private(set) readonly VerifyRequestPrepare $preparedVerify)
     {
     }
 
