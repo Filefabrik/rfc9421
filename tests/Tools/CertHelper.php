@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Tools;
 
-use UnexpectedValueException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 
 final class CertHelper
 {
@@ -18,6 +18,9 @@ final class CertHelper
     {
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public function getPrivatPemContent(): string
     {
         $fname = $this->name.'-private.pem';
@@ -31,12 +34,18 @@ final class CertHelper
         return $this->dir ??= dirname(__DIR__, 2).'/tests/Keys/';
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     private function getFC(string $path): string
     {
         return is_string($fc = file_get_contents($path)) ? $fc :
-            throw new UnexpectedValueException('pem file not found at '.$path);
+            throw new UnexpectedValue('pem file not found at '.$path);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public function getPublicPemContent(): string
     {
         $fname = $this->name.'-public.pem';

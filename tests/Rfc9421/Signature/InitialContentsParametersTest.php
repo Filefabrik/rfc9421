@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Signature;
 
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 #[CoversClass(InitialContentsParameters::class)]
 final class InitialContentsParametersTest extends TestCase
@@ -41,6 +41,7 @@ final class InitialContentsParametersTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetValueOrThrow(): void
     {
@@ -53,10 +54,11 @@ final class InitialContentsParametersTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetValueOrThrowThrows(): void
     {
-        $this->expectExceptionObject(new UnexpectedValueException('Initial contents enum: "key" was not set before.'));
+        $this->expectExceptionObject(new UnexpectedValue('Initial contents enum: "key" was not set before.'));
         $t = new InitialContentsParameters();
         $t->setParameter('name', '"baz"')
           ->setParameter('sf')

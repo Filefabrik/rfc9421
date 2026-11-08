@@ -31,4 +31,26 @@ final class ProcessingExceptionTest extends TestCase
         );
         throw ProcessingException::SignedHeaderLines();
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
+    public function testSigningParametersString(): void
+    {
+        $this->expectExceptionObject(
+            new ProcessingException(
+                'Signing parameter string was not set before. First you have to call an sign or verify method.',
+            ),
+        );
+        throw ProcessingException::signingParametersString();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
+    public function testSigningLines(): self
+    {
+        $this->expectExceptionObject(new ProcessingException('Signing\Lines not set.'));
+        throw ProcessingException::signingLines();
+    }
 }

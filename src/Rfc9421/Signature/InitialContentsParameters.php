@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -15,7 +16,7 @@ use Bakame\Http\StructuredFields\DisplayString;
 use Bakame\Http\StructuredFields\Token;
 use DateTimeImmutable;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
-use UnexpectedValueException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 
 /**
  * Todo check which combinations are allowed per rfc
@@ -73,6 +74,7 @@ final class InitialContentsParameters
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function getValueOrThrow(
         string|InitialContentsEnum $name,
@@ -81,7 +83,7 @@ final class InitialContentsParameters
 
         return $this->has($name) ?
             $this->parameters[$sName] :
-            throw new UnexpectedValueException(sprintf('Initial contents enum: "%s" was not set before.', $sName));
+            throw new UnexpectedValue(sprintf('Initial contents enum: "%s" was not set before.', $sName));
     }
 
     /**

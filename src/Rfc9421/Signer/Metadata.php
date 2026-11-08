@@ -23,6 +23,7 @@ final class Metadata extends AbstractMetadata
      * @param array<string,int|string> $metadata
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function fromArray(array $metadata): self
     {
@@ -33,6 +34,7 @@ final class Metadata extends AbstractMetadata
      * @param array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string} $metadata
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function bindMetadata(self $instance, array $metadata): self
     {

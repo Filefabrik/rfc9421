@@ -15,6 +15,7 @@ use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
@@ -22,7 +23,6 @@ use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use UnexpectedValueException;
 
 trait TraitSigner
 {
@@ -38,12 +38,12 @@ trait TraitSigner
      */
     private null|WriteLines $signingLines = null;
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
     public function getSignedLines(): WriteLines
     {
-        return $this->signingLines ??
-            throw new UnexpectedValueException(
-                'Signing\Lines not set',
-            );
+        return $this->signingLines ?? throw ProcessingException::signingLines();
     }
 
     /**
@@ -53,8 +53,10 @@ trait TraitSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     private function sign(): ResponseInterface|RequestInterface
     {
@@ -88,6 +90,7 @@ trait TraitSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function prepareSigning(): void
     {
@@ -145,8 +148,10 @@ trait TraitSigner
      * Generate the base signature
      *
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function crypt(string $signingParametersString): string
     {
@@ -170,11 +175,12 @@ trait TraitSigner
         return sprintf($this->signingConfiguration->signatureKeyName.':%s:', $signature);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
     public function getSigningParametersStringOrThrow(): string
     {
-        return $this->signingParametersString ?? throw new UnexpectedValueException(
-            'signing parameter string was not set before',
-        );
+        return $this->signingParametersString ?? throw ProcessingException::signingParametersString();
     }
 
     /**

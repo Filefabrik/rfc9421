@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Signer;
 
 use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
@@ -19,7 +20,6 @@ use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
-use UnexpectedValueException;
 
 #[CoversClass(PrepareComponents::class)]
 final class PrepareComponentsTest extends TestCase
@@ -273,7 +273,7 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents(message: $r, preparedMethods: new PreparedMethods());
         $prepareInstance->preparedMethods->add(
             'testing',
-            fn ($method): never => throw new UnexpectedValueException('is a bug'),
+            fn ($method): never => throw new UnexpectedValue('is a bug'),
         );
         $prepareInstance->processValue('testing');
     }

@@ -50,6 +50,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSet(): void
     {
@@ -61,6 +62,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testToString(): void
     {
@@ -83,6 +85,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testToStringEmpty(): void
     {
@@ -102,6 +105,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     #[DataProvider('dataProviderToArray')]
     public function testToArray(...$datas): void

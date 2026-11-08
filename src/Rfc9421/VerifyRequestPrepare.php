@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -10,6 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421;
 
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\ContentDigest;
 use Filefabrik\Rfc9421\Extractors\HeaderSignature;
@@ -18,7 +20,6 @@ use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
 use Filefabrik\Rfc9421\Verify\PrepareSignatureKeyName;
 use Psr\Http\Message\RequestInterface;
-use UnexpectedValueException;
 
 /**
  * Outside from the verify process read only the incoming request
@@ -52,6 +53,7 @@ final class VerifyRequestPrepare
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     public function prepareVerification(): bool
@@ -110,15 +112,16 @@ final class VerifyRequestPrepare
 
     /**
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException *@throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
     private function getExtractedMetadataArray(): array
     {
-        return $this->getSignaturInputInstance()->extractedMetadata?->toArray() ?? throw new UnexpectedValueException(
+        return $this->getSignaturInputInstance()->extractedMetadata?->toArray() ?? throw new UnexpectedValue(
             'No Metadata Found',
         );
     }
@@ -127,6 +130,7 @@ final class VerifyRequestPrepare
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
     private function getSignaturInputInstance(): HeaderSignatureInput

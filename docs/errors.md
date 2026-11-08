@@ -6,6 +6,8 @@ or signing a response)
 
 All filefabrik/Rfc9421 Throwable's are abstracted from the class `AbstractRfc9421Exception`.
 So you are able to cover all errors they will be thrown during the HTTP Message Signing and Verification Process.
+If there is an standard php-exception in the package, please let me know. Iam expecting that all errors inside this
+package are covered by a `AbstractRfc9421Exception` Exception Class.
 
 ## PrepareMethodsException
 

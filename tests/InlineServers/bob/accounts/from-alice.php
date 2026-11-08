@@ -15,6 +15,7 @@ use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
@@ -66,12 +67,11 @@ $verifyPrepareInstance = new VerifyRequestPrepare(message: $psr7Request, signing
  */
 try {
     $verifyPrepareInstance->prepareVerification();
-} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException|AlreadySetException|SignatureExtractionException $e) {
+} catch (ContentDigestException|VerifyHeaderSignatureException|SignatureException|AlreadySetException|SignatureExtractionException|UnexpectedValue$e) {
     displayLogger('Prepare Verification Error '.$e->getMessage());
 
     return;
 }
-
 displayLogger("prepareVerification from Alice Request at Bob's Server without Errors");
 /*
  * with the keyId you should be able to download the public pem

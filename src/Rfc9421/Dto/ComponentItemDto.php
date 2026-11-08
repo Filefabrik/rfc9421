@@ -17,8 +17,8 @@ use Bakame\Http\StructuredFields\Token;
 use DateTimeImmutable;
 use Exception;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use UnexpectedValueException;
 
 /**
  * Ensured FieldItem read in during the componentNames method
@@ -47,6 +47,9 @@ final readonly class ComponentItemDto
         }
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public static function fromFieldItem(Item $item): self
     {
         return new self(self::validFieldName($item), $item->toHttpValue(), $item);
@@ -54,6 +57,8 @@ final readonly class ComponentItemDto
 
     /**
      * From Bakame Structured Field as string
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function validFieldName(Item $item): string
     {
@@ -64,11 +69,13 @@ final readonly class ComponentItemDto
 
     /**
      * Pressing the $v into a string
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     private static function ensureStringValue(
         Bytes|Token|DisplayString|DateTimeImmutable|string|int|float|bool $v,
     ): string {
-        return is_string($v) ? $v : throw new UnexpectedValueException(
+        return is_string($v) ? $v : throw new UnexpectedValue(
             sprintf('Expected string, got "%s"', gettype($v)),
         );
     }

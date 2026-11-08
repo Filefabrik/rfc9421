@@ -26,7 +26,9 @@ final class Components
      */
     public function __construct(
         private string $componentsString {
-            set => UnquoteHelper::hasSurroundBraces($value) ? UnquoteHelper::removeSurroundingBraces($value) : $value;
+            /**
+             * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+             */ set => UnquoteHelper::hasSurroundBraces($value) ? UnquoteHelper::removeSurroundingBraces($value) : $value;
         },
     ) {
     }

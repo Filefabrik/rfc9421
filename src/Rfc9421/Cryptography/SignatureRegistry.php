@@ -13,8 +13,8 @@ namespace Filefabrik\Rfc9421\Cryptography;
 
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
-use UnexpectedValueException;
 
 /**
  * Holds Signing-Algorithms and executes a SigningAlgorithm
@@ -32,6 +32,7 @@ final class SignatureRegistry
 
     /**
      * @throws SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function signing(
         string|SigningEnumInterface $signingEnumInterface,
@@ -40,7 +41,7 @@ final class SignatureRegistry
     ): string {
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnumInterface);
 
-        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValueException(
+        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValue(
             sprintf('Signing method for "%s" not registered.', $enum->getName()),
         );
 

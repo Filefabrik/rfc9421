@@ -9,6 +9,7 @@
  */
 declare(strict_types=1);
 
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 
 require_once __DIR__.'/../../vendor/autoload.php';
@@ -43,7 +44,12 @@ $sPath           = $_SERVER['SCRIPT_NAME'];
 $route = null;
 if ('/public-pem' === $sPath) {
     $certInstance = new CertHelper('rsa', __DIR__.'/'.$serverContext.'/Keys/');
-    echo $certInstance->getPublicPemContent();
+    try {
+        echo $certInstance->getPublicPemContent();
+    } catch (UnexpectedValue $e) {
+        /* @noinspection PhpUnhandledExceptionInspection */
+        throw $e;
+    }
     exit(0);
 }
 

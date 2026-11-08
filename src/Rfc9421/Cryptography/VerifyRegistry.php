@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -12,8 +13,8 @@ namespace Filefabrik\Rfc9421\Cryptography;
 
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
-use UnexpectedValueException;
 
 /**
  * Holds Verify-Algorithms and executes a Verify Algorithm
@@ -39,6 +40,7 @@ final class VerifyRegistry
 
     /**
      * @throws SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function verifying(
         string|SigningEnumInterface $signingEnum,
@@ -48,7 +50,7 @@ final class VerifyRegistry
     ): bool {
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnum);
 
-        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValueException(
+        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValue(
             sprintf('Verify method for "%s" not registered.', $enum->getName()),
         );
 

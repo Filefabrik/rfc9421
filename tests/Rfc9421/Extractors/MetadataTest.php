@@ -24,6 +24,7 @@ final class MetadataTest extends TestCase
 {
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testExtract(): void
     {
@@ -47,6 +48,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testExtractThrowParts(): void
     {
@@ -62,6 +64,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testExtractThrowDuplicate(): void
     {
@@ -75,6 +78,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testExtractEmptyCreated(): void
     {
@@ -86,6 +90,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testExtractZeroCreated(): void
     {
@@ -97,6 +102,7 @@ final class MetadataTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetAlgOrThrow(): void
     {

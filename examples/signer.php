@@ -10,7 +10,10 @@
 declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, InitialContentsEnum, SigningEnum};
-use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception, ProcessingException, SignatureExtractionException};
+use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
+    ProcessingException,
+    SignatureExtractionException,
+    UnexpectedValue};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
@@ -233,7 +236,12 @@ if (null === $keyId) {
     return;
 }
 
-$verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
+try {
+    $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
+} catch (UnexpectedValue $e) {
+    echo $e->getMessage();
+    return;
+}
 
 /*
  * When using mastodon it does not request in the metadata the signature algorithm

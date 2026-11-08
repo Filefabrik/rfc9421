@@ -13,15 +13,16 @@ namespace Filefabrik\Rfc9421Test\Cryptography;
 
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 #[CoversClass(SignatureRegistry::class)]
 final class SignatureRegistryTest extends TestCase
 {
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSigning(): void
     {
@@ -61,12 +62,13 @@ final class SignatureRegistryTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSigningNotRegisteredThrow(): void
     {
         SignatureRegistry::clearRegistry();
         $this->expectExceptionObject(
-            new UnexpectedValueException('Signing method for "'.SigningEnum::ed25519->name.'" not registered.'),
+            new UnexpectedValue('Signing method for "'.SigningEnum::ed25519->name.'" not registered.'),
         );
 
         SignatureRegistry::signing(SigningEnum::ed25519, '', '');

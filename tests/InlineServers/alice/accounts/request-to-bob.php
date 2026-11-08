@@ -15,7 +15,8 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     AlreadySetException,
     ContentDigestException,
     SignatureException,
-    SignatureExtractionException};
+    SignatureExtractionException,
+    UnexpectedValue};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
@@ -63,7 +64,7 @@ try {
         // for signing needs private
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
-} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException $e) {
+} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException|UnexpectedValue $e) {
     displayLogger('signing configuration error: '.$e->getMessage());
 
     return;

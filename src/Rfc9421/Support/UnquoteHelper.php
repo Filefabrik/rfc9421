@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Support;
 
-use UnexpectedValueException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 
 /**
  * Helper to remove the required Quotes for a string
@@ -20,6 +20,8 @@ final class UnquoteHelper
 {
     /**
      * Removes the quotes from a string
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function unquote(string $string): string
     {
@@ -29,7 +31,7 @@ final class UnquoteHelper
             return substr($first, 0, -1);
         }
 
-        throw new UnexpectedValueException(
+        throw new UnexpectedValue(
             sprintf('The expected value has to be wrapped by quotes "value" but is %s.', $string),
         );
     }
@@ -49,18 +51,24 @@ final class UnquoteHelper
         return '"'.$string.'"';
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public static function removeSurroundingBraces(string $string): string
     {
         return self::removeEndBrace(self::removeStartBrace($string));
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public static function removeEndBrace(string $string): string
     {
         if (self::endsWithBrace($string)) {
             return substr($string, 0, -1);
         }
 
-        throw new UnexpectedValueException(
+        throw new UnexpectedValue(
             sprintf('There was no brace ")" at the end value:"%s".', $string),
         );
     }
@@ -70,13 +78,16 @@ final class UnquoteHelper
         return str_ends_with($string, ')');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public static function removeStartBrace(string $string): string
     {
         if (self::startsWithBrace($string)) {
             return substr($string, 1);
         }
 
-        throw new UnexpectedValueException(
+        throw new UnexpectedValue(
             sprintf('There was no brace "(" at the beginning value:"%s".', $string),
         );
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -13,8 +14,8 @@ namespace Filefabrik\Rfc9421\Support;
 use BadMethodCallException;
 use Filefabrik\Rfc9421\Cryptography\SigningEnumsRegistry;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
-use UnexpectedValueException;
 
 abstract class AbstractMetadata
 {
@@ -31,12 +32,6 @@ abstract class AbstractMetadata
      * @var string[]
      */
     protected static array $decodeToInt = ['created', 'expires'];
-
-    /**
-     * UNIX timestamp when the signature was generated (recommended for replay protection)
-     * Please use UTC Timezone
-     */
-    private int|null $created = null;
 
     /**
      * UNIX timestamp after which the signature should be rejected
@@ -66,13 +61,21 @@ abstract class AbstractMetadata
      */
     private(set) string|null $tag = null;
 
+    /**
+     * UNIX timestamp when the signature was generated (recommended for replay protection)
+     * Please use UTC Timezone
+     */
+    private int|null $created = null;
+
     public function hasTag(): bool
     {
         return null !== $this->tag;
     }
 
     /**
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function set(string $key, int|string|null $value): static
     {
@@ -91,17 +94,13 @@ abstract class AbstractMetadata
         return $this;
     }
 
-    public function setCreated(?int $created): static
-    {
-        $this->created = $created;
-
-        return $this;
-    }
-
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     private function setIntOrNull(mixed $value): ?int
     {
         return (is_int($value) || null === $value) ? $value :
-            throw new UnexpectedValueException('$value must be int|null');
+            throw new UnexpectedValue('$value must be int|null');
     }
 
     public function setExpires(?int $expires): static
@@ -118,10 +117,13 @@ abstract class AbstractMetadata
         return $this;
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     private function setStringOrNull(mixed $value): ?string
     {
         return null === $value || is_string($value) ? $value :
-            throw new UnexpectedValueException('$value must be string|null');
+            throw new UnexpectedValue('$value must be string|null');
     }
 
     public function setKeyid(?string $keyid): static
@@ -197,6 +199,7 @@ abstract class AbstractMetadata
 
         return $metadata;
     }
+
     /**
      * UNIX timestamp when the signature was generated (recommended for replay protection)
      * Please use UTC Timezone
@@ -204,5 +207,12 @@ abstract class AbstractMetadata
     public function getCreated(): ?int
     {
         return $this->created;
+    }
+
+    public function setCreated(?int $created): static
+    {
+        $this->created = $created;
+
+        return $this;
     }
 }
