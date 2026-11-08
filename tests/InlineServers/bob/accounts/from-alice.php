@@ -156,10 +156,10 @@ if (null !== $keyId) {
         /*
          * or something
          */
-        if (null !== $metadata->created && ($currentDateTime + 6000) > $metadata->created) {
+        if (null !== $metadata->getCreated() && ($currentDateTime + 6000) > $metadata->getCreated()) {
             // ...
 
-            displayLogger('created: '.$metadata->created);
+            displayLogger('created: '.$metadata->getCreated());
         }
 
         if ($verifier->hasValidatedBody) {

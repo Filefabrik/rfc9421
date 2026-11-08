@@ -284,9 +284,9 @@ $metadata = $VerifyRequest->getSigningConfiguration()->metadata;
 /*
  * or something
  */
-if (null !== $metadata->created && ($currentDateTime + 6000) > $metadata->created) {
+if (null !== $metadata->getCreated() && ($currentDateTime + 6000) > $metadata->getCreated()) {
     // ...
-    echo 'has created date and created date is in range: '.$metadata->created.PHP_EOL;
+    echo 'has created date and created date is in range: '.$metadata->getCreated().PHP_EOL;
 }
 
 if ($VerifyRequest->hasValidatedBody) {

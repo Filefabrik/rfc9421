@@ -63,10 +63,10 @@ final class SigningConfigurationTest extends TestCase
     public function testWithCreated(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->metadata->created);
+        self::assertNull($i->metadata->getCreated());
         $dt = 123456;
         $i->setCreated($dt);
-        self::assertSame($dt, $i->metadata->created);
+        self::assertSame($dt, $i->metadata->getCreated());
     }
 
     /**

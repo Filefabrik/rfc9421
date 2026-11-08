@@ -36,7 +36,7 @@ abstract class AbstractMetadata
      * UNIX timestamp when the signature was generated (recommended for replay protection)
      * Please use UTC Timezone
      */
-    private(set) int|null $created = null;
+    private int|null $created = null;
 
     /**
      * UNIX timestamp after which the signature should be rejected
@@ -196,5 +196,13 @@ abstract class AbstractMetadata
         }
 
         return $metadata;
+    }
+    /**
+     * UNIX timestamp when the signature was generated (recommended for replay protection)
+     * Please use UTC Timezone
+     */
+    public function getCreated(): ?int
+    {
+        return $this->created;
     }
 }

@@ -124,7 +124,7 @@ final class MetadataTest extends TestCase
     {
         $ts = new DateTime()->getTimestamp();
 
-        self::assertEquals($ts, new Metadata()->setCreated($ts)->created);
+        self::assertEquals($ts, new Metadata()->setCreated($ts)->getCreated());
     }
 
     /**

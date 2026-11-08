@@ -80,7 +80,7 @@ final class MetadataTest extends TestCase
     {
         $now     = new DateTime()->getTimestamp();
         $string  = 'created=;'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";tag="my-tag"';
-        $created = Metadata::stringToMetadata($string)->created;
+        $created = Metadata::stringToMetadata($string)->getCreated();
         self::assertEquals(0, $created);
     }
 
@@ -91,7 +91,7 @@ final class MetadataTest extends TestCase
     {
         $now     = new DateTime()->getTimestamp();
         $string  = 'created=0;'.'expires='.$now.';'.'nonce="my-nonce";keyid="my-keyid";tag="my-tag"';
-        $created = Metadata::stringToMetadata($string)->created;
+        $created = Metadata::stringToMetadata($string)->getCreated();
         self::assertEquals(0, $created);
     }
 
