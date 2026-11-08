@@ -25,8 +25,6 @@ final class MessageQueryParams
      *
      * Find one query parameter by name (which must be supplied as parameters in the covered field list).
      *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      */
@@ -60,7 +58,6 @@ final class MessageQueryParams
          * todo with key method is potentially wrong in 'macgirvin/http-message-signer' no underscores needed
          */
 
-        // special of the key _baz_ with underscore before and after baz
         // InitialContentsEnum::name, $fieldName
         // can be pure because the Name-Class fix the InitialContentsEnum::name, $fieldName
         return new Entry(DerivedComponentEnum::queryParam->value, $value, InitialContentsEnum::name, $fieldName);
@@ -69,6 +66,7 @@ final class MessageQueryParams
     /**
      * Todo extremely buggy
      * todo comment
+     * todo user should use an own security parser. Make documentation of MessageQueryParams override
      * The value of the name parameter and the component value of a single named parameter are calculated via the following process:
      *
      * Parse the nameString or valueString of the named query parameter defined by Section 5.1 ("application/x-www-form-urlencoded parsing") of [HTMLURL]; this is the value after percent-encoded octets are decoded.

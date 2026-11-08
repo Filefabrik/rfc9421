@@ -15,7 +15,6 @@ use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
-// in response the req parameter
 /**
  * todo the content-digest;req and the content-digest regular
  * NOTE: '\' line wrapping per RFC 8792
@@ -34,7 +33,8 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  * ;created=1618884479;keyid="test-key-ecc-p256"
  */
 /**
- * Makes the line with there values they are in the signature-input
+ * Makes the line with there values they are in the signature-input.
+ * It does NOT processing an header-value or something. Only the Signature-Param Key
  * todo check logic with req
  * Formats everything except the value
  * something like "test-header";sf: VALUE
@@ -64,7 +64,7 @@ final class Entry
         private(set) readonly null|string|int $value = null,
         private(set) null|InitialContentsEnum $initialContents = null,
         /**
-         * Special need for key and name `"@query-param";name="Pet": dog` takes the PET
+         * Special need for key and name `"@query-param";name="Pet": dog` takes the `Pet`
          *
          */
         private(set) readonly string|null $nameOrKeyValue = null,
@@ -150,8 +150,8 @@ final class Entry
     /**
      * @param string[] $parts
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @return string[]
      */
     private function handleKeyOrName(array $parts): array
