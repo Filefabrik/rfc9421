@@ -55,12 +55,16 @@ final readonly class Base
      */
     public function createSignatureLines(): WriteLines
     {
+        /**
+         * Todo validate ;req und andere Parameter/Components ob diese für das request oder response signing erlaubt sind.
+         * Wenn es ein Response signing mit einem ;req ist, muss der Request-Header als Datasource verwendet werden.
+         * Für das Validieren einer Signed Response beim Original-Requester muss ebenso auf die validierung der richtigen Source geachtet werden
+         */
         $components = new PrepareComponents(message: $this->message, signingConfiguration: $this->configuration);
-
         /*
          * Prepare methods they must render your signature-params and singing parameters
+         * Prepare-Methods können sich unterscheiden ob es ein einfaches request-signing ist oder ob eine response signed wird bzw. eine signierte response signed wird
          */
-
         $components->setPreparedMethods($this->configuration->getSigningMethodsWithDefaults());
 
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {

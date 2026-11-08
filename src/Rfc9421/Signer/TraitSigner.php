@@ -99,6 +99,7 @@ trait TraitSigner
 
         /*
          * Signing line is an array of Lines with the component representation and the calculated values
+         * für den response signer kann ein ;req benötigt werden.
          */
         $this->signingLines = $base->createSignatureLines();
 
