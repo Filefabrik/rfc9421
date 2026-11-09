@@ -11,11 +11,13 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
+use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signer\PrepareComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Handling the signature base params
@@ -25,12 +27,13 @@ use Psr\Http\Message\RequestInterface;
 final readonly class Base
 {
     public function __construct(
-        private(set) RequestInterface|Response $message,
+        private(set) RequestInterface|ResponseInterface $message,
         private(set) SigningConfiguration $configuration,
         /**
          * ready prepared lines they will be part of the signature
          */
         private(set) WriteLines $signatureLines = new WriteLines(),
+        private(set) null|ReadLines $readLines = null,
     ) {
     }
 
@@ -52,6 +55,7 @@ final readonly class Base
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function createSignatureLines(): WriteLines
     {
@@ -68,15 +72,63 @@ final readonly class Base
         $components->setPreparedMethods($this->configuration->getSigningMethodsWithDefaults());
 
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
-            $line = new PrepareLine(
-                signingConfiguration: $this->configuration,
-                componentItemDto    : $signatureComponent,
-                message             : $this->message,
-            )->handle();
+            if ($signatureComponent->hasInitialContentsReq()) {
+                // ;req flag so take the original from the req
+
+                $line = $this->handleReq($signatureComponent);
+            } else {
+                $line = new PrepareLine(
+                    signingConfiguration: $this->configuration,
+                    componentItemDto    : $signatureComponent,
+                    message             : $this->message,
+                )->handle();
+            }
             $this->signatureLines->add(signatureLine: $line);
         }
 
         return $this->signatureLines;
+    }
+
+    /**
+     * Todo ugly processing but works
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    private function handleReq(ComponentItemDto $signatureComponent): Line
+    {
+        if ($this->message instanceof RequestInterface) {
+            throw new UnexpectedValue('Request Interface can not have an ;req flag.');
+        }
+        if (null === $this->readLines) {
+            throw new UnexpectedValue('For Response signing the signed Request must be set into the Signer!');
+        }
+        // ;req flag so take the original from the req
+
+        $withoutReq = $signatureComponent->withoutInitialContentsReq()
+                                         ->getHttpValue()
+        ;
+
+        return $this->findAndFix($withoutReq, $signatureComponent->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    private function findAndFix($searchInRequest, string $requestLineValue)
+    {
+        foreach ($this->readLines->getLines() as $line) {
+            if ($searchInRequest === $line->signatureComponent) {
+                // extract value to sign
+
+                $v = str_replace($searchInRequest, $requestLineValue, $line->valueToSign);
+
+                return new Line($requestLineValue, $v);
+            }
+        }
+        throw new UnexpectedValue(
+            sprintf('Can not find "%s" in the signed request "%s".', $requestLineValue, $searchInRequest),
+        );
     }
 
     /**

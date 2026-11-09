@@ -16,6 +16,7 @@ use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
@@ -288,8 +289,8 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetSignedLinesOne(): void
@@ -437,5 +438,90 @@ final class RequestSignerTest extends TestCase
 
         $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->sign();
+    }
+
+    /**
+     * Throws if has ;req Flag
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testSignThrowsReq(): void
+    {
+        $this->expectExceptionObject(new UnexpectedValue('Request Interface can not have an ;req flag.'));
+        $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
+        $certInstance         = new CertHelper('rsa');
+        $currentDateTime      = new DateTime()->getTimestamp();
+        $expireDateTime       = $currentDateTime + 7200;
+        $signingConfiguration = new SigningConfiguration()
+            /*
+             * todo documentation for addSigningMethod for content-type
+             */
+
+            ->addSigningMethod(
+                componentName: 'content-type',
+                closure      : fn (
+                    RequestInterface $request,
+                ): string => $request->getHeaderLine('content-type'),
+            )
+            ->mustCreateContentDigest()
+            ->signHeader('content-type')
+            ->signHeader('"content-digest";req')
+            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::req))
+            ->signHeader('"@query-param";name="baz"')
+            ->signHeader('@method')
+            ->signHeader('x-Origin-host')
+            ->signHeader('"example-dict";sf')
+            ->signHeader('"example-dict";key="d"')
+            ->signHeader('"example-header";bs')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($expireDateTime)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->withNonce('nonce-now')
+            ->setContentDigestAlgo('sha512')
+            // content digest signer key
+            ->setSignatureKeyName('testValue=')
+            // for signing needs private
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+        ;
+
+        $signingConfiguration->getStructuredFields()
+                             ->add('example-dict', 'dictionary')
+        ;
+        /**
+         * Prepare the Request
+         */
+        $request = new Request(
+            method : 'POST',
+            uri    : $targetUrl,
+            headers: [
+                'x-origin-host' => 'mytest.com',
+                'Example-Dict'  => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
+                'content-type'  => 'application/json',
+            ],
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
+        );
+
+        $request       = $request->withAddedHeader('example-header', 'value, with, lots')
+                                 ->withAddedHeader('example-header', 'of, commas')
+        ;
+        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
+        $signedRequest = $signer->sign();
+
+
+
     }
 }

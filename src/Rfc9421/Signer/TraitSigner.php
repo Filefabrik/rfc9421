@@ -57,6 +57,7 @@ trait TraitSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     private function sign(): ResponseInterface|RequestInterface
     {
@@ -89,6 +90,7 @@ trait TraitSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
@@ -98,7 +100,15 @@ trait TraitSigner
 
         $this->updateHeadersBeforePrepare();
 
-        $base = new Base(message: $this->message, configuration: $this->signingConfiguration);
+        $base = new Base(
+            message      : $this->message,
+            configuration: $this->signingConfiguration,
+            /*
+             * Request Lines can be Null if it is a Request Signer
+             * todo make sure that requestLines can only be set if the MessageInterface is a response Interface!
+             */
+            readLines    : $this->requestLines,
+        );
 
         /*
          * Signing line is an array of Lines with the component representation and the calculated values

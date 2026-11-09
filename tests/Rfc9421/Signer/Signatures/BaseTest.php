@@ -14,11 +14,15 @@ namespace Filefabrik\Rfc9421Test\Signer\Signatures;
 use DateTime;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
+use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
+use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use GuzzleHttp\Psr7\Request;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
@@ -54,6 +58,109 @@ final class BaseTest extends TestCase
         ;
 
         self::assertEquals(['"not-existing"' => '"not-existing": hm', '"@method"' => '"@method": POST'], $arr);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testCreateSignatureLinesResponseInterfaceWithReq(): void
+    {
+        $this->expectExceptionObject(new UnexpectedValue('Request Interface can not have an ;req flag.'));
+        $sc = new SigningConfiguration();
+        $sc->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'));
+        $sc->signHeader('not-ExistinG')// ->signHeader('@method')
+        ;
+        $sc->getStructuredFields()
+           ->add('not-existing', 'etag')
+        ;
+        // simulate a request
+        $writeLines = new WriteLines();
+
+        // pure setter without ;req flag
+        $writeLines->add(
+            new Line(
+                signatureComponent: '"@method"',
+                valueToSign       : '"@method": POST',
+            ),
+        );
+        $rl = new ReadLines($writeLines);
+
+        $r = new Request('post', '', ['noT-exIsting' => 'hm']);
+
+        $i = new Base(message: $r, configuration: $sc, readLines: $rl);
+        $i->createSignatureLines();
+        $arr = $i->createSignatureLines()
+                 ->toKeyValueArray()
+        ;
+
+        self::assertEquals(
+            [
+                '"@method";req'  => '"@method";req: POST',
+                '"not-existing"' => '"not-existing": hm',
+
+            ],
+            $arr,
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testCreateSignatureLinesResponseInterfaceThrows(): void
+    {
+        $this->expectExceptionObject(
+            new UnexpectedValue('For Response signing the signed Request must be set into the Signer!'),
+        );
+        $sc = new SigningConfiguration();
+        $sc
+            ->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'))
+        ;
+
+        $response = new Response();
+        $i        = new Base($response, $sc);
+        $i->createSignatureLines();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testCreateSignatureLinesWrongInterfaceReqThrows(): void
+    {
+        $this->expectExceptionObject(
+            new UnexpectedValue('For Response signing the signed Request must be set into the Signer!'),
+        );
+        $sc = new SigningConfiguration();
+        $sc
+            ->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'))
+        ;
+
+        $response = new Response();
+        $i        = new Base($response, $sc);
+        $i->createSignatureLines();
     }
 
     /**

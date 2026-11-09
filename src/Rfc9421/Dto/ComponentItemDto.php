@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -16,6 +17,7 @@ use Bakame\Http\StructuredFields\Item;
 use Bakame\Http\StructuredFields\Token;
 use DateTimeImmutable;
 use Exception;
+use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signature\ComponentName;
@@ -88,5 +90,26 @@ final readonly class ComponentItemDto
     public function getHttpValue(): string
     {
         return $this->httpValue;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function withoutInitialContentsReq(): self
+    {
+        if ($this->hasInitialContentsReq()) {
+            return self::fromFieldItem(
+                $this->getItem()
+                     ->withoutParameterByKeys(InitialContentsEnum::req->name),
+            );
+        }
+        throw new UnexpectedValue('Can not find initial contents enum "req"');
+    }
+
+    public function hasInitialContentsReq(): bool
+    {
+        return null !== $this->getItem()
+                             ->parameterByKey(InitialContentsEnum::req->name)
+        ;
     }
 }

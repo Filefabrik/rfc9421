@@ -13,7 +13,6 @@ namespace Filefabrik\Rfc9421\StructuredFields;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -43,13 +42,7 @@ final readonly class FieldValue
      */
     public function getFieldValue(): Entry
     {
-        $entry = $this->handleRequestInterface();
-
-        if ($this->messageInterface instanceof ResponseInterface) {
-            return $this->prepareHandleREQ($entry);
-        }
-
-        return $entry;
+        return $this->handleRequestInterface();
     }
 
     /**
@@ -89,22 +82,6 @@ final readonly class FieldValue
         }
 
         throw InvalidHeaderKeyException::headerNotExists($fieldName);
-    }
-
-    /**
-     * Todo req only on response signing
-     * todo check in which combination it is possible
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     */
-    private function prepareHandleREQ(Entry $entry): Entry
-    {
-        // todo req is only attachable if others not set
-        if ($this->initialContentsParameters->has(InitialContentsEnum::req)) {
-            $entry->withREQEnum();
-        }
-
-        return $entry;
     }
 
 }

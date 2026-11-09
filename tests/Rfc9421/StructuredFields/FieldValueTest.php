@@ -158,26 +158,4 @@ final class FieldValueTest extends TestCase
         $fw->getFieldValue();
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testWithResponseInterface(): void
-    {
-        $request = new Response(headers: ['test' => 'testValue']);
-
-        $fw = new FieldValue(
-            messageInterface         : $request,
-            signingConfiguration     : new SigningConfiguration(),
-            headerItemsDto           : HeaderItemsDto::fromMessageInterface($request),
-            componentItemDto         : ComponentName::fromString('"test";req'),
-            initialContentsParameters: new InitialContentsParameters([InitialContentsEnum::req->name => true]),
-        );
-
-        $handled = $fw->getFieldValue();
-
-        self::assertEquals(new Entry('test', 'testValue')->withREQEnum(), $handled);
-    }
 }

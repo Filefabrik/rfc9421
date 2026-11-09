@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421;
 
+use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\TraitSigner;
 use Psr\Http\Message\ResponseInterface;
 
@@ -32,10 +33,8 @@ final class ResponseSigner
         /*
          * Todo, if the request verifier set, it is also possible to handle some ;req headers
          * Todo check we should use another object to handle the ;req for the signed response from a request or signed request
-         *
-         *
          * */
-        private(set) readonly ?VerifyRequest $verifyRequest = null,
+        private(set) readonly ?ReadLines $requestLines = null,
     ) {
         $this->message = $message;
     }
@@ -51,6 +50,7 @@ final class ResponseSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function sign(): ResponseInterface
     {
