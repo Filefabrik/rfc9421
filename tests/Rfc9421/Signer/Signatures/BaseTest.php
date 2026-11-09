@@ -71,7 +71,57 @@ final class BaseTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function testCreateSignatureLinesResponseInterfaceWithReq(): void
+    public function testCreateSignatureLinesResponseInterfaceWithReqValid(): void
+    {
+        $sc = new SigningConfiguration();
+        $sc->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'));
+        $sc->signHeader('not-ExistinG')// ->signHeader('@method')
+        ;
+        $sc->getStructuredFields()
+           ->add('not-existing', 'etag')
+        ;
+        // simulate a request
+        $writeLines = new WriteLines();
+
+        // pure setter without ;req flag
+        $writeLines->add(
+            new Line(
+                signatureComponent: '"@method"',
+                valueToSign       : '"@method": POST',
+            ),
+        );
+        $rl = new ReadLines($writeLines);
+
+        $r = new Response(headers: ['noT-exIsting' => 'hm']);
+
+        $i = new Base(message: $r, configuration: $sc, readLines: $rl);
+        $i->createSignatureLines();
+        $arr = $i->createSignatureLines()
+                 ->toKeyValueArray()
+        ;
+
+        self::assertEquals(
+            [
+                '"@method";req'  => '"@method";req: POST',
+                '"not-existing"' => '"not-existing": hm',
+
+            ],
+            $arr,
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testCreateSignatureLinesResponseInterfaceWithReqThrows(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('Request Interface can not have an ;req flag.'));
         $sc = new SigningConfiguration();
@@ -306,7 +356,10 @@ final class BaseTest extends TestCase
         $sc->getStructuredFields()
            ->add('not-existing', 'etag')
         ;
-        $sc->addSigningMethod(componentName: '@authority', closure: fn (MessageInterface $message): string => 'game');
+        $sc->addSigningMethod(
+            componentName: '@authority',
+            closure      : fn (MessageInterface $message): string => 'game',
+        );
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
 
@@ -324,5 +377,4 @@ final class BaseTest extends TestCase
             self::assertSame($item[1], $line->valueToSign);
         }
     }
-
 }

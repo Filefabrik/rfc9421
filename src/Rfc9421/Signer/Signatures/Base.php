@@ -109,15 +109,15 @@ final readonly class Base
                                          ->getHttpValue()
         ;
 
-        return $this->findAndFix($withoutReq, $signatureComponent->getHttpValue());
+        return $this->findAndFix($this->readLines, $withoutReq, $signatureComponent->getHttpValue());
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private function findAndFix($searchInRequest, string $requestLineValue)
+    private function findAndFix(ReadLines $requestLines, $searchInRequest, string $requestLineValue): Line
     {
-        foreach ($this->readLines->getLines() as $line) {
+        foreach ($requestLines->getLines() as $line) {
             if ($searchInRequest === $line->signatureComponent) {
                 // extract value to sign
 
