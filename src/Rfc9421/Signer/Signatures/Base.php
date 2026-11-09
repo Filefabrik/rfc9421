@@ -83,6 +83,7 @@ final readonly class Base
                     message             : $this->message,
                 )->handle();
             }
+
             $this->signatureLines->add(signatureLine: $line);
         }
 
@@ -100,9 +101,11 @@ final readonly class Base
         if ($this->message instanceof RequestInterface) {
             throw new UnexpectedValue('Request Interface can not have an ;req flag.');
         }
-        if (null === $this->readLines) {
+
+        if (!$this->readLines instanceof ReadLines) {
             throw new UnexpectedValue('For Response signing the signed Request must be set into the Signer!');
         }
+
         // ;req flag so take the original from the req
 
         $withoutReq = $signatureComponent->withoutInitialContentsReq()
@@ -115,7 +118,7 @@ final readonly class Base
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private function findAndFix(ReadLines $requestLines, $searchInRequest, string $requestLineValue): Line
+    private function findAndFix(ReadLines $requestLines, string $searchInRequest, string $requestLineValue): Line
     {
         foreach ($requestLines->getLines() as $line) {
             if ($searchInRequest === $line->signatureComponent) {
@@ -126,8 +129,9 @@ final readonly class Base
                 return new Line($requestLineValue, $v);
             }
         }
+
         throw new UnexpectedValue(
-            sprintf('Can not find "%s" in the signed request "%s".', $requestLineValue, $searchInRequest),
+            sprintf('Can not find %s in the signed request %s.', $requestLineValue, $searchInRequest),
         );
     }
 

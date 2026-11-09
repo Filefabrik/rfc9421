@@ -99,16 +99,17 @@ final readonly class ComponentItemDto
     {
         if ($this->hasInitialContentsReq()) {
             return self::fromFieldItem(
-                $this->getItem()
+                $this->item
                      ->withoutParameterByKeys(InitialContentsEnum::req->name),
             );
         }
+
         throw new UnexpectedValue('Can not find initial contents enum "req"');
     }
 
     public function hasInitialContentsReq(): bool
     {
-        return null !== $this->getItem()
+        return null !== $this->item
                              ->parameterByKey(InitialContentsEnum::req->name)
         ;
     }

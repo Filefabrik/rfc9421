@@ -519,7 +519,7 @@ final class RequestSignerTest extends TestCase
                                  ->withAddedHeader('example-header', 'of, commas')
         ;
         $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
-        $signedRequest = $signer->sign();
+        $signer->sign();
 
 
 

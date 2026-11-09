@@ -309,7 +309,7 @@ final class ResponseSignerTest extends TestCase
      */
     public function testSignWithReqFromSignedRequest(): void
     {
-        $verifier = self::getSignedAndVerifiedRequest();
+        $verifier = $this->getSignedAndVerifiedRequest();
 
         $certInstance = new CertHelper('rsa');
 
@@ -382,6 +382,7 @@ final class ResponseSignerTest extends TestCase
 
         self::assertSame($signedLinesText, $responseSigner->signingParametersString);
     }
+
     /**
      * todo missing tests
      * todo with ;req
@@ -461,7 +462,7 @@ final class ResponseSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      */
-    private static function getSignedAndVerifiedRequest(): VerifyRequest
+    private function getSignedAndVerifiedRequest(): VerifyRequest
     {
         $cert         = 'rsa';
         $signingAlgo  = SigningEnum::rsa_v_1_5_sha_512->name;

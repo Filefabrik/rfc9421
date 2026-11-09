@@ -14,6 +14,7 @@ namespace Filefabrik\Rfc9421Test\Dto;
 use Bakame\Http\StructuredFields\Item;
 use Exception;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -61,6 +62,45 @@ final class ComponentItemDtoTest extends TestCase
                          ->getItem(),
             $i,
         );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws Exception
+     */
+    public function testWithoutInitialContentsReq(): void
+    {
+        $i = ComponentItemDto::fromFieldItem(Item::fromHttpValue('"test";req'));
+        self::assertSame(
+            '"test"',
+            $i->withoutInitialContentsReq()
+              ->getHttpValue(),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws Exception
+     */
+    public function testWithoutInitialContentsReqThrows(): void
+    {
+        $this->expectExceptionObject(new UnexpectedValue('Can not find initial contents enum "req"'));
+        $i = ComponentItemDto::fromFieldItem(Item::fromHttpValue('"test";sf'));
+        $i->withoutInitialContentsReq();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws Exception
+     */
+    public function testHasInitialContentsReq(): void
+    {
+        $i = ComponentItemDto::fromFieldItem(Item::fromHttpValue('"test";sf'));
+
+        self::assertFalse($i->hasInitialContentsReq());
+        $i = ComponentItemDto::fromFieldItem(Item::fromHttpValue('"test";req'));
+
+        self::assertTrue($i->hasInitialContentsReq());
     }
 
 }
