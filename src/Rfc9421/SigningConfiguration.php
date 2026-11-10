@@ -70,7 +70,7 @@ final class SigningConfiguration
     }
 
     /**
-     * Signing algorithm valid for metadata
+     * Signing algorithm valid for set into the metadata as "alg"
      *
      * @throws SignatureException
      */

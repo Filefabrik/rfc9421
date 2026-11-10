@@ -59,6 +59,7 @@ final class HeaderSignatureInput
 
         // empty components
         if (null === $this->signatureInput->components || '' === $this->signatureInput->components) {
+            // todo more descriptive that we can not sign if we do not have components
             throw new InvalidArgumentException('missing components');
         }
 

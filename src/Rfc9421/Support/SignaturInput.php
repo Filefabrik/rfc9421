@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -17,7 +18,7 @@ use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
  * $signatureKeyName:   testValue=
  * $components:         "@method" "content-digest"
  * $metadata:           created=1789634264;expires=1789641464;nonce="nonce-now";tag="mastodon"
- *
+ * // todo make all getters
  * validate against null if the "segment" found or not
  */
 final class SignaturInput

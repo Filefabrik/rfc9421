@@ -402,6 +402,7 @@ try {
 }
 /**
  * We expect a signed response with the `"content-digest";req` so we have to use it in the verification process
+ * todo make an object for rebuilding expectation more elegant then the read lines
  */
 $wl = new WriteLines();
 $wl->add(
@@ -414,9 +415,12 @@ $resRL                           = new ReadLines($wl);
 $signedResponseVerifyPreparation = new VerifyResponsePrepare(
     message             : $signedResponse,
     signingConfiguration: $verifyResponseConfiguration,
-)->setExpectedReqSigners(
-    readLines: $resRL,
-);
+)
+    // important feature if we have ';req' otherwise it will not work
+    ->setExpectedReqSigners(
+        readLines: $resRL,
+    )
+;
 try {
     $signedResponseVerifyPreparation->prepareVerification();
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
