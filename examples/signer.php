@@ -26,9 +26,7 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signer\Signatures\Line;
-use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
-use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
+use Filefabrik\Rfc9421\Signer\{Signatures\Line, Signatures\ReadLines, Signatures\WriteLines};
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -243,7 +241,7 @@ try {
 /*
  * with the keyId you should be able to download the public pem
  */
-$keyId = $verifierConfiguration->metadata->keyid;
+$keyId = $verifierConfiguration->getMetadata()->keyid;
 
 if (null === $keyId) {
     echo 'missing key id/PEm';
@@ -253,8 +251,8 @@ if (null === $keyId) {
 
 try {
     $verifierConfiguration->setPublicPem(publicPem: $signerCertInstance->getPublicPemContent());
-} catch (UnexpectedValue $e) {
-    echo $e->getMessage();
+} catch (UnexpectedValue $unexpectedValue) {
+    echo $unexpectedValue->getMessage();
 
     return;
 }
@@ -303,7 +301,7 @@ try {
 /*
  * Also the $metadata are verified
  */
-$metadata = $VerifyRequest->getSigningConfiguration()->metadata;
+$metadata = $VerifyRequest->getSigningConfiguration()->getMetadata();
 
 /*
  * or something
@@ -374,11 +372,12 @@ try {
         signingConfiguration: $responseSigningConfiguration,
         requestLines        : $VerifyRequest->getSignedHeaderLines(),
     );
-} catch (ProcessingException $e) {
-    echo $e->getLine(), $e->getMessage();
+} catch (ProcessingException $processingException) {
+    echo $processingException->getLine(), $processingException->getMessage();
 
     return;
 }
+
 try {
     $signedResponse = $responseSigner->sign();
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
@@ -395,11 +394,12 @@ try {
     $verifyResponseConfiguration = new SigningConfiguration()->setPublicPem($signerCertInstance->getPublicPemContent())
                                                              ->signHeader('content-digest')
     ;
-} catch (AbstractRfc9421Exception $e) {
-    echo $e->getMessage(), PHP_EOL;
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo $rfc9421Exception->getMessage(), PHP_EOL;
 
     return;
 }
+
 /**
  * We expect a signed response with the `"content-digest";req` so we have to use it in the verification process
  * todo make an object for rebuilding expectation more elegant then the read lines
@@ -428,6 +428,7 @@ try {
 
     return;
 }
+
 echo 'after prepare verifying response start the Verify Process', PHP_EOL;
 
 $signedResponseVerify = new VerifyResponse($signedResponseVerifyPreparation);

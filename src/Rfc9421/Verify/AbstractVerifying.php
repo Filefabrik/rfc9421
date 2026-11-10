@@ -27,7 +27,9 @@ abstract class AbstractVerifying
      *
      */
     private(set) bool               $hasValidatedBody     = false;
+
     protected ?SigningConfiguration $signingConfiguration = null;
+
     /**
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */

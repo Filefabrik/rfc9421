@@ -57,7 +57,7 @@ final class VerifyResponsePrepareTest extends TestCase
             ),
         );
 
-        $signedResponse = self::getSignedResponse();
+        $signedResponse = $this->getSignedResponse();
 
         $verifyResponseConfiguration = new SigningConfiguration();
         $prepare                     = new VerifyResponsePrepare(
@@ -85,7 +85,7 @@ final class VerifyResponsePrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private static function getSignedResponse(): ResponseInterface
+    private function getSignedResponse(): ResponseInterface
     {
         $rsaCert = new CertHelper('rsa');
 
@@ -123,7 +123,7 @@ final class VerifyResponsePrepareTest extends TestCase
      */
     public function testSuccess(): void
     {
-        $signedResponse = self::getSignedResponse();
+        $signedResponse = $this->getSignedResponse();
 
         $verifyResponseConfiguration = new SigningConfiguration();
         $prepare                     = new VerifyResponsePrepare(
@@ -163,7 +163,7 @@ final class VerifyResponsePrepareTest extends TestCase
      */
     public function testSuccessREQ(): void
     {
-        $signedResponse = self::getSignedResponseREQ();
+        $signedResponse = $this->getSignedResponseREQ();
 
         $verifyResponseConfiguration = new SigningConfiguration();
         $prepare                     = new VerifyResponsePrepare(
@@ -201,7 +201,7 @@ final class VerifyResponsePrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private static function getSignedResponseREQ(): ResponseInterface
+    private function getSignedResponseREQ(): ResponseInterface
     {
         $rsaCert = new CertHelper('rsa');
 

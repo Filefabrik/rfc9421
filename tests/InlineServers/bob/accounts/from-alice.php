@@ -72,6 +72,7 @@ try {
 
     return;
 }
+
 displayLogger("prepareVerification from Alice Request at Bob's Server without Errors");
 /*
  * with the keyId you should be able to download the public pem
@@ -83,6 +84,7 @@ if (null === $keyId) {
 
     return;
 }
+
 displayLogger('Alice sends the KeyId in her request: '.$keyId);
 displayLogger('Bob tries to request the public pem from Alice via the KeyId-Url.');
 /*
@@ -100,8 +102,8 @@ try {
     $bobPublicPem = new Client()->send($psrPemRequest)
                                 ->getBody()
     ;
-} catch (GuzzleException $e) {
-    displayLogger('Getting Certificate from Bob Error: '.$e->getMessage());
+} catch (GuzzleException $guzzleException) {
+    displayLogger('Getting Certificate from Bob Error: '.$guzzleException->getMessage());
 
     return;
 }
@@ -129,8 +131,8 @@ displayLogger('Bob now verifies the incoming signed request from Alice with her 
 $verifier = new VerifyRequest($verifyPrepareInstance);
 try {
     $res = $verifier->verifying();
-} catch (AbstractRfc9421Exception  $e) {
-    displayLogger('Verify the Signed Request Error: '.$e->getMessage());
+} catch (AbstractRfc9421Exception  $rfc9421Exception) {
+    displayLogger('Verify the Signed Request Error: '.$rfc9421Exception->getMessage());
 
     return;
 }
@@ -149,8 +151,8 @@ if (!$res) {
 
 try {
     $signedHeaderLines = $verifier->getSignedHeaderLines();
-} catch (ProcessingException $e) {
-    echo $e->getMessage();
+} catch (ProcessingException $processingException) {
+    echo $processingException->getMessage();
 
     return;
 }
@@ -168,6 +170,7 @@ if (null !== $metadata->getCreated() && ($currentDateTime + 6000) > $metadata->g
 
     displayLogger('created: '.$metadata->getCreated());
 }
+
 /**
  * Body was also a part of the request singing
  */

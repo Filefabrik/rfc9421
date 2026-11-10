@@ -53,9 +53,10 @@ final class VerifyResponseTest extends TestCase
     {
         $rsaCert  = new CertHelper('rsa');
 
-        $prepared = self::getPreparedVerifyResponseREQ();
+        $prepared = $this->getPreparedVerifyResponseREQ();
 
         $prepared->signingConfiguration->setPublicPem($rsaCert->getPublicPemContent());
+
         $vR = new VerifyResponse($prepared);
 
         self::assertTrue($vR->verifying());
@@ -76,7 +77,7 @@ final class VerifyResponseTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
-    private static function getPreparedVerifyResponseREQ(): VerifyResponsePrepare
+    private function getPreparedVerifyResponseREQ(): VerifyResponsePrepare
     {
         $requestSigned  = new ReadLines(
             new WriteLines()->addEntry(
@@ -84,7 +85,7 @@ final class VerifyResponseTest extends TestCase
                 '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
             ),
         );
-        $signedResponse = self::getSignedResponseREQ();
+        $signedResponse = $this->getSignedResponseREQ();
 
         $verifyResponseConfiguration = new SigningConfiguration();
         $prepare                     = new VerifyResponsePrepare(
@@ -124,7 +125,7 @@ final class VerifyResponseTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private static function getSignedResponseREQ(): ResponseInterface
+    private function getSignedResponseREQ(): ResponseInterface
     {
         $rsaCert = new CertHelper('rsa');
 

@@ -24,7 +24,9 @@ use Filefabrik\Rfc9421\Signer\Metadata;
 abstract class AbstractVerifyPrepare
 {
     private(set) ?HeaderSignature   $headerSignatureExtractor = null;
+
     protected ?HeaderSignatureInput $signatureInputInstance   = null;
+
     protected HeaderHelper          $headerHelper;
 
     public function getHeaderHelper(): HeaderHelper

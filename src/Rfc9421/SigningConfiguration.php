@@ -138,9 +138,6 @@ final class SigningConfiguration
         return $this->contentDigestAlgo instanceof DigestAlgorithmsEnum;
     }
 
-    /**
-     * @return \Filefabrik\Rfc9421\Signer\Metadata
-     */
     public function getMetadata(): Metadata
     {
         return $this->metadata;
