@@ -447,6 +447,7 @@ final class ResponseSignerTest extends TestCase
     }
 
     /**
+     * Helper/Mock Method
      * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
