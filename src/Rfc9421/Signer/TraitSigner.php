@@ -166,7 +166,7 @@ trait TraitSigner
     public function crypt(string $signingParametersString): string
     {
         $signature = SignatureRegistry::signing(
-            signingEnumInterface: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->metadata->alg),
+            signingEnumInterface: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->getMetadata()->alg),
             signingDatas        : $signingParametersString,
             privateKey          : $this->signingConfiguration->getPrivatePemOrThrow(),
         );

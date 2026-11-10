@@ -157,7 +157,7 @@ final class VerifyRequestTest extends TestCase
          * Maybe that let us know, that we handle derivedComponents with a special method
          *
          */
-        if (null !== $signerConfiguration->metadata->tag) {
+        if (null !== $signerConfiguration->getMetadata()->tag) {
             // for mastodon an own config für x-origin or something
             $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
@@ -269,7 +269,7 @@ final class VerifyRequestTest extends TestCase
          * Maybe that let us know, that we handle derivedComponents with a special method
          *
          */
-        if (null !== $signerConfiguration->metadata->tag) {
+        if (null !== $signerConfiguration->getMetadata()->tag) {
             // for mastodon an own config für x-origin or something
             $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
@@ -482,7 +482,7 @@ final class VerifyRequestTest extends TestCase
          * Maybe that let us know, that we handle derivedComponents with a special method
          *
          */
-        if (null !== $signerConfiguration->metadata->tag) {
+        if (null !== $signerConfiguration->getMetadata()->tag) {
             // for mastodon an own config für x-origin or something
             $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }

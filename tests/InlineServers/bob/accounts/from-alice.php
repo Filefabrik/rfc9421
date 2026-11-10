@@ -76,7 +76,7 @@ displayLogger("prepareVerification from Alice Request at Bob's Server without Er
 /*
  * with the keyId you should be able to download the public pem
  */
-$keyId = $verifierConfiguration->metadata->keyid;
+$keyId = $verifierConfiguration->getMetadata()->keyid;
 
 if (null === $keyId) {
     displayLogger(':( Alice does not send the KeyId in her request so we can not request the public pem');
@@ -158,7 +158,7 @@ try {
 /*
  * Also the $metadata are verified
  */
-$metadata = $verifier->getSigningConfiguration()->metadata;
+$metadata = $verifier->getSigningConfiguration()->getMetadata();
 
 /*
  * or something

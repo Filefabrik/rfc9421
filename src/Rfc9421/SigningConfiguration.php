@@ -48,7 +48,7 @@ final class SigningConfiguration
     private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
 
     public function __construct(
-        private(set) readonly Metadata $metadata = new Metadata(),
+        private readonly Metadata $metadata = new Metadata(),
         private(set) SigningComponents $signatureComponents = new SigningComponents(),
         /**
          * Methods for extracting the header and recompile the component
@@ -136,6 +136,14 @@ final class SigningConfiguration
     public function hasContentDigestHashAlgo(): bool
     {
         return $this->contentDigestAlgo instanceof DigestAlgorithmsEnum;
+    }
+
+    /**
+     * @return \Filefabrik\Rfc9421\Signer\Metadata
+     */
+    public function getMetadata(): Metadata
+    {
+        return $this->metadata;
     }
 
 }

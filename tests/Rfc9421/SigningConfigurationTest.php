@@ -30,9 +30,9 @@ final class SigningConfigurationTest extends TestCase
     public function testWithTag(): void
     {
         $i = new SigningConfiguration();
-        self::assertSame('tagname', $i->setTag('tagname')->metadata->tag);
+        self::assertSame('tagname', $i->setTag('tagname')->getMetadata()->tag);
         $i->setTag(null);
-        self::assertNull($i->metadata->tag);
+        self::assertNull($i->getMetadata()->tag);
     }
 
     /**
@@ -63,10 +63,10 @@ final class SigningConfigurationTest extends TestCase
     public function testWithCreated(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->metadata->getCreated());
+        self::assertNull($i->getMetadata()->getCreated());
         $dt = 123456;
         $i->setCreated($dt);
-        self::assertSame($dt, $i->metadata->getCreated());
+        self::assertSame($dt, $i->getMetadata()->getCreated());
     }
 
     /**
@@ -201,26 +201,26 @@ final class SigningConfigurationTest extends TestCase
     public function testWithExpires(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->metadata->expires);
+        self::assertNull($i->getMetadata()->expires);
         $dt = 123456;
         $i->setExpires($dt);
-        self::assertSame($dt, $i->metadata->expires);
+        self::assertSame($dt, $i->getMetadata()->expires);
     }
 
     public function testWithNonce(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->metadata->nonce);
+        self::assertNull($i->getMetadata()->nonce);
         $i->withNonce('foo');
-        self::assertSame('foo', $i->metadata->nonce);
+        self::assertSame('foo', $i->getMetadata()->nonce);
     }
 
     public function testWithKeyid(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->metadata->keyid);
+        self::assertNull($i->getMetadata()->keyid);
         $i->setKeyid('foo');
-        self::assertSame('foo', $i->metadata->keyid);
+        self::assertSame('foo', $i->getMetadata()->keyid);
     }
 
     /**
@@ -229,11 +229,11 @@ final class SigningConfigurationTest extends TestCase
     public function testWithSigningAlgorithm(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->metadata->alg);
+        self::assertNull($i->getMetadata()->alg);
         $i->setSigningAlgorithm(SigningEnum::rsa_pss_sha512);
-        self::assertSame(SigningEnum::rsa_pss_sha512, $i->metadata->alg);
+        self::assertSame(SigningEnum::rsa_pss_sha512, $i->getMetadata()->alg);
         $i->setSigningAlgorithm('ecdsa-p256-sha256');
-        self::assertSame(SigningEnum::ecdsa_p_256_sha_256, $i->metadata->alg);
+        self::assertSame(SigningEnum::ecdsa_p_256_sha_256, $i->getMetadata()->alg);
     }
 
     /**

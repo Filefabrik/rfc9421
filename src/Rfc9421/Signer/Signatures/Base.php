@@ -152,7 +152,7 @@ final readonly class Base
             signatureKeyName   : $this->configuration->signatureKeyName ?? '',
         )->makeSig1fromSignatureParams();
 
-        $metadataString = $this->configuration->metadata->toString();
+        $metadataString = $this->configuration->getMetadata()->toString();
 
         return $headerString.';'.$metadataString;
     }

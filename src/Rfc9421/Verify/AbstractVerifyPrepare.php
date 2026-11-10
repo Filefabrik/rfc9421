@@ -76,7 +76,7 @@ abstract class AbstractVerifyPrepare
          * @throws VerifyHeaderSignatureException
          */
         Metadata::bindMetadata(
-            instance: $this->signingConfiguration->metadata,
+            instance: $this->signingConfiguration->getMetadata(),
             metadata: $this->getExtractedMetadataArray(),
         );
 
@@ -99,12 +99,12 @@ abstract class AbstractVerifyPrepare
 
     /**
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
     protected function getExtractedMetadataArray(): array
