@@ -11,15 +11,29 @@ declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, InitialContentsEnum, SigningEnum};
 use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
+    ContentDigestException,
+    EmptyException,
+    EnumTypeException,
+    InvalidHeaderKeyException,
+    MethodException,
+    PrepareMethodsException,
     ProcessingException,
+    SignatureException,
     SignatureExtractionException,
-    UnexpectedValue};
+    StructuredFieldException,
+    UnexpectedValue,
+    VerifyHeaderSignatureException};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signer\Signatures\Line;
+use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
+use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
+use Filefabrik\Rfc9421\VerifyResponse;
+use Filefabrik\Rfc9421\VerifyResponsePrepare;
 use Filefabrik\Rfc9421Test\Examples\Tools\JsonToString;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
@@ -41,8 +55,8 @@ require_once __DIR__.'/../src/register-openssl-signing-verify.php';
 /*
  * for testing purposes we use our own cert-loader
  */
-$certInstance = new CertHelper('rsa');
-$targetUrl    = 'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman';
+$signerCertInstance = new CertHelper('rsa');
+$targetUrl          = 'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman';
 
 /*
  * Prepare signingConfiguration
@@ -143,7 +157,7 @@ try {
         // content digest signer key
         ->setSignatureKeyName('sig=')
         // for signing needs private
-        ->setPrivatePem($certInstance->getPrivatPemContent())
+        ->setPrivatePem($signerCertInstance->getPrivatPemContent())
     ;
     $signingConfiguration->getStructuredFields()
                          ->addMany($extraParser)
@@ -210,7 +224,8 @@ $verifierConfiguration->getStructuredFields()
                       ->addMany($extraParser)
 ;
 $verifierConfiguration->addSigningMethods($prepareMethods);
-$verifyPrepareInstance = new VerifyRequestPrepare($signedRequest, $verifierConfiguration);
+$verifyPrepareInstance =
+    new VerifyRequestPrepare(message: $signedRequest, signingConfiguration: $verifierConfiguration);
 
 /*
  * Prepare the incoming Request for verifying
@@ -237,9 +252,10 @@ if (null === $keyId) {
 }
 
 try {
-    $verifierConfiguration->setPublicPem(publicPem: $certInstance->getPublicPemContent());
+    $verifierConfiguration->setPublicPem(publicPem: $signerCertInstance->getPublicPemContent());
 } catch (UnexpectedValue $e) {
     echo $e->getMessage();
+
     return;
 }
 
@@ -324,13 +340,21 @@ try {
         ->setSignatureKeyName('responseSig=')
         // singing the status as relevant information for the requester Alice, to ensure the status
         ->signHeader(DerivedComponentEnum::status)
+        // content digest which must be response to the requester that the requester can check, the response body was not tempered
+        ->signHeader('content-digest')
+        ->setContentDigestAlgo('sha256')
+        ->mustCreateContentDigest()
+        /*
+         * Signing ";req"
+         */
+        ->signHeader('"content-digest";req')
         // Content-Length has a default method to calculate the length of the body
         ->signHeader('content-length')
         // the sender of the request expects an algo that Bob can check while receive this signed response
         // todo use different signing for response
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         // set alice private pem to encrypt the response
-        ->setPrivatePem($certInstance->getPrivatPemContent())
+        ->setPrivatePem($signerCertInstance->getPrivatPemContent())
         // singing the response body
         // todo use different signing for response
         ->setContentDigestAlgo('sha256')
@@ -341,10 +365,20 @@ try {
     return;
 }
 
-/**
+/*
  * Signing the Response if need signed response
  */
-$responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
+try {
+    $responseSigner = new ResponseSigner(
+        message             : $response,
+        signingConfiguration: $responseSigningConfiguration,
+        requestLines        : $VerifyRequest->getSignedHeaderLines(),
+    );
+} catch (ProcessingException $e) {
+    echo $e->getLine(), $e->getMessage();
+
+    return;
+}
 try {
     $signedResponse = $responseSigner->sign();
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
@@ -354,3 +388,53 @@ try {
 }
 
 echo 'response is successfully signed and can be response to the sender'.PHP_EOL;
+
+echo 'Start Verify the Signed Response'.PHP_EOL;
+
+try {
+    $verifyResponseConfiguration = new SigningConfiguration()->setPublicPem($signerCertInstance->getPublicPemContent())
+                                                             ->signHeader('content-digest')
+    ;
+} catch (AbstractRfc9421Exception $e) {
+    echo $e->getMessage(), PHP_EOL;
+
+    return;
+}
+/**
+ * We expect a signed response with the `"content-digest";req` so we have to use it in the verification process
+ */
+$wl = new WriteLines();
+$wl->add(
+    new Line(
+        signatureComponent: '"content-digest"',
+        valueToSign       : '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:',
+    ),
+);
+$resRL                           = new ReadLines($wl);
+$signedResponseVerifyPreparation = new VerifyResponsePrepare(
+    message             : $signedResponse,
+    signingConfiguration: $verifyResponseConfiguration,
+)->setExpectedReqSigners(
+    readLines: $resRL,
+);
+try {
+    $signedResponseVerifyPreparation->prepareVerification();
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo $rfc9421Exception->getMessage();
+
+    return;
+}
+echo 'after prepare verifying response start the Verify Process', PHP_EOL;
+
+$signedResponseVerify = new VerifyResponse($signedResponseVerifyPreparation);
+
+try {
+    $verifySignedResponseResult = $signedResponseVerify->verifying();
+} catch (ContentDigestException|VerifyHeaderSignatureException|UnexpectedValue|StructuredFieldException|SignatureExtractionException|SignatureException|ProcessingException|PrepareMethodsException|MethodException|InvalidHeaderKeyException|EnumTypeException|EmptyException $e) {
+    echo 'bug during the signed response verify process:', PHP_EOL, $e->getMessage();
+
+    return;
+}
+
+echo 'after verify response ', PHP_EOL;
+echo 'verify signed Response Verification Result: ', $verifySignedResponseResult, PHP_EOL;
