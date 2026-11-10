@@ -33,6 +33,10 @@ final readonly class Base
          * ready prepared lines they will be part of the signature
          */
         private(set) WriteLines $signatureLines = new WriteLines(),
+        /**
+         * ReadLines are the qualified object which comes from a Signed Request
+         *
+         */
         private(set) null|ReadLines $readLines = null,
     ) {
     }
@@ -106,21 +110,22 @@ final readonly class Base
             throw new UnexpectedValue('For Response signing the signed Request must be set into the Signer!');
         }
 
-        // ;req flag so take the original from the req
-
-        $withoutReq = $signatureComponent->withoutInitialContentsReq()
-                                         ->getHttpValue()
-        ;
-
-        return $this->findAndFix($this->readLines, $withoutReq, $signatureComponent->getHttpValue());
+        return $this->findAndFix(
+            $this->readLines,
+            $signatureComponent->httpValueWithoutReq(),
+            $signatureComponent->getHttpValue(),
+        );
     }
 
     /**
+     * Already ensured that the wanted line contains the ";req" Flag
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     private function findAndFix(ReadLines $requestLines, string $searchInRequest, string $requestLineValue): Line
     {
         foreach ($requestLines->getLines() as $line) {
+            // 1:1 value
             if ($searchInRequest === $line->signatureComponent) {
                 // extract value to sign
 

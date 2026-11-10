@@ -87,6 +87,18 @@ final readonly class ComponentItemDto
         return $this->item;
     }
 
+    /**
+     * Without the ";req" flag so take the original from the req
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function httpValueWithoutReq(): string
+    {
+        return $this->withoutInitialContentsReq()
+                    ->getHttpValue()
+        ;
+    }
+
     public function getHttpValue(): string
     {
         return $this->httpValue;
@@ -100,7 +112,7 @@ final readonly class ComponentItemDto
         if ($this->hasInitialContentsReq()) {
             return self::fromFieldItem(
                 $this->item
-                     ->withoutParameterByKeys(InitialContentsEnum::req->name),
+                    ->withoutParameterByKeys(InitialContentsEnum::req->name),
             );
         }
 
@@ -110,7 +122,7 @@ final readonly class ComponentItemDto
     public function hasInitialContentsReq(): bool
     {
         return null !== $this->item
-                             ->parameterByKey(InitialContentsEnum::req->name)
+                ->parameterByKey(InitialContentsEnum::req->name)
         ;
     }
 }

@@ -103,4 +103,15 @@ final class ComponentItemDtoTest extends TestCase
         self::assertTrue($i->hasInitialContentsReq());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws Exception
+     */
+    public function testHttpValueWithoutReq(): void
+    {
+        $i = ComponentItemDto::fromFieldItem(Item::fromHttpValue('"test";req'));
+
+        self::assertSame('"test"', $i->httpValueWithoutReq());
+    }
+
 }
