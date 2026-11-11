@@ -29,7 +29,7 @@ final class WriteLines extends AbstractLines
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @example from a full signature params line '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:',
      */
-    public function fromString(string $line): self
+    public function fromSignatureLine(string $line): self
     {
         $this->add(DecodeSignatureComponentEntry::toLine($line));
 

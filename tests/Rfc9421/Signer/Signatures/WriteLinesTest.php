@@ -71,7 +71,7 @@ final class WriteLinesTest extends TestCase
     public function testFromString(): void
     {
         $lines   = new WriteLines()
-            ->fromString('"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:')
+            ->fromSignatureLine('"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:')
         ;
         $setLine = $lines->getLines()[0];
         self::assertSame(

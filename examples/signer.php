@@ -23,7 +23,6 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     StructuredFieldException,
     UnexpectedValue,
     VerifyHeaderSignatureException};
-use Filefabrik\Rfc9421\Extractors\DecodeSignatureComponentEntry;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
@@ -407,12 +406,7 @@ try {
  */
 $wl = new WriteLines();
 try {
-    $wl->add(
-        DecodeSignatureComponentEntry::toLine(
-            '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:',
-        ),
-
-    );
+    $wl->fromSignatureLine('"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:');
 } catch (SignatureExtractionException $e) {
     echo $e->getMessage(), PHP_EOL;
     return;
