@@ -206,8 +206,7 @@ final class VerifyResponsePrepareTest extends TestCase
         $rsaCert = new CertHelper('rsa');
 
         $requestSigned               = new ReadLines(
-            new WriteLines()->addEntry(
-                '"content-digest"',
+            new WriteLines()->fromString(
                 '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
             ),
         );

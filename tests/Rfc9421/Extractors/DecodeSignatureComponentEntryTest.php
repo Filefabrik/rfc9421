@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Extractors;
 
+use Bakame\Http\StructuredFields\Item;
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Extractors\DecodeSignatureComponentEntry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -117,12 +119,122 @@ final class DecodeSignatureComponentEntryTest extends TestCase
         ];
     }
 
+    public static function componentDtoProvider(): array
+    {
+        return [
+            // buggy format errors
+            //            [
+            //                '"@query-param:  ',
+            //                [],
+            //            ], // buggy format errors
+            //            [
+            //                '@query-param:"',
+            //                [],
+            //            ],
+            //            // missing space after
+            //            [
+            //                '"@query-param":',
+            //                [],
+            //            ],
+            [
+                '"@query-param";name="baz": bat-man',
+                Item::fromString('"@query-param";name="baz"'),
+
+            ],
+            [
+                '"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d',
+                Item::fromString('"example-dict";sf'),
+
+            ],
+
+            [
+                '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:',
+                Item::fromString('"content-digest"'),
+            ],
+            [
+                '"content-type": application/json',
+                Item::fromString('"content-type"'),
+
+            ],
+
+            [
+                '"@method": POST',
+                Item::fromString('"@method"'),
+
+            ],
+
+            [
+                '"example-dict";key="d": ?1',
+                Item::fromString('"example-dict";key="d"'),
+
+            ],
+            [
+                '"example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:',
+                Item::fromString('"example-header";bs'),
+
+            ],
+
+            // empty values
+            [
+                '"@query-param": ',
+                Item::fromString('"@query-param"'),
+
+            ],
+            // two spaces, last space is value
+            [
+                '"@query-param":  ',
+                Item::fromString('"@query-param"'),
+
+            ],
+
+        ];
+    }
+
     #[DataProvider('stringProvider')]
-    public function testExtract($line, $expected): void
+    public function testExtract(string $line, array $expected): void
     {
         $matches = DecodeSignatureComponentEntry::extract($line);
 
         self::assertSame($expected, $matches);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    #[DataProvider('stringProvider')]
+    public function testExtractThrow(string $line, array $expected): void
+    {
+        if (0 === count($expected)) {
+            $this->expectExceptionObject(SignatureExtractionException::invalidLine($line));
+        }
+
+        $matches = DecodeSignatureComponentEntry::extractOrThrow($line);
+
+        self::assertSame($expected, $matches);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    #[DataProvider('componentDtoProvider')]
+    public function testToComponentItemDto(string $line, ?Item $expectedItem): void
+    {
+        $item    = DecodeSignatureComponentEntry::toComponentDto($line);
+        $exValue = $expectedItem->value();
+        $decoded = $item->getHttpValue();
+        self::assertEquals($exValue, $decoded);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testToLine(): void
+    {
+        $line = DecodeSignatureComponentEntry::toLine('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d');
+
+        self::assertEquals(
+            ['"example-dict";sf', '"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d'],
+            [$line->signatureComponent, $line->valueToSign]
+        );
+    }
 }

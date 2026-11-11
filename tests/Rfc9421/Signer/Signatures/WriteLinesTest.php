@@ -64,4 +64,19 @@ final class WriteLinesTest extends TestCase
         ;
         self::assertEquals(['bar', 'bar2'], $sl->values());
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testFromString(): void
+    {
+        $lines   = new WriteLines()
+            ->fromString('"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:')
+        ;
+        $setLine = $lines->getLines()[0];
+        self::assertSame(
+            ['"content-digest"', '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:'],
+            [$setLine->signatureComponent, $setLine->valueToSign],
+        );
+    }
 }

@@ -36,6 +36,7 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  * Makes the line with there values they are in the signature-input.
  * It does NOT processing an header-value or something. Only the Signature-Param Key
  * todo check logic with req
+ * todo check logic if there are more initial contents params
  * Formats everything except the value
  * something like "test-header";sf: VALUE
  */
@@ -150,8 +151,8 @@ final class Entry
     /**
      * @param string[] $parts
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @return string[]
      */
     private function handleKeyOrName(array $parts): array

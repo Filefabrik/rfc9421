@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -18,8 +19,13 @@ final class SignatureExtractionException extends AbstractRfc9421Exception
         return new self(
             sprintf(
                 'Signature is not proceeded. Call before %s::extract',
-                \Filefabrik\Rfc9421\Verify\HeaderSignatureInput::class
+                \Filefabrik\Rfc9421\Verify\HeaderSignatureInput::class,
             ),
         );
+    }
+
+    public static function invalidLine(string $line): self
+    {
+        return new self(sprintf('Invalid signature line:%s', $line));
     }
 }

@@ -17,9 +17,9 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
+use Filefabrik\Rfc9421\Extractors\DecodeSignatureComponentEntry;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
-use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -249,9 +249,8 @@ final class ResponseSignerTest extends TestCase
         $writeLines = new WriteLines();
 
         $writeLines->add(
-            new Line(
-                signatureComponent: '"content-digest"',
-                valueToSign       : '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
+            DecodeSignatureComponentEntry::toLine(
+                '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
             ),
         );
         $rl = new ReadLines($writeLines);
@@ -340,16 +339,7 @@ final class ResponseSignerTest extends TestCase
             ->mustCreateContentDigest()
         ;
 
-        /* // simulate a request
-         $writeLines = new WriteLines();
 
-         $writeLines->add(
-             new Line(
-                 signatureComponent: '"content-digest"',
-                 valueToSign       : '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
-             ),
-        $rl = new ReadLines($writeLines);
-         );*/
 
         $responseSigner = new ResponseSigner(
             message             : $response,
@@ -384,70 +374,8 @@ final class ResponseSignerTest extends TestCase
     }
 
     /**
-     * todo missing tests
-     * todo with ;req
-     * todo empty @query-params
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
-     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
-     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws JsonException
-     */
-    public function testSignWithReqWithoutSignedRequest(): void
-    {
-        $this->expectExceptionObject(new UnexpectedValue('For Response signing the signed Request must be set into the Signer!'));
-
-        $certInstance = new CertHelper('rsa');
-
-        $response = new Response(headers: [], body: '{"recipient":"Alex","new-amount":900000000}');
-
-        //... now sign the response
-
-        $responseSigningConfiguration = new SigningConfiguration()
-
-            // make sure the receiver Alice expects the following response Key
-            ->setSignatureKeyName('responseSig=')
-            // test req
-            ->signHeader('"content-digest";req')
-            ->signHeader('"@authority";req')
-            //->signHeader('"@method";req')
-            // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signHeader(DerivedComponentEnum::status)
-            // content-length is covered by a $this->addSigningMethod()
-            ->signHeader('content-length')
-            ->signHeader('content-digest')
-
-            // the sender of the request expects an algo that Bob can check while receive this signed response
-            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            // set alice private pem to encrypt the response
-            ->setPrivatePem($certInstance->getPrivatPemContent())
-            // singing the response body
-            ->setContentDigestAlgo('sha256')
-            ->mustCreateContentDigest()
-        ;
-
-
-        $responseSigner = new ResponseSigner(
-            message             : $response,
-            signingConfiguration: $responseSigningConfiguration,
-        );
-
-     $responseSigner->sign();
-
-    }
-
-    /**
      * Helper/Mock Method
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
@@ -524,5 +452,68 @@ final class ResponseSignerTest extends TestCase
         $verifier->verifying();
 
         return $verifier;
+    }
+
+    /**
+     * todo missing tests
+     * todo with ;req
+     * todo empty @query-params
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws JsonException
+     */
+    public function testSignWithReqWithoutSignedRequest(): void
+    {
+        $this->expectExceptionObject(
+            new UnexpectedValue('For Response signing the signed Request must be set into the Signer!'),
+        );
+
+        $certInstance = new CertHelper('rsa');
+
+        $response = new Response(headers: [], body: '{"recipient":"Alex","new-amount":900000000}');
+
+        //... now sign the response
+
+        $responseSigningConfiguration = new SigningConfiguration()
+
+            // make sure the receiver Alice expects the following response Key
+            ->setSignatureKeyName('responseSig=')
+            // test req
+            ->signHeader('"content-digest";req')
+            ->signHeader('"@authority";req')
+            //->signHeader('"@method";req')
+            // singing the status as relevant information for the requester Alice, to ensure the status
+            ->signHeader(DerivedComponentEnum::status)
+            // content-length is covered by a $this->addSigningMethod()
+            ->signHeader('content-length')
+            ->signHeader('content-digest')
+
+            // the sender of the request expects an algo that Bob can check while receive this signed response
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            // set alice private pem to encrypt the response
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+            // singing the response body
+            ->setContentDigestAlgo('sha256')
+            ->mustCreateContentDigest()
+        ;
+
+        $responseSigner = new ResponseSigner(
+            message             : $response,
+            signingConfiguration: $responseSigningConfiguration,
+        );
+
+        $responseSigner->sign();
     }
 }

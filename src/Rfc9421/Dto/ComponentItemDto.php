@@ -101,7 +101,6 @@ final readonly class ComponentItemDto
 
     /**
      * HTTP Value is the key without the value after before the colon ":"
-     * @return string
      */
     public function getHttpValue(): string
     {

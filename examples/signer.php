@@ -23,10 +23,11 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     StructuredFieldException,
     UnexpectedValue,
     VerifyHeaderSignatureException};
+use Filefabrik\Rfc9421\Extractors\DecodeSignatureComponentEntry;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signer\{Signatures\Line, Signatures\ReadLines, Signatures\WriteLines};
+use Filefabrik\Rfc9421\Signer\{Signatures\ReadLines, Signatures\WriteLines};
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -405,12 +406,17 @@ try {
  * todo make an object for rebuilding expectation more elegant then the read lines
  */
 $wl = new WriteLines();
-$wl->add(
-    new Line(
-        signatureComponent: '"content-digest"',
-        valueToSign       : '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:',
-    ),
-);
+try {
+    $wl->add(
+        DecodeSignatureComponentEntry::toLine(
+            '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:',
+        ),
+
+    );
+} catch (SignatureExtractionException $e) {
+    echo $e->getMessage(), PHP_EOL;
+    return;
+}
 $resRL                           = new ReadLines($wl);
 $signedResponseVerifyPreparation = new VerifyResponsePrepare(
     message             : $signedResponse,
