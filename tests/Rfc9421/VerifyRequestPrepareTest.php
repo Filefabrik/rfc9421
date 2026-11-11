@@ -153,7 +153,7 @@ final class VerifyRequestPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \JsonException
+     * @throws JsonException
      */
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerifyWithContentDigest(string|SigningEnum $signingAlgo, string $cert): void
@@ -310,7 +310,7 @@ final class VerifyRequestPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testGetSignatureInputInstance(): void
     {
