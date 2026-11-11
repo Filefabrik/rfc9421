@@ -24,4 +24,34 @@ final class LineTest extends TestCase
         self::assertEquals('one', $i->signatureComponent);
         self::assertEquals('val', $i->valueToSign);
     }
+
+    /**
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testGetItem(): void
+    {
+        $i = new Line('one', 'val');
+        self::assertEquals('one', $i->signatureComponent);
+
+        self::assertSame(
+            '"one"',
+            $i->getComponentItemDto()
+              ->getHttpValue(),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testExtractValue(): void
+    {
+        $i = new Line('one', 'val');
+        self::assertEquals('one', $i->signatureComponent);
+
+        self::assertSame(
+            'val',
+            $i->extractValue(),
+        );
+    }
 }

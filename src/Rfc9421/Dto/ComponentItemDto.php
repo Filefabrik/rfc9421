@@ -29,7 +29,7 @@ final readonly class ComponentItemDto
 {
     private function __construct(
         private(set) string $fieldName,
-        private(set) string $httpValue,
+        private string $httpValue,
         private(set) Item $item,
     ) {
     }
@@ -99,6 +99,10 @@ final readonly class ComponentItemDto
         ;
     }
 
+    /**
+     * HTTP Value is the key without the value after before the colon ":"
+     * @return string
+     */
     public function getHttpValue(): string
     {
         return $this->httpValue;

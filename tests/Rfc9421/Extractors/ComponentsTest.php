@@ -57,7 +57,7 @@ final class ComponentsTest extends TestCase
 
         $validateable = [];
         foreach ($result->getComponents() as $item) {
-            $validateable[] = $item->httpValue;
+            $validateable[] = $item->getHttpValue();
         }
 
         $line = implode(' ', $validateable);
@@ -103,7 +103,7 @@ final class ComponentsTest extends TestCase
 
         $validateable = [];
         foreach ($result->getComponents() as $item) {
-            $validateable[] = $item->httpValue;
+            $validateable[] = $item->getHttpValue();
         }
 
         $line = implode(' ', $validateable);

@@ -177,6 +177,7 @@ final class ComponentName
     /** @noinspection PhpUnusedPrivateMethodInspection */
     private static function extract3(string $segment): ?self
     {
+        // todo can be with ;req
         $s = implode('|', InitialContentsEnum::names());
         preg_match('#^"(.*?)";('.$s.')$#', $segment, $matches);
 

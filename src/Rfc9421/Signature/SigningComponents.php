@@ -54,7 +54,7 @@ final class SigningComponents
     public function set(ComponentItemDto $component): self
     {
         if ($this->isset($component)) {
-            throw AlreadySetException::ComponentExists($component->httpValue);
+            throw AlreadySetException::ComponentExists($component->getHttpValue());
         }
 
         $this->components[] = $component;
@@ -69,7 +69,7 @@ final class SigningComponents
     {
         return array_any(
             $this->components,
-            fn (ComponentItemDto $setComponent): bool => $component->httpValue === $setComponent->httpValue,
+            fn (ComponentItemDto $setComponent): bool => $component->getHttpValue() === $setComponent->getHttpValue(),
         );
     }
 

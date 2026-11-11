@@ -122,7 +122,7 @@ final class ComponentNameTest extends TestCase
     public function testFromNameAndInitialContentEnumWithValue(): void
     {
         $i = ComponentName::fromNameAndInitialContentEnumWithValue('caramba', InitialContentsEnum::name, 'myName');
-        self::assertEquals('"caramba";name="myName"', $i->httpValue);
+        self::assertEquals('"caramba";name="myName"', $i->getHttpValue());
     }
 
     /**
@@ -134,8 +134,8 @@ final class ComponentNameTest extends TestCase
             'caramba',
             InitialContentsEnum::name,
             'myName',
-        )->httpValue;
-        self::assertSame('"caramba";name="myName"', ComponentName::fromString($i)->httpValue);
+        )->getHttpValue();
+        self::assertSame('"caramba";name="myName"', ComponentName::fromString($i)->getHttpValue());
     }
 
     /**
