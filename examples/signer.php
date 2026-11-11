@@ -370,7 +370,7 @@ try {
     $responseSigner = new ResponseSigner(
         message             : $response,
         signingConfiguration: $responseSigningConfiguration,
-        requestLines        : $VerifyRequest->getSignedHeaderLines(),
+        expectedSignedLines : $VerifyRequest->getSignedHeaderLines(),
     );
 } catch (ProcessingException $processingException) {
     echo $processingException->getLine(), $processingException->getMessage();
@@ -418,7 +418,7 @@ $signedResponseVerifyPreparation = new VerifyResponsePrepare(
 )
     // important feature if we have ';req' otherwise it will not work
     ->setExpectedReqSigners(
-        readLines: $resRL,
+        expectedSignedLines: $resRL,
     )
 ;
 try {

@@ -105,9 +105,9 @@ trait TraitSigner
             configuration: $this->signingConfiguration,
             /*
              * Request Lines can be Null if it is a Request Signer
-             * todo make sure that requestLines can only be set if the MessageInterface is a response Interface!
+             * todo make sure that expectedSignedLines can only be set if the MessageInterface is a response Interface!
              */
-            readLines    : $this->requestLines ?? null,
+            readLines    : $this->expectedSignedLines ?? null,
         );
 
         /*

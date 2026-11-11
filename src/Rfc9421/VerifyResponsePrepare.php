@@ -34,9 +34,9 @@ final class VerifyResponsePrepare extends AbstractVerifyPrepare
         $this->headerHelper = new HeaderHelper($this->message);
     }
 
-    public function setExpectedReqSigners(ReadLines $readLines): self
+    public function setExpectedReqSigners(ReadLines $expectedSignedLines): self
     {
-        $this->expectedSigners = $readLines;
+        $this->expectedSigners = $expectedSignedLines;
 
         return $this;
     }

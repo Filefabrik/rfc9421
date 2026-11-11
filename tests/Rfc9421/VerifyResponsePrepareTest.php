@@ -222,7 +222,7 @@ final class VerifyResponsePrepareTest extends TestCase
         $responseSigner = new ResponseSigner(
             message             : $response,
             signingConfiguration: $responseSignerConfiguration,
-            requestLines        : $requestSigned,
+            expectedSignedLines : $requestSigned,
         );
 
         return $responseSigner->sign();

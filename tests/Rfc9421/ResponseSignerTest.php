@@ -259,7 +259,7 @@ final class ResponseSignerTest extends TestCase
         $responseSigner = new ResponseSigner(
             message             : $response,
             signingConfiguration: $responseSigningConfiguration,
-            requestLines        : $rl,
+            expectedSignedLines : $rl,
         );
 
         $signedResponse = $responseSigner->sign();
@@ -354,7 +354,7 @@ final class ResponseSignerTest extends TestCase
         $responseSigner = new ResponseSigner(
             message             : $response,
             signingConfiguration: $responseSigningConfiguration,
-            requestLines        : $verifier->getSignedHeaderLines(),
+            expectedSignedLines : $verifier->getSignedHeaderLines(),
         );
 
         $signedResponse = $responseSigner->sign();
