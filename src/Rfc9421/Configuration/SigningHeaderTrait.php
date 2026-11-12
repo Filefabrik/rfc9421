@@ -87,11 +87,9 @@ trait SigningHeaderTrait
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    public function signComponentSf(DerivedComponentEnum|string $headerKey): self
+    public function signComponentSf(DerivedComponentEnum|string $headerKey, bool $asReq = false): self
     {
-        $this->setComponent(ComponentName::withSf(name: $headerKey));
-
-        return $this;
+        return $this->setComponent(ComponentName::withSf(name: $headerKey, asReq: $asReq));
     }
 
     /**

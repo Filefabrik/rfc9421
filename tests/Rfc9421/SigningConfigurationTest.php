@@ -30,7 +30,11 @@ final class SigningConfigurationTest extends TestCase
     public function testWithTag(): void
     {
         $i = new SigningConfiguration();
-        self::assertSame('tagname', $i->setTag('tagname')->getMetadata()->tag);
+        self::assertSame(
+            'tagname',
+            $i->setTag('tagname')
+              ->getMetadata()->tag,
+        );
         $i->setTag(null);
         self::assertNull($i->getMetadata()->tag);
     }
@@ -63,10 +67,17 @@ final class SigningConfigurationTest extends TestCase
     public function testWithCreated(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->getMetadata()->getCreated());
+        self::assertNull(
+            $i->getMetadata()
+              ->getCreated(),
+        );
         $dt = 123456;
         $i->setCreated($dt);
-        self::assertSame($dt, $i->getMetadata()->getCreated());
+        self::assertSame(
+            $dt,
+            $i->getMetadata()
+              ->getCreated(),
+        );
     }
 
     /**
@@ -410,4 +421,60 @@ final class SigningConfigurationTest extends TestCase
         $i->setPublicPem('');
         $i->getPublicPemOrThrow();
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testSignComponent(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertEmpty($i->signatureComponents->getComponents());
+        $i->signComponent('foo');
+
+        $c = $i->signatureComponents->getComponents()[0]->getHttpValue();
+        self::assertEquals('"foo"', $c);
+
+        $i->signComponent('foo-with-req', true);
+        self::assertEquals('"foo-with-req";req', $i->signatureComponents->getComponents()[1]->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testSignComponentSf(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertEmpty($i->signatureComponents->getComponents());
+        $i->signComponentSf('foo');
+
+        $c = $i->signatureComponents->getComponents()[0]->getHttpValue();
+        self::assertEquals('"foo";sf', $c);
+
+        $i->signComponentSf('foo-with-req', true);
+        self::assertEquals('"foo-with-req";req;sf', $i->signatureComponents->getComponents()[1]->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testSignComponentKey(): void
+    {
+        $i = new SigningConfiguration();
+        self::assertEmpty($i->signatureComponents->getComponents());
+        $i->signComponentKey('foo', 'the-key');
+
+        $c = $i->signatureComponents->getComponents()[0]->getHttpValue();
+        self::assertEquals('"foo";key="the-key"', $c);
+
+        $i->signComponentKey('foo-with-req', 'the-key', true);
+        self::assertEquals(
+            '"foo-with-req";req;key="the-key"',
+            $i->signatureComponents->getComponents()[1]->getHttpValue(),
+        );
+    }
+
+    //signComponent
 }
