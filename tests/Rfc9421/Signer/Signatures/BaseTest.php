@@ -83,7 +83,7 @@ final class BaseTest extends TestCase
         // simulate a request
         $writeLines = new WriteLines();
 
-        // pure setter without ;req flag
+        // pure setter without ;asReq flag
         $writeLines->add(
             new Line(
                 signatureComponent: '"@method"',
@@ -135,7 +135,7 @@ final class BaseTest extends TestCase
         // simulate a request
         $writeLines = new WriteLines();
 
-        // pure setter without ;req flag
+        // pure setter without ;asReq flag
         $writeLines->add(
             new Line(
                 signatureComponent: '"@method"',

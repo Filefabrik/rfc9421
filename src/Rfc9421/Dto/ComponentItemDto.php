@@ -88,7 +88,7 @@ final readonly class ComponentItemDto
     }
 
     /**
-     * Without the ";req" flag so take the original from the req
+     * Without the ";asReq" flag so take the original from the asReq
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */

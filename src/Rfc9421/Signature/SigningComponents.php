@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -79,7 +80,10 @@ final class SigningComponents
      */
     public function addWithContentsEnum(string $name, string|InitialContentsEnum $initialContentsEnum): self
     {
-        return $this->set(ComponentName::fromNameAndInitialContent($name, $initialContentsEnum));
+        return $this->set(ComponentName::fromNameAndInitialContent(
+            name: $name,
+            initialContentsEnum: $initialContentsEnum
+        ));
     }
 
 }

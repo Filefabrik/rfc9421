@@ -30,7 +30,7 @@ use Psr\Http\Message\ResponseInterface;
 final readonly class CompileEntry
 {
     /* todo
-     * Required only if we are handle a signed response where we want to use the req field
+     * Required only if we are handle a signed response where we want to use the asReq field
 
        private(set) RequestInterface|null $originalRequest = null;
     */
@@ -55,7 +55,7 @@ final readonly class CompileEntry
     {
         $parameters = $this->extractParameters($this->componentItemDto->getItem());
 
-        // todo if req found right here there must be an error because the field will not proceed with the response interface
+        // todo if asReq found right here there must be an error because the field will not proceed with the response interface
         // todo check parameters duplicated is allowed or not in RFC
         // throws
         //  $this->checkParametersConflict($parameters);

@@ -16,26 +16,26 @@ use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
- * todo the content-digest;req and the content-digest regular
+ * todo the content-digest;asReq and the content-digest regular
  * NOTE: '\' line wrapping per RFC 8792
  *
  * "@status": 503
  * "content-digest": sha-512=:0Y6iCBzGg5rZtoXS95Ijz03mslf6KAMCloESHObf\
  * wnHJDbkkWWQz6PhhU9kxsTbARtY2PTBOzq24uJFpHsMuAg==:
  * "content-type": application/json
- * "@authority";req: example.com
- * "@method";req: POST
- * "@path";req: /foo
- * "content-digest";req: sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A\
+ * "@authority";asReq: example.com
+ * "@method";asReq: POST
+ * "@path";asReq: /foo
+ * "content-digest";asReq: sha-512=:WZDPaVn/7XgHaAy8pmojAkGWoRx2UFChF41A\
  * 2svX+TaPm+AbwAgBWnrIiYllu7BNNyealdVLvRwEmTHWXvJwew==:
  * "@signature-params": ("@status" "content-digest" "content-type" \
- * "@authority";req "@method";req "@path";req "content-digest";req)\
+ * "@authority";asReq "@method";asReq "@path";asReq "content-digest";asReq)\
  * ;created=1618884479;keyid="test-key-ecc-p256"
  */
 /**
  * Makes the line with there values they are in the signature-input.
  * It does NOT processing an header-value or something. Only the Signature-Param Key
- * todo check logic with req
+ * todo check logic with asReq
  * todo check logic if there are more initial contents params
  * Formats everything except the value
  * something like "test-header";sf: VALUE
@@ -93,7 +93,7 @@ final class Entry
     }
 
     /**
-     * todo check what happens with req
+     * todo check what happens with asReq
      */
     public function withREQEnum(): self
     {
@@ -130,7 +130,7 @@ final class Entry
          * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHMsIG9mLCBjb21tYXM=:
          */
         if ($this->initialContents instanceof InitialContentsEnum) {
-            // todo check req
+            // todo check asReq
             $parts[] = self::semicolon;
             $parts[] = $this->initialContents->name;
 

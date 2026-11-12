@@ -33,7 +33,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * todo signing with ;req
+ * todo signing with ;asReq
  */
 #[CoversClass(ResponseSigner::class)]
 final class ResponseSignerTest extends TestCase
@@ -46,7 +46,7 @@ final class ResponseSignerTest extends TestCase
 
     /**
      * todo missing tests
-     * todo with ;req
+     * todo with ;asReq
      * todo empty @query-params
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -117,7 +117,7 @@ final class ResponseSignerTest extends TestCase
 
     /**
      * todo missing tests
-     * todo with req
+     * todo with asReq
      * todo empty @query-params
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -198,7 +198,7 @@ final class ResponseSignerTest extends TestCase
 
     /**
      * todo missing tests
-     * todo with ;req
+     * todo with ;asReq
      * todo empty @query-params
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -227,9 +227,9 @@ final class ResponseSignerTest extends TestCase
 
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
-            // test req
+            // test asReq
             ->signHeader('"content-digest";req')
-            //->signHeader('"@method";req')
+            //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
             ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
@@ -288,7 +288,7 @@ final class ResponseSignerTest extends TestCase
 
     /**
      * todo missing tests
-     * todo with ;req
+     * todo with ;asReq
      * todo empty @query-params
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -320,10 +320,10 @@ final class ResponseSignerTest extends TestCase
 
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
-            // test req
+            // test asReq
             ->signHeader('"content-digest";req')
             ->signHeader('"@authority";req')
-            //->signHeader('"@method";req')
+            //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
             ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
@@ -456,7 +456,7 @@ final class ResponseSignerTest extends TestCase
 
     /**
      * todo missing tests
-     * todo with ;req
+     * todo with ;asReq
      * todo empty @query-params
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -490,10 +490,10 @@ final class ResponseSignerTest extends TestCase
 
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
-            // test req
+            // test asReq
             ->signHeader('"content-digest";req')
             ->signHeader('"@authority";req')
-            //->signHeader('"@method";req')
+            //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
             ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()

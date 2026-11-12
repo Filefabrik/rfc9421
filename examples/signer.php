@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, InitialContentsEnum, SigningEnum};
+use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, SigningEnum};
 use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     ContentDigestException,
     EmptyException,
@@ -87,34 +87,23 @@ try {
         /*
          * as component-string
          */
-        '"@query-param";name="baz"',
+        ComponentName::withName('@query-param', 'baz'),
         /*
          * programmatically add
          * '"example-dict";sf'
          */
-        ComponentName::fromNameAndInitialContent(name: 'example-dict', initialContentsEnum: InitialContentsEnum::sf),
+        ComponentName::withSf(name: 'example-dict'),
         DerivedComponentEnum::authority,
-        ComponentName::fromNameAndInitialContentEnumWithValue(
-            name               : 'example-dict',
-            initialContentsEnum: InitialContentsEnum::key,
-            value              : 'a',
-        ),
+        ComponentName::withKey(name: 'example-dict', keyName: 'a'),
         /*
          * '"example-dict";key="c"'
          */
-        ComponentName::fromNameAndInitialContentEnumWithValue(
-            name               : 'example-dict',
-            initialContentsEnum: InitialContentsEnum::key,
-            value              : 'c',
-        ),
+        ComponentName::withKey(name: 'example-dict', keyName: 'c'),
+
         /*
          * '"example-dict";key="d"'
          */
-        ComponentName::fromNameAndInitialContentEnumWithValue(
-            name               : 'example-dict',
-            initialContentsEnum: InitialContentsEnum::key,
-            value              : 'd',
-        ),
+        ComponentName::withKey(name: 'example-dict', keyName: 'd'),
     ];
 } catch (SignatureExtractionException $signatureExtractionException) {
     echo $signatureExtractionException->getMessage();
@@ -137,10 +126,10 @@ try {
          */
         //->signHeader('"@query-param";name="baz"')
         ->mustCreateContentDigest()
-        ->signHeader('x-Origin-host')
-        ->signHeader('test-header')
-        ->signHeader('"example-dict"')
-        ->signHeader('content-digest')
+        ->signComponent('x-Origin-host')
+        ->signComponent('test-header')
+        ->signComponent('"example-dict"')
+        ->signComponent('content-digest')
         /*
          * Setting a bundle of prepared components
          */
@@ -301,7 +290,9 @@ try {
 /*
  * Also the $metadata are verified
  */
-$metadata = $VerifyRequest->getSigningConfiguration()->getMetadata();
+$metadata = $VerifyRequest->getSigningConfiguration()
+                          ->getMetadata()
+;
 
 /*
  * or something
@@ -331,7 +322,7 @@ $responseBodyJson = JsonToString::toString(['account' => 'Alex', 'new-amount' =>
 $response         = new Response(headers: [], body: $responseBodyJson);
 
 //... now sign the response
-// todo also add ;req parameters
+// todo also add ;asReq parameters
 try {
     $responseSigningConfiguration = new SigningConfiguration()
         // make sure the receiver Alice expects the following response Key
@@ -343,9 +334,9 @@ try {
         ->setContentDigestAlgo('sha256')
         ->mustCreateContentDigest()
         /*
-         * Signing ";req"
+         * Signing ";asReq"
          */
-        ->signHeader('"content-digest";req')
+        ->signComponent('content-digest', true)
         // Content-Length has a default method to calculate the length of the body
         ->signHeader('content-length')
         // the sender of the request expects an algo that Bob can check while receive this signed response
@@ -401,7 +392,7 @@ try {
 }
 
 /**
- * We expect a signed response with the `"content-digest";req` so we have to use it in the verification process
+ * We expect a signed response with the `"content-digest";asReq` so we have to use it in the verification process
  * todo make an object for rebuilding expectation more elegant then the read lines
  */
 $wl = new WriteLines();
@@ -409,6 +400,7 @@ try {
     $wl->fromSignatureLine('"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:');
 } catch (SignatureExtractionException $e) {
     echo $e->getMessage(), PHP_EOL;
+
     return;
 }
 $resRL                           = new ReadLines($wl);
@@ -416,7 +408,7 @@ $signedResponseVerifyPreparation = new VerifyResponsePrepare(
     message             : $signedResponse,
     signingConfiguration: $verifyResponseConfiguration,
 )
-    // important feature if we have ';req' otherwise it will not work
+    // important feature if we have ';asReq' otherwise it will not work
     ->setExpectedReqSigners(
         expectedSignedLines: $resRL,
     )

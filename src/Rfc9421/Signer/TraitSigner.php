@@ -61,13 +61,13 @@ trait TraitSigner
      */
     private function sign(): ResponseInterface|RequestInterface
     {
-        // todo if ;req make "content-digest";req:
-        // todo move the content_digest as regular signHeader() because of the possible ;req on response signing
+        // todo if ;asReq make "content-digest";asReq:
+        // todo move the content_digest as regular signHeader() because of the possible ;asReq on response signing
         // set up the content digest into rendering if the ContentDigestAlgo exists
         /*     if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
                  $this->signingConfiguration->signatureComponents->addName(HeaderKeysEnum::content_digest->value);
              }*/
-        // todo with ;req if it ist Response Signer
+        // todo with ;asReq if it ist Response Signer
         $this->prepareSigning();
 
         // last phase, crypt and base64_encode. get back header key value  sig1=:base64_signature:
@@ -112,7 +112,7 @@ trait TraitSigner
 
         /*
          * Signing line is an array of Lines with the component representation and the calculated values
-         * für den response signer kann ein ;req benötigt werden.
+         * für den response signer kann ein ;asReq benötigt werden.
          */
         $this->signingLines = $base->createSignatureLines();
 

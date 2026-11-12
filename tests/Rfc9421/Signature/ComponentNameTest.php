@@ -134,8 +134,14 @@ final class ComponentNameTest extends TestCase
             'caramba',
             InitialContentsEnum::name,
             'myName',
-        )->getHttpValue();
-        self::assertSame('"caramba";name="myName"', ComponentName::fromString($i)->getHttpValue());
+        )
+                          ->getHttpValue()
+        ;
+        self::assertSame(
+            '"caramba";name="myName"',
+            ComponentName::fromString($i)
+                         ->getHttpValue(),
+        );
     }
 
     /**
@@ -146,4 +152,95 @@ final class ComponentNameTest extends TestCase
         $this->expectExceptionObject(new SignatureExtractionException('Segment has unknown format ";"'));
         ComponentName::fromString(';');
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithSf(): void
+    {
+        $i = ComponentName::withSf('caramba');
+        self::assertEquals('"caramba";sf', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithSfReq(): void
+    {
+        $i = ComponentName::withSf('caramba', true);
+        self::assertEquals('"caramba";req;sf', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithBs(): void
+    {
+        $i = ComponentName::withBs('caramba');
+        self::assertEquals('"caramba";bs', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithBsReq(): void
+    {
+        $i = ComponentName::withBs('caramba', true);
+        self::assertEquals('"caramba";req;bs', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithName(): void
+    {
+        $i = ComponentName::withName('caramba', 'a');
+        self::assertEquals('"caramba";name="a"', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithNameReq(): void
+    {
+        $i = ComponentName::withName('caramba', 'a', true);
+        self::assertEquals('"caramba";req;name="a"', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithKey(): void
+    {
+        $i = ComponentName::withKey('caramba', 'a');
+        self::assertEquals('"caramba";key="a"', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithKeyReq(): void
+    {
+        $i = ComponentName::withKey('caramba', 'a', true);
+        self::assertEquals('"caramba";req;key="a"', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithComponent(): void
+    {
+        $i = ComponentName::withComponent('caramba');
+        self::assertEquals('"caramba"', $i->getHttpValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testWithComponentReq(): void
+    {
+        $i = ComponentName::withComponent('caramba', true);
+        self::assertEquals('"caramba";req', $i->getHttpValue());
+    }
+
 }

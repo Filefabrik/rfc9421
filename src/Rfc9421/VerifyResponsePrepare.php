@@ -23,7 +23,7 @@ use Psr\Http\Message\ResponseInterface;
 final class VerifyResponsePrepare extends AbstractVerifyPrepare
 {
     /**
-     * If Signed Response and is there inside an ';req' inject the line from your request to check it
+     * If Signed Response and is there inside an ';asReq' inject the line from your request to check it
      */
     private ?ReadLines $expectedSigners = null;
 

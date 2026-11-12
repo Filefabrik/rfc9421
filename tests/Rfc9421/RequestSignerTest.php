@@ -71,7 +71,7 @@ final class RequestSignerTest extends TestCase
             ->mustCreateContentDigest()
             ->signHeader('content-type')
             ->signHeader('content-digest')
-            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::req))
+            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
             ->signHeader('"@query-param";name="baz"')
             ->signHeader('@method')
             ->signHeader('x-Origin-host')
@@ -441,7 +441,7 @@ final class RequestSignerTest extends TestCase
     }
 
     /**
-     * Throws if has ;req Flag
+     * Throws if has ;asReq Flag
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
@@ -478,7 +478,7 @@ final class RequestSignerTest extends TestCase
             ->mustCreateContentDigest()
             ->signHeader('content-type')
             ->signHeader('"content-digest";req')
-            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::req))
+            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
             ->signHeader('"@query-param";name="baz"')
             ->signHeader('@method')
             ->signHeader('x-Origin-host')

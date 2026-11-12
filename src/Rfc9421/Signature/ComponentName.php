@@ -55,6 +55,12 @@ final class ComponentName
          * todo check against quotas
          */
         private(set) readonly ?string $keyOrNameValue = null,
+        /**
+         * Req Parameter
+         *
+         * @var bool
+         */
+        private readonly bool $asReq = false,
     ) {
     }
 
@@ -124,11 +130,60 @@ final class ComponentName
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
+    public static function withSf(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
+    {
+        return self::fromNameAndInitialContent(
+            name               : $name,
+            initialContentsEnum: InitialContentsEnum::sf,
+            asReq              : $asReq,
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public static function fromNameAndInitialContent(
         string|DerivedComponentEnum $name,
         InitialContentsEnum|string $initialContentsEnum,
+        bool $asReq = false,
     ): ComponentItemDto {
-        return ComponentItemDto::fromComponentName(new self($name, $initialContentsEnum));
+        return ComponentItemDto::fromComponentName(
+            new self(
+                name           : $name,
+                initialContents: $initialContentsEnum,
+                asReq          : $asReq,
+            ),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public static function withBs(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
+    {
+        return self::fromNameAndInitialContent(
+            name               : $name,
+            initialContentsEnum: InitialContentsEnum::bs,
+            asReq              : $asReq,
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @example with "COMPONENT-NAME";name="VALUE"
+     * @example with "COMPONENT-NAME";req;name="VALUE"
+     */
+    public static function withName(
+        string|DerivedComponentEnum $name,
+        ?string $nameValue = null,
+        bool $asReq = false,
+    ): ComponentItemDto {
+        return self::fromNameAndInitialContentEnumWithValue(
+            name               : $name,
+            initialContentsEnum: InitialContentsEnum::name,
+            keyOrNameValue     : $nameValue,
+            asReq              : $asReq,
+        );
     }
 
     /**
@@ -137,13 +192,15 @@ final class ComponentName
     public static function fromNameAndInitialContentEnumWithValue(
         string|DerivedComponentEnum $name,
         InitialContentsEnum $initialContentsEnum,
-        null|string $value,
+        null|string $keyOrNameValue,
+        bool $asReq = false,
     ): ComponentItemDto {
         return ComponentItemDto::fromComponentName(
             componentName: self::withKeyInitialContentValue(
                 name           : $name,
                 initialContents: $initialContentsEnum,
-                keyOrNameValue : $value,
+                keyOrNameValue : $keyOrNameValue,
+                asReq          : $asReq,
             ),
         );
     }
@@ -151,12 +208,45 @@ final class ComponentName
     /**
      * 3-Parts such as '"example-dict";key="a"'
      */
-    public static function withKeyInitialContentValue(
+    private static function withKeyInitialContentValue(
         string|DerivedComponentEnum $name,
         string|InitialContentsEnum $initialContents,
         string|null $keyOrNameValue,
+        bool $asReq = false,
     ): self {
-        return new ComponentName(name: $name, initialContents: $initialContents, keyOrNameValue: $keyOrNameValue);
+        return new ComponentName(
+            name           : $name,
+            initialContents: $initialContents,
+            keyOrNameValue : $keyOrNameValue,
+            asReq          : $asReq,
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @example with "COMPONENT-NAME";req;key="VALUE"
+     * @example with "COMPONENT-NAME";key="VALUE"
+     */
+    public static function withKey(
+        string|DerivedComponentEnum $name,
+        ?string $keyName = null,
+        bool $asReq = false,
+    ): ComponentItemDto {
+        return self::fromNameAndInitialContentEnumWithValue(
+            name               : $name,
+            initialContentsEnum: InitialContentsEnum::key,
+            keyOrNameValue     : $keyName,
+            asReq              : $asReq,
+        );
+    }
+
+    /**
+     * Only the component key perhaps the ';req'
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public static function withComponent(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
+    {
+        return ComponentItemDto::fromComponentName(new self(name: $name, asReq: $asReq));
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -177,7 +267,7 @@ final class ComponentName
     /** @noinspection PhpUnusedPrivateMethodInspection */
     private static function extract3(string $segment): ?self
     {
-        // todo can be with ;req
+        // todo can be with ;asReq
         $s = implode('|', InitialContentsEnum::names());
         preg_match('#^"(.*?)";('.$s.')$#', $segment, $matches);
 
@@ -222,7 +312,10 @@ final class ComponentName
         $nName = !UnquoteHelper::startsWithQuote($nName) ? UnquoteHelper::quote($nName) : $nName;
 
         $parts[] = $nName;
-
+        // with the ';req'
+        if ($this->asReq) {
+            $parts[] = ';'.InitialContentsEnum::req->name;
+        }
         if ($hasInitialContents) {
             $parts[] = ';'.$this->initialContents->name;
             // only if we have initial contents enum

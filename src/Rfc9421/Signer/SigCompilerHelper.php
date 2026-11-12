@@ -28,7 +28,7 @@ final readonly class SigCompilerHelper
     /**
      *
      *
-     * @return string sig1=("@method";req "@authority" "@path" "content-type" "content-length");
+     * @return string sig1=("@method";asReq "@authority" "@path" "content-type" "content-length");
      */
     public function makeSig1fromSignatureParams(): string
     {
@@ -37,7 +37,7 @@ final readonly class SigCompilerHelper
 
     /**
      *
-     * @return string sig1=("@method" "@authority";req "@path" "content-type" "content-length")
+     * @return string sig1=("@method" "@authority";asReq "@path" "content-type" "content-length")
      * @todo during concat with Metadata to signature-params don't forget the trailing semicolon
      */
     public static function makeSig1fromComponents(SigningComponents $components, string $signatureKeyName): string

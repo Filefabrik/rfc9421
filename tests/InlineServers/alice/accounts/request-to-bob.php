@@ -86,7 +86,7 @@ $prepareMethods = [
 displayLogger('We are signing the @authority with $message->getHeaderLine(\'x-Origin-host\').');
 displayLogger("// So Bob's Server must also set this method to getting the correct @authority value from header.");
 /*
- * Todo check response was signed with expected ;req from something
+ * Todo check response was signed with expected ;asReq from something
  */
 $signingConfiguration->addSigningMethods($prepareMethods);
 /**

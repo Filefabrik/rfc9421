@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -45,9 +46,19 @@ trait SigningHeaderTrait
      */
     public function signHeader(DerivedComponentEnum|string|ComponentItemDto $headerKey): self
     {
-        $setter = $headerKey instanceof ComponentItemDto ? $headerKey : ComponentName::fromString($headerKey);
+        $component = $headerKey instanceof ComponentItemDto ? $headerKey : ComponentName::fromString($headerKey);
 
-        $this->signatureComponents->set($setter);
+        $this->setComponent($component);
+
+        return $this;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
+    private function setComponent(ComponentItemDto $component): self
+    {
+        $this->signatureComponents->set($component);
 
         return $this;
     }
@@ -62,8 +73,60 @@ trait SigningHeaderTrait
         string|DerivedComponentEnum $name,
         InitialContentsEnum|string $initialContentsEnum,
     ): self {
-        $this->signatureComponents->set(ComponentName::fromNameAndInitialContent($name, $initialContentsEnum));
+        $this->setComponent(
+            ComponentName::fromNameAndInitialContent(
+                name               : $name,
+                initialContentsEnum: $initialContentsEnum,
+            ),
+        );
 
         return $this;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function signComponentSf(DerivedComponentEnum|string $headerKey): self
+    {
+        $this->setComponent(ComponentName::withSf(name: $headerKey));
+
+        return $this;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function signComponentKey(
+        DerivedComponentEnum|string $headerKey,
+        string $keyOrNameValue,
+        bool $asReq = false,
+    ): self {
+        $this->setComponent(
+            ComponentName::withKey(
+                name   : $headerKey,
+                keyName: $keyOrNameValue,
+                asReq  : $asReq,
+            ),
+        );
+
+        return $this;
+    }
+
+    /**
+     * Only the "component-name"
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     */
+    public function signComponent(string|DerivedComponentEnum $headerKey, bool $asReq = false): self
+    {
+        return $this->setComponent(
+            ComponentName::withComponent(
+                name : $headerKey,
+                asReq: $asReq,
+            ),
+        );
     }
 }

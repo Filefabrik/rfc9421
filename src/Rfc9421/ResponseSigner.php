@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Only for signing the Response
- * todo how to handle ;req from the request
+ * todo how to handle ;asReq from the request
  */
 final class ResponseSigner
 {
@@ -31,8 +31,8 @@ final class ResponseSigner
         ResponseInterface $message,
         private(set) readonly SigningConfiguration $signingConfiguration,
         /*
-         * Todo, if the request verifier set, it is also possible to handle some ;req headers
-         * Todo check we should use another object to handle the ;req for the signed response from a request or signed request
+         * Todo, if the request verifier set, it is also possible to handle some ;asReq headers
+         * Todo check we should use another object to handle the ;asReq for the signed response from a request or signed request
          * */
         private(set) readonly ?ReadLines $expectedSignedLines = null,
     ) {

@@ -64,8 +64,8 @@ final readonly class Base
     public function createSignatureLines(): WriteLines
     {
         /**
-         * Todo validate ;req und andere Parameter/Components ob diese für das request oder response signing erlaubt sind.
-         * Wenn es ein Response signing mit einem ;req ist, muss der Request-Header als Datasource verwendet werden.
+         * Todo validate ;asReq und andere Parameter/Components ob diese für das request oder response signing erlaubt sind.
+         * Wenn es ein Response signing mit einem ;asReq ist, muss der Request-Header als Datasource verwendet werden.
          * Für das Validieren einer Signed Response beim Original-Requester muss ebenso auf die validierung der richtigen Source geachtet werden
          */
         $components = new PrepareComponents(message: $this->message, signingConfiguration: $this->configuration);
@@ -77,7 +77,7 @@ final readonly class Base
 
         foreach ($this->configuration->signatureComponents->getComponents() as $signatureComponent) {
             if ($signatureComponent->hasInitialContentsReq()) {
-                // ;req flag so take the original from the req
+                // ;asReq flag so take the original from the asReq
 
                 $line = $this->handleReq($signatureComponent);
             } else {
@@ -118,7 +118,7 @@ final readonly class Base
     }
 
     /**
-     * Already ensured that the wanted line contains the ";req" Flag
+     * Already ensured that the wanted line contains the ";asReq" Flag
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */

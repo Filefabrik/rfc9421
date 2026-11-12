@@ -38,7 +38,7 @@ $bobCertInstance = new CertHelper('rsa', __DIR__.'/../Keys/');
 
 $currentDateTime = new DateTime()->getTimestamp();
 /*
- * todo make req for back signing from request
+ * todo make asReq for back signing from request
  */
 /*
  * Make the HTTP Request into PSR-7 Request for php usage
@@ -201,7 +201,7 @@ if ($verifier->hasValidatedBody) {
     displayLogger($explanation, 2, false);
 
     /*
-     * todo check ;req is possible and it is only allowed if some parameter was signed by Alice (if it must be, @see the documentation of ;req)
+     * todo check ;asReq is possible and it is only allowed if some parameter was signed by Alice (if it must be, @see the documentation of ;asReq)
      */
     displayLogger('*** todo, signing the response that alice can validate the signed response ***', 2);
 } else {
