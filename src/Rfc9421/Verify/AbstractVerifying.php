@@ -119,7 +119,7 @@ abstract class AbstractVerifying
         return $this->preparedVerify->getHeaderHelper();
     }
 
-    abstract protected function getSigner():RequestSigner|ResponseSigner;
+    abstract protected function getSigner(): RequestSigner|ResponseSigner;
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException

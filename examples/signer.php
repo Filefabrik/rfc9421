@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, SigningEnum};
 use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
+    AlreadySetException,
     ContentDigestException,
     EmptyException,
     EnumTypeException,
@@ -22,11 +23,12 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     SignatureExtractionException,
     StructuredFieldException,
     UnexpectedValue,
-    VerifyHeaderSignatureException};
+    VerifyHeaderSignatureException
+};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
-use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signer\{Signatures\ReadLines, Signatures\WriteLines};
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -53,7 +55,7 @@ require_once __DIR__.'/../src/register-openssl-signing-verify.php';
 /*
  * for testing purposes we use our own cert-loader
  */
-$signerCertInstance = new CertHelper('rsa');
+$signerCertInstance = new CertHelper(name: 'rsa');
 $targetUrl          = 'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman';
 
 /*
@@ -70,49 +72,58 @@ $extraParser = ['example-dict' => 'dictionary'];
  * Use ist as you need
  */
 try {
-    $signingHeaders = [
+    $componentsToSign = new SigningComponentsFactory()
         /*
-         * as string without quotas
-         */
-        'content-type',
+            * as string without quotas
+            */
+
+        ->signComponent(headerKey: 'content-type')
         /*
          * as string with quotas
          */
-        '"content-length"',
+        ->signComponent(headerKey: '"content-length"')
         /*
-         * as Enum
-         */
-        DerivedComponentEnum::query,
-        DerivedComponentEnum::method,
+        * as Enum
+        */
+        ->signComponent(headerKey: DerivedComponentEnum::query)
+        ->signComponent(headerKey: DerivedComponentEnum::method)
+        ->signComponent(headerKey: DerivedComponentEnum::authority)
         /*
-         * as component-string
-         */
-        ComponentName::withName('@query-param', 'baz'),
+        * with the name
+        */
+        ->signComponentName(headerKey: '@query-param', nameValue: 'baz')
         /*
-         * programmatically add
-         * '"example-dict";sf'
-         */
-        ComponentName::withSf(name: 'example-dict'),
-        DerivedComponentEnum::authority,
-        ComponentName::withKey(name: 'example-dict', keyName: 'a'),
+       * programmatically add
+       * '"example-dict";sf'
+       */
+        ->signComponentSf(headerKey: 'example-dict')
+        ->signComponentKey(headerKey: 'example-dict', keyValue: 'a')
         /*
-         * '"example-dict";key="c"'
-         */
-        ComponentName::withKey(name: 'example-dict', keyName: 'c'),
-
+    * '"example-dict";key="c"'
+    */
+        ->signComponentKey(headerKey: 'example-dict', keyValue: 'c')
         /*
-         * '"example-dict";key="d"'
-         */
-        ComponentName::withKey(name: 'example-dict', keyName: 'd'),
-    ];
-} catch (SignatureExtractionException $signatureExtractionException) {
-    echo $signatureExtractionException->getMessage();
+      * '"example-dict";key="d"'
+      */
+        ->signComponentKey(headerKey: 'example-dict', keyValue: 'd')
+        ->signComponent('x-Origin-host')
+        ->signComponent('test-header')
+        ->signComponent('example-dict')
+        ->signComponent('content-digest')
+    ;
+} catch (AlreadySetException|SignatureExtractionException $e) {
+    echo $e->getMessage();
 
     return;
 }
 
 try {
-    $signingConfiguration = new SigningConfiguration()
+    $signingConfiguration = new SigningConfiguration(
+        /*
+         * Setting a bundle of prepared components
+         */
+        signingComponents: $componentsToSign->getSignatureComponents(),
+    )
         /*
          * content-type will be injected after signing so configure that we are signing manuell the content-type
          * the method we are generating the content-type value (simply via header line)
@@ -126,28 +137,20 @@ try {
          */
         //->signHeader('"@query-param";name="baz"')
         ->mustCreateContentDigest()
-        ->signComponent('x-Origin-host')
-        ->signComponent('test-header')
-        ->signComponent('"example-dict"')
-        ->signComponent('content-digest')
-        /*
-         * Setting a bundle of prepared components
-         */
-        ->signHeaders(headerKeys: $signingHeaders)
-        ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-        ->setCreated($currentDateTime)
-        ->setExpires($currentDateTime + 7200)
-        ->setTag('mastodon')
-        ->setKeyid('http://127.0.0.1:8001/account/publicPem#main-key')
-        ->withNonce('nonce-now')
-        ->setContentDigestAlgo('sha256')
+        ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
+        ->setCreated(created: $currentDateTime)
+        ->setExpires(expires: $currentDateTime + 7200)
+        ->setTag(tag: 'mastodon')
+        ->setKeyid(keyid: 'http://127.0.0.1:8001/account/publicPem#main-key')
+        ->withNonce(nonce: 'nonce-now')
+        ->setContentDigestAlgo(contentDigestAlgo: 'sha256')
         // content digest signer key
-        ->setSignatureKeyName('sig=')
+        ->setSignatureKeyName(signatureKey: 'sig=')
         // for signing needs private
-        ->setPrivatePem($signerCertInstance->getPrivatPemContent())
+        ->setPrivatePem(privatePem: $signerCertInstance->getPrivatPemContent())
     ;
     $signingConfiguration->getStructuredFields()
-                         ->addMany($extraParser)
+                         ->addMany(fields: $extraParser)
     ;
 } catch (AbstractRfc9421Exception$rfc9421Exception) {
     echo $rfc9421Exception->getMessage();
@@ -174,12 +177,12 @@ $prepareMethods = [
  *
  * don't forget to use thís prepared component in the verifier
  */
-$signingConfiguration->addSigningMethods($prepareMethods);
+$signingConfiguration->addSigningMethods(methods: $prepareMethods);
 /*
  * Prepare the Request
  */
 
-$bodyJson = JsonToString::toString(['recipient' => 'Alex', 'add' => 90.09, 'currency' => 'EUR']);
+$bodyJson = JsonToString::toString(data: ['recipient' => 'Alex', 'add' => 90.09, 'currency' => 'EUR']);
 
 $request = new Request(
     method : 'POST',
@@ -208,9 +211,9 @@ try {
  */
 $verifierConfiguration = new SigningConfiguration();
 $verifierConfiguration->getStructuredFields()
-                      ->addMany($extraParser)
+                      ->addMany(fields: $extraParser)
 ;
-$verifierConfiguration->addSigningMethods($prepareMethods);
+$verifierConfiguration->addSigningMethods(methods: $prepareMethods);
 $verifyPrepareInstance =
     new VerifyRequestPrepare(message: $signedRequest, signingConfiguration: $verifierConfiguration);
 
@@ -257,7 +260,7 @@ try {
 /**
  * Verify the incoming request from above(receiver-side)
  */
-$VerifyRequest = new VerifyRequest($verifyPrepareInstance);
+$VerifyRequest = new VerifyRequest(preparedVerify: $verifyPrepareInstance);
 try {
     $verifiedRequestBool = $VerifyRequest->verifying();
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
@@ -277,9 +280,9 @@ if (!$verifiedRequestBool) {
 echo PHP_EOL.'signing params lines with there values:'.PHP_EOL;
 try {
     echo implode(
-        "\n",
-        $VerifyRequest->getSignedHeaderLines()
-                      ->values(),
+        separator: "\n",
+        array    : $VerifyRequest->getSignedHeaderLines()
+                                 ->values(),
     );
 } catch (ProcessingException $processingException) {
     echo $processingException->getMessage();
@@ -318,35 +321,43 @@ if ($VerifyRequest->hasValidatedBody) {
 
 // after processing give back a signed response, that the sender can be sure the response is valid
 
-$responseBodyJson = JsonToString::toString(['account' => 'Alex', 'new-amount' => 1290.09, 'currency' => 'EUR']);
+$responseBodyJson = JsonToString::toString(data: ['account' => 'Alex', 'new-amount' => 1290.09, 'currency' => 'EUR']);
 $response         = new Response(headers: [], body: $responseBodyJson);
-
-//... now sign the response
-// todo also add ;asReq parameters
 try {
-    $responseSigningConfiguration = new SigningConfiguration()
-        // make sure the receiver Alice expects the following response Key
-        ->setSignatureKeyName('responseSig=')
+    $responseComponents = new SigningComponentsFactory()
         // singing the status as relevant information for the requester Alice, to ensure the status
-        ->signHeader(DerivedComponentEnum::status)
+        ->signComponent(headerKey: DerivedComponentEnum::status)
         // content digest which must be response to the requester that the requester can check, the response body was not tempered
-        ->signHeader('content-digest')
-        ->setContentDigestAlgo('sha256')
-        ->mustCreateContentDigest()
+        ->signHeader(headerKey: 'content-digest')
         /*
          * Signing ";asReq"
          */
-        ->signComponent('content-digest', true)
+        ->signComponent(headerKey: 'content-digest', asReq: true)
         // Content-Length has a default method to calculate the length of the body
-        ->signHeader('content-length')
+        ->signComponent(headerKey: 'content-length')
+        ->getSignatureComponents()
+    ;
+} catch (AlreadySetException|SignatureExtractionException $e) {
+    echo $e->getMessage();
+
+    return;
+}
+//... now sign the response
+// todo also add ;asReq parameters
+try {
+    $responseSigningConfiguration = new SigningConfiguration(signingComponents: $responseComponents)
+        // make sure the receiver Alice expects the following response Key
+        ->setSignatureKeyName(signatureKey: 'responseSig=')
+        ->setContentDigestAlgo(contentDigestAlgo: 'sha256')
+        ->mustCreateContentDigest()
         // the sender of the request expects an algo that Bob can check while receive this signed response
         // todo use different signing for response
-        ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+        ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
         // set alice private pem to encrypt the response
-        ->setPrivatePem($signerCertInstance->getPrivatPemContent())
+        ->setPrivatePem(privatePem: $signerCertInstance->getPrivatPemContent())
         // singing the response body
         // todo use different signing for response
-        ->setContentDigestAlgo('sha256')
+        ->setContentDigestAlgo(contentDigestAlgo: 'sha256')
     ;
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
     echo 'response signing configuration error: '.$rfc9421Exception->getMessage();
@@ -380,10 +391,19 @@ try {
 echo 'response is successfully signed and can be response to the sender'.PHP_EOL;
 
 echo 'Start Verify the Signed Response'.PHP_EOL;
-
 try {
-    $verifyResponseConfiguration = new SigningConfiguration()->setPublicPem($signerCertInstance->getPublicPemContent())
-                                                             ->signHeader('content-digest')
+    $responseSigningComponents = new SigningComponentsFactory()->signComponent(headerKey: 'content-digest')
+                                                               ->getSignatureComponents()
+    ;
+} catch (AlreadySetException|SignatureExtractionException $e) {
+    echo 'response signing configuration error: '.$e->getMessage();
+
+    return;
+}
+try {
+    $verifyResponseConfiguration = new SigningConfiguration()
+        ->setComponents($responseSigningComponents)
+        ->setPublicPem($signerCertInstance->getPublicPemContent())
     ;
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
     echo $rfc9421Exception->getMessage(), PHP_EOL;
@@ -397,13 +417,13 @@ try {
  */
 $wl = new WriteLines();
 try {
-    $wl->fromSignatureLine('"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:');
+    $wl->fromSignatureLine(line: '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:');
 } catch (SignatureExtractionException $e) {
     echo $e->getMessage(), PHP_EOL;
 
     return;
 }
-$resRL                           = new ReadLines($wl);
+$resRL                           = new ReadLines(lines: $wl);
 $signedResponseVerifyPreparation = new VerifyResponsePrepare(
     message             : $signedResponse,
     signingConfiguration: $verifyResponseConfiguration,
@@ -423,7 +443,7 @@ try {
 
 echo 'after prepare verifying response start the Verify Process', PHP_EOL;
 
-$signedResponseVerify = new VerifyResponse($signedResponseVerifyPreparation);
+$signedResponseVerify = new VerifyResponse(preparedVerify: $signedResponseVerifyPreparation);
 
 try {
     $verifySignedResponseResult = $signedResponseVerify->verifying();

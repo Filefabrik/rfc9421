@@ -17,6 +17,7 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\RequestSigner;
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -85,21 +86,25 @@ final class VerifyRequestTest extends TestCase
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName = 'testing=';
+
+        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                           ->signComponent('@authority')
+                                                           ->getSignatureComponents()
+        ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
-        $configuration   = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-                      ->setSigningAlgorithm($signingAlgo)
-                      ->setCreated($currentDateTime)
-                      ->setExpires($currentDateTime + 7200)
-                      ->setTag('mastodon')
-                      ->withNonce('nonce-now')
-                      ->setSignatureKeyName($signatureKeyName)
+        $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
+        $configuration
+            ->setSigningAlgorithm($signingAlgo)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->withNonce('nonce-now')
+            ->setSignatureKeyName($signatureKeyName)
             // for signing needs private
-                      ->setPrivatePem($certInstance->getPrivatPemContent())
+            ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
         /**
@@ -192,14 +197,17 @@ final class VerifyRequestTest extends TestCase
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName = 'testing=';
+
+        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                           ->signComponent('@authority')
+                                                           ->getSignatureComponents()
+        ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
-        $configuration   = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-                      ->setSigningAlgorithm($signingAlgo)
+        $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
+        $configuration->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
                       ->setTag('mastodon')
@@ -301,16 +309,18 @@ final class VerifyRequestTest extends TestCase
     {
         $certInstance = new CertHelper($cert);
 
-        $signatureKeyName = 'testing=';
+        $signatureKeyName  = 'testing=';
+        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                           ->signComponent('@authority')
+                                                           ->signComponent('content-digest')
+                                                           ->getSignatureComponents()
+        ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
-        $configuration   = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-                      ->signHeader('content-digest')
-                      ->mustCreateContentDigest()
+        $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
+        $configuration->mustCreateContentDigest()
                       ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
@@ -396,17 +406,19 @@ final class VerifyRequestTest extends TestCase
     ): void {
         $certInstance = new CertHelper($cert);
 
-        $signatureKeyName = 'testing=';
+        $signatureKeyName  = 'testing=';
+        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                           ->signComponent('@authority')
+                                                           ->signComponent('content-digest')
+                                                           ->getSignatureComponents()
+        ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
-        $configuration   = new SigningConfiguration();
+        $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
 
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-                      ->signHeader('content-digest')
-                      ->mustCreateContentDigest()
+        $configuration->mustCreateContentDigest()
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)

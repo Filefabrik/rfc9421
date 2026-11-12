@@ -229,13 +229,13 @@ final class ComponentName
      */
     public static function withKey(
         string|DerivedComponentEnum $name,
-        ?string $keyName = null,
+        ?string $keyValue = null,
         bool $asReq = false,
     ): ComponentItemDto {
         return self::fromNameAndInitialContentEnumWithValue(
             name               : $name,
             initialContentsEnum: InitialContentsEnum::key,
-            keyOrNameValue     : $keyName,
+            keyOrNameValue     : $keyValue,
             asReq              : $asReq,
         );
     }
@@ -316,6 +316,7 @@ final class ComponentName
         if ($this->asReq) {
             $parts[] = ';'.InitialContentsEnum::req->name;
         }
+
         if ($hasInitialContents) {
             $parts[] = ';'.$this->initialContents->name;
             // only if we have initial contents enum

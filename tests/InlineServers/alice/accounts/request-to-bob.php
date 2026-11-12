@@ -18,6 +18,7 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     SignatureExtractionException,
     UnexpectedValue};
 use Filefabrik\Rfc9421\RequestSigner;
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Client;
@@ -40,18 +41,26 @@ displayLogger("Here is Alice's Server");
  * Prepare signingConfiguration
  */
 $currentDateTime = new DateTime()->getTimestamp();
-
 try {
-    $signingConfiguration = new SigningConfiguration()
+    $singingComponents = new SigningComponentsFactory()
         /*
-         * tell the signing process that content-type has to be signed
-         */
+             * tell the signing process that content-type has to be signed
+             */
         ->signHeader('content-type')
         ->signHeader('@method')
         ->signHeader('x-Origin-host')
         ->signHeader('content-digest')
-        ->mustCreateContentDigest()
         ->signHeader('@authority')
+        ->getSignatureComponents()
+    ;
+} catch (AlreadySetException|SignatureExtractionException $e) {
+    echo $e->getMessage();
+
+    return;
+}
+try {
+    $signingConfiguration = new SigningConfiguration(signingComponents: $singingComponents)
+        ->mustCreateContentDigest()
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated($currentDateTime)
         ->setExpires($currentDateTime + 7200)

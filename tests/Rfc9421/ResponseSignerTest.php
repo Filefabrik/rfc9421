@@ -22,6 +22,7 @@ use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -70,16 +71,18 @@ final class ResponseSignerTest extends TestCase
         $response = new Response(headers: [], body: '{"recipient":"Alex","new-amount":900000000}');
 
         //... now sign the response
-
-        $responseSigningConfiguration = new SigningConfiguration()
+        $signatureComponents          = new SigningComponentsFactory()
+            // singing the status as relevant information for the requester Alice, to ensure the status
+            ->signComponent(DerivedComponentEnum::status)
+            // content-length is covered by a $this->addSigningMethod()
+            ->signComponent('content-length')
+            ->signComponent('content-digest')
+            ->getSignatureComponents()
+        ;
+        $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
 
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
-            // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signHeader(DerivedComponentEnum::status)
-            // content-length is covered by a $this->addSigningMethod()
-            ->signHeader('content-length')
-            ->signHeader('content-digest')
             // the sender of the request expects an algo that Bob can check while receive this signed response
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             // set alice private pem to encrypt the response
@@ -151,16 +154,19 @@ final class ResponseSignerTest extends TestCase
         $response = new Response(headers: [], body: $responseBodyJson);
 
         //... now sign the response
-
-        $responseSigningConfiguration = new SigningConfiguration()
-
-            // make sure the receiver Alice expects the following response Key
-            ->setSignatureKeyName('responseSig=')
+        $signingComponents            = new SigningComponentsFactory()
             // singing the status as relevant information for the requester Alice, to ensure the status
             ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
             ->signHeader('content-length')
             ->signHeader(DerivedComponentEnum::query)
+            ->getSignatureComponents()
+        ;
+        $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signingComponents)
+
+            // make sure the receiver Alice expects the following response Key
+            ->setSignatureKeyName('responseSig=')
+
             // the sender of the request expects an algo that Bob can check while receive this signed response
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             // set alice private pem to encrypt the response
@@ -223,19 +229,21 @@ final class ResponseSignerTest extends TestCase
 
         //... now sign the response
 
-        $responseSigningConfiguration = new SigningConfiguration()
-
-            // make sure the receiver Alice expects the following response Key
-            ->setSignatureKeyName('responseSig=')
+        $signingComponents = new SigningComponentsFactory()
             // test asReq
-            ->signHeader('"content-digest";req')
+            ->signComponent('"content-digest"', true)
             //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signHeader(DerivedComponentEnum::status)
+            ->signComponent(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-            ->signHeader('content-length')
-            ->signHeader('content-digest')
+            ->signComponent('content-length')
+            ->signComponent('content-digest')
+            ->getSignatureComponents()
+        ;
 
+        $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signingComponents)
+            // make sure the receiver Alice expects the following response Key
+            ->setSignatureKeyName('responseSig=')
             // the sender of the request expects an algo that Bob can check while receive this signed response
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             // set alice private pem to encrypt the response
@@ -315,20 +323,22 @@ final class ResponseSignerTest extends TestCase
         $response = new Response(headers: [], body: '{"recipient":"Alex","new-amount":900000000}');
 
         //... now sign the response
-
-        $responseSigningConfiguration = new SigningConfiguration()
+        $signedComponents             = new SigningComponentsFactory()
+            // test asReq
+            ->signComponent('"content-digest"', true)
+            ->signComponent('"@authority"', true)
+            //->signHeader('"@method";asReq')
+            // singing the status as relevant information for the requester Alice, to ensure the status
+            ->signComponent(DerivedComponentEnum::status)
+            // content-length is covered by a $this->addSigningMethod()
+            ->signComponent('content-length')
+            ->signComponent('content-digest')
+            ->getSignatureComponents()
+        ;
+        $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signedComponents)
 
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
-            // test asReq
-            ->signHeader('"content-digest";req')
-            ->signHeader('"@authority";req')
-            //->signHeader('"@method";asReq')
-            // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signHeader(DerivedComponentEnum::status)
-            // content-length is covered by a $this->addSigningMethod()
-            ->signHeader('content-length')
-            ->signHeader('content-digest')
 
             // the sender of the request expects an algo that Bob can check while receive this signed response
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
@@ -338,8 +348,6 @@ final class ResponseSignerTest extends TestCase
             ->setContentDigestAlgo('sha256')
             ->mustCreateContentDigest()
         ;
-
-
 
         $responseSigner = new ResponseSigner(
             message             : $response,
@@ -398,14 +406,18 @@ final class ResponseSignerTest extends TestCase
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName = 'testing=';
+
+        $signedComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                          ->signComponent('@authority')
+                                                          ->signComponent('content-digest')
+                                                          ->getSignatureComponents()
+        ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-                      ->signHeader('content-digest')
+        $configuration->setComponents($signedComponents)
                       ->mustCreateContentDigest()
                       ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
                       ->setSigningAlgorithm($signingAlgo)
@@ -486,27 +498,31 @@ final class ResponseSignerTest extends TestCase
 
         //... now sign the response
 
-        $responseSigningConfiguration = new SigningConfiguration()
-
-            // make sure the receiver Alice expects the following response Key
-            ->setSignatureKeyName('responseSig=')
-            // test asReq
-            ->signHeader('"content-digest";req')
-            ->signHeader('"@authority";req')
+        // test asReq
+        $signedComponents = new SigningComponentsFactory()->signHeader('"content-digest";req')
+                                                          ->signHeader('"@authority";req')
             //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signHeader(DerivedComponentEnum::status)
+                                                          ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-            ->signHeader('content-length')
-            ->signHeader('content-digest')
+                                                          ->signHeader('content-length')
+                                                          ->signHeader('content-digest')
+                                                          ->getSignatureComponents()
+        ;
+
+        $responseSigningConfiguration = new SigningConfiguration()->setComponents($signedComponents)
+
+            // make sure the receiver Alice expects the following response Key
+                                                                  ->setSignatureKeyName('responseSig=')
+
 
             // the sender of the request expects an algo that Bob can check while receive this signed response
-            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+                                                                  ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             // set alice private pem to encrypt the response
-            ->setPrivatePem($certInstance->getPrivatPemContent())
+                                                                  ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-            ->setContentDigestAlgo('sha256')
-            ->mustCreateContentDigest()
+                                                                  ->setContentDigestAlgo('sha256')
+                                                                  ->mustCreateContentDigest()
         ;
 
         $responseSigner = new ResponseSigner(

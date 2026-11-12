@@ -14,7 +14,6 @@ namespace Filefabrik\Rfc9421;
 use Filefabrik\Rfc9421\Configuration\{GenerateContentDigestTrait, MetadataTrait, SigningMethodsTrait};
 use Filefabrik\Rfc9421\Configuration\PrivatePemTrait;
 use Filefabrik\Rfc9421\Configuration\PublicPemTrait;
-use Filefabrik\Rfc9421\Configuration\SigningHeaderTrait;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
@@ -34,7 +33,7 @@ final class SigningConfiguration
     use PrivatePemTrait;
     use SigningMethodsTrait;
     use MetadataTrait;
-    use SigningHeaderTrait;
+
     use GenerateContentDigestTrait;
 
     /**
@@ -49,7 +48,7 @@ final class SigningConfiguration
 
     public function __construct(
         private readonly Metadata $metadata = new Metadata(),
-        private(set) SigningComponents $signatureComponents = new SigningComponents(),
+        private SigningComponents $signingComponents = new SigningComponents(),
         /**
          * Methods for extracting the header and recompile the component
          */
@@ -57,6 +56,11 @@ final class SigningConfiguration
         // todo with prepared config factory
         private ?StructuredFields $structuredFields = null,
     ) {
+    }
+
+    public function getSignatureComponents(): SigningComponents
+    {
+        return $this->signingComponents;
     }
 
     public function getStructuredFields(): StructuredFields
@@ -98,7 +102,7 @@ final class SigningConfiguration
      */
     public function setComponents(SigningComponents $components): self
     {
-        $this->signatureComponents = $components;
+        $this->signingComponents = $components;
 
         return $this;
     }

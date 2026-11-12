@@ -20,6 +20,7 @@ use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use GuzzleHttp\Psr7\Request;
 use Nyholm\Psr7\Response;
@@ -43,15 +44,15 @@ final class BaseTest extends TestCase
      */
     public function testCreateSignatureLines(): void
     {
-        $sc = new SigningConfiguration();
-        $sc->signHeader('not-ExistinG')
-           ->signHeader('@method')
+        $sc     = new SigningComponentsFactory()->signComponent('not-ExistinG')
+                                                ->signComponent('@method')
         ;
-        $sc->getStructuredFields()
-           ->add('not-existing', 'etag')
+        $config = new SigningConfiguration()->setComponents($sc->getSignatureComponents());
+        $config->getStructuredFields()
+               ->add('not-existing', 'etag')
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
-        $i = new Base($r, $sc);
+        $i = new Base($r, $config);
 
         $arr = $i->createSignatureLines()
                  ->toKeyValueArray()
@@ -73,10 +74,18 @@ final class BaseTest extends TestCase
      */
     public function testCreateSignatureLinesResponseInterfaceWithReqValid(): void
     {
-        $sc = new SigningConfiguration();
-        $sc->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'));
-        $sc->signHeader('not-ExistinG')// ->signHeader('@method')
-        ;
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()
+                ->signHeader(
+                    ComponentName::fromNameAndInitialContent(
+                        '@method',
+                        'req',
+                    ),
+                )
+                ->signComponent('not-ExistinG')
+                ->getSignatureComponents(),
+        );
+
         $sc->getStructuredFields()
            ->add('not-existing', 'etag')
         ;
@@ -125,10 +134,19 @@ final class BaseTest extends TestCase
     public function testCreateSignatureLinesResponseInterfaceWithReqThrows(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('Request Interface can not have an ;req flag.'));
-        $sc = new SigningConfiguration();
-        $sc->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'));
-        $sc->signHeader('not-ExistinG')// ->signHeader('@method')
-        ;
+
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()
+                ->signHeader(
+                    ComponentName::fromNameAndInitialContent(
+                        '@method',
+                        'req',
+                    ),
+                )
+                ->signComponent('not-ExistinG')
+                ->getSignatureComponents(),
+        );
+
         $sc->getStructuredFields()
            ->add('not-existing', 'etag')
         ;
@@ -179,10 +197,10 @@ final class BaseTest extends TestCase
         $this->expectExceptionObject(
             new UnexpectedValue('For Response signing the signed Request must be set into the Signer!'),
         );
-        $sc = new SigningConfiguration();
-        $sc
-            ->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'))
-        ;
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signComponent('@method', true)
+                                                             ->getSignatureComponents(),
+        );
 
         $response = new Response();
         $i        = new Base($response, $sc);
@@ -205,8 +223,10 @@ final class BaseTest extends TestCase
         $this->expectExceptionObject(
             new UnexpectedValue('Can not find "@method";req in the signed request "@method".'),
         );
-        $sc = new SigningConfiguration();
-        $sc->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'));
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signComponent('@method', true)
+                                                             ->getSignatureComponents(),
+        );
 
         $response = new Response();
         $i        = new Base(message: $response, configuration: $sc, readLines: new ReadLines(new WriteLines()));
@@ -229,10 +249,10 @@ final class BaseTest extends TestCase
         $this->expectExceptionObject(
             new UnexpectedValue('For Response signing the signed Request must be set into the Signer!'),
         );
-        $sc = new SigningConfiguration();
-        $sc
-            ->signHeader(ComponentName::fromNameAndInitialContent('@method', 'req'))
-        ;
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signComponent('@method', true)
+                                                             ->getSignatureComponents(),
+        );
 
         $response = new Response();
         $i        = new Base($response, $sc);
@@ -252,12 +272,14 @@ final class BaseTest extends TestCase
      */
     public function testHandleSignBody(): void
     {
-        $sc = new SigningConfiguration();
-        $sc->signHeader('not-ExistinG')
-           ->signHeader('@method')
-           ->signHeader('content-digest')
-           ->setContentDigestAlgo('sha256')
-        ;
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signComponent('not-ExistinG')
+                                                             ->signComponent('@method')
+                                                             ->signComponent('content-digest')
+                                                             ->getSignatureComponents(),
+        );
+        $sc->setContentDigestAlgo('sha256');
+
         $r     = new Request('post', '', ['noT-exIsting' => 'hm', 'content-digest' => 'an value']);
         $i     = new Base($r, $sc);
         $lines = $i->createSignatureLines();
@@ -290,11 +312,13 @@ final class BaseTest extends TestCase
                 'The header "content-digest" does not exist in the message. Note:headers can only be a part of the signing process if they are existing. $message->withHeader("content-digest", \'your value\')',
             ),
         );
-        $sc = new SigningConfiguration();
-        $sc->signHeader('not-ExistinG')
-           ->signHeader('@method')
-            // do not use this
-           ->signHeader('content-digest')
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signComponent('not-ExistinG')
+                                                             ->signComponent('@method')
+                // do not use this
+                                                             ->signHeader('content-digest')
+                                                             ->getSignatureComponents(),
+        );
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
         $i = new Base($r, $sc);
@@ -320,8 +344,10 @@ final class BaseTest extends TestCase
             ),
         );
 
-        $sc = new SigningConfiguration();
-        $sc->signHeader('not-existing');
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signComponent('not-ExistinG')
+                                                             ->getSignatureComponents(),
+        );
 
         $r = new Request('POST', '', ['x-wrong-name' => 'hm']);
         $i = new Base($r, $sc);
@@ -335,10 +361,14 @@ final class BaseTest extends TestCase
      */
     public function testMakeSignatureInput(): void
     {
-        $sc      = new SigningConfiguration();
+        $sc      = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signHeaders(
+                ['stupid-header', '@method'],
+            )
+                                                             ->getSignatureComponents(),
+        );
         $created = new DateTime()->getTimestamp();
-        $sc->signHeaders(['stupid-header', '@method'])
-           ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
+        $sc->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
            ->setCreated($created)
            ->setSignatureKeyName('')
         ;
@@ -373,11 +403,12 @@ final class BaseTest extends TestCase
      */
     public function testWithPreparedComponents(): void
     {
-        $sc = new SigningConfiguration();
-        $sc->signHeader('not-ExistinG')
-           ->signHeader('@method')
-           ->signHeader('@authority')
-        ;
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponentsFactory()->signComponent('not-ExistinG')
+                                                             ->signComponent('@method')
+                                                             ->signComponent('@authority')
+                                                             ->getSignatureComponents(),
+        );
 
         $sc->getStructuredFields()
            ->add('not-existing', 'etag')

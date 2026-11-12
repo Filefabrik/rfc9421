@@ -15,8 +15,6 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\EmptyException;
-use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
@@ -77,103 +75,6 @@ final class SigningConfigurationTest extends TestCase
             $dt,
             $i->getMetadata()
               ->getCreated(),
-        );
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignHeader(): void
-    {
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeader('foo');
-
-        $c = $i->signatureComponents->getComponents()[0]->getItem()
-                                                        ->toHttpValue()
-        ;
-        self::assertEquals('"foo"', $c);
-
-        $i = new SigningConfiguration();
-        $i->signHeader(
-            ComponentName::fromNameAndInitialContent('@authority', 'name')
-                         ->getItem()
-                         ->toHttpValue(),
-        );
-
-        self::assertEquals(
-            '"@authority";name',
-            $i->signatureComponents->getComponents()[0]->getItem()
-                                                       ->toHttpValue(),
-        );
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignHeaderThrowWrongKey(): void
-    {
-        $this->expectExceptionObject(
-            new EnumTypeException(
-                '"@foo" is not a valid enumeration of "Filefabrik\Rfc9421\Enums\DerivedComponentEnum" Enum.',
-            ),
-        );
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeader('@foo');
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignHeaderThrowWrongInitialContent(): void
-    {
-        $this->expectExceptionObject(
-            new EnumTypeException(
-                '"@bullshit" is not a valid enumeration of "Filefabrik\Rfc9421\Enums\DerivedComponentEnum" Enum.',
-            ),
-        );
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeader('@bullshit');
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignHeaders(): void
-    {
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeaders(['Foo', 'bar', ComponentName::fromNameAndInitialContent('new', 'key')]);
-
-        self::assertEquals(
-            [
-                ComponentName::fromComponentName('foo'),
-                ComponentName::fromComponentName('bar'),
-                ComponentName::fromNameAndInitialContent('new', 'key'),
-            ],
-            $i->signatureComponents->getComponents(),
-        );
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignHeaderInitialContent(): void
-    {
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signHeaderNameInitialContent('foo', 'key');
-
-        self::assertEquals(
-            [ComponentName::fromNameAndInitialContent('foo', 'key')],
-            $i->signatureComponents->getComponents(),
         );
     }
 
@@ -275,7 +176,7 @@ final class SigningConfigurationTest extends TestCase
         $c = new SigningComponents();
         $i = new SigningConfiguration();
         $i->setComponents($c);
-        self::assertSame($c, $i->signatureComponents);
+        self::assertSame($c, $i->getSignatureComponents());
     }
 
     public function testGetStructuredFields(): void
@@ -422,59 +323,5 @@ final class SigningConfigurationTest extends TestCase
         $i->getPublicPemOrThrow();
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignComponent(): void
-    {
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signComponent('foo');
 
-        $c = $i->signatureComponents->getComponents()[0]->getHttpValue();
-        self::assertEquals('"foo"', $c);
-
-        $i->signComponent('foo-with-req', true);
-        self::assertEquals('"foo-with-req";req', $i->signatureComponents->getComponents()[1]->getHttpValue());
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignComponentSf(): void
-    {
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signComponentSf('foo');
-
-        $c = $i->signatureComponents->getComponents()[0]->getHttpValue();
-        self::assertEquals('"foo";sf', $c);
-
-        $i->signComponentSf('foo-with-req', true);
-        self::assertEquals('"foo-with-req";req;sf', $i->signatureComponents->getComponents()[1]->getHttpValue());
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignComponentKey(): void
-    {
-        $i = new SigningConfiguration();
-        self::assertEmpty($i->signatureComponents->getComponents());
-        $i->signComponentKey('foo', 'the-key');
-
-        $c = $i->signatureComponents->getComponents()[0]->getHttpValue();
-        self::assertEquals('"foo";key="the-key"', $c);
-
-        $i->signComponentKey('foo-with-req', 'the-key', true);
-        self::assertEquals(
-            '"foo-with-req";req;key="the-key"',
-            $i->signatureComponents->getComponents()[1]->getHttpValue(),
-        );
-    }
-
-    //signComponent
 }

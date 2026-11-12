@@ -16,6 +16,7 @@ use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyResponsePrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
@@ -90,9 +91,11 @@ final class VerifyResponsePrepareTest extends TestCase
         $rsaCert = new CertHelper('rsa');
 
         $response                    = new Response();
-        $responseSignerConfiguration = new SigningConfiguration();
+        $signingComponents           = new SigningComponentsFactory()->signComponent('@status')
+                                                                     ->getSignatureComponents()
+        ;
+        $responseSignerConfiguration = new SigningConfiguration(signingComponents: $signingComponents);
         $responseSignerConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-                                    ->signHeader('@status')
                                     ->setPrivatePem($rsaCert->getPrivatPemContent())
                                     ->setSignatureKeyName('todo=')
         ;
@@ -205,16 +208,19 @@ final class VerifyResponsePrepareTest extends TestCase
     {
         $rsaCert = new CertHelper('rsa');
 
-        $requestSigned               = new ReadLines(
+        $requestSigned = new ReadLines(
             new WriteLines()->fromSignatureLine(
                 '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
             ),
         );
+
+        $signingComponents           = new SigningComponentsFactory()->signComponent('@status')
+                                                                     ->signComponent('content-digest', true)
+                                                                     ->getSignatureComponents()
+        ;
         $response                    = new Response();
-        $responseSignerConfiguration = new SigningConfiguration();
+        $responseSignerConfiguration = new SigningConfiguration(signingComponents: $signingComponents);
         $responseSignerConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-                                    ->signHeader('@status')
-                                    ->signHeader('"content-digest";req')
                                     ->setPrivatePem($rsaCert->getPrivatPemContent())
                                     ->setSignatureKeyName('todo=')
         ;

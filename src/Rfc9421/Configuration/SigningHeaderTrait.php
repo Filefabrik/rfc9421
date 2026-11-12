@@ -15,9 +15,14 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\SigningComponents;
 
 trait SigningHeaderTrait
 {
+    private ?SigningComponents $signatureComponents = null {
+        get => $this->signatureComponents ??= new SigningComponents();
+    }
+
     /**
      * Signing header Parameter
      * todo documentation
@@ -98,14 +103,34 @@ trait SigningHeaderTrait
      */
     public function signComponentKey(
         DerivedComponentEnum|string $headerKey,
-        string $keyOrNameValue,
+        string $keyValue,
         bool $asReq = false,
     ): self {
         $this->setComponent(
             ComponentName::withKey(
-                name   : $headerKey,
-                keyName: $keyOrNameValue,
-                asReq  : $asReq,
+                name    : $headerKey,
+                keyValue: $keyValue,
+                asReq   : $asReq,
+            ),
+        );
+
+        return $this;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function signComponentName(
+        DerivedComponentEnum|string $headerKey,
+        string $nameValue,
+        bool $asReq = false,
+    ): self {
+        $this->setComponent(
+            ComponentName::withName(
+                name     : $headerKey,
+                nameValue: $nameValue,
+                asReq    : $asReq,
             ),
         );
 
@@ -126,5 +151,10 @@ trait SigningHeaderTrait
                 asReq: $asReq,
             ),
         );
+    }
+
+    public function getSignatureComponents(): SigningComponents
+    {
+        return $this->signatureComponents;
     }
 }

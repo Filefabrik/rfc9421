@@ -17,6 +17,7 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
@@ -80,26 +81,29 @@ final class VerifyRequestPrepareTest extends TestCase
     {
         $certInstance = new CertHelper($cert);
 
-        $signatureKeyName = 'testing=';
+        $signatureKeyName  = 'testing=';
+        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                           ->signComponent('@authority')
+                                                           ->getSignatureComponents()
+        ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
-        $configuration   = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
+        $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
+        $configuration
             /*
              * check duplicate content-digest
              * ->withHeader('content-digest')
              */
-                      ->setSigningAlgorithm($signingAlgo)
-                      ->setCreated($currentDateTime)
-                      ->setExpires($currentDateTime + 7200)
-                      ->setTag('mastodon')
-                      ->withNonce('nonce-now')
-                      ->setSignatureKeyName($signatureKeyName)
+            ->setSigningAlgorithm($signingAlgo)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->withNonce('nonce-now')
+            ->setSignatureKeyName($signatureKeyName)
             // for signing needs private
-                      ->setPrivatePem($certInstance->getPrivatPemContent())
+            ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
         /**
@@ -160,16 +164,18 @@ final class VerifyRequestPrepareTest extends TestCase
     {
         $certInstance = new CertHelper($cert);
 
-        $signatureKeyName = 'testing=';
+        $signatureKeyName    = 'testing=';
+        $signatureComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                             ->signComponent('@authority')
+                                                             ->signComponent('content-digest')
+                                                             ->getSignatureComponents()
+        ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
-        $configuration   = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-                      ->signHeader('content-digest')
-                      ->mustCreateContentDigest()
+        $configuration   = new SigningConfiguration(signingComponents: $signatureComponents);
+        $configuration->mustCreateContentDigest()
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
@@ -316,32 +322,35 @@ final class VerifyRequestPrepareTest extends TestCase
     {
         $certInstance = new CertHelper('rsa');
 
-        $signatureKeyName = 'testing=';
-        $bodyParams       = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];
-        $bodyJson         = json_encode($bodyParams, JSON_THROW_ON_ERROR);
-        $request          = new Request(
+        $signatureComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                             ->signComponent('@authority')
+            /*
+             * todo check duplicate content-digest
+             * ->withHeader('content-digest')
+             */
+                                                             ->getSignatureComponents()
+        ;
+        $signatureKeyName    = 'testing=';
+        $bodyParams          = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];
+        $bodyJson            = json_encode($bodyParams, JSON_THROW_ON_ERROR);
+        $request             = new Request(
             method : 'POST',
             uri    : 'https://target-host.com',
             headers: ['x-origin-host' => 'target-host.com'],
             body   : $bodyJson,
         );
-        $currentDateTime  = new DateTime()->getTimestamp();
-        $configuration    = new SigningConfiguration();
-        $configuration->signHeader('@method')
-                      ->signHeader('@authority')
-            /*
-             * todo check duplicate content-digest
-             * ->withHeader('content-digest')
-             */
-                      ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
-                      ->setCreated($currentDateTime)
-                      ->setExpires($currentDateTime + 7200)
-                      ->setTag('mastodon')
-                      ->withNonce('nonce-now')
-                      ->setSignatureKeyName($signatureKeyName)
-                      ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)
+        $currentDateTime     = new DateTime()->getTimestamp();
+        $configuration       = new SigningConfiguration(signingComponents: $signatureComponents);
+        $configuration
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->withNonce('nonce-now')
+            ->setSignatureKeyName($signatureKeyName)
+            ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)
             // for signing needs private
-                      ->setPrivatePem($certInstance->getPrivatPemContent())
+            ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
         $signer                  = new RequestSigner($request, $configuration);

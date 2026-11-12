@@ -18,6 +18,7 @@ use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\RequestSigner;
+use Filefabrik\Rfc9421\SigningComponentsFactory;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
@@ -53,42 +54,44 @@ final class RequestSignerTest extends TestCase
      */
     public function testSign(): void
     {
+        $signingComponents    = new SigningComponentsFactory()->signComponent('content-type')
+                                                              ->signComponent('content-digest')
+            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
+                                                              ->signComponentName('"@query-param"', 'baz')
+                                                              ->signComponent('@method')
+                                                              ->signComponent('x-Origin-host')
+                                                              ->signComponentSf('"example-dict"')
+                                                              ->signHeader('"example-dict";key="d"')
+                                                              ->signHeader('"example-header";bs')
+        ;
         $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance         = new CertHelper('rsa');
         $currentDateTime      = new DateTime()->getTimestamp();
         $expireDateTime       = $currentDateTime + 7200;
-        $signingConfiguration = new SigningConfiguration()
-            /*
-             * todo documentation for addSigningMethod for content-type
-             */
+        $signingConfiguration =
+            new SigningConfiguration(signingComponents: $signingComponents->getSignatureComponents())
+                /*
+                 * todo documentation for addSigningMethod for content-type
+                 */
 
-            ->addSigningMethod(
-                componentName: 'content-type',
-                closure      : fn (
-                    RequestInterface $request,
-                ): string => $request->getHeaderLine('content-type'),
-            )
-            ->mustCreateContentDigest()
-            ->signHeader('content-type')
-            ->signHeader('content-digest')
-            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
-            ->signHeader('"@query-param";name="baz"')
-            ->signHeader('@method')
-            ->signHeader('x-Origin-host')
-            ->signHeader('"example-dict";sf')
-            ->signHeader('"example-dict";key="d"')
-            ->signHeader('"example-header";bs')
-            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->setCreated($currentDateTime)
-            ->setExpires($expireDateTime)
-            ->setTag('mastodon')
-            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
-            ->withNonce('nonce-now')
-            ->setContentDigestAlgo('sha512')
-            // content digest signer key
-            ->setSignatureKeyName('testValue=')
-            // for signing needs private
-            ->setPrivatePem($certInstance->getPrivatPemContent())
+                ->addSigningMethod(
+                    componentName: 'content-type',
+                    closure      : fn (
+                        RequestInterface $request,
+                    ): string => $request->getHeaderLine('content-type'),
+                )
+                ->mustCreateContentDigest()
+                ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+                ->setCreated($currentDateTime)
+                ->setExpires($expireDateTime)
+                ->setTag('mastodon')
+                ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+                ->withNonce('nonce-now')
+                ->setContentDigestAlgo('sha512')
+                // content digest signer key
+                ->setSignatureKeyName('testValue=')
+                // for signing needs private
+                ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
         $signingConfiguration->getStructuredFields()
@@ -188,20 +191,23 @@ final class RequestSignerTest extends TestCase
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
-        $signingConfiguration = new SigningConfiguration()
-            ->signHeader('@method')
-            ->signHeader('x-Origin-host')
-            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
-            ->setCreated($currentDateTime)
-            ->setExpires($currentDateTime + 7200)
-            ->setTag('mastodon')
-            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
-            ->withNonce('nonce-now')
-            //->setContentDigestAlgo('sha512')
-            // content digest signer key
-            ->setSignatureKeyName('testValue=')
-            // for signing needs private
-            ->setPrivatePem($certInstance->getPrivatPemContent())
+        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                           ->signComponent('x-Origin-host')
+        ;
+
+        $signingConfiguration =
+            new SigningConfiguration(signingComponents: $signingComponents->getSignatureComponents())
+                ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+                ->setCreated($currentDateTime)
+                ->setExpires($currentDateTime + 7200)
+                ->setTag('mastodon')
+                ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+                ->withNonce('nonce-now')
+                //->setContentDigestAlgo('sha512')
+                // content digest signer key
+                ->setSignatureKeyName('testValue=')
+                // for signing needs private
+                ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
         /**
@@ -241,22 +247,31 @@ final class RequestSignerTest extends TestCase
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
-        $signingConfiguration = new SigningConfiguration()
-            ->signHeader('@method')
-            ->signHeader('content-digest')
+        $signatureComponents = new SigningComponentsFactory()->signComponent('@method')
+                                                             ->signComponent('content-digest')
+                                                             ->signComponent('x-Origin-host')
+                                                             ->getSignatureComponents()
+        ;
+
+        $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
             ->mustCreateContentDigest()
-            ->signHeader('x-Origin-host')
-            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setSigningAlgorithm(
+                SigningEnum::rsa_v_1_5_sha_512,
+            )
             ->setCreated($currentDateTime)
             ->setExpires($currentDateTime + 7200)
             ->setTag('mastodon')
-            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->setKeyid(
+                'http://127.0.0.1:8001/actor#main-key',
+            )
             ->withNonce('nonce-now')
             ->setContentDigestAlgo('sha512')
             // content digest signer key
             ->setSignatureKeyName('testValue=')
             // for signing needs private
-            ->setPrivatePem($certInstance->getPrivatPemContent())
+            ->setPrivatePem(
+                $certInstance->getPrivatPemContent(),
+            )
         ;
 
         /**
@@ -407,12 +422,15 @@ final class RequestSignerTest extends TestCase
             ),
         );
 
-        $targetUrl       = 'http://localhost:8001/mastodon';
-        $certInstance    = new CertHelper('rsa');
-        $currentDateTime = new DateTime()->getTimestamp();
-
-        $signingConfiguration = new SigningConfiguration()
-            ->signHeader(DerivedComponentEnum::queryParam)
+        $targetUrl            = 'http://localhost:8001/mastodon';
+        $certInstance         = new CertHelper('rsa');
+        $currentDateTime      = new DateTime()->getTimestamp();
+        $signatureComponents  = new SigningComponentsFactory()->signComponent(DerivedComponentEnum::queryParam)
+                                                              ->signComponent('@authority')
+                                                              ->signComponent('content-digest')
+                                                              ->getSignatureComponents()
+        ;
+        $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
             ->setExpires($currentDateTime + 7200)
@@ -460,11 +478,24 @@ final class RequestSignerTest extends TestCase
     public function testSignThrowsReq(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('Request Interface can not have an ;req flag.'));
-        $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
-        $certInstance         = new CertHelper('rsa');
-        $currentDateTime      = new DateTime()->getTimestamp();
-        $expireDateTime       = $currentDateTime + 7200;
-        $signingConfiguration = new SigningConfiguration()
+        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
+        $certInstance    = new CertHelper('rsa');
+        $currentDateTime = new DateTime()->getTimestamp();
+        $expireDateTime  = $currentDateTime + 7200;
+
+        $signatureComponents = new SigningComponentsFactory()->signHeader('content-type')
+                                                             ->signHeader('"content-digest";req')
+            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
+                                                             ->signHeader('"@query-param";name="baz"')
+                                                             ->signHeader('@method')
+                                                             ->signHeader('x-Origin-host')
+                                                             ->signHeader('"example-dict";sf')
+                                                             ->signHeader('"example-dict";key="d"')
+                                                             ->signHeader('"example-header";bs')
+                                                             ->getSignatureComponents()
+        ;
+
+        $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
             /*
              * todo documentation for addSigningMethod for content-type
              */
@@ -476,15 +507,6 @@ final class RequestSignerTest extends TestCase
                 ): string => $request->getHeaderLine('content-type'),
             )
             ->mustCreateContentDigest()
-            ->signHeader('content-type')
-            ->signHeader('"content-digest";req')
-            // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
-            ->signHeader('"@query-param";name="baz"')
-            ->signHeader('@method')
-            ->signHeader('x-Origin-host')
-            ->signHeader('"example-dict";sf')
-            ->signHeader('"example-dict";key="d"')
-            ->signHeader('"example-header";bs')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
             ->setExpires($expireDateTime)
@@ -515,13 +537,10 @@ final class RequestSignerTest extends TestCase
             body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
         );
 
-        $request       = $request->withAddedHeader('example-header', 'value, with, lots')
-                                 ->withAddedHeader('example-header', 'of, commas')
+        $request = $request->withAddedHeader('example-header', 'value, with, lots')
+                           ->withAddedHeader('example-header', 'of, commas')
         ;
-        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
+        $signer  = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->sign();
-
-
-
     }
 }
