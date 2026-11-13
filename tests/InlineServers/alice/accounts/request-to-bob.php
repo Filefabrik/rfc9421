@@ -18,7 +18,7 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     SignatureExtractionException,
     UnexpectedValue};
 use Filefabrik\Rfc9421\RequestSigner;
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Client;
@@ -42,16 +42,15 @@ displayLogger("Here is Alice's Server");
  */
 $currentDateTime = new DateTime()->getTimestamp();
 try {
-    $singingComponents = new SigningComponentsFactory()
-        /*
-             * tell the signing process that content-type has to be signed
-             */
-        ->signHeader('content-type')
-        ->signHeader('@method')
-        ->signHeader('x-Origin-host')
-        ->signHeader('content-digest')
-        ->signHeader('@authority')
-        ->getSignatureComponents()
+    $singingComponents = new SigningComponents()
+        /**
+         * tell the signing process that content-type has to be signed
+         */
+        ->sign('content-type')
+        ->sign('@method')
+        ->sign('x-Origin-host')
+        ->sign('content-digest')
+        ->sign('@authority')
     ;
 } catch (AlreadySetException|SignatureExtractionException $e) {
     echo $e->getMessage();
@@ -73,7 +72,7 @@ try {
         // for signing needs private
         ->setPrivatePem($certInstance->getPrivatPemContent())
     ;
-} catch (AlreadySetException|SignatureException|ContentDigestException|SignatureExtractionException|UnexpectedValue $e) {
+} catch (SignatureException|ContentDigestException|UnexpectedValue $e) {
     displayLogger('signing configuration error: '.$e->getMessage());
 
     return;

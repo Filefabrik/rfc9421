@@ -16,7 +16,7 @@ use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyResponsePrepare;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
@@ -91,8 +91,8 @@ final class VerifyResponsePrepareTest extends TestCase
         $rsaCert = new CertHelper('rsa');
 
         $response                    = new Response();
-        $signingComponents           = new SigningComponentsFactory()->signComponent('@status')
-                                                                     ->getSignatureComponents()
+        $signingComponents           = new SigningComponents()->sign('@status')
+
         ;
         $responseSignerConfiguration = new SigningConfiguration(signingComponents: $signingComponents);
         $responseSignerConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
@@ -214,9 +214,9 @@ final class VerifyResponsePrepareTest extends TestCase
             ),
         );
 
-        $signingComponents           = new SigningComponentsFactory()->signComponent('@status')
-                                                                     ->signComponent('content-digest', true)
-                                                                     ->getSignatureComponents()
+        $signingComponents           = new SigningComponents()->sign('@status')
+                                                              ->sign('content-digest', true)
+
         ;
         $response                    = new Response();
         $responseSignerConfiguration = new SigningConfiguration(signingComponents: $signingComponents);

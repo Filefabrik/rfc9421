@@ -23,12 +23,11 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     SignatureExtractionException,
     StructuredFieldException,
     UnexpectedValue,
-    VerifyHeaderSignatureException
-};
+    VerifyHeaderSignatureException};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\{Signatures\ReadLines, Signatures\WriteLines};
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -72,44 +71,44 @@ $extraParser = ['example-dict' => 'dictionary'];
  * Use ist as you need
  */
 try {
-    $componentsToSign = new SigningComponentsFactory()
+    $componentsToSign = new SigningComponents()
         /*
             * as string without quotas
             */
 
-        ->signComponent(headerKey: 'content-type')
+        ->sign(headerKey: 'content-type')
         /*
          * as string with quotas
          */
-        ->signComponent(headerKey: '"content-length"')
+        ->sign(headerKey: '"content-length"')
         /*
         * as Enum
         */
-        ->signComponent(headerKey: DerivedComponentEnum::query)
-        ->signComponent(headerKey: DerivedComponentEnum::method)
-        ->signComponent(headerKey: DerivedComponentEnum::authority)
+        ->sign(headerKey: DerivedComponentEnum::query)
+        ->sign(headerKey: DerivedComponentEnum::method)
+        ->sign(headerKey: DerivedComponentEnum::authority)
         /*
         * with the name
         */
-        ->signComponentName(headerKey: '@query-param', nameValue: 'baz')
+        ->signWithName(headerKey: '@query-param', nameValue: 'baz')
         /*
        * programmatically add
        * '"example-dict";sf'
        */
-        ->signComponentSf(headerKey: 'example-dict')
-        ->signComponentKey(headerKey: 'example-dict', keyValue: 'a')
+        ->signWithSF(headerKey: 'example-dict')
+        ->signWithKey(headerKey: 'example-dict', keyValue: 'a')
         /*
     * '"example-dict";key="c"'
     */
-        ->signComponentKey(headerKey: 'example-dict', keyValue: 'c')
+        ->signWithKey(headerKey: 'example-dict', keyValue: 'c')
         /*
       * '"example-dict";key="d"'
       */
-        ->signComponentKey(headerKey: 'example-dict', keyValue: 'd')
-        ->signComponent('x-Origin-host')
-        ->signComponent('test-header')
-        ->signComponent('example-dict')
-        ->signComponent('content-digest')
+        ->signWithKey(headerKey: 'example-dict', keyValue: 'd')
+        ->sign('x-Origin-host')
+        ->sign('test-header')
+        ->sign('example-dict')
+        ->sign('content-digest')
     ;
 } catch (AlreadySetException|SignatureExtractionException $e) {
     echo $e->getMessage();
@@ -122,7 +121,7 @@ try {
         /*
          * Setting a bundle of prepared components
          */
-        signingComponents: $componentsToSign->getSignatureComponents(),
+        signingComponents: $componentsToSign,
     )
         /*
          * content-type will be injected after signing so configure that we are signing manuell the content-type
@@ -214,8 +213,10 @@ $verifierConfiguration->getStructuredFields()
                       ->addMany(fields: $extraParser)
 ;
 $verifierConfiguration->addSigningMethods(methods: $prepareMethods);
-$verifyPrepareInstance =
-    new VerifyRequestPrepare(message: $signedRequest, signingConfiguration: $verifierConfiguration);
+$verifyPrepareInstance = new VerifyRequestPrepare(
+    message             : $signedRequest,
+    signingConfiguration: $verifierConfiguration,
+);
 
 /*
  * Prepare the incoming Request for verifying
@@ -324,18 +325,17 @@ if ($VerifyRequest->hasValidatedBody) {
 $responseBodyJson = JsonToString::toString(data: ['account' => 'Alex', 'new-amount' => 1290.09, 'currency' => 'EUR']);
 $response         = new Response(headers: [], body: $responseBodyJson);
 try {
-    $responseComponents = new SigningComponentsFactory()
+    $responseComponents = new SigningComponents()
         // singing the status as relevant information for the requester Alice, to ensure the status
-        ->signComponent(headerKey: DerivedComponentEnum::status)
+        ->sign(headerKey: DerivedComponentEnum::status)
         // content digest which must be response to the requester that the requester can check, the response body was not tempered
-        ->signHeader(headerKey: 'content-digest')
+        ->sign(headerKey: 'content-digest')
         /*
          * Signing ";asReq"
          */
-        ->signComponent(headerKey: 'content-digest', asReq: true)
+        ->sign(headerKey: 'content-digest', asReq: true)
         // Content-Length has a default method to calculate the length of the body
-        ->signComponent(headerKey: 'content-length')
-        ->getSignatureComponents()
+        ->sign(headerKey: 'content-length')
     ;
 } catch (AlreadySetException|SignatureExtractionException $e) {
     echo $e->getMessage();
@@ -392,9 +392,7 @@ echo 'response is successfully signed and can be response to the sender'.PHP_EOL
 
 echo 'Start Verify the Signed Response'.PHP_EOL;
 try {
-    $responseSigningComponents = new SigningComponentsFactory()->signComponent(headerKey: 'content-digest')
-                                                               ->getSignatureComponents()
-    ;
+    $responseSigningComponents = new SigningComponents()->sign(headerKey: 'content-digest');
 } catch (AlreadySetException|SignatureExtractionException $e) {
     echo 'response signing configuration error: '.$e->getMessage();
 

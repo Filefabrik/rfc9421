@@ -22,7 +22,7 @@ use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -71,13 +71,12 @@ final class ResponseSignerTest extends TestCase
         $response = new Response(headers: [], body: '{"recipient":"Alex","new-amount":900000000}');
 
         //... now sign the response
-        $signatureComponents          = new SigningComponentsFactory()
+        $signatureComponents          = new SigningComponents()
             // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signComponent(DerivedComponentEnum::status)
+            ->sign(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-            ->signComponent('content-length')
-            ->signComponent('content-digest')
-            ->getSignatureComponents()
+            ->sign('content-length')
+            ->sign('content-digest')
         ;
         $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
 
@@ -154,13 +153,12 @@ final class ResponseSignerTest extends TestCase
         $response = new Response(headers: [], body: $responseBodyJson);
 
         //... now sign the response
-        $signingComponents            = new SigningComponentsFactory()
+        $signingComponents            = new SigningComponents()
             // singing the status as relevant information for the requester Alice, to ensure the status
             ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
             ->signHeader('content-length')
             ->signHeader(DerivedComponentEnum::query)
-            ->getSignatureComponents()
         ;
         $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signingComponents)
 
@@ -229,16 +227,15 @@ final class ResponseSignerTest extends TestCase
 
         //... now sign the response
 
-        $signingComponents = new SigningComponentsFactory()
+        $signingComponents = new SigningComponents()
             // test asReq
-            ->signComponent('"content-digest"', true)
+            ->sign('"content-digest"', true)
             //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signComponent(DerivedComponentEnum::status)
+            ->sign(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-            ->signComponent('content-length')
-            ->signComponent('content-digest')
-            ->getSignatureComponents()
+            ->sign('content-length')
+            ->sign('content-digest')
         ;
 
         $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signingComponents)
@@ -323,17 +320,16 @@ final class ResponseSignerTest extends TestCase
         $response = new Response(headers: [], body: '{"recipient":"Alex","new-amount":900000000}');
 
         //... now sign the response
-        $signedComponents             = new SigningComponentsFactory()
+        $signedComponents             = new SigningComponents()
             // test asReq
-            ->signComponent('"content-digest"', true)
-            ->signComponent('"@authority"', true)
+            ->sign('"content-digest"', true)
+            ->sign('"@authority"', true)
             //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signComponent(DerivedComponentEnum::status)
+            ->sign(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-            ->signComponent('content-length')
-            ->signComponent('content-digest')
-            ->getSignatureComponents()
+            ->sign('content-length')
+            ->sign('content-digest')
         ;
         $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signedComponents)
 
@@ -407,10 +403,9 @@ final class ResponseSignerTest extends TestCase
 
         $signatureKeyName = 'testing=';
 
-        $signedComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                          ->signComponent('@authority')
-                                                          ->signComponent('content-digest')
-                                                          ->getSignatureComponents()
+        $signedComponents = new SigningComponents()->sign('@method')
+                                                   ->sign('@authority')
+                                                   ->sign('content-digest')
         ;
         /**
          * Prepare signingConfiguration
@@ -499,15 +494,14 @@ final class ResponseSignerTest extends TestCase
         //... now sign the response
 
         // test asReq
-        $signedComponents = new SigningComponentsFactory()->signHeader('"content-digest";req')
-                                                          ->signHeader('"@authority";req')
+        $signedComponents = new SigningComponents()->signHeader('"content-digest";req')
+                                                   ->signHeader('"@authority";req')
             //->signHeader('"@method";asReq')
             // singing the status as relevant information for the requester Alice, to ensure the status
-                                                          ->signHeader(DerivedComponentEnum::status)
+                                                   ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-                                                          ->signHeader('content-length')
-                                                          ->signHeader('content-digest')
-                                                          ->getSignatureComponents()
+                                                   ->signHeader('content-length')
+                                                   ->signHeader('content-digest')
         ;
 
         $responseSigningConfiguration = new SigningConfiguration()->setComponents($signedComponents)

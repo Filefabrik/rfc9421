@@ -18,7 +18,7 @@ use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\RequestSigner;
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
@@ -54,22 +54,22 @@ final class RequestSignerTest extends TestCase
      */
     public function testSign(): void
     {
-        $signingComponents    = new SigningComponentsFactory()->signComponent('content-type')
-                                                              ->signComponent('content-digest')
+        $signingComponents    = new SigningComponents()->sign('content-type')
+                                                       ->sign('content-digest')
             // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
-                                                              ->signComponentName('"@query-param"', 'baz')
-                                                              ->signComponent('@method')
-                                                              ->signComponent('x-Origin-host')
-                                                              ->signComponentSf('"example-dict"')
-                                                              ->signHeader('"example-dict";key="d"')
-                                                              ->signHeader('"example-header";bs')
+                                                       ->signWithName('"@query-param"', 'baz')
+                                                       ->sign('@method')
+                                                       ->sign('x-Origin-host')
+                                                       ->signWithSF('"example-dict"')
+                                                       ->signHeader('"example-dict";key="d"')
+                                                       ->signHeader('"example-header";bs')
         ;
         $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance         = new CertHelper('rsa');
         $currentDateTime      = new DateTime()->getTimestamp();
         $expireDateTime       = $currentDateTime + 7200;
         $signingConfiguration =
-            new SigningConfiguration(signingComponents: $signingComponents->getSignatureComponents())
+            new SigningConfiguration(signingComponents: $signingComponents)
                 /*
                  * todo documentation for addSigningMethod for content-type
                  */
@@ -191,12 +191,12 @@ final class RequestSignerTest extends TestCase
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
-        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                           ->signComponent('x-Origin-host')
+        $signingComponents = new SigningComponents()->sign('@method')
+                                                    ->sign('x-Origin-host')
         ;
 
         $signingConfiguration =
-            new SigningConfiguration(signingComponents: $signingComponents->getSignatureComponents())
+            new SigningConfiguration(signingComponents: $signingComponents)
                 ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
                 ->setCreated($currentDateTime)
                 ->setExpires($currentDateTime + 7200)
@@ -247,10 +247,10 @@ final class RequestSignerTest extends TestCase
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
 
-        $signatureComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                             ->signComponent('content-digest')
-                                                             ->signComponent('x-Origin-host')
-                                                             ->getSignatureComponents()
+        $signatureComponents = new SigningComponents()->sign('@method')
+                                                      ->sign('content-digest')
+                                                      ->sign('x-Origin-host')
+
         ;
 
         $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
@@ -425,10 +425,10 @@ final class RequestSignerTest extends TestCase
         $targetUrl            = 'http://localhost:8001/mastodon';
         $certInstance         = new CertHelper('rsa');
         $currentDateTime      = new DateTime()->getTimestamp();
-        $signatureComponents  = new SigningComponentsFactory()->signComponent(DerivedComponentEnum::queryParam)
-                                                              ->signComponent('@authority')
-                                                              ->signComponent('content-digest')
-                                                              ->getSignatureComponents()
+        $signatureComponents  = new SigningComponents()->sign(DerivedComponentEnum::queryParam)
+                                                       ->sign('@authority')
+                                                       ->sign('content-digest')
+
         ;
         $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
@@ -483,16 +483,16 @@ final class RequestSignerTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
         $expireDateTime  = $currentDateTime + 7200;
 
-        $signatureComponents = new SigningComponentsFactory()->signHeader('content-type')
-                                                             ->signHeader('"content-digest";req')
+        $signatureComponents = new SigningComponents()->signHeader('content-type')
+                                                      ->signHeader('"content-digest";req')
             // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
-                                                             ->signHeader('"@query-param";name="baz"')
-                                                             ->signHeader('@method')
-                                                             ->signHeader('x-Origin-host')
-                                                             ->signHeader('"example-dict";sf')
-                                                             ->signHeader('"example-dict";key="d"')
-                                                             ->signHeader('"example-header";bs')
-                                                             ->getSignatureComponents()
+                                                      ->signHeader('"@query-param";name="baz"')
+                                                      ->signHeader('@method')
+                                                      ->signHeader('x-Origin-host')
+                                                      ->signHeader('"example-dict";sf')
+                                                      ->signHeader('"example-dict";key="d"')
+                                                      ->signHeader('"example-header";bs')
+
         ;
 
         $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)

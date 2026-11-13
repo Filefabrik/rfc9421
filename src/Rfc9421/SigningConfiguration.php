@@ -18,7 +18,6 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
-use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
@@ -33,7 +32,6 @@ final class SigningConfiguration
     use PrivatePemTrait;
     use SigningMethodsTrait;
     use MetadataTrait;
-
     use GenerateContentDigestTrait;
 
     /**
@@ -47,8 +45,8 @@ final class SigningConfiguration
     private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
 
     public function __construct(
-        private readonly Metadata $metadata = new Metadata(),
         private SigningComponents $signingComponents = new SigningComponents(),
+        private readonly Metadata $metadata = new Metadata(),
         /**
          * Methods for extracting the header and recompile the component
          */

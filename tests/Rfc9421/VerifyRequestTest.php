@@ -17,7 +17,7 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\RequestSigner;
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
@@ -87,9 +87,9 @@ final class VerifyRequestTest extends TestCase
 
         $signatureKeyName = 'testing=';
 
-        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                           ->signComponent('@authority')
-                                                           ->getSignatureComponents()
+        $signingComponents = new SigningComponents()->sign('@method')
+                                                    ->sign('@authority')
+
         ;
         /**
          * Prepare signingConfiguration
@@ -198,9 +198,9 @@ final class VerifyRequestTest extends TestCase
 
         $signatureKeyName = 'testing=';
 
-        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                           ->signComponent('@authority')
-                                                           ->getSignatureComponents()
+        $signingComponents = new SigningComponents()->sign('@method')
+                                                    ->sign('@authority')
+
         ;
         /**
          * Prepare signingConfiguration
@@ -310,10 +310,10 @@ final class VerifyRequestTest extends TestCase
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName  = 'testing=';
-        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                           ->signComponent('@authority')
-                                                           ->signComponent('content-digest')
-                                                           ->getSignatureComponents()
+        $signingComponents = new SigningComponents()->sign('@method')
+                                                    ->sign('@authority')
+                                                    ->sign('content-digest')
+
         ;
         /**
          * Prepare signingConfiguration
@@ -407,10 +407,10 @@ final class VerifyRequestTest extends TestCase
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName  = 'testing=';
-        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                           ->signComponent('@authority')
-                                                           ->signComponent('content-digest')
-                                                           ->getSignatureComponents()
+        $signingComponents = new SigningComponents()->sign('@method')
+                                                    ->sign('@authority')
+                                                    ->sign('content-digest')
+
         ;
         /**
          * Prepare signingConfiguration

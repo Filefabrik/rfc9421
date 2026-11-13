@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Signer;
 
-use Filefabrik\Rfc9421\Signature\SigningComponents;
+use Filefabrik\Rfc9421\SigningComponents;
 
 /**
  * merges the signature params into sig1=("@method" "@authority" "@path" "content-type" "content-length")

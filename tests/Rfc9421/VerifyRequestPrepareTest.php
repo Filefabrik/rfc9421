@@ -17,7 +17,7 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\RequestSigner;
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Verify\HeaderHelper;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
@@ -82,9 +82,9 @@ final class VerifyRequestPrepareTest extends TestCase
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName  = 'testing=';
-        $signingComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                           ->signComponent('@authority')
-                                                           ->getSignatureComponents()
+        $signingComponents = new SigningComponents()->sign('@method')
+                                                    ->sign('@authority')
+
         ;
         /**
          * Prepare signingConfiguration
@@ -165,10 +165,10 @@ final class VerifyRequestPrepareTest extends TestCase
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName    = 'testing=';
-        $signatureComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                             ->signComponent('@authority')
-                                                             ->signComponent('content-digest')
-                                                             ->getSignatureComponents()
+        $signatureComponents = new SigningComponents()->sign('@method')
+                                                      ->sign('@authority')
+                                                      ->sign('content-digest')
+
         ;
         /**
          * Prepare signingConfiguration
@@ -322,13 +322,13 @@ final class VerifyRequestPrepareTest extends TestCase
     {
         $certInstance = new CertHelper('rsa');
 
-        $signatureComponents = new SigningComponentsFactory()->signComponent('@method')
-                                                             ->signComponent('@authority')
+        $signatureComponents = new SigningComponents()->sign('@method')
+                                                      ->sign('@authority')
             /*
              * todo check duplicate content-digest
              * ->withHeader('content-digest')
              */
-                                                             ->getSignatureComponents()
+
         ;
         $signatureKeyName    = 'testing=';
         $bodyParams          = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];

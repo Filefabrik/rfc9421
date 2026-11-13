@@ -13,7 +13,7 @@ namespace Filefabrik\Rfc9421\Extractors;
 use Exception;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\Signature\SigningComponents;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**

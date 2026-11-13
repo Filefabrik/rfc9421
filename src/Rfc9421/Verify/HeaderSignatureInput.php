@@ -14,7 +14,7 @@ use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\Components;
 use Filefabrik\Rfc9421\Extractors\Metadata;
-use Filefabrik\Rfc9421\Signature\SigningComponents;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\Support\SignaturInput;
 use InvalidArgumentException;
 

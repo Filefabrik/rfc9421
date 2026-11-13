@@ -13,8 +13,8 @@ namespace Filefabrik\Rfc9421Test\Signer;
 
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Signature\SigningComponents;
 use Filefabrik\Rfc9421\Signer\SigCompilerHelper;
+use Filefabrik\Rfc9421\SigningComponents;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -27,10 +27,10 @@ final class SigCompilerHelperTest extends TestCase
      */
     public function testMakeSig1fromComponents(): void
     {
-        $components = new SigningComponents()->addName('test')
-                                             ->addName('@authority')
-                                             ->addName('try-out')
-                                             ->addName('some-header')
+        $components = new SigningComponents()->sign('test')
+                                             ->sign('@authority')
+                                             ->sign('try-out')
+                                             ->sign('some-header')
         ;
         self::assertEquals(
             'someSig=("test" "@authority" "try-out" "some-header")',
@@ -45,10 +45,10 @@ final class SigCompilerHelperTest extends TestCase
     public function testMakeSig1fromSignatureParams(): void
     {
         // todo status only on response signing
-        $components = new SigningComponents()->addName('test')
-                                             ->addName('@status')
-                                             ->addName('try-out')
-                                             ->addName('some-header')
+        $components = new SigningComponents()->sign('test')
+                                             ->sign('@status')
+                                             ->sign('try-out')
+                                             ->sign('some-header')
         ;
 
         self::assertEquals(
@@ -63,10 +63,10 @@ final class SigCompilerHelperTest extends TestCase
      */
     public function testMakeSig1fromConstructWithInitial(): void
     {
-        $components = new SigningComponents()->addName('test')
-                                             ->addName(DerivedComponentEnum::requestTarget)
-                                             ->addName('try-out')
-                                             ->addName('some-header')
+        $components = new SigningComponents()->sign('test')
+                                             ->sign(DerivedComponentEnum::requestTarget)
+                                             ->sign('try-out')
+                                             ->sign('some-header')
         ;
 
         self::assertEquals(
@@ -82,10 +82,10 @@ final class SigCompilerHelperTest extends TestCase
     public function testMakeSig1fromConstructThrows(): void
     {
         $this->expectExceptionObject(EnumTypeException::TypeError('@test', DerivedComponentEnum::class));
-        $components = new SigningComponents()->addName('test')
-                                             ->addName('@test')
-                                             ->addName('try-out')
-                                             ->addName('some-header')
+        $components = new SigningComponents()->sign('test')
+                                             ->sign('@test')
+                                             ->sign('try-out')
+                                             ->sign('some-header')
         ;
         new SigCompilerHelper($components, 'sig1=')->makeSig1fromSignatureParams();
     }

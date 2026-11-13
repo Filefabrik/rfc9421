@@ -16,7 +16,7 @@ use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
-use Filefabrik\Rfc9421\SigningComponentsFactory;
+use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyResponse;
 use Filefabrik\Rfc9421\VerifyResponsePrepare;
@@ -136,9 +136,9 @@ final class VerifyResponseTest extends TestCase
                 '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
             ),
         );
-        $signingComponents           = new SigningComponentsFactory()->signComponent('@status')
-                                                                     ->signHeader('"content-digest";req')
-                                                                     ->getSignatureComponents();
+        $signingComponents           = new SigningComponents()->sign('@status')
+                                                              ->signHeader('"content-digest";req')
+                                                                     ;
         $response                    = new Response();
         $responseSignerConfiguration = new SigningConfiguration(signingComponents: $signingComponents);
         $responseSignerConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
