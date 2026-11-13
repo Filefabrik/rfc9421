@@ -78,8 +78,8 @@ final class ResponseSignerTest extends TestCase
             ->sign('content-length')
             ->sign('content-digest')
         ;
-        $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
-
+        $responseSigningConfiguration = new SigningConfiguration()
+            ->setSigningComponents($signatureComponents)
             // make sure the receiver Alice expects the following response Key
             ->setSignatureKeyName('responseSig=')
             // the sender of the request expects an algo that Bob can check while receive this signed response
@@ -412,7 +412,7 @@ final class ResponseSignerTest extends TestCase
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration();
-        $configuration->setComponents($signedComponents)
+        $configuration->setSigningComponents($signedComponents)
                       ->mustCreateContentDigest()
                       ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
                       ->setSigningAlgorithm($signingAlgo)
@@ -504,7 +504,7 @@ final class ResponseSignerTest extends TestCase
                                                    ->signHeader('content-digest')
         ;
 
-        $responseSigningConfiguration = new SigningConfiguration()->setComponents($signedComponents)
+        $responseSigningConfiguration = new SigningConfiguration()->setSigningComponents($signedComponents)
 
             // make sure the receiver Alice expects the following response Key
                                                                   ->setSignatureKeyName('responseSig=')

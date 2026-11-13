@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -16,13 +17,6 @@ trait MetadataTrait
     public function setCreated(?int $created): self
     {
         $this->metadata->setCreated($created);
-
-        return $this;
-    }
-
-    public function setSignatureKeyName(string $signatureKey): self
-    {
-        $this->signatureKeyName = $signatureKey;
 
         return $this;
     }

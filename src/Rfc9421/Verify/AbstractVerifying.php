@@ -54,7 +54,7 @@ abstract class AbstractVerifying
     public function verifying(): bool
     {
         $signingConfiguration = $this->getSigningConfiguration();
-        $signingConfiguration->setComponents(
+        $signingConfiguration->setSigningComponents(
             components: $this->preparedVerify->getSignatureInputInstance()
                                              ->getExtractedComponents(),
         );

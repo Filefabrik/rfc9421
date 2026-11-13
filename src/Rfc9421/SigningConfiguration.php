@@ -11,7 +11,11 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421;
 
-use Filefabrik\Rfc9421\Configuration\{GenerateContentDigestTrait, MetadataTrait, SigningMethodsTrait};
+use Filefabrik\Rfc9421\Configuration\{GenerateContentDigestTrait,
+    MetadataTrait,
+    SignatureKeyNameTrait,
+    SigningMethodsTrait
+};
 use Filefabrik\Rfc9421\Configuration\PrivatePemTrait;
 use Filefabrik\Rfc9421\Configuration\PublicPemTrait;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
@@ -33,11 +37,7 @@ final class SigningConfiguration
     use SigningMethodsTrait;
     use MetadataTrait;
     use GenerateContentDigestTrait;
-
-    /**
-     * Prefix the signature value
-     */
-    private(set) ?string $signatureKeyName = null;
+    use SignatureKeyNameTrait;
 
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
@@ -56,7 +56,7 @@ final class SigningConfiguration
     ) {
     }
 
-    public function getSignatureComponents(): SigningComponents
+    public function getSigningComponents(): SigningComponents
     {
         return $this->signingComponents;
     }
@@ -95,10 +95,11 @@ final class SigningConfiguration
     }
 
     /**
+     * All things you want to sign
      *
      * @return $this
      */
-    public function setComponents(SigningComponents $components): self
+    public function setSigningComponents(SigningComponents $components): self
     {
         $this->signingComponents = $components;
 

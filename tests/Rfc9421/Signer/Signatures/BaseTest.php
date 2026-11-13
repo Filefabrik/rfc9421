@@ -47,7 +47,7 @@ final class BaseTest extends TestCase
         $sc     = new SigningComponents()->sign('not-ExistinG')
                                          ->sign('@method')
         ;
-        $config = new SigningConfiguration()->setComponents($sc);
+        $config = new SigningConfiguration()->setSigningComponents($sc);
         $config->getStructuredFields()
                ->add('not-existing', 'etag')
         ;
@@ -82,8 +82,7 @@ final class BaseTest extends TestCase
                         'req',
                     ),
                 )
-                ->sign('not-ExistinG')
-              ,
+                ->sign('not-ExistinG'),
         );
 
         $sc->getStructuredFields()
@@ -143,8 +142,7 @@ final class BaseTest extends TestCase
                         'req',
                     ),
                 )
-                ->sign('not-ExistinG')
-
+                ->sign('not-ExistinG'),
         );
 
         $sc->getStructuredFields()
@@ -223,8 +221,7 @@ final class BaseTest extends TestCase
             new UnexpectedValue('Can not find "@method";req in the signed request "@method".'),
         );
         $sc = new SigningConfiguration(
-            signingComponents: new SigningComponents()->sign('@method', true)
-                                                           ,
+            signingComponents: new SigningComponents()->sign('@method', true),
         );
 
         $response = new Response();
@@ -249,8 +246,7 @@ final class BaseTest extends TestCase
             new UnexpectedValue('For Response signing the signed Request must be set into the Signer!'),
         );
         $sc = new SigningConfiguration(
-            signingComponents: new SigningComponents()->sign('@method', true)
-                                                           ,
+            signingComponents: new SigningComponents()->sign('@method', true),
         );
 
         $response = new Response();
@@ -274,8 +270,7 @@ final class BaseTest extends TestCase
         $sc = new SigningConfiguration(
             signingComponents: new SigningComponents()->sign('not-ExistinG')
                                                       ->sign('@method')
-                                                      ->sign('content-digest')
-                                                             ,
+                                                      ->sign('content-digest'),
         );
         $sc->setContentDigestAlgo('sha256');
 
@@ -315,8 +310,7 @@ final class BaseTest extends TestCase
             signingComponents: new SigningComponents()->sign('not-ExistinG')
                                                       ->sign('@method')
                 // do not use this
-                                                      ->signHeader('content-digest')
-                                                             ,
+                                                      ->signHeader('content-digest'),
         );
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
@@ -344,8 +338,7 @@ final class BaseTest extends TestCase
         );
 
         $sc = new SigningConfiguration(
-            signingComponents: new SigningComponents()->sign('not-ExistinG')
-                                                       ,
+            signingComponents: new SigningComponents()->sign('not-ExistinG'),
         );
 
         $r = new Request('POST', '', ['x-wrong-name' => 'hm']);
@@ -363,8 +356,7 @@ final class BaseTest extends TestCase
         $sc      = new SigningConfiguration(
             signingComponents: new SigningComponents()->signHeaders(
                 ['stupid-header', '@method'],
-            )
-                                                            ,
+            ),
         );
         $created = new DateTime()->getTimestamp();
         $sc->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
@@ -376,6 +368,32 @@ final class BaseTest extends TestCase
         $res = $i->makeSignatureInput();
         self::assertEquals(
             '("stupid-header" "@method");created='.$created.';alg="'.SigningEnum::rsa_v_1_5_sha_256->getValue().'"',
+            $res,
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testMakeSignatureInputWithKey(): void
+    {
+        $sc = new SigningConfiguration(
+            signingComponents: new SigningComponents()->signHeaders(
+                ['stupid-header', '@method'],
+            ),
+        );
+
+        $created = new DateTime()->getTimestamp();
+        $sc->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
+           ->setCreated($created)
+            ->setSignatureKeyName('playground=');
+        $r   = new Request('POST', '', ['stupid-header' => 'hm']);
+        $i   = new Base($r, $sc);
+        $res = $i->makeSignatureInput();
+        self::assertEquals(
+            'playground=("stupid-header" "@method");created='.$created.';alg="'.SigningEnum::rsa_v_1_5_sha_256->getValue().'"',
             $res,
         );
     }
@@ -405,8 +423,7 @@ final class BaseTest extends TestCase
         $sc = new SigningConfiguration(
             signingComponents: new SigningComponents()->sign('not-ExistinG')
                                                       ->sign('@method')
-                                                      ->sign('@authority')
-                                                             ,
+                                                      ->sign('@authority'),
         );
 
         $sc->getStructuredFields()

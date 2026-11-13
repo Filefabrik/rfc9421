@@ -105,9 +105,9 @@ final class SigningConfigurationTest extends TestCase
     public function testWithSignatureKeyName(): void
     {
         $i = new SigningConfiguration();
-        self::assertNull($i->signatureKeyName);
+        self::assertNull($i->getSignatureKeyName());
         $i->setSignatureKeyName('keyname=');
-        self::assertSame('keyname=', $i->signatureKeyName);
+        self::assertSame('keyname=', $i->getSignatureKeyName());
     }
 
     public function testWithExpires(): void
@@ -175,8 +175,8 @@ final class SigningConfigurationTest extends TestCase
     {
         $c = new SigningComponents();
         $i = new SigningConfiguration();
-        $i->setComponents($c);
-        self::assertSame($c, $i->getSignatureComponents());
+        $i->setSigningComponents($c);
+        self::assertSame($c, $i->getSigningComponents());
     }
 
     public function testGetStructuredFields(): void

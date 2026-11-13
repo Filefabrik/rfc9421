@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -24,20 +25,22 @@ use InvalidArgumentException;
 final class HeaderSignatureInput
 {
     private(set) null|SignaturInput $signatureInput = null;
-
+    /**
+     * only if validatedSignatureParts was successfully
+     */
+    private(set) null|Metadata $extractedMetadata = null;
     /**
      * only if validatedSignatureParts was successfully
      */
     private ?SigningComponents $extractedComponents = null;
 
-    /**
-     * only if validatedSignatureParts was successfully
-     */
-    private(set) null|Metadata $extractedMetadata = null;
-
     public function __construct(
         private(set) readonly string $headerSignatureInputValue,
-        private(set) readonly string $signatureNameKey,
+        /**
+         * if the signatureNameKey not set/null, then detect it during the extract
+         *
+         */
+        private(set) readonly string $signatureNameKey
     ) {
     }
 

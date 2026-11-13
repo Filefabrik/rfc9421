@@ -400,7 +400,7 @@ try {
 }
 try {
     $verifyResponseConfiguration = new SigningConfiguration()
-        ->setComponents($responseSigningComponents)
+        ->setSigningComponents($responseSigningComponents)
         ->setPublicPem($signerCertInstance->getPublicPemContent())
     ;
 } catch (AbstractRfc9421Exception $rfc9421Exception) {

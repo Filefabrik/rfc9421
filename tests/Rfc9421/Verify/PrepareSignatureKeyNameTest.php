@@ -35,7 +35,7 @@ final class PrepareSignatureKeyNameTest extends TestCase
 
         $instance->prepare();
 
-        self::assertSame('testValue=', $sc->signatureKeyName);
+        self::assertSame('testValue=', $sc->getSignatureKeyName());
     }
 
     /**
@@ -53,7 +53,7 @@ final class PrepareSignatureKeyNameTest extends TestCase
 
         $instance->prepare();
 
-        self::assertSame('katze=', $sc->signatureKeyName);
+        self::assertSame('katze=', $sc->getSignatureKeyName());
     }
 
     /**
@@ -71,6 +71,6 @@ final class PrepareSignatureKeyNameTest extends TestCase
 
         $instance->prepare();
 
-        self::assertSame('', $sc->signatureKeyName);
+        self::assertSame('', $sc->getSignatureKeyName());
     }
 }

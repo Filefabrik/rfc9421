@@ -75,7 +75,7 @@ final readonly class Base
          */
         $components->setPreparedMethods($this->configuration->getSigningMethodsWithDefaults());
 
-        foreach ($this->configuration->getSignatureComponents()->getComponents() as $signatureComponent) {
+        foreach ($this->configuration->getSigningComponents()->getComponents() as $signatureComponent) {
             if ($signatureComponent->hasInitialContentsReq()) {
                 // ;asReq flag so take the original from the asReq
 
@@ -148,8 +148,8 @@ final readonly class Base
     public function makeSignatureInput(): string
     {
         $headerString = new SigCompilerHelper(
-            signatureComponents: $this->configuration->getSignatureComponents(),
-            signatureKeyName   : $this->configuration->signatureKeyName ?? '',
+            signatureComponents: $this->configuration->getSigningComponents(),
+            signatureKeyName   : $this->configuration->getSignatureKeyName() ?? '',
         )->makeSig1fromSignatureParams();
 
         $metadataString = $this->configuration->getMetadata()->toString();

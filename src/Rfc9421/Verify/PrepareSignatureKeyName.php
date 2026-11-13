@@ -33,7 +33,7 @@ final readonly class PrepareSignatureKeyName
      */
     public function prepare(): void
     {
-        if (null === $this->signingConfiguration->signatureKeyName) {
+        if (null === $this->signingConfiguration->getSignatureKeyName()) {
             try {
                 //* Extracts the "sig1=" from the 'sig1=("@method" "content-digest");created=1789634264;tag="mastodon"';
                 // todo works if only one signature-input and only one signature

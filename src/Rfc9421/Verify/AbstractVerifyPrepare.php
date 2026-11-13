@@ -128,7 +128,7 @@ abstract class AbstractVerifyPrepare
         $headerSignatureInstance = new HeaderSignatureInput(
             headerSignatureInputValue: $this->headerHelper
                 ->getSignatureInputLine(),
-            signatureNameKey         : $this->signingConfiguration->signatureKeyName ?? '',
+            signatureNameKey         : $this->signingConfiguration->getSignatureKeyName(),
         );
         // throws error
         $headerSignatureInstance->extract();

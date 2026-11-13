@@ -182,7 +182,7 @@ trait TraitSigner
      */
     public function makeSignatureString(string $signature): string
     {
-        return sprintf($this->signingConfiguration->signatureKeyName.':%s:', $signature);
+        return sprintf($this->signingConfiguration->getSignatureKeyName().':%s:', $signature);
     }
 
     /**
