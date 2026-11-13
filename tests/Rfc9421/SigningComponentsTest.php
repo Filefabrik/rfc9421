@@ -160,6 +160,28 @@ final class SigningComponentsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
+    public function testSignComponentBS(): void
+    {
+        $i = new SigningComponents();
+        self::assertEmpty(
+            $i->getComponents(),
+        );
+        $i->signWithBS('foo');
+
+        $c = $i->getComponents()[0]->getHttpValue();
+        self::assertEquals('"foo";bs', $c);
+
+        $i->signWithBS('foo-with-req', true);
+        self::assertEquals(
+            '"foo-with-req";req;bs',
+            $i->getComponents()[1]->getHttpValue(),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testSignComponentKey(): void
     {
         $i = new SigningComponents();
@@ -203,24 +225,6 @@ final class SigningComponentsTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testSignHeaderInitialContent(): void
-    {
-        $i = new SigningComponents();
-        self::assertEmpty(
-            $i->getComponents(),
-        );
-        $i->signHeaderNameInitialContent('foo', 'key');
-
-        self::assertEquals(
-            [ComponentName::fromNameAndInitialContent('foo', 'key')],
-            $i->getComponents(),
-        );
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function testSet(): void
@@ -243,8 +247,8 @@ final class SigningComponentsTest extends TestCase
     {
         $this->expectExceptionObject(new AlreadySetException('The Component "test2" already exists.'));
         new SigningComponents()->sign('test')
-                                      ->sign('test2')
-                                      ->sign('test2')
+                               ->sign('test2')
+                               ->sign('test2')
         ;
     }
 

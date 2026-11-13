@@ -14,7 +14,6 @@ namespace Filefabrik\Rfc9421;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 
@@ -53,7 +52,6 @@ final class SigningComponents
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @deprecated
      */
     public function signHeader(DerivedComponentEnum|string|ComponentItemDto $headerKey): self
     {
@@ -88,23 +86,15 @@ final class SigningComponents
     }
 
     /**
-     * todo documentation
+     * Signing "$headerKey";bs
+     * Signing "$headerKey";req;bs
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    public function signHeaderNameInitialContent(
-        string|DerivedComponentEnum $name,
-        InitialContentsEnum|string $initialContentsEnum,
-    ): self {
-        $this->set(
-            ComponentName::fromNameAndInitialContent(
-                name               : $name,
-                initialContentsEnum: $initialContentsEnum,
-            ),
-        );
-
-        return $this;
+    public function signWithBS(DerivedComponentEnum|string $headerKey, bool $asReq = false): self
+    {
+        return $this->set(ComponentName::withBs(name: $headerKey, asReq: $asReq));
     }
 
     /**
@@ -181,6 +171,10 @@ final class SigningComponents
         );
     }
 
+    /**
+     * @return array{ComponentItemDto}|array{}
+     *
+     */
     public function getComponents(): array
     {
         return $this->components;
