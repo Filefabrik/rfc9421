@@ -272,7 +272,7 @@ final class BaseTest extends TestCase
                                                       ->sign('@method')
                                                       ->sign('content-digest'),
         );
-        $sc->setContentDigestAlgo('sha256');
+        $sc->withContentDigest('sha256');
 
         $r     = new Request('post', '', ['noT-exIsting' => 'hm', 'content-digest' => 'an value']);
         $i     = new Base($r, $sc);

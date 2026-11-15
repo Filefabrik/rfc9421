@@ -89,22 +89,21 @@ final class VerifyRequestTest extends TestCase
 
         $signingComponents = new SigningComponents()->sign('@method')
                                                     ->sign('@authority')
-
         ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
-        $configuration
-            ->setSigningAlgorithm($signingAlgo)
-            ->setCreated($currentDateTime)
-            ->setExpires($currentDateTime + 7200)
-            ->setTag('mastodon')
-            ->withNonce('nonce-now')
-            ->setSignatureKeyName($signatureKeyName)
+        $configuration->setSigningAlgorithm($signingAlgo)
+                      ->withContentDigest(DigestAlgorithmsEnum::sha256)
+                      ->setCreated($currentDateTime)
+                      ->setExpires($currentDateTime + 7200)
+                      ->setTag('mastodon')
+                      ->withNonce('nonce-now')
+                      ->setSignatureKeyName($signatureKeyName)
             // for signing needs private
-            ->setPrivatePem($certInstance->getPrivatPemContent())
+                      ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
         /**
@@ -154,10 +153,6 @@ final class VerifyRequestTest extends TestCase
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
 
         /*
-         * now prepare the verify process
-         */
-
-        /*
          * Optional we have found a "tag" from sender.
          * Maybe that let us know, that we handle derivedComponents with a special method
          *
@@ -200,7 +195,6 @@ final class VerifyRequestTest extends TestCase
 
         $signingComponents = new SigningComponents()->sign('@method')
                                                     ->sign('@authority')
-
         ;
         /**
          * Prepare signingConfiguration
@@ -312,16 +306,13 @@ final class VerifyRequestTest extends TestCase
         $signatureKeyName  = 'testing=';
         $signingComponents = new SigningComponents()->sign('@method')
                                                     ->sign('@authority')
-                                                    ->sign('content-digest')
-
         ;
         /**
          * Prepare signingConfiguration
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
-        $configuration->mustCreateContentDigest()
-                      ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
+        $configuration->withContentDigest(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
@@ -409,8 +400,6 @@ final class VerifyRequestTest extends TestCase
         $signatureKeyName  = 'testing=';
         $signingComponents = new SigningComponents()->sign('@method')
                                                     ->sign('@authority')
-                                                    ->sign('content-digest')
-
         ;
         /**
          * Prepare signingConfiguration
@@ -418,14 +407,14 @@ final class VerifyRequestTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
 
-        $configuration->mustCreateContentDigest()
+        $configuration->withContentDigest('sha256')
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
                       ->setTag('mastodon')
                       ->withNonce('nonce-now')
                       ->setSignatureKeyName($signatureKeyName)
-                      ->setContentDigestAlgo('sha256')
+
 
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())

@@ -57,12 +57,12 @@ final class RequestSignerTest extends TestCase
         $signingComponents    = new SigningComponents()->sign('content-type')
                                                        ->sign('content-digest')
             // ->signHeader(ComponentName::fromNameAndInitialContent(HeaderKeysEnum::content_digest->value,InitialContentsEnum::asReq))
-                                                       ->signWithName('"@query-param"', 'baz')
+                                                       ->signWithName('@query-param', 'baz')
                                                        ->sign('@method')
                                                        ->sign('x-Origin-host')
                                                        ->signWithSF('"example-dict"')
-                                                       ->signHeader('"example-dict";key="d"')
-                                                       ->signHeader('"example-header";bs')
+                                                       ->signWithKey('example-dict', 'd')
+                                                       ->signWithBS('example-header')
         ;
         $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance         = new CertHelper('rsa');
@@ -80,14 +80,14 @@ final class RequestSignerTest extends TestCase
                         RequestInterface $request,
                     ): string => $request->getHeaderLine('content-type'),
                 )
-                ->mustCreateContentDigest()
+                ->withContentDigest('sha512')
                 ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
                 ->setCreated($currentDateTime)
                 ->setExpires($expireDateTime)
                 ->setTag('mastodon')
                 ->setKeyid('http://127.0.0.1:8001/actor#main-key')
                 ->withNonce('nonce-now')
-                ->setContentDigestAlgo('sha512')
+
                 // content digest signer key
                 ->setSignatureKeyName('testValue=')
                 // for signing needs private
@@ -250,11 +250,10 @@ final class RequestSignerTest extends TestCase
         $signatureComponents = new SigningComponents()->sign('@method')
                                                       ->sign('content-digest')
                                                       ->sign('x-Origin-host')
-
         ;
 
         $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
-            ->mustCreateContentDigest()
+            ->withContentDigest('sha512')
             ->setSigningAlgorithm(
                 SigningEnum::rsa_v_1_5_sha_512,
             )
@@ -265,7 +264,7 @@ final class RequestSignerTest extends TestCase
                 'http://127.0.0.1:8001/actor#main-key',
             )
             ->withNonce('nonce-now')
-            ->setContentDigestAlgo('sha512')
+
             // content digest signer key
             ->setSignatureKeyName('testValue=')
             // for signing needs private
@@ -428,7 +427,6 @@ final class RequestSignerTest extends TestCase
         $signatureComponents  = new SigningComponents()->sign(DerivedComponentEnum::queryParam)
                                                        ->sign('@authority')
                                                        ->sign('content-digest')
-
         ;
         $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
@@ -492,7 +490,6 @@ final class RequestSignerTest extends TestCase
                                                       ->signHeader('"example-dict";sf')
                                                       ->signHeader('"example-dict";key="d"')
                                                       ->signHeader('"example-header";bs')
-
         ;
 
         $signingConfiguration = new SigningConfiguration(signingComponents: $signatureComponents)
@@ -506,14 +503,14 @@ final class RequestSignerTest extends TestCase
                     RequestInterface $request,
                 ): string => $request->getHeaderLine('content-type'),
             )
-            ->mustCreateContentDigest()
+            ->withContentDigest('sha512')
             ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
             ->setCreated($currentDateTime)
             ->setExpires($expireDateTime)
             ->setTag('mastodon')
             ->setKeyid('http://127.0.0.1:8001/actor#main-key')
             ->withNonce('nonce-now')
-            ->setContentDigestAlgo('sha512')
+
             // content digest signer key
             ->setSignatureKeyName('testValue=')
             // for signing needs private

@@ -11,15 +11,12 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421;
 
-use Filefabrik\Rfc9421\Configuration\{GenerateContentDigestTrait,
+use Filefabrik\Rfc9421\Configuration\{ContentDigestTrait,
     MetadataTrait,
+    PrivatePemTrait,
+    PublicPemTrait,
     SignatureKeyNameTrait,
-    SigningMethodsTrait
-};
-use Filefabrik\Rfc9421\Configuration\PrivatePemTrait;
-use Filefabrik\Rfc9421\Configuration\PublicPemTrait;
-use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
-use Filefabrik\Rfc9421\Exceptions\ContentDigestException;
+    SigningMethodsTrait};
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 use Filefabrik\Rfc9421\Signer\Metadata;
@@ -36,13 +33,9 @@ final class SigningConfiguration
     use PrivatePemTrait;
     use SigningMethodsTrait;
     use MetadataTrait;
-    use GenerateContentDigestTrait;
-    use SignatureKeyNameTrait;
 
-    /**
-     * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
-     */
-    private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
+    use SignatureKeyNameTrait;
+    use ContentDigestTrait;
 
     public function __construct(
         private SigningComponents $signingComponents = new SigningComponents(),
@@ -104,41 +97,6 @@ final class SigningConfiguration
         $this->signingComponents = $components;
 
         return $this;
-    }
-
-    /**
-     * Hashing the content-digest|body with algo
-     * if set, the header line "content-digest" will be created and the hash value will be stored into the header
-     *
-     */
-    public function getContentDigestAlgo(): ?DigestAlgorithmsEnum
-    {
-        return $this->contentDigestAlgo;
-    }
-
-    /**
-     * @throws ContentDigestException
-     */
-    public function setContentDigestAlgo(null|string|DigestAlgorithmsEnum $contentDigestAlgo): self
-    {
-        $this->contentDigestAlgo = null === $contentDigestAlgo ?
-            null :
-            DigestAlgorithmsEnum::isOwnTypeOrThrow($contentDigestAlgo);
-
-        return $this;
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
-     */
-    public function getContentDigestHashAlgoOrThrow(): DigestAlgorithmsEnum
-    {
-        return $this->contentDigestAlgo ?? throw ContentDigestException::hashAlgoNotSupported('Missing');
-    }
-
-    public function hasContentDigestHashAlgo(): bool
-    {
-        return $this->contentDigestAlgo instanceof DigestAlgorithmsEnum;
     }
 
     public function getMetadata(): Metadata

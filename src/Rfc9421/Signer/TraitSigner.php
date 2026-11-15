@@ -58,6 +58,7 @@ trait TraitSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      */
     private function sign(): ResponseInterface|RequestInterface
     {
@@ -85,6 +86,7 @@ trait TraitSigner
      * Todo, derived components not allowed during request and some not during response
      * Für das verify auch verwenden
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
@@ -141,11 +143,18 @@ trait TraitSigner
      * Method for the content-digest which will be pushed into the header if not exists
      * todo move out as extra service
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     private function updateHeadersBeforePrepare(): void
     {
         if ($this->signingConfiguration->isMustGenerateContentDigest()) {
+
+            if(!$this->signingConfiguration->getSigningComponents()->findComponentByName('content-digest')){
+                $this->signingConfiguration->getSigningComponents()->sign('content-digest');
+            }
+
             $contentDigestHeader = new ContentDigestHeader(
                 message             : $this->message,
                 signingConfiguration: $this->signingConfiguration,

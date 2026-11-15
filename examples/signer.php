@@ -71,7 +71,7 @@ $extraParser = ['example-dict' => 'dictionary'];
  * Use ist as you need
  */
 try {
-    $componentsToSign = new SigningComponents()
+    $signRequestComponents = new SigningComponents()
         /*
             * as string without quotas
             */
@@ -117,12 +117,11 @@ try {
 }
 
 try {
-    $signingConfiguration = new SigningConfiguration(
+    $signingConfiguration = new SigningConfiguration()
         /*
          * Setting a bundle of prepared components
          */
-        signingComponents: $componentsToSign,
-    )
+        ->setSigningComponents($signRequestComponents)
         /*
          * content-type will be injected after signing so configure that we are signing manuell the content-type
          * the method we are generating the content-type value (simply via header line)
@@ -135,14 +134,13 @@ try {
          * tell the signing process that content-type has to be signed
          */
         //->signHeader('"@query-param";name="baz"')
-        ->mustCreateContentDigest()
+        ->withContentDigest(contentDigestAlgo: 'sha256')
         ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated(created: $currentDateTime)
         ->setExpires(expires: $currentDateTime + 7200)
         ->setTag(tag: 'mastodon')
         ->setKeyid(keyid: 'http://127.0.0.1:8001/account/publicPem#main-key')
         ->withNonce(nonce: 'nonce-now')
-        ->setContentDigestAlgo(contentDigestAlgo: 'sha256')
         // content digest signer key
         ->setSignatureKeyName(signatureKey: 'sig=')
         // for signing needs private
@@ -212,6 +210,10 @@ $verifierConfiguration = new SigningConfiguration();
 $verifierConfiguration->getStructuredFields()
                       ->addMany(fields: $extraParser)
 ;
+
+/*
+ * on reciepient-side of the request you can also check, that all you are expecting signed components was signed by the sender
+ */
 $verifierConfiguration->addSigningMethods(methods: $prepareMethods);
 $verifyPrepareInstance = new VerifyRequestPrepare(
     message             : $signedRequest,
@@ -255,7 +257,7 @@ try {
  * The only supported algorithm is still RSASSA-PKCS1-v1_5 Using SHA-256
  * $verifierConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256);
  *
- * $verifierConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha256);
+ * $verifierConfiguration->withContentDigest(DigestAlgorithmsEnum::sha256);
  */
 
 /**
@@ -345,11 +347,12 @@ try {
 //... now sign the response
 // todo also add ;asReq parameters
 try {
-    $responseSigningConfiguration = new SigningConfiguration(signingComponents: $responseComponents)
+    $responseSigningConfiguration = new SigningConfiguration()
+        ->setSigningComponents($responseComponents)
         // make sure the receiver Alice expects the following response Key
         ->setSignatureKeyName(signatureKey: 'responseSig=')
-        ->setContentDigestAlgo(contentDigestAlgo: 'sha256')
-        ->mustCreateContentDigest()
+        ->withContentDigest(contentDigestAlgo: 'sha256')
+
         // the sender of the request expects an algo that Bob can check while receive this signed response
         // todo use different signing for response
         ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
@@ -357,7 +360,7 @@ try {
         ->setPrivatePem(privatePem: $signerCertInstance->getPrivatPemContent())
         // singing the response body
         // todo use different signing for response
-        ->setContentDigestAlgo(contentDigestAlgo: 'sha256')
+        //->setContentDigestAlgo(contentDigestAlgo: 'sha256')
     ;
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
     echo 'response signing configuration error: '.$rfc9421Exception->getMessage();

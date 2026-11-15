@@ -313,21 +313,9 @@ Per default the body will NOT be automatically signed.
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration
-    ->mustCreateContentDigest()
-    ->signHeader('content-digest')
-    ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512);
+    ->withContentDigest(DigestAlgorithmsEnum::sha512);
 ?>
 ```
-
-To sign the body as content-digest you have to made 3 configuration entries
-
-1. Tell that the content-digest has to be created and inserted as HTTP Message header into the existing HTTP Message
-   Interface  `$signingConfiguration->mustCreateContentDigest()`
-2. Such as you are regular configuring a singing-component, set the signHeader with 'content-digest'
-   `$signingConfiguration->signHeader('content-digest')`
-3. The Setter `$signingConfiguration->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)` is needed two times. 
-   1. For the generation of the HTTP Message Header such as `sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:`
-   2. And will be inserted into the Metadata-Part of the Signed Message
 
 Note: The ordering of the configuration-steps is not relevant.
 
@@ -337,13 +325,13 @@ other forms of writings are also valid:
 <?php 
 
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-$signingConfiguration->setContentDigestAlgo('sha256');
+$signingConfiguration->withContentDigest('sha256');
 // or
-$signingConfiguration->setContentDigestAlgo('sha-256');
+$signingConfiguration->withContentDigest('sha-256');
 // or 
-$signingConfiguration->setContentDigestAlgo('sha512');
+$signingConfiguration->withContentDigest('sha512');
 // or
-$signingConfiguration->setContentDigestAlgo('sha-512');
+$signingConfiguration->withContentDigest('sha-512');
 ?>
 ```
 

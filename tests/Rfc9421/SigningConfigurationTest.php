@@ -194,13 +194,16 @@ final class SigningConfigurationTest extends TestCase
         }
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
     public function testMustCreateContentDigest(): void
     {
         $i = new SigningConfiguration();
 
         //$instance = new GenerateContentDigestFaked();
         self::assertFalse($i->isMustGenerateContentDigest());
-        $i->mustCreateContentDigest();
+        $i->withContentDigest(DigestAlgorithmsEnum::sha512);
         self::assertTrue($i->isMustGenerateContentDigest());
     }
 

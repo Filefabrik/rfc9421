@@ -17,17 +17,18 @@ use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\ContentDigest;
 use Filefabrik\Rfc9421\Extractors\HeaderSignature;
 use Filefabrik\Rfc9421\Signer\Metadata;
+use Filefabrik\Rfc9421\SigningConfiguration;
 
 /**
  * Todo check shared methods
  */
 abstract class AbstractVerifyPrepare
 {
-    private(set) ?HeaderSignature   $headerSignatureExtractor = null;
+    private(set) ?HeaderSignature $headerSignatureExtractor = null;
 
-    protected ?HeaderSignatureInput $signatureInputInstance   = null;
+    protected ?HeaderSignatureInput $signatureInputInstance = null;
 
-    protected HeaderHelper          $headerHelper;
+    protected HeaderHelper $headerHelper;
 
     public function getHeaderHelper(): HeaderHelper
     {
@@ -101,12 +102,12 @@ abstract class AbstractVerifyPrepare
 
     /**
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
     protected function getExtractedMetadataArray(): array
@@ -145,13 +146,20 @@ abstract class AbstractVerifyPrepare
             ->hasContentDigestLine()
         ;
         if ($hasContentDigestLine) {
-            $this->signingConfiguration->setContentDigestAlgo(
-                contentDigestAlgo: new ContentDigest(
-                    contentDigest: $this->headerHelper
-                        ->getContentDigestLine(),
-                )->getAlgorithm(),
-            );
+            $this->getSigningConfiguration()
+                 ->setContentDigestAlgo(
+                     contentDigestAlgo: new ContentDigest(
+                         contentDigest: $this->headerHelper
+                             ->getContentDigestLine(),
+                     )->getAlgorithm(),
+                 )
+            ;
         }
+    }
+
+    private function getSigningConfiguration(): SigningConfiguration
+    {
+        return $this->signingConfiguration;
     }
 
     /**

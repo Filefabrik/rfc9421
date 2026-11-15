@@ -175,14 +175,14 @@ final class VerifyRequestPrepareTest extends TestCase
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration(signingComponents: $signatureComponents);
-        $configuration->mustCreateContentDigest()
+        $configuration
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
                       ->setTag('mastodon')
                       ->withNonce('nonce-now')
                       ->setSignatureKeyName($signatureKeyName)
-                      ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)
+                      ->withContentDigest(DigestAlgorithmsEnum::sha512)
             // for signing needs private
                       ->setPrivatePem($certInstance->getPrivatPemContent())
         ;

@@ -59,14 +59,14 @@ try {
 }
 try {
     $signingConfiguration = new SigningConfiguration(signingComponents: $singingComponents)
-        ->mustCreateContentDigest()
+        ->withContentDigest('sha256')
         ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated($currentDateTime)
         ->setExpires($currentDateTime + 7200)
         ->setTag('mastodon')
         ->setKeyid('http://localhost:8000/public-pem#main-key')
         ->withNonce('nonce-now')
-        ->setContentDigestAlgo('sha256')
+
         // content digest signer key
         ->setSignatureKeyName('sig=')
         // for signing needs private

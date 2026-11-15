@@ -26,7 +26,7 @@ abstract class AbstractVerifying
      * Flag if the body was part of the requester signing and the body has not tampered
      *
      */
-    private(set) bool               $hasValidatedBody     = false;
+    private(set) bool $hasValidatedBody = false;
 
     protected ?SigningConfiguration $signingConfiguration = null;
 
@@ -72,7 +72,8 @@ abstract class AbstractVerifying
         $signer = $this->getSigner();
 
         $verified = VerifyRegistry::verifying(
-            signingEnum: $signingConfiguration->getMetadata()->getAlgOrThrow(),
+            signingEnum: $signingConfiguration->getMetadata()
+                                              ->getAlgOrThrow(),
             data       : $signer->getSigningParametersStringOrThrow(),
             signature  : $this->getBinarySignatureValue(),
             publicKey  : $signingConfiguration->getPublicPemOrThrow(),
@@ -85,6 +86,11 @@ abstract class AbstractVerifying
         }
 
         return $verified;
+    }
+
+    public function getSigningConfiguration(): SigningConfiguration
+    {
+        return $this->signingConfiguration ??= $this->preparedVerify->signingConfiguration;
     }
 
     /**
@@ -100,18 +106,15 @@ abstract class AbstractVerifying
             body         : (string)$this->preparedVerify->message
                 ->getBody(),
         );
-        if ($verified = $verifyInstance->verify()) {
-            // rebind the extracted php hash-algo
-            // later in verify process, during rebuild the content-digest the algo is needed
-            $this->getSigningConfiguration()
-                 ->setContentDigestAlgo(
-                     contentDigestAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
-                 )
-            ;
-        }
 
-        // no validation of the body
-        return $verified;
+        return $verifyInstance->verify();
+        // rebind the extracted php hash-algo
+        // later in verify process, during rebuild the content-digest the algo is needed
+        /*$this->getSigningConfiguration()
+             ->setContentDigestAlgo(
+                 contentDigestAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
+             )
+        ;*/
     }
 
     public function getHeaderHelper(): HeaderHelper
@@ -140,10 +143,5 @@ abstract class AbstractVerifying
     }
 
     abstract public function getMessage();
-
-    public function getSigningConfiguration(): SigningConfiguration
-    {
-        return $this->signingConfiguration ??= $this->preparedVerify->signingConfiguration;
-    }
 
 }

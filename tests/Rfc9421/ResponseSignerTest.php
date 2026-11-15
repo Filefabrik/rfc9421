@@ -87,8 +87,8 @@ final class ResponseSignerTest extends TestCase
             // set alice private pem to encrypt the response
             ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-            ->setContentDigestAlgo('sha256')
-            ->mustCreateContentDigest()
+
+            ->withContentDigest('sha256')
         ;
 
         $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
@@ -170,7 +170,7 @@ final class ResponseSignerTest extends TestCase
             // set alice private pem to encrypt the response
             ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-            ->setContentDigestAlgo('sha256')
+            ->withContentDigest('sha256')
         ;
 
         $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
@@ -246,8 +246,8 @@ final class ResponseSignerTest extends TestCase
             // set alice private pem to encrypt the response
             ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-            ->setContentDigestAlgo('sha256')
-            ->mustCreateContentDigest()
+            //  ->setContentDigestAlgo('sha256')
+            ->withContentDigest('sha256')
         ;
 
         // simulate a request
@@ -341,8 +341,7 @@ final class ResponseSignerTest extends TestCase
             // set alice private pem to encrypt the response
             ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-            ->setContentDigestAlgo('sha256')
-            ->mustCreateContentDigest()
+            ->withContentDigest('sha256')
         ;
 
         $responseSigner = new ResponseSigner(
@@ -413,8 +412,7 @@ final class ResponseSignerTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration();
         $configuration->setSigningComponents($signedComponents)
-                      ->mustCreateContentDigest()
-                      ->setContentDigestAlgo(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
+                      ->withContentDigest(contentDigestAlgo: DigestAlgorithmsEnum::sha512)
                       ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
@@ -515,8 +513,7 @@ final class ResponseSignerTest extends TestCase
             // set alice private pem to encrypt the response
                                                                   ->setPrivatePem($certInstance->getPrivatPemContent())
             // singing the response body
-                                                                  ->setContentDigestAlgo('sha256')
-                                                                  ->mustCreateContentDigest()
+                                                                  ->withContentDigest('sha256')
         ;
 
         $responseSigner = new ResponseSigner(

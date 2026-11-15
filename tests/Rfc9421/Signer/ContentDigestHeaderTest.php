@@ -30,7 +30,7 @@ final class ContentDigestHeaderTest extends TestCase
         $messageInterface = new ContentDigestHeader(
             new Request('POST', 'test', [], 'text-body'),
             new SigningConfiguration()
-                ->setContentDigestAlgo('sha256'),
+                ->withContentDigest('sha256'),
         )->handle();
 
         self::assertSame(
