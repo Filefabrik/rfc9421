@@ -174,7 +174,7 @@ if (null !== $metadata->getCreated() && ($currentDateTime + 6000) > $metadata->g
 /**
  * Body was also a part of the request singing
  */
-if ($verifier->hasValidatedBody) {
+if ($verifier->hasSignedBody()) {
     displayLogger('The body of the Request from bob was signed and is valid.');
     displayLogger('Content of the body:');
 

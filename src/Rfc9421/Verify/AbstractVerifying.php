@@ -19,21 +19,21 @@ use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Psr\Http\Message\MessageInterface;
 
 abstract class AbstractVerifying
 {
-    /**
-     * Flag if the body was part of the requester signing and the body has not tampered
-     *
-     */
-    private(set) bool $hasValidatedBody = false;
-
     protected ?SigningConfiguration $signingConfiguration = null;
 
     /**
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
     protected null|ReadLines $signedHeaderLines = null;
+
+    /**
+     * Flag if the body was part of the requester signing and the body has not tampered
+     */
+    private bool $hasSignedBody = false;
 
     /**
      * Main method to validate
@@ -59,14 +59,14 @@ abstract class AbstractVerifying
                                              ->getExtractedComponents(),
         );
 
-        // Validates the Content digest if needed from signature-line sig1=(content-digest)
+        // Validates the Content digest if needed from signature-line sig1=("content-digest")
         if ($signingConfiguration->hasContentDigestHashAlgo()) {
             if (!$this->validateContentDigest()) {
                 // todo logging the error that validate content digest is wrong
                 return false;
             }
 
-            $this->hasValidatedBody = true;
+            $this->hasSignedBody = true;
         }
 
         $signer = $this->getSigner();
@@ -142,6 +142,15 @@ abstract class AbstractVerifying
         return $this->signedHeaderLines ?? throw ProcessingException::SignedHeaderLines();
     }
 
-    abstract public function getMessage();
+    abstract public function getMessage():MessageInterface;
+
+    /**
+     *
+     * @return bool
+     */
+    public function hasSignedBody(): bool
+    {
+        return $this->hasSignedBody;
+    }
 
 }

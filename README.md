@@ -219,9 +219,7 @@ $verifyPrepareInstance = new VerifyRequestPrepare($signedRequest, $verifierConfi
 $verifyPrepareInstance->prepareVerification();
 
 // if there is no exception thrown you can go further.
-// For mastodon, you have to download the user public pem
-
-$keyId = $verifierConfiguration->getMetadata()->keyid;
+// For mastodon, you have to download the user public pem if not already done
 // download or get from your local cache the users pem
 $downloadedUsersPem = '--- pem ---';
 $verifierConfiguration->setPublicPem(publicPem: $downloadedUsersPem);
@@ -237,9 +235,9 @@ if(!$verifiedBool){
     return;
 }
 
-// check also is verifying bool that is true
-// after that you can use the validated incoming request parameters to execute your Code
-if ($verifier->hasValidatedBody) {
+// If you need a signed body, check the body was in the signer process from the requester.
+// At this point, if the requester singend the body, the body is automatically verified  via the $verifier->verifying();
+if ($verifier->hasSignedBody()) {
     echo 'Cool, body verified'."\n";
     $body = (string)$verifier->getMessage()
                              ->getBody()

@@ -308,7 +308,7 @@ if (null !== $metadata->getCreated() && ($currentDateTime + 6000) > $metadata->g
     echo 'has created date and created date is in range: '.$metadata->getCreated().PHP_EOL;
 }
 
-if ($VerifyRequest->hasValidatedBody) {
+if ($VerifyRequest->hasSignedBody()) {
     echo 'Cool, the body was in the requester signing process and is verified:'.PHP_EOL;
     $body = (string)$VerifyRequest->getMessage()
                                   ->getBody()

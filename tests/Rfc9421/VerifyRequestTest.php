@@ -367,6 +367,7 @@ final class VerifyRequestTest extends TestCase
          */
 
         self::assertEquals(1, $verifier->verifying());
+        self::assertTrue($verifier->hasSignedBody());
     }
 
     /**
@@ -514,4 +515,5 @@ final class VerifyRequestTest extends TestCase
         $verifyPrepare = new VerifyRequestPrepare($request, new SigningConfiguration());
         new VerifyRequest($verifyPrepare)->getSignedHeaderLines();
     }
+
 }
