@@ -264,19 +264,32 @@ $signingConfiguration   = new SigningConfiguration();
 
 ### Signing Components
 
-You can set more header entries from your request/response as "signed" so the receiver can be sure, that this header-entries also
-valid and not tempered/fixed/hacked from somewhere.
+You can set more header entries from your request/response as "signed" so the receiver can be sure, that this header-entries also valid and not tempered/fixed/hacked from somewhere.
 
 ```php
 <?php 
 use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
-
+use Filefabrik\Rfc9421\Enums\DerivedComponentEnum
 $signingConfiguration = new SigningConfiguration();
 
 $signingComponents = new SigningComponents()
      ->sign('@method') 
      ->sign('x-Origin-host')
+     ->sign(DerivedComponentEnum::requestTarget)
+     // Signing "$headerKey";bs
+     // Signing "$headerKey";req;bs
+     ->signWithBS('example-dict')
+     // Signing "$headerKey";sf
+     // Signing "$headerKey";req;sf
+     ->signWithSF('example-dict')
+     // Signing "$headerKey";key="$keyValue"
+     // Signing "$headerKey";req;key="$keyValue"
+     ->signWithKey('example-dict', 'd')
+     // Signing "$headerKey";name="$nameValue"
+     // Signing "$headerKey";req;name="$nameValue"
+     ->signWithName(DerivedComponentEnum::queryParam, 'baz')
+     //.. other signings
 
 $signingConfiguration->setSigningComponents($signingComponents)
         // ..other configs
