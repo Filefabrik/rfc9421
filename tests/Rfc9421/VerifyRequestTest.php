@@ -29,6 +29,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * todo deeper checking
@@ -83,8 +84,58 @@ final class VerifyRequestTest extends TestCase
     #[DataProvider('withSigningMethods')]
     public function testValidate(string|SigningEnum $signingAlgo, string $cert): void
     {
-        $certInstance = new CertHelper($cert);
+        $certInstance  = new CertHelper($cert);
+        $signedRequest = $this->helperGetRequestForValidation($signingAlgo, $certInstance);
+        /**
+         * optional we prepare a method that we inject if we need this
+         */
+        $mastodonVerifierMethods = [
+            '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
+        ];
 
+        $verifyPrepare = new VerifyRequestPrepare($signedRequest, new SigningConfiguration());
+        $verifyPrepare->prepareVerification();
+
+        $verifier = new VerifyRequest($verifyPrepare);
+
+        // optional before preparing verify and verifying
+        $signerConfiguration = $verifier->getSigningConfiguration();
+        //  ->setSignatureKeyName($signatureKeyName)
+        // for verify needs public
+        $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
+
+        /*
+         * Optional we have found a "tag" from sender.
+         * Maybe that let us know, that we handle derivedComponents with a special method
+         *
+         */
+        if (null !== $signerConfiguration->getMetadata()->tag) {
+            // for mastodon an own config für x-origin or something
+            $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
+        }
+        self::assertEquals(1, $verifier->verifying());
+        self::assertTrue($verifier->hasSignedBody());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    private function helperGetRequestForValidation(
+        string|SigningEnum $signingAlgo,
+        CertHelper $certInstance,
+    ): RequestInterface {
         $signatureKeyName = 'testing=';
 
         $signingComponents = new SigningComponents()->sign('@method')
@@ -95,8 +146,8 @@ final class VerifyRequestTest extends TestCase
          */
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration(signingComponents: $signingComponents);
-        $configuration->setSigningAlgorithm($signingAlgo)
-                      ->withContentDigest(DigestAlgorithmsEnum::sha256)
+        $configuration->withContentDigest(DigestAlgorithmsEnum::sha256)
+                      ->setSigningAlgorithm($signingAlgo)
                       ->setCreated($currentDateTime)
                       ->setExpires($currentDateTime + 7200)
                       ->setTag('mastodon')
@@ -128,41 +179,7 @@ final class VerifyRequestTest extends TestCase
             );
         }
 
-        $signer        = new RequestSigner($request, $configuration);
-        $signedRequest = $signer->sign();
-
-        /**
-         * Now decrypt the Request
-         */
-        /**
-         * optional we prepare a method that we inject if we need this
-         */
-        $mastodonVerifierMethods = [
-            '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
-        ];
-
-        $verifyPrepare = new VerifyRequestPrepare($signedRequest, new SigningConfiguration());
-        $verifyPrepare->prepareVerification();
-
-        $verifier = new VerifyRequest($verifyPrepare);
-
-        // optional before preparing verify and verifying
-        $signerConfiguration = $verifier->getSigningConfiguration();
-        //  ->setSignatureKeyName($signatureKeyName)
-        // for verify needs public
-        $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());
-
-        /*
-         * Optional we have found a "tag" from sender.
-         * Maybe that let us know, that we handle derivedComponents with a special method
-         *
-         */
-        if (null !== $signerConfiguration->getMetadata()->tag) {
-            // for mastodon an own config für x-origin or something
-            $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
-        }
-
-        self::assertEquals(1, $verifier->verifying());
+        return new RequestSigner($request, $configuration)->sign();
     }
 
     /**
@@ -238,15 +255,15 @@ final class VerifyRequestTest extends TestCase
         $signedRequest = $signer->sign();
 
         /**
-         * Now decrypt the Request
-         */
-        /**
          * optional we prepare a method that we inject if we need this
          */
         $mastodonVerifierMethods = [
             '@authority' => fn (MessageInterface $message): string => $message->getHeaderLine('x-Origin-host'),
         ];
 
+        /**
+         * Manipulate the body
+         */
         $tamperedRequest     = clone $signedRequest;
         $tamperedBody        = $bodyParams;
         $tamperedBody['mod'] = 'hasModiefied';
@@ -275,7 +292,8 @@ final class VerifyRequestTest extends TestCase
             // for mastodon an own config für x-origin or something
             $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
-
+        // body can be tampered because not part of the signing
+        self::assertFalse($verifier->hasSignedBody());
         self::assertEquals(1, $verifier->verifying());
     }
 

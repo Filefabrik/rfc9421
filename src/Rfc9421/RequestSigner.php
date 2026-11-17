@@ -32,6 +32,8 @@ final class RequestSigner
     }
 
     /**
+     * @return \Psr\Http\Message\RequestInterface
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -40,9 +42,9 @@ final class RequestSigner
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function sign(): RequestInterface
     {

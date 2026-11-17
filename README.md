@@ -117,7 +117,7 @@ The signing process should be easy for you to handle without deeper knowledge of
 
 That's all
 
-#### Signing Tutorial
+#### Detailed Signing Request  Tutorial
 
 Let us have a look at the most relevant parameters when sending a Message (request) against another Server
 
@@ -269,7 +269,7 @@ You can set more header entries from your request/response as "signed" so the re
 use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum
-$signingConfiguration = new SigningConfiguration();
+
 
 $signingComponents = new SigningComponents()
      ->sign('@method') 
@@ -283,12 +283,15 @@ $signingComponents = new SigningComponents()
      ->signWithSF('example-dict')
      // Signing "$headerKey";key="$keyValue"
      // Signing "$headerKey";req;key="$keyValue"
+     //->signHeader('"example-dict";key="d"') or better way like:
      ->signWithKey('example-dict', 'd')
      // Signing "$headerKey";name="$nameValue"
      // Signing "$headerKey";req;name="$nameValue"
+     //->signHeader('"@query-param";name="baz"') or better way like:
      ->signWithName(DerivedComponentEnum::queryParam, 'baz')
      //.. other signings
-
+$signingConfiguration = new SigningConfiguration();   
+// push the signingComponents into the SigningConfiguration
 $signingConfiguration->setSigningComponents($signingComponents)
         // ..other configs
 ;
@@ -302,23 +305,25 @@ or:
 <?php 
 use Filefabrik\Rfc9421\SigningComponents;
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-new SigningComponents()->signHeaders(['@method','x-Origin-host']);
+$signingComponents= new SigningComponents()->signHeaders(['@method','x-Origin-host']);
+
+$signingConfiguration = new SigningConfiguration();   
+// push the signingComponents into the SigningConfiguration
+$signingConfiguration->setSigningComponents($signingComponents)
 ?>
 ```
 
-Other Formats to set Component Headers
-TODO:
-Use for the Derived Components the Derived Component Enum `DerivedComponentEnum`
+Note:
 
-todo: if you know your exactly component, make precise
+* Use for the Derived Components the Derived Component Enum `DerivedComponentEnum`
+* if you know your exactly component, make precise and specify the the component with:
+  * `->sign('x-Origin-host')`
+  * `->signWithBS('example-dict')`
+  * `->signWithSF('example-dict')`
+  * ` ->signWithKey('example-dict', 'd')` 
+  * `->signWithName(DerivedComponentEnum::queryParam, 'baz')`
 
-Fore easier handling you can specify
-
-```php
-
-/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-
-```
+instead of the `->setHeader()` or `->setHeaders()` method
 
 ### Signing Algorithm (required)
 
@@ -333,7 +338,7 @@ $signingConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512);
 
 it can be a string or an enum `SigningEnum::rsa_v_1_5_sha_512`
 
-### content-digest
+### The magic "content-digest"
 
 One important aspect is hashing the "body" of the POST Message.
 The hashed "content-digest" will be part in the signed message. So the receiver know that the "body" of the Message was
@@ -381,7 +386,9 @@ $signingConfiguration->setPrivatePem(file_get_contents('the-private-key.pem'));
 ?>
 ```
 
-### Nonce (optional)
+### Metadata
+
+#### Nonce (optional)
 
 when you are the sender you can set each request with your own "nonce". The receiver can check that he is only one time
 processing your request.
@@ -392,7 +399,7 @@ $signingConfiguration->withNonce(rand(1,100).'something unique from your server'
 ?>
 ```
 
-### create (optional)
+#### create (optional)
 
 Timestamp UTC! when you are sending the message
 Note: receiver can ignore it
@@ -403,7 +410,7 @@ $signingConfiguration->setCreated( new DateTime()->getTimestamp());
 ?>
 ```
 
-### expires (optional)
+#### expires (optional)
 
 Tell the receiver the timestamp when the request is expired.
 Note: receiver can ignore it
@@ -414,7 +421,7 @@ $signingConfiguration->setExpires( new DateTime()->getTimestamp() + 3600);
 ?>
 ```
 
-### tag (optional)
+#### tag (optional)
 
 If your RFC9421 Message has a special format and the target-server need this information.
 Note: receiver can ignore it
@@ -424,6 +431,10 @@ Note: receiver can ignore it
 $signingConfiguration->setTag('fediverse');
 ?>
 ```
+
+
+
+
 
 ## Customization
 
@@ -555,8 +566,6 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
     * `"symfony/http-foundation": "^v8.1.8",
       "symfony/psr-http-message-bridge": "^v8.1.0",
       "nyholm/psr7": "^1.8"`
-* documentation: whenever possible use DerivedComponentEnum, every @-component-name is cased in DerivedComponentEnum or
-  throws
 * todo diagnose/testmethods to implement faster a new requester/vendor to check there stuff and also explain detailed
   what happens during your or there processing
 * doc structured field types and mappers need for "Key" "Sf"
