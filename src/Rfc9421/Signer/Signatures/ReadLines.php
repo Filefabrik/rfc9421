@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -16,7 +17,7 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 final class ReadLines extends AbstractLines
 {
     /**
-     * @param array<string,string>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
+     * @param array<string|int,string|\Filefabrik\Rfc9421\Signer\Signatures\Line>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
      */
     public function __construct(array|WriteLines $lines)
     {
@@ -24,7 +25,7 @@ final class ReadLines extends AbstractLines
     }
 
     /**
-     * @param array<string,string>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
+     * @param array<string|int,string|\Filefabrik\Rfc9421\Signer\Signatures\Line>|array{}|\Filefabrik\Rfc9421\Signer\Signatures\WriteLines $lines
      */
     private function setup(array|WriteLines $lines): void
     {
@@ -33,7 +34,13 @@ final class ReadLines extends AbstractLines
         }
 
         foreach ($lines as $key => $line) {
-            $this->protectedAddEntry($key, $line);
+            if ($line instanceof Line && is_int($key)) {
+                $this->protectedAdd($line);
+            } else {
+                /* @var string $key */
+                /* @var string $line */
+                $this->protectedAddEntry($key, $line);
+            }
         }
     }
 }

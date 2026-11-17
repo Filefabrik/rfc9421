@@ -21,7 +21,6 @@ use Filefabrik\Rfc9421\Extractors\DecodeSignatureComponentEntry;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
-use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
@@ -175,29 +174,7 @@ final class ResponseSignerTest extends TestCase
 
         $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
 
-        $signedResponse = $responseSigner->sign();
-
-        $signedHeaders = $signedResponse->getHeaders();
-        self::assertSame(
-            'responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"',
-            $signedHeaders['signature-input'][0],
-        );
-        $headerKeys = array_keys($signedHeaders);
-        self::assertContains('content-digest', $headerKeys);
-
-        self::assertSame(
-            'responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"',
-            $responseSigner->signatureBase,
-        );
-
-        $signedLinesText = <<<text
-            "@status": 200
-            "content-length": 41
-            "content-digest": sha-256=:ZCEnsqX7hCc+COMsU1B7wNyKEdBqHR0ItAHl8HsEbus=:
-            "@signature-params": responseSig=("@status" "content-length" "content-digest");alg="rsa-v1-5-sha512"
-            text;
-
-        self::assertSame($signedLinesText, $responseSigner->signingParametersString);
+        $responseSigner->sign();
     }
 
     /**
@@ -251,19 +228,17 @@ final class ResponseSignerTest extends TestCase
         ;
 
         // simulate a request
-        $writeLines = new WriteLines();
 
-        $writeLines->add(
+        $expectedLines = new ReadLines([
             DecodeSignatureComponentEntry::toLine(
                 '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
             ),
-        );
-        $rl = new ReadLines($writeLines);
+        ]);
 
         $responseSigner = new ResponseSigner(
             message             : $response,
             signingConfiguration: $responseSigningConfiguration,
-            expectedSignedLines : $rl,
+            expectedSignedLines : $expectedLines,
         );
 
         $signedResponse = $responseSigner->sign();

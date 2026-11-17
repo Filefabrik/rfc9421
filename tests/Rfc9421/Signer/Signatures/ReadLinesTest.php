@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Signer\Signatures;
 
+use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -33,6 +34,13 @@ final class ReadLinesTest extends TestCase
         ;
 
         $rl = new ReadLines($wl);
+
+        self::assertEquals(['foo' => 'bar', 'play' => 'book'], $rl->toKeyValueArray());
+    }
+
+    public function testSetup(): void
+    {
+        $rl = new ReadLines([new Line('foo', 'bar'), new Line('play', 'book')]);
 
         self::assertEquals(['foo' => 'bar', 'play' => 'book'], $rl->toKeyValueArray());
     }

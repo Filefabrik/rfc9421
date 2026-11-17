@@ -20,7 +20,7 @@ use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
- *  Handle a signature line
+ * Helper to Handle a signature line
  */
 final class DecodeSignatureComponentEntry
 {
@@ -35,7 +35,7 @@ final class DecodeSignatureComponentEntry
 
         $key = $componentItemDto->getHttpValue();
 
-        return new Line($key, self::concatKeyValue($key, $extracted[3]));
+        return new Line(signatureComponent: $key, valueToSign: self::concatKeyValue($key, $extracted[3]));
     }
 
     /**
@@ -76,7 +76,7 @@ final class DecodeSignatureComponentEntry
         return ComponentName::fromString($string);
     }
 
-    public static function concatKeyValue($key, $value): string
+    public static function concatKeyValue(string $key, string $value): string
     {
         return $key.Entry::colonWithSpace.$value;
     }
