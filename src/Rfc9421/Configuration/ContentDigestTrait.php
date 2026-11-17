@@ -20,8 +20,9 @@ trait ContentDigestTrait
     /**
      * for creating the content digest hash it should sha-256 sha256 sha-512 sha512
      */
-    private(set) ?DigestAlgorithmsEnum $contentDigestAlgo         = null;
-    private bool                       $mustGenerateContentDigest = false;
+    private(set) ?DigestAlgorithmsEnum $contentDigestAlgo = null;
+
+    private bool $mustGenerateContentDigest = false;
 
     /**
      * Explizit Command that the content-digest has to be rendered from the message body and MUST be set into the HTTP Message Header as ["content-digest" => 'sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:']
@@ -37,6 +38,11 @@ trait ContentDigestTrait
         return $this;
     }
 
+    /**
+     * Flag that the "content-digest" will be generated into the HTTP-Header with the value  sha*="...hashed body..."
+     * and also automatically adds the "content-digest" into the signed components
+     *
+     */
     public function isMustGenerateContentDigest(): bool
     {
         return $this->mustGenerateContentDigest;
@@ -54,8 +60,9 @@ trait ContentDigestTrait
 
     /**
      * Do not set directly.
-     * @internal
+     *
      * @throws ContentDigestException
+     * @internal
      */
     public function setContentDigestAlgo(null|string|DigestAlgorithmsEnum $contentDigestAlgo): self
     {

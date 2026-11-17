@@ -17,7 +17,6 @@ use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\ContentDigest;
 use Filefabrik\Rfc9421\Extractors\HeaderSignature;
 use Filefabrik\Rfc9421\Signer\Metadata;
-use Filefabrik\Rfc9421\SigningConfiguration;
 
 /**
  * Todo check shared methods
@@ -146,7 +145,7 @@ abstract class AbstractVerifyPrepare
             ->hasContentDigestLine()
         ;
         if ($hasContentDigestLine) {
-            $this->getSigningConfiguration()
+            $this->signingConfiguration
                  ->setContentDigestAlgo(
                      contentDigestAlgo: new ContentDigest(
                          contentDigest: $this->headerHelper
@@ -155,11 +154,6 @@ abstract class AbstractVerifyPrepare
                  )
             ;
         }
-    }
-
-    private function getSigningConfiguration(): SigningConfiguration
-    {
-        return $this->signingConfiguration;
     }
 
     /**

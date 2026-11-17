@@ -147,22 +147,30 @@ Looks quite a normal request. Now, let us have a look for the Signer-Configurati
 **Full example of request signer**
 
 ```php
-<?php 
+<?php
+use Filefabrik\Rfc9421\SigningComponents;
+use Filefabrik\Rfc9421\SigningConfiguration;
+
+/**
+* Components you want to sign
+ */
+$signingComponents= new SigningComponents()
+    ->sign('@method')
+    ->sign('x-Origins-host');
+ 
+
+$currentDateTime = new DateTime()->getTimestamp();
 /**
  * Prepare signingConfiguration
  */
-$currentDateTime = new DateTime()->getTimestamp();
-
-$signingConfiguration = new SigningConfiguration()
-    ->signHeader('@method')
-    ->signHeader('x-Origins-host')
+$signingConfiguration = new SigningConfiguration($signingComponents)
     ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
     ->setCreated($currentDateTime)
     ->setExpires($currentDateTime + 7200)
     ->setTag('mastodon')
     ->setKeyid('http://127.0.0.1:8001/actor#main-key')
     ->withNonce('nonce-now')
-    ->setContentDigestAlgo('sha512')
+    ->withContentDigest('sha512')
     // content digest signer key
     ->setSignatureKeyName('sig=')
     // for signing needs private
@@ -196,8 +204,12 @@ _That's All_
 
 ```php
 <?php 
+use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\VerifyRequestPrepare;
+use Filefabrik\Rfc9421\VerifyRequest;
+
 $verifierConfiguration = new SigningConfiguration();
-$verifyPrepareInstance = new VerifyPrepare($signedRequest, $verifierConfiguration);
+$verifyPrepareInstance = new VerifyRequestPrepare($signedRequest, $verifierConfiguration);
 
 /**
  * Prepare the incoming Request for verifying
@@ -209,12 +221,12 @@ $verifyPrepareInstance->prepareVerification();
 // if there is no exception thrown you can go further.
 // For mastodon, you have to download the user public pem
 
-$keyId = $verifierConfiguration->metadata->keyid;
+$keyId = $verifierConfiguration->getMetadata()->keyid;
 // download or get from your local cache the users pem
 $downloadedUsersPem = '--- pem ---';
 $verifierConfiguration->setPublicPem(publicPem: $downloadedUsersPem);
 
-$verifier = new Verify($verifyPrepareInstance);
+$verifier = new VerifyRequest($verifyPrepareInstance);
 /**
 * Throws if something went wrong during the verifying
  */
@@ -241,6 +253,7 @@ if ($verifier->hasValidatedBody) {
 
 ## Explained signing configuration
 
+For Request and Response Signing use the `SigningConfiguration`. 
 ```php
 <?php 
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -249,17 +262,26 @@ $signingConfiguration   = new SigningConfiguration();
 ?>
 ```
 
-### Signing Headers
+### Signing Components
 
-You can set more header entries from your request as "signed" so the receiver can be sure, that this header-entries also
-valid and not tempered/fixed/hacked from somewhere
+You can set more header entries from your request/response as "signed" so the receiver can be sure, that this header-entries also
+valid and not tempered/fixed/hacked from somewhere.
 
 ```php
 <?php 
+use Filefabrik\Rfc9421\SigningComponents;
+use Filefabrik\Rfc9421\SigningConfiguration;
 
-/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-$signingConfiguration->signHeader('@method')
-    ->signHeader('x-Origin-host');
+$signingConfiguration = new SigningConfiguration();
+
+$signingComponents = new SigningComponents()
+     ->sign('@method') 
+     ->sign('x-Origin-host')
+
+$signingConfiguration->setSigningComponents($signingComponents)
+        // ..other configs
+;
+
 ?>
 ```
 
@@ -267,9 +289,9 @@ or:
 
 ```php
 <?php 
-
+use Filefabrik\Rfc9421\SigningComponents;
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-$signingConfiguration->signHeaders(['@method','x-Origin-host']);
+new SigningComponents()->signHeaders(['@method','x-Origin-host']);
 ?>
 ```
 
@@ -277,12 +299,14 @@ Other Formats to set Component Headers
 TODO:
 Use for the Derived Components the Derived Component Enum `DerivedComponentEnum`
 
+todo: if you know your exactly component, make precise
+
 Fore easier handling you can specify
 
 ```php
 
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-$signingConfiguration->signHeaderNameInitialContent()
+
 ```
 
 ### Signing Algorithm (required)
@@ -307,17 +331,15 @@ not modified.
 The reason of the RFC9421 is to make sure, some information's of the request are not modified after signing.
 I think a signedBody is mandatory for Post Requests.
 Per default the body will NOT be automatically signed.
+To make signing the body with automatically insert the header "content-digest" use the following configuration:
 
 ```php
 <?php 
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
-$signingConfiguration
-    ->withContentDigest(DigestAlgorithmsEnum::sha512);
+$signingConfiguration->withContentDigest(DigestAlgorithmsEnum::sha512);
 ?>
 ```
-
-Note: The ordering of the configuration-steps is not relevant.
 
 other forms of writings are also valid:
 
@@ -340,16 +362,7 @@ $signingConfiguration->withContentDigest('sha-512');
 To create a signed message, you need your private key. With your public key pem the receiver can check the signed
 message that can only be come from your server.
 
-```cert
------BEGIN PRIVATE KEY-----
-MIHsAgEAMBQGByqGSM49AgEGCSskAwMCCAEBDgSB0DCBzQIBAQRAUuppIGbSl5mW
-cU1MuO9R3DR7HUNK77BbRIjC5UxRdN7uWRoUnBEVG9SkXmxggIR2b91JRLtzHuwb
-corEJiM77KGBhQOBggAEmn3TVHPwtiGXHm8ss3FXA9J4Bp+emMUaLO3Fn9RZ4eYk
-/ZLPoFlanf9go/1nrIfWFYLHmIQJGkojkdcxhKQ3oReSW+4oYUgBTZe9QXJmntO0
-qmtY4EdmScMucHmOtfo4SovgL47u0jReWH/X8DVYCQW+BtU/LEXIVIoMBeXkxac=
------END PRIVATE KEY-----
-```
-
+Example: 
 ```php
 <?php 
 /** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */

@@ -25,10 +25,12 @@ use InvalidArgumentException;
 final class HeaderSignatureInput
 {
     private(set) null|SignaturInput $signatureInput = null;
+
     /**
      * only if validatedSignatureParts was successfully
      */
     private(set) null|Metadata $extractedMetadata = null;
+
     /**
      * only if validatedSignatureParts was successfully
      */

@@ -34,9 +34,14 @@ you can configure the derived component value generation per SigningConfiguratio
 
 ```php
 <?php 
-$signingConfiguration = new SigningConfiguration()
-    ->signHeader('@method')
-    ->signHeader('x-Origin-host')
+use Filefabrik\Rfc9421\SigningComponents;
+use Filefabrik\Rfc9421\SigningConfiguration;
+
+$signingConfiguration = new SigningConfiguration();
+
+$signingComponents = new SigningComponents()
+     ->sign('@method') 
+     ->sign('x-Origin-host')
     //...
     ->withSigningComponentMethod('@authority',fn(RequestInterface $message) => $message->getHeaderLine('X-Original-Host'))
     ->withSigningComponentMethod('something-special',fn(RequestInterface $message) => 'do something special')
