@@ -13,6 +13,7 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\StructuredFields\Entry;
 
 /**
  * Signature line, the si
@@ -20,8 +21,8 @@ use Filefabrik\Rfc9421\Signature\ComponentName;
 final readonly class Line
 {
     /**
-     * @param string $signatureComponent the component name "@method" Note: The Signature Component has no function atm
-     * @param string $valueToSign the extracted value representation "@method": POST
+     * @param string $signatureComponent the component name "@method"
+     * @param string $valueToSign the extracted value representation "@method": POST. The valueToSign is parsed as signable value
      */
     public function __construct(private(set) string $signatureComponent, private(set) string $valueToSign)
     {
@@ -39,7 +40,7 @@ final readonly class Line
         ;
 
         // todo, if no colon space ': ' it is invalid
-        return str_replace($key.': ', '', $this->valueToSign);
+        return str_replace($key.Entry::colonWithSpace, '', $this->valueToSign);
     }
 
     /**
