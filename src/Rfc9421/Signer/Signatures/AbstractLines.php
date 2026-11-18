@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -23,7 +24,7 @@ abstract class AbstractLines
     /**
      * for testing
      *
-     * @return array<string,string>|array{}
+     * @return array<string,string|int>|array{}
      */
     public function toKeyValueArray(): array
     {
@@ -44,7 +45,20 @@ abstract class AbstractLines
     }
 
     /**
-     * @return string[]
+     * @return array<string,string>
+     */
+    public function toLineString(): array
+    {
+        $parts = [];
+        foreach ($this->lines as $line) {
+            $parts[$line->signatureComponent] = $line->toLineString();
+        }
+
+        return $parts;
+    }
+
+    /**
+     * @return array<string|int>
      */
     public function values(): array
     {
@@ -71,7 +85,7 @@ abstract class AbstractLines
         return $array;
     }
 
-    protected function protectedAddEntry(string $key, string $value): static
+    protected function protectedAddEntry(string $key, string|int $value): static
     {
         return $this->protectedAdd(signatureLine: new Line(signatureComponent: $key, valueToSign: $value));
     }

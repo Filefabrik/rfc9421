@@ -193,7 +193,7 @@ final class CompileEntryTest extends TestCase
             initialContents: InitialContentsEnum::name,
             nameOrKeyValue : 'baz',
         );
-        $parsed      = $targetEntry->parse();
+        $parsed      = $targetEntry->parseComponentNameAndValue();
         self::assertSame('"@query-param";name="baz": bat-man', $parsed);
         self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
     }

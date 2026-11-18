@@ -29,7 +29,8 @@ final class NameTest extends TestCase
     {
         $firstEntry = new Entry('query-param', 'no-value');
         // stupid never existing example
-        self::assertSame('"query-param": no-value', $firstEntry->parse());
+        self::assertSame('"query-param": no-value', $firstEntry->parseComponentNameAndValue());
+        self::assertSame('"query-param"', $firstEntry->parseComponentName());
         $handledEntry = new Name()->handle($firstEntry, 'thats-the-key');
         self::assertEquals(
             new Entry(
@@ -40,6 +41,8 @@ final class NameTest extends TestCase
             ),
             $handledEntry,
         );
-        self::assertSame('"query-param";name="thats-the-key": no-value', $handledEntry->parse());
+        self::assertSame('"query-param";name="thats-the-key"', $handledEntry->parseComponentName());
+        self::assertSame('no-value', $handledEntry->value);
+        self::assertSame('"query-param";name="thats-the-key": no-value', $handledEntry->parseComponentNameAndValue());
     }
 }

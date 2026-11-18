@@ -43,7 +43,7 @@ final class PrepareLineTest extends TestCase
         );
         $line     = $instance->handle();
 
-        self::assertEquals(new Line('"test"', '"test": testValue'), $line);
+        self::assertEquals(new Line('"test"', 'testValue'), $line);
     }
 
     /**
@@ -66,7 +66,7 @@ final class PrepareLineTest extends TestCase
         );
         $line     = $instance->handle();
 
-        $targetEntry = new Line('"test";bs', new Entry('test', ':dGVzdFZhbHVl:', InitialContentsEnum::bs)->parse());
+        $targetEntry = new Line('"test";bs', new Entry('test', ':dGVzdFZhbHVl:', InitialContentsEnum::bs)->value);
         self::assertEquals($targetEntry, $line);
     }
 
@@ -95,7 +95,7 @@ final class PrepareLineTest extends TestCase
         );
         $line     = $instance->handle();
 
-        $targetEntry = new Line('"test";sf', new Entry('test', 'testValue', InitialContentsEnum::sf)->parse());
+        $targetEntry = new Line('"test";sf', new Entry('test', 'testValue', InitialContentsEnum::sf)->value);
         self::assertEquals($targetEntry, $line);
     }
 
@@ -125,7 +125,7 @@ final class PrepareLineTest extends TestCase
         $line     = $instance->handle();
 
         self::assertEquals(
-            new Line('"@query-param";name="var"', '"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value'),
+            new Line('"@query-param";name="var"', 'this%20is%20a%20big%0Amultiline%20value'),
             $line,
         );
     }

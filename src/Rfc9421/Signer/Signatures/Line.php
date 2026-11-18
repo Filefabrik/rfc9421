@@ -21,26 +21,19 @@ use Filefabrik\Rfc9421\StructuredFields\Entry;
 final readonly class Line
 {
     /**
+     * todo make sure it started with an Quoute otherwise it is buggy !!!
+     *
      * @param string $signatureComponent the component name "@method"
-     * @param string $valueToSign the extracted value representation "@method": POST. The valueToSign is parsed as signable value
+     *
+     * @param string|int $valueToSign the extracted value representation "@method": POST. The valueToSign is parsed as signable value
      */
-    public function __construct(private(set) string $signatureComponent, private(set) string $valueToSign)
+    public function __construct(private(set) string $signatureComponent, private(set) string|int $valueToSign)
     {
     }
 
-    /**
-     * Extracting the pure value after the key '"@method": POST' extracts to 'POST'
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function extractValue(): string
+    public function toLineString(): string
     {
-        $key = $this->getComponentItemDto()
-                    ->getHttpValue()
-        ;
-
-        // todo, if no colon space ': ' it is invalid
-        return str_replace($key.Entry::colonWithSpace, '', $this->valueToSign);
+        return $this->signatureComponent.Entry::colonWithSpace.$this->valueToSign;
     }
 
     /**

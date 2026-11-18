@@ -16,7 +16,6 @@ use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
- * todo the content-digest;asReq and the content-digest regular
  * NOTE: '\' line wrapping per RFC 8792
  *
  * "@status": 503
@@ -35,10 +34,10 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
 /**
  * Makes the line with there values they are in the signature-input.
  * It does NOT processing an header-value or something. Only the Signature-Param Key
- * todo check logic with asReq
  * todo check logic if there are more initial contents params
  * Formats everything except the value
  * something like "test-header";sf: VALUE
+ * Todo this is an helper class which only compiles the component-name
  */
 final class Entry
 {
@@ -92,9 +91,6 @@ final class Entry
         return $new;
     }
 
-    /**
-     * todo check what happens with asReq
-     */
     public function withREQEnum(): self
     {
         $this->reqEnum = true;
@@ -103,19 +99,29 @@ final class Entry
     }
 
     /**
-     * Todo Extra Parser from Outside
-     * Parsing the expression for signature component
-     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
+    public function parseComponentNameAndValue(): string
+    {
+        return $this->parseComponentName().self::colonWithSpace.$this->value;
+    }
+
+    /**
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function parse(): string
+    public function parseComponentName(): string
     {
         $parts = [];
 
         // the key quoted
         $parts[] = UnquoteHelper::quote($this->key);
 
+        if ($this->reqEnum) {
+            $parts[] = self::semicolon;
+            $parts[] = InitialContentsEnum::req->name;
+        }
         /*
          * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3
          * todo bs allowed with some byte sequences (base_encode64)
@@ -134,25 +140,20 @@ final class Entry
             $parts[] = self::semicolon;
             $parts[] = $this->initialContents->name;
 
-            if (InitialContentsEnum::sf === $this->initialContents || InitialContentsEnum::bs === $this->initialContents) {
-                $parts[] = self::colonWithSpace;
-            } elseif (InitialContentsEnum::key === $this->initialContents || InitialContentsEnum::name === $this->initialContents) {
+            if (InitialContentsEnum::key === $this->initialContents || InitialContentsEnum::name === $this->initialContents) {
                 $parts = $this->handleKeyOrName($parts);
             }
-        } else {
-            $parts[] = self::colonWithSpace;
         }
-
-        $parts[] = $this->value;
 
         return implode('', $parts);
     }
 
     /**
+     * Special Method which is adding the `name="$this->nameOrKeyValue"` or `key="$this->nameOrKeyValue"`
      * @param string[] $parts
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @return string[]
      */
     private function handleKeyOrName(array $parts): array
@@ -167,7 +168,6 @@ final class Entry
         $parts[] = self::equals;
         // todo check already quoted and exists
         $parts[] = UnquoteHelper::quote($this->nameOrKeyValue);
-        $parts[] = self::colonWithSpace;
 
         return $parts;
     }

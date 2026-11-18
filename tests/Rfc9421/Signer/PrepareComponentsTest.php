@@ -89,32 +89,32 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame(
             '"@method": POST',
             $prepareInstance->processValue('@method')
-                            ->parse(),
+                            ->parseComponentNameAndValue(),
         );
         self::assertSame(
             '"@target-uri": https://test.com/var/pathy/?qer=var',
             $prepareInstance->processValue('@target-uri')
-                            ->parse(),
+                            ->parseComponentNameAndValue(),
         );
         self::assertSame(
             '"@authority": test.com',
             $prepareInstance->processValue('@authority')
-                            ->parse(),
+                            ->parseComponentNameAndValue(),
         );
         self::assertSame(
             '"@scheme": https',
             $prepareInstance->processValue('@scheme')
-                            ->parse(),
+                            ->parseComponentNameAndValue(),
         );
         self::assertSame(
             '"@path": /var/pathy/',
             $prepareInstance->processValue('@path')
-                            ->parse(),
+                            ->parseComponentNameAndValue(),
         );
         self::assertSame(
             '"content-length": 62',
             $prepareInstance->processValue('content-length')
-                            ->parse(),
+                            ->parseComponentNameAndValue(),
         );
     }
 
@@ -200,7 +200,7 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame(
             '"@path": /var/pathy/',
             $prepareInstance->processValue('@path')
-                            ->parse(),
+                            ->parseComponentNameAndValue(),
         );
 
         /** @noinspection HttpUrlsUsage */
@@ -209,7 +209,7 @@ final class PrepareComponentsTest extends TestCase
         self::assertSame(
             '"@path": /',
             new PrepareComponents($r)->processValue('@path')
-                                     ->parse(),
+                                     ->parseComponentNameAndValue(),
         );
     }
 

@@ -31,7 +31,7 @@ final class MessageQueryParamsTest extends TestCase
         $request     = new Request('GET', 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman');
         $returnEntry = MessageQueryParams::handle($request, 'baz');
 
-        self::assertSame('"@query-param";name="baz": bat-man', $returnEntry->parse());
+        self::assertSame('"@query-param";name="baz": bat-man', $returnEntry->parseComponentNameAndValue());
     }
 
     /**
@@ -45,7 +45,7 @@ final class MessageQueryParamsTest extends TestCase
         $request     = new Request('GET', 'http://localhost:8001/path?param=value&foo=bar&baz=batman&qux=');
         $returnEntry = MessageQueryParams::handle($request, 'qux');
 
-        self::assertSame('"@query-param";name="qux": ', $returnEntry->parse());
+        self::assertSame('"@query-param";name="qux": ', $returnEntry->parseComponentNameAndValue());
     }
 
     /**
@@ -63,7 +63,7 @@ final class MessageQueryParamsTest extends TestCase
         );
         $returnEntry = MessageQueryParams::handle($request, 'var');
 
-        self::assertSame('"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value', $returnEntry->parse());
+        self::assertSame('"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value', $returnEntry->parseComponentNameAndValue());
     }
 
     /**

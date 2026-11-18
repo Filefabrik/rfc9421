@@ -32,7 +32,8 @@ final class KeyTest extends TestCase
         $entry = new Entry('example-dict');
         //$structuredFields
         $returnEntry = $keyInstance->handle(entry: $entry, keyName: 'b');
-        self::assertSame('"example-dict";key="b": ', $returnEntry->parse());
+        self::assertSame('"example-dict";key="b"', $returnEntry->parseComponentName());
+        self::assertSame('"example-dict";key="b": ', $returnEntry->parseComponentNameAndValue());
     }
 
     /**
@@ -50,13 +51,13 @@ final class KeyTest extends TestCase
         //$structuredFields
         $returnEntry = $keyInstance->handle(entry: $entry, keyName: 'a');
         // starting from a
-        self::assertSame('"example-dict";key="a": 1', $returnEntry->parse());
+        self::assertSame('"example-dict";key="a": 1', $returnEntry->parseComponentNameAndValue());
 
         $entry = new Entry('example-dict', 'a=1,    b=2;x=1;y=2,   d ');
         //$structuredFields
         $returnEntry = $keyInstance->handle(entry: $entry, keyName: 'b');
         // starting from b
-        self::assertSame('"example-dict";key="b": 2;x=1;y=2', $returnEntry->parse());
+        self::assertSame('"example-dict";key="b": 2;x=1;y=2', $returnEntry->parseComponentNameAndValue());
     }
 
 }

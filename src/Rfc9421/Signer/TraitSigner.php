@@ -130,7 +130,7 @@ trait TraitSigner
             new Line(
                 // important to quote
                 signatureComponent: UnquoteHelper::quote($signatureParamsEntry->key),
-                valueToSign       : $signatureParamsEntry->parse(),
+                valueToSign       : $signatureParamsEntry->value,
             ),
         );
 
@@ -150,9 +150,13 @@ trait TraitSigner
     private function updateHeadersBeforePrepare(): void
     {
         if ($this->signingConfiguration->isMustGenerateContentDigest()) {
-
-            if(!$this->signingConfiguration->getSigningComponents()->findComponentByName('content-digest')){
-                $this->signingConfiguration->getSigningComponents()->sign('content-digest');
+            if (
+                !$this->signingConfiguration->getSigningComponents()
+                                            ->findComponentByName(HeaderKeysEnum::content_digest->value)
+            ) {
+                $this->signingConfiguration->getSigningComponents()
+                                           ->sign(HeaderKeysEnum::content_digest->value)
+                ;
             }
 
             $contentDigestHeader = new ContentDigestHeader(

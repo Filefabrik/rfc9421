@@ -47,7 +47,7 @@ final readonly class Base
     public static function compileSignatureInputToString(WriteLines $signatureLines): string
     {
         // this is what to sign with private key
-        return implode("\n", $signatureLines->values());
+        return implode("\n", $signatureLines->toLineString());
     }
 
     /**
@@ -75,7 +75,10 @@ final readonly class Base
          */
         $components->setPreparedMethods($this->configuration->getSigningMethodsWithDefaults());
 
-        foreach ($this->configuration->getSigningComponents()->getComponents() as $signatureComponent) {
+        foreach (
+            $this->configuration->getSigningComponents()
+                                ->getComponents() as $signatureComponent
+        ) {
             if ($signatureComponent->hasInitialContentsReq()) {
                 // ;asReq flag so take the original from the asReq
 
@@ -129,9 +132,7 @@ final readonly class Base
             if ($searchInRequest === $line->signatureComponent) {
                 // extract value to sign
 
-                $v = str_replace($searchInRequest, $requestLineValue, $line->valueToSign);
-
-                return new Line($requestLineValue, $v);
+                return new Line($requestLineValue, $line->valueToSign);
             }
         }
 
@@ -152,7 +153,9 @@ final readonly class Base
             signatureKeyName   : $this->configuration->getSignatureKeyName() ?? '',
         )->makeSig1fromSignatureParams();
 
-        $metadataString = $this->configuration->getMetadata()->toString();
+        $metadataString = $this->configuration->getMetadata()
+                                              ->toString()
+        ;
 
         return $headerString.';'.$metadataString;
     }

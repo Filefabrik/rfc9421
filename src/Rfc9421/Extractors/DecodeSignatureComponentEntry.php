@@ -16,7 +16,6 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
@@ -35,7 +34,7 @@ final class DecodeSignatureComponentEntry
 
         $key = $componentItemDto->getHttpValue();
 
-        return new Line(signatureComponent: $key, valueToSign: self::concatKeyValue($key, $extracted[3]));
+        return new Line(signatureComponent: $key, valueToSign: $extracted[3]);
     }
 
     /**
@@ -74,10 +73,5 @@ final class DecodeSignatureComponentEntry
         $string    = $quoted.$extracted[2];
 
         return ComponentName::fromString($string);
-    }
-
-    public static function concatKeyValue(string $key, string $value): string
-    {
-        return $key.Entry::colonWithSpace.$value;
     }
 }

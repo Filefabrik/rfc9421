@@ -95,7 +95,7 @@ final class RequestSignerTest extends TestCase
         self::assertTrue($signedRequest->hasHeader('content-digest'));
 
         $signingLinesValues = $signer->getSignedLines()
-                                     ->values()
+                                     ->toLineString()
         ;
         $signingLinesKeys   = $signer->getSignedLines()
                                      ->keys()
@@ -317,6 +317,7 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      */
     public function testGetSignedLinesOne(): void
     {
@@ -362,7 +363,7 @@ final class RequestSignerTest extends TestCase
         self::assertSame(
             $signatureParamsText,
             $signer->getSignedLines()
-                   ->getLines()[0]->valueToSign,
+                   ->getLines()[0]->toLineString(),
         );
     }
 

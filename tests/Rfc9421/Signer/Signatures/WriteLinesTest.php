@@ -75,7 +75,7 @@ final class WriteLinesTest extends TestCase
         ;
         $setLine = $lines->getLines()[0];
         self::assertSame(
-            ['"content-digest"', '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:'],
+            ['"content-digest"', 'sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:'],
             [$setLine->signatureComponent, $setLine->valueToSign],
         );
     }

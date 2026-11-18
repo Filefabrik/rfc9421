@@ -44,4 +44,11 @@ final class ReadLinesTest extends TestCase
 
         self::assertEquals(['foo' => 'bar', 'play' => 'book'], $rl->toKeyValueArray());
     }
+
+    public function testToLineString(): void
+    {
+        $rl = new ReadLines([new Line('"foo"', 'bar'), new Line('"play"', 'book')]);
+
+        self::assertEquals(['"foo"' => '"foo": bar', '"play"' => '"play": book'], $rl->toLineString());
+    }
 }

@@ -29,7 +29,9 @@ final class EntryTest extends TestCase
     public function testWithREQEnum(): void
     {
         $entry = new Entry('testkey', 'myValue')->withREQEnum();
-        self::assertSame('"testkey": myValue', $entry->parse());
+        self::assertSame('"testkey";req', $entry->parseComponentName());
+        self::assertSame('myValue', $entry->value);
+        self::assertSame('"testkey";req: myValue', $entry->parseComponentNameAndValue());
     }
 
     /**
@@ -39,9 +41,15 @@ final class EntryTest extends TestCase
     public function testSetValue(): void
     {
         $entry    = new Entry('testkey');
+
+        self::assertSame('"testkey"', $entry->parseComponentName());
+        self::assertNull($entry->value);
+
+        self::assertSame('"testkey": ', $entry->parseComponentNameAndValue());
+
         $newEntry = $entry->setValue('myValue');
-        self::assertSame('"testkey": ', $entry->parse());
-        self::assertSame('"testkey": myValue', $newEntry->parse());
+        self::assertSame('myValue', $newEntry->value);
+        self::assertSame('"testkey": myValue', $newEntry->parseComponentNameAndValue());
     }
 
     /**
@@ -54,17 +62,17 @@ final class EntryTest extends TestCase
         $newEntry = $entry->setValue('myValue');
 
         // todo this is wrong because of response handles other
-        self::assertSame('"testkey": myValue', $newEntry->parse());
+        self::assertSame('"testkey";req: myValue', $newEntry->parseComponentNameAndValue());
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function testParse(): void
+    public function testParseComponentNameAndValue(): void
     {
         $entry = new Entry('testkey', null, InitialContentsEnum::sf);
-        self::assertSame('"testkey";sf: ', $entry->parse());
+        self::assertSame('"testkey";sf: ', $entry->parseComponentNameAndValue());
 
         //todo with 'name' parameter, that is wrong
         //  $entry = new Entry('cramaba', '"myName"', InitialContentsEnum::name);
@@ -76,7 +84,7 @@ final class EntryTest extends TestCase
             initialContents: InitialContentsEnum::key,
             nameOrKeyValue : 'a',
         );
-        self::assertSame('"testkey";key="a": 1', $targetEntry->parse());
+        self::assertSame('"testkey";key="a": 1', $targetEntry->parseComponentNameAndValue());
     }
 
     /**
@@ -86,7 +94,7 @@ final class EntryTest extends TestCase
     public function test__construct(): void
     {
         $entry = new Entry('testkey');
-        self::assertSame('"testkey": ', $entry->parse());
+        self::assertSame('"testkey": ', $entry->parseComponentNameAndValue());
     }
 
     public function testSetInitialContents(): void
@@ -110,6 +118,6 @@ final class EntryTest extends TestCase
             key            : 'testkey',
             value          : '1',
             initialContents: InitialContentsEnum::key,
-        )->parse();
+        )->parseComponentNameAndValue();
     }
 }

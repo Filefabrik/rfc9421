@@ -233,7 +233,7 @@ final class DecodeSignatureComponentEntryTest extends TestCase
         $line = DecodeSignatureComponentEntry::toLine('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d');
 
         self::assertEquals(
-            ['"example-dict";sf', '"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d'],
+            ['"example-dict";sf', 'a=1, b=2;x=1;y=2, c=(a b c), d'],
             [$line->signatureComponent, $line->valueToSign]
         );
     }

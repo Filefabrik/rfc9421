@@ -41,17 +41,14 @@ final class LineTest extends TestCase
         );
     }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testExtractValue(): void
+    public function testToLineString(): void
     {
-        $i = new Line('one', 'val');
-        self::assertEquals('one', $i->signatureComponent);
+        $i = new Line('"one"', 'val');
+        self::assertEquals('"one"', $i->signatureComponent);
 
         self::assertSame(
-            'val',
-            $i->extractValue(),
+            '"one": val',
+            $i->toLineString(),
         );
     }
 }

@@ -55,7 +55,7 @@ final class BaseTest extends TestCase
         $i = new Base($r, $config);
 
         $arr = $i->createSignatureLines()
-                 ->toKeyValueArray()
+                 ->toLineString()
         ;
 
         self::assertEquals(['"not-existing"' => '"not-existing": hm', '"@method"' => '"@method": POST'], $arr);
@@ -95,7 +95,7 @@ final class BaseTest extends TestCase
         $writeLines->add(
             new Line(
                 signatureComponent: '"@method"',
-                valueToSign       : '"@method": POST',
+                valueToSign       : 'POST',
             ),
         );
         $rl = new ReadLines($writeLines);
@@ -106,7 +106,7 @@ final class BaseTest extends TestCase
         $i->createSignatureLines();
 
         $arr = $i->createSignatureLines()
-                 ->toKeyValueArray()
+                 ->toLineString()
         ;
 
         self::assertEquals(
@@ -267,6 +267,7 @@ final class BaseTest extends TestCase
      */
     public function testHandleSignBody(): void
     {
+        // Note: Ugly content-digest test
         $sc = new SigningConfiguration(
             signingComponents: new SigningComponents()->sign('not-ExistinG')
                                                       ->sign('@method')
@@ -278,11 +279,11 @@ final class BaseTest extends TestCase
         $i     = new Base($r, $sc);
         $lines = $i->createSignatureLines();
         self::assertEquals(
-            new Line('"not-existing"', '"not-existing": hm'),
+            new Line('"not-existing"', 'hm'),
             $lines->getLines()[0],
         );
         self::assertEquals(
-            new Line('"@method"', '"@method": POST'),
+            new Line('"@method"', 'POST'),
             $lines->getLines()[1],
         );
         self::assertEquals('"content-digest"', $lines->getLines()[2]->signatureComponent);
@@ -388,7 +389,8 @@ final class BaseTest extends TestCase
         $created = new DateTime()->getTimestamp();
         $sc->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
            ->setCreated($created)
-            ->setSignatureKeyName('playground=');
+           ->setSignatureKeyName('playground=')
+        ;
         $r   = new Request('POST', '', ['stupid-header' => 'hm']);
         $i   = new Base($r, $sc);
         $res = $i->makeSignatureInput();
@@ -400,7 +402,7 @@ final class BaseTest extends TestCase
 
     public function testCompileSignatureInputToString(): void
     {
-        $sls = new WriteLines()->addEntry('header-key', '"header-key": the-value');
+        $sls = new WriteLines()->addEntry('"header-key"', 'the-value');
 
         $res = Base::compileSignatureInputToString($sls);
 
@@ -440,9 +442,9 @@ final class BaseTest extends TestCase
                           ->getLines()
         ;
         $expectations = [
-            ['"not-existing"', '"not-existing": hm'],
-            ['"@method"', '"@method": POST'],
-            ['"@authority"', '"@authority": game'],
+            ['"not-existing"', 'hm'],
+            ['"@method"', 'POST'],
+            ['"@authority"', 'game'],
         ];
         foreach ($expectations as $cnt => $item) {
             $line = $arr[$cnt];
