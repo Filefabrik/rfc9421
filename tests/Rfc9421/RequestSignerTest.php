@@ -487,7 +487,6 @@ final class RequestSignerTest extends TestCase
     public function testSignThrowsReq(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('Request Interface can not have an ;req flag.'));
-        $targetUrl       = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
         $expireDateTime  = $currentDateTime + 7200;

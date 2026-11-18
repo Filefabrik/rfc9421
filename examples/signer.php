@@ -23,7 +23,8 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     SignatureExtractionException,
     StructuredFieldException,
     UnexpectedValue,
-    VerifyHeaderSignatureException};
+    VerifyHeaderSignatureException
+};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\{Signatures\ReadLines, Signatures\WriteLines};
@@ -108,7 +109,6 @@ try {
         ->sign('x-Origin-host')
         ->sign('test-header')
         ->sign('example-dict')
-        ->sign('content-digest')
     ;
 } catch (AlreadySetException|SignatureExtractionException $e) {
     echo $e->getMessage();
@@ -212,7 +212,7 @@ $verifierConfiguration->getStructuredFields()
 ;
 
 /*
- * on reciepient-side of the request you can also check, that all you are expecting signed components was signed by the sender
+ * on recipient-side of the request you can also check, that all you are expecting signed components was signed by the sender
  */
 $verifierConfiguration->addSigningMethods(methods: $prepareMethods);
 $verifyPrepareInstance = new VerifyRequestPrepare(
@@ -308,14 +308,20 @@ if (null !== $metadata->getCreated() && ($currentDateTime + 6000) > $metadata->g
     echo 'has created date and created date is in range: '.$metadata->getCreated().PHP_EOL;
 }
 
-if ($VerifyRequest->hasSignedBody()) {
-    echo 'Cool, the body was in the requester signing process and is verified:'.PHP_EOL;
-    $body = (string)$VerifyRequest->getMessage()
-                                  ->getBody()
-    ;
-    echo $body.PHP_EOL;
-} else {
-    echo 'body was not part of verifying process'.PHP_EOL;
+try {
+    if ($VerifyRequest->hasSignedBody()) {
+        echo 'Cool, the body was in the requester signing process and is verified:'.PHP_EOL;
+        $body = (string)$VerifyRequest->getMessage()
+                                      ->getBody()
+        ;
+        echo $body.PHP_EOL;
+    } else {
+        echo '!!!! Body was not part of verifying process'.PHP_EOL;
+    }
+} catch (ProcessingException $processingException) {
+    echo $processingException->getMessage();
+
+    return;
 }
 
 /*
@@ -344,6 +350,7 @@ try {
 
     return;
 }
+
 //... now sign the response
 // todo also add ;asReq parameters
 try {
@@ -401,6 +408,7 @@ try {
 
     return;
 }
+
 try {
     $verifyResponseConfiguration = new SigningConfiguration()
         ->setSigningComponents($responseSigningComponents)
@@ -419,11 +427,12 @@ try {
 $wl = new WriteLines();
 try {
     $wl->fromSignatureLine(line: '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:');
-} catch (SignatureExtractionException $e) {
-    echo $e->getMessage(), PHP_EOL;
+} catch (SignatureExtractionException $signatureExtractionException) {
+    echo $signatureExtractionException->getMessage(), PHP_EOL;
 
     return;
 }
+
 $resRL                           = new ReadLines(lines: $wl);
 $signedResponseVerifyPreparation = new VerifyResponsePrepare(
     message             : $signedResponse,

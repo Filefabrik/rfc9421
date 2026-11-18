@@ -113,6 +113,7 @@ final class VerifyRequestTest extends TestCase
             // for mastodon an own config für x-origin or something
             $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
+
         self::assertEquals(1, $verifier->verifying());
         // must be true because body(content-digest) was part of the signing process
         self::assertTrue($verifier->hasSignedBody());
