@@ -21,11 +21,18 @@ final class ProcessingException extends AbstractRfc9421Exception
 
     public static function signingParametersString(): self
     {
-        return new self('Signing parameter string was not set before. First you have to call an sign or verify method.');
+        return new self(
+            'Signing parameter string was not set before. First you have to call an sign or verify method.',
+        );
     }
 
     public static function signingLines(): self
     {
         return new self('Signing\Lines not set.');
+    }
+
+    public static function hasSignedBodyBeforeVerify(): self
+    {
+        return new self('The method hasSignedBody() must be called after verifying()');
     }
 }

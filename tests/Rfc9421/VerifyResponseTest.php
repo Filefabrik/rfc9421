@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test;
 
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
@@ -138,7 +139,7 @@ final class VerifyResponseTest extends TestCase
         );
         $signingComponents           = new SigningComponents()->sign('@status')
                                                               ->signHeader('"content-digest";req')
-                                                                     ;
+        ;
         $response                    = new Response();
         $responseSignerConfiguration = new SigningConfiguration(signingComponents: $signingComponents);
         $responseSignerConfiguration->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
@@ -159,5 +160,34 @@ final class VerifyResponseTest extends TestCase
         $response = new Response();
         $vR       = new VerifyResponse(new VerifyResponsePrepare($response, new SigningConfiguration()));
         $this->assertSame($response, $vR->getMessage());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testHasSignedBody(): void
+    {
+        $this->expectExceptionObject(ProcessingException::hasSignedBodyBeforeVerify());
+        $rsaCert = new CertHelper('rsa');
+
+        $prepared = $this->getPreparedVerifyResponseREQ();
+
+        $prepared->signingConfiguration->setPublicPem($rsaCert->getPublicPemContent());
+
+        $vR = new VerifyResponse($prepared);
+
+        self::assertTrue($vR->hasSignedBody());
     }
 }

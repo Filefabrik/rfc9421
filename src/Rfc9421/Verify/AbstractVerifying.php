@@ -33,7 +33,7 @@ abstract class AbstractVerifying
     /**
      * Flag if the body was part of the requester signing and the body has not tampered
      */
-    private bool $hasSignedBody = false;
+    private bool|null $hasSignedBody = null;
 
     /**
      * Main method to validate
@@ -59,14 +59,11 @@ abstract class AbstractVerifying
                                              ->getExtractedComponents(),
         );
 
-        // Validates the Content digest if needed from signature-line sig1=("content-digest")
-        if ($signingConfiguration->hasContentDigestHashAlgo()) {
-            if (!$this->validateContentDigest()) {
-                // todo logging the error that validate content digest is wrong
-                return false;
-            }
+        $contentDigestResult = $this->verifyContentDigestIfNeed($signingConfiguration);
 
-            $this->hasSignedBody = true;
+        if (!$contentDigestResult) {
+            // todo logging the error that validate content digest is wrong
+            return false;
         }
 
         $signer = $this->getSigner();
@@ -91,6 +88,31 @@ abstract class AbstractVerifying
     public function getSigningConfiguration(): SigningConfiguration
     {
         return $this->signingConfiguration ??= $this->preparedVerify->signingConfiguration;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     */
+    private function verifyContentDigestIfNeed(SigningConfiguration $signingConfiguration): bool
+    {
+        // Validates the Content digest if needed from signature-line sig1=("content-digest")
+        if ($signingConfiguration->hasContentDigestHashAlgo()) {
+            if (!$this->validateContentDigest()) {
+                // todo logging the error that validate content digest is wrong
+                return false;
+            }
+
+            // was signed and is valid
+            $this->hasSignedBody = true;
+
+            return true;
+        }
+
+        // content-digest was not part of the signing process
+        $this->hasSignedBody = false;
+
+        // return true so tell we have no validation error
+        return true;
     }
 
     /**
@@ -142,15 +164,14 @@ abstract class AbstractVerifying
         return $this->signedHeaderLines ?? throw ProcessingException::SignedHeaderLines();
     }
 
-    abstract public function getMessage():MessageInterface;
+    abstract public function getMessage(): MessageInterface;
 
     /**
-     *
-     * @return bool
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
      */
     public function hasSignedBody(): bool
     {
-        return $this->hasSignedBody;
+        return $this->hasSignedBody ?? throw ProcessingException::hasSignedBodyBeforeVerify();
     }
 
 }

@@ -48,9 +48,20 @@ final class ProcessingExceptionTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
      */
-    public function testSigningLines(): self
+    public function testSigningLines(): void
     {
         $this->expectExceptionObject(new ProcessingException('Signing\Lines not set.'));
         throw ProcessingException::signingLines();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
+    public function testHasSignedBodyBeforeVerify(): void
+    {
+        $this->expectExceptionObject(
+            new ProcessingException('The method hasSignedBody() must be called after verifying()'),
+        );
+        throw ProcessingException::hasSignedBodyBeforeVerify();
     }
 }

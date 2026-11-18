@@ -32,7 +32,6 @@ final class RequestSigner
     }
 
     /**
-     * @return \Psr\Http\Message\RequestInterface
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException

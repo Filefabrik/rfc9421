@@ -114,6 +114,7 @@ final class VerifyRequestTest extends TestCase
             $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
         self::assertEquals(1, $verifier->verifying());
+        // must be true because body(content-digest) was part of the signing process
         self::assertTrue($verifier->hasSignedBody());
     }
 
@@ -292,9 +293,10 @@ final class VerifyRequestTest extends TestCase
             // for mastodon an own config für x-origin or something
             $signerConfiguration->addSigningMethods($mastodonVerifierMethods);
         }
-        // body can be tampered because not part of the signing
-        self::assertFalse($verifier->hasSignedBody());
+
         self::assertEquals(1, $verifier->verifying());
+        // body can be tampered without an error message because not part of the signing
+        self::assertFalse($verifier->hasSignedBody());
     }
 
     /**
@@ -532,6 +534,18 @@ final class VerifyRequestTest extends TestCase
         $request       = new Request('GET', 'https://target-host.com?play=something');
         $verifyPrepare = new VerifyRequestPrepare($request, new SigningConfiguration());
         new VerifyRequest($verifyPrepare)->getSignedHeaderLines();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     */
+    public function testHasSignedBody(): void
+    {
+        $this->expectExceptionObject(ProcessingException::hasSignedBodyBeforeVerify());
+        $request       = new Request('GET', 'https://target-host.com?play=something');
+        $verifyPrepare = new VerifyRequestPrepare($request, new SigningConfiguration());
+        $v             = new VerifyRequest($verifyPrepare);
+        $v->hasSignedBody();
     }
 
 }

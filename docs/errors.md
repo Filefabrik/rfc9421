@@ -6,8 +6,10 @@ or signing a response)
 
 All filefabrik/Rfc9421 Throwable's are abstracted from the class `AbstractRfc9421Exception`.
 So you are able to cover all errors they will be thrown during the HTTP Message Signing and Verification Process.
-If there is an standard php-exception in the package, please let me know. Iam expecting that all errors inside this
+If there is a standard php-exception in the package, please let me know. Iam expecting that all errors inside this
 package are covered by a `AbstractRfc9421Exception` Exception Class.
+
+Note: The list is not complete yet.
 
 ## PrepareMethodsException
 
@@ -22,6 +24,11 @@ the Derived`@query-params`
 ## ProcessingException
 
 If you want a public object that was not created before.
+
+### ::hasSignedBodyBeforeVerify
+
+When you call the `VerifyRequest::hasSignedBodyBeforeVerify` or `VerifyResponse::hasSignedBodyBeforeVerify` before you
+have called `verifying()`
 
 ## EmptyException
 
