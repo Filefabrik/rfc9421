@@ -160,7 +160,7 @@ try {
 /*
  * Also the $metadata are verified
  */
-$metadata = $verifier->getSigningConfiguration()->getMetadata();
+$metadata = $verifier->getVerifySigningConfiguration()->getMetadata();
 
 /*
  * or something

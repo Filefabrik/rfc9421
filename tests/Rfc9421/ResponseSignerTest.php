@@ -420,7 +420,7 @@ final class ResponseSignerTest extends TestCase
         $verifier = new VerifyRequest($verifyPrepare);
 
         // optional before preparing verify and verifying
-        $signerConfiguration = $verifier->getSigningConfiguration();
+        $signerConfiguration = $verifier->getVerifySigningConfiguration();
         //  ->setSignatureKeyName($signatureKeyName)
         // for verify needs public
         $signerConfiguration->setPublicPem($certInstance->getPublicPemContent());

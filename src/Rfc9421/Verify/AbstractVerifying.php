@@ -25,8 +25,6 @@ use Psr\Http\Message\MessageInterface;
 
 abstract class AbstractVerifying
 {
-    protected ?SigningConfiguration $signingConfiguration = null;
-
     /**
      * @var \Filefabrik\Rfc9421\Signer\Signatures\ReadLines|null null on not set
      */
@@ -55,14 +53,14 @@ abstract class AbstractVerifying
      */
     public function verifying(): bool
     {
-        $signingConfiguration = $this->getSigningConfiguration();
-        $signingConfiguration->setSigningComponents(
+        $preparedSigningConfiguration = $this->getVerifySigningConfiguration();
+        $preparedSigningConfiguration->setSigningComponents(
             components: $this->getPreparedVerify()
                              ->getSignatureInputInstance()
                              ->getExtractedComponents(),
         );
 
-        $contentDigestResult = $this->verifyContentDigestIfNeed($signingConfiguration);
+        $contentDigestResult = $this->verifyContentDigestIfNeed($preparedSigningConfiguration);
 
         if (!$contentDigestResult) {
             // todo logging the error that validate content digest is wrong
@@ -72,11 +70,11 @@ abstract class AbstractVerifying
         $signer = $this->getSigner();
 
         $verified = VerifyRegistry::verifying(
-            signingEnum: $signingConfiguration->getMetadata()
-                                              ->getAlgOrThrow(),
+            signingEnum: $preparedSigningConfiguration->getMetadata()
+                                                      ->getAlgOrThrow(),
             data       : $signer->getSigningParametersStringOrThrow(),
             signature  : $this->getBinarySignatureValue(),
-            publicKey  : $signingConfiguration->getPublicPemOrThrow(),
+            publicKey  : $preparedSigningConfiguration->getPublicPemOrThrow(),
         );
 
         if ($verified) {
@@ -88,9 +86,12 @@ abstract class AbstractVerifying
         return $verified;
     }
 
-    public function getSigningConfiguration(): SigningConfiguration
+    /**
+     * From prepared SingingConfiguration
+     */
+    public function getVerifySigningConfiguration(): SigningConfiguration
     {
-        return $this->signingConfiguration ??= $this->getPreparedVerify()->signingConfiguration;
+        return $this->getPreparedVerify()->signingConfiguration;
     }
 
     private function getPreparedVerify(): VerifyRequestPrepare|VerifyResponsePrepare

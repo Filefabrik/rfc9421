@@ -45,7 +45,7 @@ final class VerifyRequest extends AbstractVerifying
     {
         $signer = new RequestSigner(
             message             : clone $this->preparedVerify->message,
-            signingConfiguration: $this->getSigningConfiguration(),
+            signingConfiguration: $this->getVerifySigningConfiguration(),
         );
 
         $signer->prepareSigning();

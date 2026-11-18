@@ -23,8 +23,7 @@ use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     SignatureExtractionException,
     StructuredFieldException,
     UnexpectedValue,
-    VerifyHeaderSignatureException
-};
+    VerifyHeaderSignatureException};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\{Signatures\ReadLines, Signatures\WriteLines};
@@ -296,7 +295,7 @@ try {
 /*
  * Also the $metadata are verified
  */
-$metadata = $VerifyRequest->getSigningConfiguration()
+$metadata = $VerifyRequest->getVerifySigningConfiguration()
                           ->getMetadata()
 ;
 
