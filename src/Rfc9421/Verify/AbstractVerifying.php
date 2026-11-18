@@ -98,18 +98,18 @@ abstract class AbstractVerifying
         // Validates the Content digest if needed from signature-line sig1=("content-digest")
         if ($signingConfiguration->hasContentDigestHashAlgo()) {
             if (!$this->validateContentDigest()) {
+                $this->hasSignedBody = false;
+
                 // todo logging the error that validate content digest is wrong
                 return false;
             }
 
             // was signed and is valid
             $this->hasSignedBody = true;
-
-            return true;
         }
 
         // content-digest was not part of the signing process
-        $this->hasSignedBody = false;
+        $this->hasSignedBody ??= false;
 
         // return true so tell we have no validation error
         return true;
