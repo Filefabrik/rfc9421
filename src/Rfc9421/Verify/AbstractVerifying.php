@@ -19,6 +19,8 @@ use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
+use Filefabrik\Rfc9421\VerifyRequestPrepare;
+use Filefabrik\Rfc9421\VerifyResponsePrepare;
 use Psr\Http\Message\MessageInterface;
 
 abstract class AbstractVerifying
@@ -55,8 +57,9 @@ abstract class AbstractVerifying
     {
         $signingConfiguration = $this->getSigningConfiguration();
         $signingConfiguration->setSigningComponents(
-            components: $this->preparedVerify->getSignatureInputInstance()
-                                             ->getExtractedComponents(),
+            components: $this->getPreparedVerify()
+                             ->getSignatureInputInstance()
+                             ->getExtractedComponents(),
         );
 
         $contentDigestResult = $this->verifyContentDigestIfNeed($signingConfiguration);
@@ -87,7 +90,12 @@ abstract class AbstractVerifying
 
     public function getSigningConfiguration(): SigningConfiguration
     {
-        return $this->signingConfiguration ??= $this->preparedVerify->signingConfiguration;
+        return $this->signingConfiguration ??= $this->getPreparedVerify()->signingConfiguration;
+    }
+
+    private function getPreparedVerify(): VerifyRequestPrepare|VerifyResponsePrepare
+    {
+        return $this->preparedVerify;
     }
 
     /**
@@ -122,26 +130,18 @@ abstract class AbstractVerifying
      */
     private function validateContentDigest(): bool
     {
+        $contentDigestLine = $this->getPreparedVerify()
+                                  ->getHeaderHelper()
+                                  ->getContentDigestLine()
+        ;
+
         $verifyInstance = new VerifyContentDigest(
-            contentDigest: $this->getHeaderHelper()
-                                ->getContentDigestLine(),
-            body         : (string)$this->preparedVerify->message
+            contentDigest: $contentDigestLine,
+            body         : (string)$this->getPreparedVerify()->message
                 ->getBody(),
         );
 
         return $verifyInstance->verify();
-        // rebind the extracted php hash-algo
-        // later in verify process, during rebuild the content-digest the algo is needed
-        /*$this->getSigningConfiguration()
-             ->setContentDigestAlgo(
-                 contentDigestAlgo: $verifyInstance->getContentDigestVerifier()->phpAlgorithm,
-             )
-        ;*/
-    }
-
-    public function getHeaderHelper(): HeaderHelper
-    {
-        return $this->preparedVerify->getHeaderHelper();
     }
 
     abstract protected function getSigner(): RequestSigner|ResponseSigner;
@@ -151,8 +151,9 @@ abstract class AbstractVerifying
      */
     private function getBinarySignatureValue(): string
     {
-        return $this->preparedVerify->getHeaderSignatureExtractor()
-                                    ->getBinarySignatureValue()
+        return $this->getPreparedVerify()
+                    ->getHeaderSignatureExtractor()
+                    ->getBinarySignatureValue()
         ;
     }
 
