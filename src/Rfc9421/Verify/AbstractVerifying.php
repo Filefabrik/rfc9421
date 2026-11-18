@@ -19,8 +19,6 @@ use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\VerifyRequestPrepare;
-use Filefabrik\Rfc9421\VerifyResponsePrepare;
 use Psr\Http\Message\MessageInterface;
 
 abstract class AbstractVerifying
@@ -55,7 +53,7 @@ abstract class AbstractVerifying
     {
         $preparedSigningConfiguration = $this->getVerifySigningConfiguration();
         $preparedSigningConfiguration->setSigningComponents(
-            components: $this->getPreparedVerify()
+            components: $this->preparedVerify
                              ->getSignatureInputInstance()
                              ->getExtractedComponents(),
         );
@@ -91,12 +89,7 @@ abstract class AbstractVerifying
      */
     public function getVerifySigningConfiguration(): SigningConfiguration
     {
-        return $this->getPreparedVerify()->signingConfiguration;
-    }
-
-    private function getPreparedVerify(): VerifyRequestPrepare|VerifyResponsePrepare
-    {
-        return $this->preparedVerify;
+        return $this->preparedVerify->signingConfiguration;
     }
 
     /**
@@ -131,14 +124,14 @@ abstract class AbstractVerifying
      */
     private function validateContentDigest(): bool
     {
-        $contentDigestLine = $this->getPreparedVerify()
+        $contentDigestLine = $this->preparedVerify
                                   ->getHeaderHelper()
                                   ->getContentDigestLine()
         ;
 
         $verifyInstance = new VerifyContentDigest(
             contentDigest: $contentDigestLine,
-            body         : (string)$this->getPreparedVerify()->message
+            body         : (string)$this->preparedVerify->message
                 ->getBody(),
         );
 
@@ -152,7 +145,7 @@ abstract class AbstractVerifying
      */
     private function getBinarySignatureValue(): string
     {
-        return $this->getPreparedVerify()
+        return $this->preparedVerify
                     ->getHeaderSignatureExtractor()
                     ->getBinarySignatureValue()
         ;

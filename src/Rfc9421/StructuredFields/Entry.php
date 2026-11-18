@@ -122,6 +122,7 @@ final class Entry
             $parts[] = self::semicolon;
             $parts[] = InitialContentsEnum::req->name;
         }
+
         /*
          * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3
          * todo bs allowed with some byte sequences (base_encode64)

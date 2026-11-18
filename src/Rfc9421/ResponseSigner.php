@@ -40,7 +40,6 @@ final class ResponseSigner
     }
 
     /**
-     * @return \Psr\Http\Message\ResponseInterface
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
