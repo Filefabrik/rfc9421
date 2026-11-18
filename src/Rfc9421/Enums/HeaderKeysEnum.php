@@ -27,4 +27,12 @@ enum HeaderKeysEnum: string
     case signature_input = 'signature-input';
 
     case signature = 'signature';
+
+    /**
+     * @return string return the value which is HTTP Header Key and also sigining components name part "content-digest";req
+     */
+    public function keyName(): string
+    {
+        return $this->value;
+    }
 }

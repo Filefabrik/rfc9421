@@ -62,13 +62,6 @@ trait TraitSigner
      */
     private function sign(): ResponseInterface|RequestInterface
     {
-        // todo if ;asReq make "content-digest";asReq:
-        // todo move the content_digest as regular signHeader() because of the possible ;asReq on response signing
-        // set up the content digest into rendering if the ContentDigestAlgo exists
-        /*     if ($this->signingConfiguration->getContentDigestAlgo() instanceof DigestAlgorithmsEnum) {
-                 $this->signingConfiguration->signatureComponents->addName(HeaderKeysEnum::content_digest->value);
-             }*/
-        // todo with ;asReq if it ist Response Signer
         $this->prepareSigning();
 
         // last phase, crypt and base64_encode. get back header key value  sig1=:base64_signature:
@@ -83,8 +76,10 @@ trait TraitSigner
     }
 
     /**
-     * Todo, derived components not allowed during request and some not during response
-     * Für das verify auch verwenden
+     * Important Method! It is used by response/request signer and also for the prepare verifying of response and request
+     *
+     * Todo, SOME derived components not allowed during request and some not during response
+     *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
@@ -150,13 +145,10 @@ trait TraitSigner
     private function updateHeadersBeforePrepare(): void
     {
         if ($this->signingConfiguration->isMustGenerateContentDigest()) {
-            if (
-                !$this->signingConfiguration->getSigningComponents()
-                                            ->findComponentByName(HeaderKeysEnum::content_digest->value)
-            ) {
-                $this->signingConfiguration->getSigningComponents()
-                                           ->sign(HeaderKeysEnum::content_digest->value)
-                ;
+            $siCo = $this->signingConfiguration->getSigningComponents();
+
+            if (!$siCo->findComponentByName(HeaderKeysEnum::content_digest->value)) {
+                $siCo->sign(HeaderKeysEnum::content_digest->value);
             }
 
             $contentDigestHeader = new ContentDigestHeader(

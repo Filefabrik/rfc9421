@@ -75,7 +75,6 @@ final class ResponseSignerTest extends TestCase
             ->sign(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
             ->sign('content-length')
-            ->sign('content-digest')
         ;
         $responseSigningConfiguration = new SigningConfiguration()
             ->setSigningComponents($signatureComponents)
@@ -212,7 +211,6 @@ final class ResponseSignerTest extends TestCase
             ->sign(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
             ->sign('content-length')
-            ->sign('content-digest')
         ;
 
         $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signingComponents)
@@ -304,7 +302,7 @@ final class ResponseSignerTest extends TestCase
             ->sign(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
             ->sign('content-length')
-            ->sign('content-digest')
+
         ;
         $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signedComponents)
 
@@ -379,7 +377,7 @@ final class ResponseSignerTest extends TestCase
 
         $signedComponents = new SigningComponents()->sign('@method')
                                                    ->sign('@authority')
-                                                   ->sign('content-digest')
+
         ;
         /**
          * Prepare signingConfiguration
@@ -474,7 +472,7 @@ final class ResponseSignerTest extends TestCase
                                                    ->signHeader(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
                                                    ->signHeader('content-length')
-                                                   ->signHeader('content-digest')
+
         ;
 
         $responseSigningConfiguration = new SigningConfiguration()->setSigningComponents($signedComponents)

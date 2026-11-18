@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, SigningEnum};
+use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, HeaderKeysEnum, SigningEnum};
 use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     AlreadySetException,
     ContentDigestException,
@@ -335,12 +335,10 @@ try {
     $responseComponents = new SigningComponents()
         // singing the status as relevant information for the requester Alice, to ensure the status
         ->sign(headerKey: DerivedComponentEnum::status)
-        // content digest which must be response to the requester that the requester can check, the response body was not tempered
-        ->sign(headerKey: 'content-digest')
         /*
-         * Signing ";asReq"
+         * Later in Processing Put in the "content-digest";req" so Alice see a wanted back-signing
          */
-        ->sign(headerKey: 'content-digest', asReq: true)
+        ->sign(headerKey: HeaderKeysEnum::content_digest->keyName(), asReq: true)
         // Content-Length has a default method to calculate the length of the body
         ->sign(headerKey: 'content-length')
     ;
@@ -353,12 +351,11 @@ try {
 //... now sign the response
 // todo also add ;asReq parameters
 try {
-    $responseSigningConfiguration = new SigningConfiguration()
-        ->setSigningComponents($responseComponents)
+    $responseSigningConfiguration = new SigningConfiguration($responseComponents)
         // make sure the receiver Alice expects the following response Key
         ->setSignatureKeyName(signatureKey: 'responseSig=')
+        // content digest which must be response to the requester that the requester can check, the response body was not tempered
         ->withContentDigest(contentDigestAlgo: 'sha256')
-
         // the sender of the request expects an algo that Bob can check while receive this signed response
         // todo use different signing for response
         ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
@@ -400,17 +397,9 @@ try {
 echo 'response is successfully signed and can be response to the sender'.PHP_EOL;
 
 echo 'Start Verify the Signed Response'.PHP_EOL;
-try {
-    $responseSigningComponents = new SigningComponents()->sign(headerKey: 'content-digest');
-} catch (AlreadySetException|SignatureExtractionException $e) {
-    echo 'response signing configuration error: '.$e->getMessage();
-
-    return;
-}
 
 try {
     $verifyResponseConfiguration = new SigningConfiguration()
-        ->setSigningComponents($responseSigningComponents)
         ->setPublicPem($signerCertInstance->getPublicPemContent())
     ;
 } catch (AbstractRfc9421Exception $rfc9421Exception) {

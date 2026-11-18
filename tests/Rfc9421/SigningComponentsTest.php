@@ -258,13 +258,16 @@ final class SigningComponentsTest extends TestCase
      */
     public function testFindComponentByName(): void
     {
-        $t = new SigningComponents()->sign('test')
-                                    ->sign('test2', true)
+        $t              = new SigningComponents()->sign('test')
+                                                 ->sign('test', true)
         ;
-
+        $current        = ComponentName::fromNameAndInitialContent('test', 'req')
+                                       ->getHttpValue()
+        ;
+        $foundComponent = $t->findComponentByName($current);
         self::assertEquals(
-            ComponentName::fromNameAndInitialContent('test2', 'req'),
-            $t->findComponentByName(ComponentName::fromNameAndInitialContent('test2', 'req')->fieldName),
+            '"test";req',
+            $foundComponent->getHttpValue(),
         );
     }
 

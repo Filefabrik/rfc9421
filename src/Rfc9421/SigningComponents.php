@@ -180,9 +180,16 @@ final class SigningComponents
         return $this->components;
     }
 
+    /**
+     * @param string $name with full line "some";key="d";
+     *
+     */
     public function findComponentByName(string $name): ?ComponentItemDto
     {
-        return array_find($this->components, fn ($component): bool => $component->fieldName === $name);
+        return array_find(
+            $this->components,
+            fn (ComponentItemDto $component): bool => $component->getHttpValue() === $name,
+        );
     }
 
 }

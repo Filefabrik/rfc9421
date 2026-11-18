@@ -167,7 +167,7 @@ final class VerifyRequestPrepareTest extends TestCase
         $signatureKeyName    = 'testing=';
         $signatureComponents = new SigningComponents()->sign('@method')
                                                       ->sign('@authority')
-                                                      ->sign('content-digest')
+
 
         ;
         /**

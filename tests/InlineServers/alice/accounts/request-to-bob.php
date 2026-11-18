@@ -47,10 +47,9 @@ try {
          * tell the signing process that content-type has to be signed
          */
         ->sign('content-type')
-        ->sign('@method')
+        ->sign(DerivedComponentEnum::method)
         ->sign('x-Origin-host')
-        ->sign('content-digest')
-        ->sign('@authority')
+        ->sign(DerivedComponentEnum::authority)
     ;
 } catch (AlreadySetException|SignatureExtractionException $e) {
     echo $e->getMessage();
