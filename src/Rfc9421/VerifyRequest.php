@@ -29,7 +29,7 @@ final class VerifyRequest extends AbstractVerifying
     }
 
     /**
-     * Getting the Signer instance to rebuild the received message
+     * Getting the Signer instance to rebuild the received request message
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
