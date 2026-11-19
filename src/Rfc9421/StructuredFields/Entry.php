@@ -39,7 +39,7 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  * something like "test-header";sf: VALUE
  * Todo this is an helper class which only compiles the component-name
  *
- * @deprecated use ComponentEncoder
+ * @deprecated use ComponentBuilder
  */
 final class Entry
 {
