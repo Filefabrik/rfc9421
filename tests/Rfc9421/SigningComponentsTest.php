@@ -262,7 +262,7 @@ final class SigningComponentsTest extends TestCase
 
         self::assertEquals([
             ComponentName::fromString('test'),
-            ComponentItemDto::fromComponentEncoder(new ComponentBuilder('test2')->withReq()),
+            ComponentItemDto::fromComponentBuilder(new ComponentBuilder('test2')->withReq()),
 
         ], $t->getComponents());
     }

@@ -58,7 +58,7 @@ final class ComponentNameTest extends TestCase
               ->value(),
         );
 
-        $i = ComponentItemDto::fromComponentEncoder(new ComponentBuilder('caramba')->withName('dings'));
+        $i = ComponentItemDto::fromComponentBuilder(new ComponentBuilder('caramba')->withName('dings'));
         self::assertEquals(
             'caramba',
             $i->getItem()
@@ -71,7 +71,7 @@ final class ComponentNameTest extends TestCase
         );
 
         // by string with @
-        $i = ComponentItemDto::fromComponentEncoder(new ComponentBuilder('@status')->withReq());
+        $i = ComponentItemDto::fromComponentBuilder(new ComponentBuilder('@status')->withReq());
 
         self::assertEquals(
             '@status',

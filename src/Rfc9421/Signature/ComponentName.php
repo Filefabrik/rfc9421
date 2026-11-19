@@ -184,6 +184,6 @@ final class ComponentName
      */
     public static function withComponent(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
     {
-        return ComponentItemDto::fromComponentEncoder(new ComponentBuilder($name)->setReq($asReq));
+        return ComponentItemDto::fromComponentBuilder(new ComponentBuilder($name)->setReq($asReq));
     }
 }

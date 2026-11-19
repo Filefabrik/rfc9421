@@ -64,7 +64,7 @@ final class SigningComponents
         if ($headerKey instanceof ComponentItemDto) {
             $this->set($headerKey);
         } elseif ($headerKey instanceof ComponentBuilder) {
-            $this->set(ComponentItemDto::fromComponentEncoder($headerKey));
+            $this->set(ComponentItemDto::fromComponentBuilder($headerKey));
         } else {
             $this->set(ComponentName::fromString($headerKey));
         }

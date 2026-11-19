@@ -254,7 +254,7 @@ final class ComponentBuilder implements \Stringable
      */
     public function toComponentItemDto(): ComponentItemDto
     {
-        return ComponentItemDto::fromComponentEncoder($this);
+        return ComponentItemDto::fromComponentBuilder($this);
     }
 
 }

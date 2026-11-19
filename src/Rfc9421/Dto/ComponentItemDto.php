@@ -40,7 +40,7 @@ final readonly class ComponentItemDto
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function fromComponentEncoder(ComponentBuilder $componentEncoder): self
+    public static function fromComponentBuilder(ComponentBuilder $componentEncoder): self
     {
         try {
             $item = Item::fromHttpValue((string)$componentEncoder);
