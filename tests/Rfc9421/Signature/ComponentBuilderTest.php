@@ -18,13 +18,13 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
-use Filefabrik\Rfc9421\Signature\ComponentEncoder;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(ComponentEncoder::class)]
-final class ComponentEncoderTest extends TestCase
+#[CoversClass(ComponentBuilder::class)]
+final class ComponentBuilderTest extends TestCase
 {
     /*    public function testErrors(): void
         {
@@ -48,56 +48,56 @@ final class ComponentEncoderTest extends TestCase
 
     public function test__construct(): void
     {
-        self::assertSame('"@authority"', (string)new ComponentEncoder(DerivedComponentEnum::authority));
-        self::assertSame('"@authority";req', (string)new ComponentEncoder(DerivedComponentEnum::authority)->withReq());
-        self::assertSame('"@authority"', (string)new ComponentEncoder('@authority'));
-        self::assertSame('"@authority";req', (string)new ComponentEncoder('@authority')->withReq());
+        self::assertSame('"@authority"', (string)new ComponentBuilder(DerivedComponentEnum::authority));
+        self::assertSame('"@authority";req', (string)new ComponentBuilder(DerivedComponentEnum::authority)->withReq());
+        self::assertSame('"@authority"', (string)new ComponentBuilder('@authority'));
+        self::assertSame('"@authority";req', (string)new ComponentBuilder('@authority')->withReq());
 
-        self::assertSame('"@authority"', (string)new ComponentEncoder('"@authority"'));
-        self::assertSame('"@authority";req', (string)new ComponentEncoder('"@authority"')->withReq());
+        self::assertSame('"@authority"', (string)new ComponentBuilder('"@authority"'));
+        self::assertSame('"@authority";req', (string)new ComponentBuilder('"@authority"')->withReq());
 
-        self::assertSame('"content-length"', (string)new ComponentEncoder('content-length'));
-        self::assertSame('"content-length";req', (string)new ComponentEncoder('content-length')->withReq());
-        self::assertSame('"content-length";bs', (string)new ComponentEncoder('content-length')->withBs());
-        self::assertSame('"content-length";sf', (string)new ComponentEncoder('content-length')->withSf());
+        self::assertSame('"content-length"', (string)new ComponentBuilder('content-length'));
+        self::assertSame('"content-length";req', (string)new ComponentBuilder('content-length')->withReq());
+        self::assertSame('"content-length";bs', (string)new ComponentBuilder('content-length')->withBs());
+        self::assertSame('"content-length";sf', (string)new ComponentBuilder('content-length')->withSf());
         self::assertSame(
             '"content-length";req;bs',
-            (string)new ComponentEncoder('content-length')->withReq()
+            (string)new ComponentBuilder('content-length')->withReq()
                                                           ->withBs(),
         );
         self::assertSame(
             '"content-length";sf;req',
-            (string)new ComponentEncoder('content-length')->withSf()
+            (string)new ComponentBuilder('content-length')->withSf()
                                                           ->withReq(),
         );
 
         self::assertSame(
             '"example-header";key="test-play"',
-            (string)new ComponentEncoder('example-header')->withKey('test-play'),
+            (string)new ComponentBuilder('example-header')->withKey('test-play'),
         );
         self::assertSame(
             '"example-header";req;key="test-play"',
-            (string)new ComponentEncoder('example-header')->withReq()
+            (string)new ComponentBuilder('example-header')->withReq()
                                                           ->withKey('test-play'),
         );
 
         self::assertSame(
             '"example-header";name="test-play"',
-            (string)new ComponentEncoder('example-header')->withName('test-play'),
+            (string)new ComponentBuilder('example-header')->withName('test-play'),
         );
         self::assertSame(
             '"example-header";req;name="test-play"',
-            (string)new ComponentEncoder('example-header')->withReq()
+            (string)new ComponentBuilder('example-header')->withReq()
                                                           ->withName('test-play'),
         );
     }
 
     public function testSetReq(): void
     {
-        self::assertSame('"test-play";req', (string)new ComponentEncoder('test-play')->setReq(true));
-        self::assertSame('"test-play"', (string)new ComponentEncoder('test-play')->setReq(false));
-        self::assertSame('"test-play"', (string)new ComponentEncoder('test-play')->setReq(null));
-        self::assertSame('"test-play"', (string)new ComponentEncoder('test-play')->setReq());
+        self::assertSame('"test-play";req', (string)new ComponentBuilder('test-play')->setReq(true));
+        self::assertSame('"test-play"', (string)new ComponentBuilder('test-play')->setReq(false));
+        self::assertSame('"test-play"', (string)new ComponentBuilder('test-play')->setReq(null));
+        self::assertSame('"test-play"', (string)new ComponentBuilder('test-play')->setReq());
     }
 
     /**
@@ -107,15 +107,15 @@ final class ComponentEncoderTest extends TestCase
     {
         self::assertSame(
             '"test-play";sf',
-            (string)new ComponentEncoder('test-play')->setValueless(InitialContentsEnum::sf),
+            (string)new ComponentBuilder('test-play')->setValueless(InitialContentsEnum::sf),
         );
         self::assertSame(
             '"test-play";req',
-            (string)new ComponentEncoder('test-play')->setValueless(InitialContentsEnum::req),
+            (string)new ComponentBuilder('test-play')->setValueless(InitialContentsEnum::req),
         );
         self::assertSame(
             '"test-play";bs',
-            (string)new ComponentEncoder('test-play')->setValueless(InitialContentsEnum::bs),
+            (string)new ComponentBuilder('test-play')->setValueless(InitialContentsEnum::bs),
         );
     }
 
@@ -126,11 +126,11 @@ final class ComponentEncoderTest extends TestCase
     {
         self::assertSame(
             '"test-play";key="key.va"',
-            (string)new ComponentEncoder('test-play')->setWithValue(InitialContentsEnum::key, 'key.va'),
+            (string)new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::key, 'key.va'),
         );
         self::assertSame(
             '"test-play";name="name.va"',
-            (string)new ComponentEncoder('test-play')->setWithValue(InitialContentsEnum::name, 'name.va'),
+            (string)new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::name, 'name.va'),
         );
     }
 
@@ -140,7 +140,7 @@ final class ComponentEncoderTest extends TestCase
     public function testSetWithValueThrowsWrongEnum(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('"bs" can not be set with an value'));
-        (string)new ComponentEncoder('test-play')->setWithValue(InitialContentsEnum::bs, 'key.va');
+        (string)new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::bs, 'key.va');
     }
 
     /**
@@ -150,7 +150,7 @@ final class ComponentEncoderTest extends TestCase
     public function testSetWithValueThrowsCanNotBeEmpty($v): void
     {
         $this->expectExceptionObject(new UnexpectedValue('Value can not be empty'));
-        (string)new ComponentEncoder('test-play')->setWithValue(InitialContentsEnum::name, $v);
+        (string)new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::name, $v);
     }
 
     /**
@@ -159,7 +159,7 @@ final class ComponentEncoderTest extends TestCase
     public function testSetValuelessThrows(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('"key" is not part of valueless'));
-        (string)new ComponentEncoder('test-play')->setValueless(InitialContentsEnum::key);
+        (string)new ComponentBuilder('test-play')->setValueless(InitialContentsEnum::key);
     }
 
     /**
@@ -168,7 +168,7 @@ final class ComponentEncoderTest extends TestCase
     #[DataProvider('detects')]
     public function testSetDetect(InitialContentsEnum $contentsEnum, $value = null, $expected = null): void
     {
-        self::assertSame($expected, (string)new ComponentEncoder('test-fieldname')->setDetect($contentsEnum, $value));
+        self::assertSame($expected, (string)new ComponentBuilder('test-fieldname')->setDetect($contentsEnum, $value));
     }
 
     /**
@@ -179,7 +179,7 @@ final class ComponentEncoderTest extends TestCase
     {
         self::assertEquals(
             ComponentItemDto::fromFieldItem(Item::fromString('test-fieldname')),
-            new ComponentEncoder('test-fieldname')->toComponentItemDto(),
+            new ComponentBuilder('test-fieldname')->toComponentItemDto(),
         );
     }
 }

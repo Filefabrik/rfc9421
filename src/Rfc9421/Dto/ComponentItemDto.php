@@ -20,7 +20,7 @@ use Exception;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
-use Filefabrik\Rfc9421\Signature\ComponentEncoder;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 
 /**
  * Ensured FieldItem read in during the componentNames method
@@ -40,7 +40,7 @@ final readonly class ComponentItemDto
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function fromComponentEncoder(ComponentEncoder $componentEncoder): self
+    public static function fromComponentEncoder(ComponentBuilder $componentEncoder): self
     {
         try {
             $item = Item::fromHttpValue((string)$componentEncoder);

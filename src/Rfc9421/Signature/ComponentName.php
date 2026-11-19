@@ -35,7 +35,7 @@ final class ComponentName
     public static function fromString(string|DerivedComponentEnum $name): ComponentItemDto
     {
         $componentEncoder = $name instanceof DerivedComponentEnum ?
-            new ComponentEncoder($name) :
+            new ComponentBuilder($name) :
             self::extractor($name);
 
         return $componentEncoder->toComponentItemDto();
@@ -48,7 +48,7 @@ final class ComponentName
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function extractor(string $segment): ComponentEncoder
+    public static function extractor(string $segment): ComponentBuilder
     {
         $pattern = '^"(.*?)"(.*?)$';
         preg_match('#'.$pattern.'#', $segment, $matches);
@@ -61,11 +61,11 @@ final class ComponentName
             }
 
             // this is the name
-            return new ComponentEncoder($segment);
+            return new ComponentBuilder($segment);
         }
 
         // this is the name
-        $componentEncoder = new ComponentEncoder($matches[1]);
+        $componentEncoder = new ComponentBuilder($matches[1]);
         if ($matches[2]) {
             $componentEncoder = self::handleSemicolons($matches[2], $componentEncoder);
         }
@@ -78,7 +78,7 @@ final class ComponentName
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private static function handleSemicolons(string $subSegment, ComponentEncoder $componentEncoder): ComponentEncoder
+    private static function handleSemicolons(string $subSegment, ComponentBuilder $componentEncoder): ComponentBuilder
     {
         if (!str_starts_with($subSegment, Entry::semicolon)) {
             throw SignatureExtractionException::invalidParameter($subSegment);
@@ -116,7 +116,7 @@ final class ComponentName
      */
     public static function withSf(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
     {
-        return new ComponentEncoder($name)->withSf()
+        return new ComponentBuilder($name)->withSf()
                                           ->setReq($asReq)
                                           ->toComponentItemDto()
         ;
@@ -130,7 +130,7 @@ final class ComponentName
      */
     public static function withBs(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
     {
-        return new ComponentEncoder($name)->withBs()
+        return new ComponentBuilder($name)->withBs()
                                           ->setReq($asReq)
                                           ->toComponentItemDto()
         ;
@@ -149,7 +149,7 @@ final class ComponentName
         bool $asReq = false,
     ): ComponentItemDto {
         return
-            new ComponentEncoder($name)->withName($nameValue)
+            new ComponentBuilder($name)->withName($nameValue)
                                        ->setReq($asReq)
                                        ->toComponentItemDto()
         ;
@@ -168,7 +168,7 @@ final class ComponentName
         bool $asReq = false,
     ): ComponentItemDto {
         return
-            new ComponentEncoder($name)->withKey($keyValue)
+            new ComponentBuilder($name)->withKey($keyValue)
                                        ->setReq($asReq)
                                        ->toComponentItemDto()
         ;
@@ -184,6 +184,6 @@ final class ComponentName
      */
     public static function withComponent(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
     {
-        return ComponentItemDto::fromComponentEncoder(new ComponentEncoder($name)->setReq($asReq));
+        return ComponentItemDto::fromComponentEncoder(new ComponentBuilder($name)->setReq($asReq));
     }
 }

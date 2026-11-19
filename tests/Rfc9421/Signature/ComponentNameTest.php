@@ -15,7 +15,7 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
-use Filefabrik\Rfc9421\Signature\ComponentEncoder;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -58,7 +58,7 @@ final class ComponentNameTest extends TestCase
               ->value(),
         );
 
-        $i = ComponentItemDto::fromComponentEncoder(new ComponentEncoder('caramba')->withName('dings'));
+        $i = ComponentItemDto::fromComponentEncoder(new ComponentBuilder('caramba')->withName('dings'));
         self::assertEquals(
             'caramba',
             $i->getItem()
@@ -71,7 +71,7 @@ final class ComponentNameTest extends TestCase
         );
 
         // by string with @
-        $i = ComponentItemDto::fromComponentEncoder(new ComponentEncoder('@status')->withReq());
+        $i = ComponentItemDto::fromComponentEncoder(new ComponentBuilder('@status')->withReq());
 
         self::assertEquals(
             '@status',

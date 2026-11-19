@@ -25,7 +25,7 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
 /**
  * new variant to make from separate initialContentsParameters a component name
  */
-final class ComponentEncoder implements \Stringable
+final class ComponentBuilder implements \Stringable
 {
     /**
      * Component-Name without quotas

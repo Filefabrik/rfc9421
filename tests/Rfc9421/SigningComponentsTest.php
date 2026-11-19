@@ -15,7 +15,7 @@ namespace Filefabrik\Rfc9421Test;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
-use Filefabrik\Rfc9421\Signature\ComponentEncoder;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\SigningComponents;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,7 +45,7 @@ final class SigningComponentsTest extends TestCase
 
         $i = new SigningComponents();
         $i->signHeader(
-            new ComponentEncoder('@authority')->withBs()->toComponentItemDto()
+            new ComponentBuilder('@authority')->withBs()->toComponentItemDto()
                          ->getItem()
                          ->toHttpValue(),
         );
@@ -112,9 +112,9 @@ final class SigningComponentsTest extends TestCase
         );
         $i->signHeaders(
             [
-                new ComponentEncoder('Foo')->toComponentItemDto(),
-                new ComponentEncoder('bar'),
-                new ComponentEncoder('new')->withName('testname'),
+                new ComponentBuilder('Foo')->toComponentItemDto(),
+                new ComponentBuilder('bar'),
+                new ComponentBuilder('new')->withName('testname'),
             ],
         );
 
@@ -262,7 +262,7 @@ final class SigningComponentsTest extends TestCase
 
         self::assertEquals([
             ComponentName::fromString('test'),
-            ComponentItemDto::fromComponentEncoder(new ComponentEncoder('test2')->withReq()),
+            ComponentItemDto::fromComponentEncoder(new ComponentBuilder('test2')->withReq()),
 
         ], $t->getComponents());
     }

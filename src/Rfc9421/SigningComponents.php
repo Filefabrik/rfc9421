@@ -15,7 +15,7 @@ namespace Filefabrik\Rfc9421;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
-use Filefabrik\Rfc9421\Signature\ComponentEncoder;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 
 /**
@@ -32,7 +32,7 @@ final class SigningComponents
      * Signing header Parameter
      * todo documentation
      *
-     * @param array<int, ComponentItemDto|DerivedComponentEnum|ComponentEncoder|string> $headerKeys
+     * @param array<int, ComponentItemDto|DerivedComponentEnum|ComponentBuilder|string> $headerKeys
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -59,11 +59,11 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function signHeader(DerivedComponentEnum|string|ComponentItemDto|ComponentEncoder $headerKey): self
+    public function signHeader(DerivedComponentEnum|string|ComponentItemDto|ComponentBuilder $headerKey): self
     {
         if ($headerKey instanceof ComponentItemDto) {
             $this->set($headerKey);
-        } elseif ($headerKey instanceof ComponentEncoder) {
+        } elseif ($headerKey instanceof ComponentBuilder) {
             $this->set(ComponentItemDto::fromComponentEncoder($headerKey));
         } else {
             $this->set(ComponentName::fromString($headerKey));
