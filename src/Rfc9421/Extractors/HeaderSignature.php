@@ -90,7 +90,7 @@ final class HeaderSignature
     {
         $extracted = $this->extractSignatureString();
         $cnt       = count($extracted);
-        //  extracted parts can be also have empty strings
+        //  extracted initialContentsParameters can be also have empty strings
         if (3 === $cnt) {
             return $extracted;
         }

@@ -77,4 +77,11 @@ final class InitialContentsParametersTest extends TestCase
         self::assertTrue($t->has('name'));
         self::assertFalse($t->has('sf'));
     }
+
+    public function testSetInitialContentsEnum(): void
+    {
+        $t = new InitialContentsParameters();
+        $t->setInitialContentsEnum(InitialContentsEnum::name, '"baz"');
+        self::assertSame(['name' => '"baz"'], $t->parameters);
+    }
 }

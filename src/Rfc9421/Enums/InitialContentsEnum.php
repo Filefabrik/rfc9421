@@ -42,8 +42,8 @@ enum InitialContentsEnum
      * tr
      * Trailer
      * Section 2.1.4 of RFC 9421
-     */
-    case tr;
+  not implemented yet
+    case tr;   */
     /**
      * asReq
      * Related request indicator
@@ -106,4 +106,5 @@ enum InitialContentsEnum
 
         return $names;
     }
+
 }

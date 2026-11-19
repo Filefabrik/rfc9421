@@ -22,13 +22,13 @@ final class InitialContentsEnumTest extends TestCase
     public function testIsOwnTypeOrNull(): void
     {
         self::assertNull(InitialContentsEnum::isOwnTypeOrNull('nothing'));
-        self::assertEquals(InitialContentsEnum::tr, InitialContentsEnum::isOwnTypeOrNull('tr'));
-        self::assertEquals(InitialContentsEnum::tr, InitialContentsEnum::isOwnTypeOrNull(InitialContentsEnum::tr));
+        self::assertEquals(InitialContentsEnum::bs, InitialContentsEnum::isOwnTypeOrNull('bs'));
+        self::assertEquals(InitialContentsEnum::sf, InitialContentsEnum::isOwnTypeOrNull(InitialContentsEnum::sf));
     }
 
     public function testNames(): void
-    {
-        self::assertEquals(['sf', 'key', 'bs', 'tr', 'req', 'name'], InitialContentsEnum::names());
+    { // 'tr'   not implemented yet
+        self::assertEquals(['sf', 'key', 'bs', 'req', 'name'], InitialContentsEnum::names());
     }
 
     /**
@@ -36,10 +36,10 @@ final class InitialContentsEnumTest extends TestCase
      */
     public function testIsOwnTypeOrNullOrThrow(): void
     {
-        self::assertEquals(InitialContentsEnum::tr, InitialContentsEnum::isOwnTypeOrNullOrThrow('tr'));
+        self::assertEquals(InitialContentsEnum::sf, InitialContentsEnum::isOwnTypeOrNullOrThrow('sf'));
         self::assertEquals(
-            InitialContentsEnum::tr,
-            InitialContentsEnum::isOwnTypeOrNullOrThrow(InitialContentsEnum::tr),
+            InitialContentsEnum::sf,
+            InitialContentsEnum::isOwnTypeOrNullOrThrow(InitialContentsEnum::sf),
         );
     }
 

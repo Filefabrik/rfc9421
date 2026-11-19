@@ -15,6 +15,7 @@ namespace Filefabrik\Rfc9421;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
+use Filefabrik\Rfc9421\Signature\ComponentEncoder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 
 /**
@@ -31,10 +32,12 @@ final class SigningComponents
      * Signing header Parameter
      * todo documentation
      *
-     * @param array<int, ComponentItemDto|DerivedComponentEnum|string> $headerKeys
+     * @param array<int, ComponentItemDto|DerivedComponentEnum|ComponentEncoder|string> $headerKeys
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function signHeaders(array $headerKeys): self
     {
@@ -50,14 +53,23 @@ final class SigningComponents
      * todo, if the code /path?param=value&foo=bar&baz=batman&qux= and the signing wich
      * Todo set the sign header has some rules what is valid.
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function signHeader(DerivedComponentEnum|string|ComponentItemDto $headerKey): self
+    public function signHeader(DerivedComponentEnum|string|ComponentItemDto|ComponentEncoder $headerKey): self
     {
-        $component = $headerKey instanceof ComponentItemDto ? $headerKey : ComponentName::fromString($headerKey);
+        if ($headerKey instanceof ComponentItemDto) {
+            $this->set($headerKey);
+        } elseif ($headerKey instanceof ComponentEncoder) {
+            $this->set(ComponentItemDto::fromComponentEncoder($headerKey));
+        } else {
+            $this->set(ComponentName::fromString($headerKey));
+        }
 
-        return $this->set($component);
+        return $this;
     }
 
     /**
@@ -89,8 +101,11 @@ final class SigningComponents
      * Signing "$headerKey";bs
      * Signing "$headerKey";req;bs
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function signWithBS(DerivedComponentEnum|string $headerKey, bool $asReq = false): self
     {
@@ -101,8 +116,11 @@ final class SigningComponents
      * Signing "$headerKey";sf
      * Signing "$headerKey";req;sf
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function signWithSF(DerivedComponentEnum|string $headerKey, bool $asReq = false): self
     {
@@ -113,8 +131,11 @@ final class SigningComponents
      * Signing "$headerKey";key="$keyValue"
      * Signing "$headerKey";req;key="$keyValue"
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function signWithKey(
         DerivedComponentEnum|string $headerKey,
@@ -136,8 +157,11 @@ final class SigningComponents
      * Signing "$headerKey";name="$nameValue"
      * Signing "$headerKey";req;name="$nameValue"
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function signWithName(
         DerivedComponentEnum|string $headerKey,
@@ -158,8 +182,11 @@ final class SigningComponents
     /**
      * Only the "component-name"
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function sign(string|DerivedComponentEnum $headerKey, bool $asReq = false): self
     {

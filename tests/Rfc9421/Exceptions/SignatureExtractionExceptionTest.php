@@ -44,4 +44,17 @@ final class SignatureExtractionExceptionTest extends TestCase
         );
         throw SignatureExtractionException::invalidLine('"@params-dings":');
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testInvalidParameter()
+    {
+        $this->expectExceptionObject(
+            new SignatureExtractionException(
+                'Invalid signature parameter:param',
+            ),
+        );
+        throw SignatureExtractionException::invalidParameter('param');
+    }
 }

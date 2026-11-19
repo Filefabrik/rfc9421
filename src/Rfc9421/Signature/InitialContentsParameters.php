@@ -73,6 +73,18 @@ final class InitialContentsParameters
     }
 
     /**
+     * Set with InitialContentsEnum
+     */
+    public function setInitialContentsEnum(
+        InitialContentsEnum $name,
+        Bytes|DisplayString|Token|bool|DateTimeImmutable|float|int|string|null $value = null,
+    ): self {
+        $this->parameters[$name->name] = $value;
+
+        return $this;
+    }
+
+    /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */

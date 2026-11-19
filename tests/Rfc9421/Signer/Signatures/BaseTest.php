@@ -77,10 +77,7 @@ final class BaseTest extends TestCase
         $sc = new SigningConfiguration(
             signingComponents: new SigningComponents()
                 ->signHeader(
-                    ComponentName::fromNameAndInitialContent(
-                        '@method',
-                        'req',
-                    ),
+                    ComponentName::withComponent('@method', true),
                 )
                 ->sign('not-ExistinG'),
         );
@@ -137,10 +134,7 @@ final class BaseTest extends TestCase
         $sc = new SigningConfiguration(
             signingComponents: new SigningComponents()
                 ->signHeader(
-                    ComponentName::fromNameAndInitialContent(
-                        '@method',
-                        'req',
-                    ),
+                    ComponentName::withComponent('@method', true),
                 )
                 ->sign('not-ExistinG'),
         );

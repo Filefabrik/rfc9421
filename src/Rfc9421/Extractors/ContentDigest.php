@@ -61,7 +61,7 @@ final readonly class ContentDigest
     }
 
     /**
-     * check we have 2 parts after splitting
+     * check we have 2 initialContentsParameters after splitting
      * todo more clever validatedSignatureParts check
      */
     public function validateExtraction(): bool

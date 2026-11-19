@@ -50,7 +50,9 @@ final class ComponentItemDtoTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetItem(): void
     {
@@ -113,5 +115,6 @@ final class ComponentItemDtoTest extends TestCase
 
         self::assertSame('"test"', $i->httpValueWithoutReq());
     }
+
 
 }

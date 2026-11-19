@@ -12,8 +12,10 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test;
 
+use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
+use Filefabrik\Rfc9421\Signature\ComponentEncoder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\SigningComponents;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +26,9 @@ final class SigningComponentsTest extends TestCase
 {
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignHeader(): void
     {
@@ -41,13 +45,13 @@ final class SigningComponentsTest extends TestCase
 
         $i = new SigningComponents();
         $i->signHeader(
-            ComponentName::fromNameAndInitialContent('@authority', 'name')
+            new ComponentEncoder('@authority')->withBs()->toComponentItemDto()
                          ->getItem()
                          ->toHttpValue(),
         );
 
         self::assertEquals(
-            '"@authority";name',
+            '"@authority";bs',
             $i
                 ->getComponents()[0]->getItem()
                                     ->toHttpValue(),
@@ -56,7 +60,9 @@ final class SigningComponentsTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignHeaderThrowWrongKey(): void
     {
@@ -74,7 +80,9 @@ final class SigningComponentsTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignHeaderThrowWrongInitialContent(): void
     {
@@ -92,7 +100,9 @@ final class SigningComponentsTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignHeaders(): void
     {
@@ -100,13 +110,19 @@ final class SigningComponentsTest extends TestCase
         self::assertEmpty(
             $i->getComponents(),
         );
-        $i->signHeaders(['Foo', 'bar', ComponentName::fromNameAndInitialContent('new', 'key')]);
+        $i->signHeaders(
+            [
+                new ComponentEncoder('Foo')->toComponentItemDto(),
+                new ComponentEncoder('bar'),
+                new ComponentEncoder('new')->withName('testname'),
+            ],
+        );
 
         self::assertEquals(
             [
-                ComponentName::fromComponentName('foo'),
-                ComponentName::fromComponentName('bar'),
-                ComponentName::fromNameAndInitialContent('new', 'key'),
+                ComponentName::fromString('foo'),
+                ComponentName::fromString('bar'),
+                ComponentName::fromString('"new";name="testname"'),
             ],
             $i->getComponents(),
         );
@@ -114,7 +130,9 @@ final class SigningComponentsTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignComponent(): void
     {
@@ -136,7 +154,9 @@ final class SigningComponentsTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignComponentSf(): void
     {
@@ -151,14 +171,16 @@ final class SigningComponentsTest extends TestCase
 
         $i->signWithSF('foo-with-req', true);
         self::assertEquals(
-            '"foo-with-req";req;sf',
+            '"foo-with-req";sf;req',
             $i->getComponents()[1]->getHttpValue(),
         );
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignComponentBS(): void
     {
@@ -173,14 +195,16 @@ final class SigningComponentsTest extends TestCase
 
         $i->signWithBS('foo-with-req', true);
         self::assertEquals(
-            '"foo-with-req";req;bs',
+            '"foo-with-req";bs;req',
             $i->getComponents()[1]->getHttpValue(),
         );
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignComponentKey(): void
     {
@@ -195,14 +219,16 @@ final class SigningComponentsTest extends TestCase
 
         $i->signWithKey('foo-with-req', 'the-key', true);
         self::assertEquals(
-            '"foo-with-req";req;key="the-key"',
+            '"foo-with-req";key="the-key";req',
             $i->getComponents()[1]->getHttpValue(),
         );
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSignComponentName(): void
     {
@@ -217,15 +243,16 @@ final class SigningComponentsTest extends TestCase
 
         $i->signWithName('foo-with-req', 'the-key', true);
         self::assertEquals(
-            '"foo-with-req";req;name="the-key"',
+            '"foo-with-req";name="the-key";req',
             $i->getComponents()[1]->getHttpValue(),
         );
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSet(): void
     {
@@ -234,14 +261,17 @@ final class SigningComponentsTest extends TestCase
         ;
 
         self::assertEquals([
-            ComponentName::fromComponentName('test'),
-            ComponentName::fromNameAndInitialContent('test2', 'req'),
+            ComponentName::fromString('test'),
+            ComponentItemDto::fromComponentEncoder(new ComponentEncoder('test2')->withReq()),
+
         ], $t->getComponents());
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSetThrow(): void
     {
@@ -254,14 +284,16 @@ final class SigningComponentsTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testFindComponentByName(): void
     {
         $t              = new SigningComponents()->sign('test')
                                                  ->sign('test', true)
         ;
-        $current        = ComponentName::fromNameAndInitialContent('test', 'req')
+        $current        = ComponentName::withComponent('test', true)
                                        ->getHttpValue()
         ;
         $foundComponent = $t->findComponentByName($current);
@@ -273,7 +305,9 @@ final class SigningComponentsTest extends TestCase
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testFindComponentByNameNotFound(): void
     {
@@ -282,7 +316,7 @@ final class SigningComponentsTest extends TestCase
         ;
 
         self::assertNull(
-            $t->findComponentByName(ComponentName::fromNameAndInitialContent('test4', 'req')->fieldName),
+            $t->findComponentByName(ComponentName::withComponent('test4', true)->fieldName),
         );
     }
 }

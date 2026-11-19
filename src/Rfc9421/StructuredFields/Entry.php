@@ -38,6 +38,8 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  * Formats everything except the value
  * something like "test-header";sf: VALUE
  * Todo this is an helper class which only compiles the component-name
+ *
+ * @deprecated use ComponentEncoder
  */
 final class Entry
 {
@@ -151,10 +153,11 @@ final class Entry
 
     /**
      * Special Method which is adding the `name="$this->nameOrKeyValue"` or `key="$this->nameOrKeyValue"`
+     *
      * @param string[] $parts
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @return string[]
      */
     private function handleKeyOrName(array $parts): array

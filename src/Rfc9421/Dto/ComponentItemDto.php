@@ -20,7 +20,7 @@ use Exception;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentEncoder;
 
 /**
  * Ensured FieldItem read in during the componentNames method
@@ -35,25 +35,21 @@ final readonly class ComponentItemDto
     }
 
     /**
+     *  Item makes sure it is validated during the Bakame Class
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function fromComponentName(ComponentName $componentName): self
+    public static function fromComponentEncoder(ComponentEncoder $componentEncoder): self
     {
         try {
-            return self::fromFieldItem($componentName->getItem());
+            $item = Item::fromHttpValue((string)$componentEncoder);
             // @codeCoverageIgnoreStart
         } catch (Exception $exception) {
             throw new SignatureExtractionException($exception->getMessage(), $exception->getCode(), $exception);
             // @codeCoverageIgnoreEnd
         }
-    }
 
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     */
-    public static function fromFieldItem(Item $item): self
-    {
         return new self(self::validFieldName($item), $item->toHttpValue(), $item);
     }
 
@@ -127,5 +123,13 @@ final readonly class ComponentItemDto
         return null !== $this->item
                 ->parameterByKey(InitialContentsEnum::req->name)
         ;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public static function fromFieldItem(Item $item): self
+    {
+        return new self(self::validFieldName($item), $item->toHttpValue(), $item);
     }
 }

@@ -28,4 +28,9 @@ final class SignatureExtractionException extends AbstractRfc9421Exception
     {
         return new self(sprintf('Invalid signature line:%s', $line));
     }
+
+    public static function invalidParameter(string $parameter): self
+    {
+        return new self(sprintf('Invalid signature parameter:%s', $parameter));
+    }
 }

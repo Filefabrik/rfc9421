@@ -42,7 +42,7 @@ final readonly class SignBody
 
     /**
      * This string will be present in the header "content-digest".
-     * The Validator checks the integrity of the body that all parts of the body matches this hash"
+     * The Validator checks the integrity of the body that all initialContentsParameters of the body matches this hash"
      * If the Body was changed outside, the signature does not match, and you can be sure, someone has "hacked" the request.
      *
 

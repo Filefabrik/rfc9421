@@ -11,10 +11,11 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Signature;
 
+use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Signature\ComponentEncoder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -23,62 +24,73 @@ use PHPUnit\Framework\TestCase;
 final class ComponentNameTest extends TestCase
 {
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function test__construct(): void
     {
         // todo does not work with structured fields
-        $i = ComponentName::fromComponentName('test');
+        $i = ComponentName::fromString('test');
         self::assertEquals(
             'test',
             $i->getItem()
               ->value(),
         );
 
-        $i = ComponentName::fromComponentName('"test55"');
+        $i = ComponentName::fromString('"test55"');
+        self::assertEquals(
+            'test55',
+            $i->getItem()
+              ->value(),
+        );
+        $i = ComponentName::fromString(DerivedComponentEnum::method);
+        self::assertEquals(
+            '@method',
+            $i->getItem()
+              ->value(),
+        );
+
+        $i = ComponentName::fromString('"test55"');
         self::assertEquals(
             'test55',
             $i->getItem()
               ->value(),
         );
 
-        $i = ComponentName::fromComponentName('"test55"');
-        self::assertEquals(
-            'test55',
-            $i->getItem()
-              ->value(),
-        );
-
-        $i = ComponentName::fromNameAndInitialContent('caramba', InitialContentsEnum::name);
+        $i = ComponentItemDto::fromComponentEncoder(new ComponentEncoder('caramba')->withName('dings'));
         self::assertEquals(
             'caramba',
             $i->getItem()
               ->value(),
         );
         self::assertEquals(
-            '"caramba";name',
+            '"caramba";name="dings"',
             $i->getItem()
               ->toHttpValue(),
         );
 
         // by string with @
-        $i = ComponentName::fromNameAndInitialContent('@status', InitialContentsEnum::name);
+        $i = ComponentItemDto::fromComponentEncoder(new ComponentEncoder('@status')->withReq());
+
         self::assertEquals(
             '@status',
             $i->getItem()
               ->value(),
         );
 
-        $i = ComponentName::fromString('"test55";name');
+        $i = ComponentName::fromString('"test55";name="kevin"');
         self::assertEquals(
-            '"test55";name',
+            '"test55";name="kevin"',
             $i->getItem()
               ->toHttpValue(),
         );
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function test__constructThrow(): void
     {
@@ -87,11 +99,13 @@ final class ComponentNameTest extends TestCase
                 '"@test" is not a valid enumeration of "'.DerivedComponentEnum::class.'" Enum.',
             ),
         );
-        ComponentName::fromComponentName('@test');
+        ComponentName::fromString('@test');
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function test__constructThrowWithQuoted(): void
     {
@@ -100,43 +114,35 @@ final class ComponentNameTest extends TestCase
                 '"@test" is not a valid enumeration of "'.DerivedComponentEnum::class.'" Enum.',
             ),
         );
-        ComponentName::fromComponentName('"@test"');
+        ComponentName::fromString('"@test"');
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetItemThrow(): void
     {
         $this->expectExceptionObject(
             new SignatureExtractionException(
-                'The HTTP textual representation ""test55" for a String contains an invalid end string.',
+                'Invalid signature line:"test55',
             ),
         );
-        ComponentName::fromString('"test55');
+        ComponentName::fromString('"test55')->getHttpValue();
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     */
-    public function testFromNameAndInitialContentEnumWithValue(): void
-    {
-        $i = ComponentName::fromNameAndInitialContentEnumWithValue('caramba', InitialContentsEnum::name, 'myName');
-        self::assertEquals('"caramba";name="myName"', $i->getHttpValue());
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testFromRegex4Segments(): void
     {
-        $i = ComponentName::fromNameAndInitialContentEnumWithValue(
-            'caramba',
-            InitialContentsEnum::name,
-            'myName',
-        )
+        $i = ComponentName::withName('caramba', 'myName')
                           ->getHttpValue()
         ;
+
         self::assertSame(
             '"caramba";name="myName"',
             ComponentName::fromString($i)
@@ -145,16 +151,20 @@ final class ComponentNameTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testFromRegexThrow(): void
     {
-        $this->expectExceptionObject(new SignatureExtractionException('Segment has unknown format ";"'));
+        $this->expectExceptionObject(new SignatureExtractionException('Invalid signature line:;'));
         ComponentName::fromString(';');
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithSf(): void
     {
@@ -163,16 +173,20 @@ final class ComponentNameTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithSfReq(): void
     {
         $i = ComponentName::withSf('caramba', true);
-        self::assertEquals('"caramba";req;sf', $i->getHttpValue());
+        self::assertEquals('"caramba";sf;req', $i->getHttpValue());
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithBs(): void
     {
@@ -181,16 +195,20 @@ final class ComponentNameTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithBsReq(): void
     {
         $i = ComponentName::withBs('caramba', true);
-        self::assertEquals('"caramba";req;bs', $i->getHttpValue());
+        self::assertEquals('"caramba";bs;req', $i->getHttpValue());
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithName(): void
     {
@@ -199,16 +217,20 @@ final class ComponentNameTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithNameReq(): void
     {
         $i = ComponentName::withName('caramba', 'a', true);
-        self::assertEquals('"caramba";req;name="a"', $i->getHttpValue());
+        self::assertEquals('"caramba";name="a";req', $i->getHttpValue());
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithKey(): void
     {
@@ -217,16 +239,20 @@ final class ComponentNameTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithKeyReq(): void
     {
         $i = ComponentName::withKey('caramba', 'a', true);
-        self::assertEquals('"caramba";req;key="a"', $i->getHttpValue());
+        self::assertEquals('"caramba";key="a";req', $i->getHttpValue());
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithComponent(): void
     {
@@ -235,7 +261,9 @@ final class ComponentNameTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testWithComponentReq(): void
     {
@@ -243,4 +271,36 @@ final class ComponentNameTest extends TestCase
         self::assertEquals('"caramba";req', $i->getHttpValue());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testExtractor()
+    {
+        $res = ComponentName::extractor('"caramba"');
+        self::assertSame('"caramba"', (string)$res);
+
+        $res = ComponentName::extractor('"caramba";req');
+        self::assertSame('"caramba";req', (string)$res);
+
+        $res = ComponentName::extractor('"caramba";req;name="player"');
+        self::assertSame('"caramba";req;name="player"', (string)$res);
+
+        $res = ComponentName::extractor('"caramba";name="player";req');
+        self::assertSame('"caramba";name="player";req', (string)$res);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testThrowMissingSemicolon(): void
+    {
+        $this->expectExceptionObject(new SignatureExtractionException('Invalid signature parameter:req'));
+         ComponentName::extractor('"caramba"req');
+
+
+    }
 }
