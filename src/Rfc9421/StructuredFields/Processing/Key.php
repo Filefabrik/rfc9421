@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
 use Filefabrik\Rfc9421\Bakame\Dictionary;
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 
 /**
@@ -26,22 +26,20 @@ final readonly class Key
     }
 
     /**
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function handle(Entry $entry, string $keyName): Entry
+    public function handle(EntryWithValue $entry, string $keyName): EntryWithValue
     {
         // todo check fieldValue cast because only strings allowed
-        $entryValue    = (string)$entry->value;
-        $value         = $this->applySingleKeyValue(name: $entry->key, key: $keyName, fieldValue: $entryValue);
+        $entryValue = (string)$entry->value;
+        $value      = $this->applySingleKeyValue(name: $entry->getFieldName(), key: $keyName, fieldValue: $entryValue);
 
-
-        // important re-build the value
-        return new Entry(
-            key            : $entry->key,
-            value          : $value,
-            initialContents: InitialContentsEnum::key,
-            nameOrKeyValue : $keyName,
-        );
+        return EntryWithValue::fromBuilder(new ComponentBuilder($entry->getFieldName())->withKey($keyName))
+                             ->setValue($value)
+        ;
     }
 
     /**
