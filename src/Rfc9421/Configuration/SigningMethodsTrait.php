@@ -36,6 +36,7 @@ trait SigningMethodsTrait
     {
         return $this->signingMethods ??= PrepareComponents::defaultMapperClosure();
     }
+
     /**
      * @param array<string, Closure>|array{} $methods
      */

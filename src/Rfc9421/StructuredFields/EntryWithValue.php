@@ -75,7 +75,7 @@ final class EntryWithValue
 
     public function parseComponentNameAndValue(): string
     {
-        return $this->getComponent().Line::colonWithSpace.$this->getValue();
+        return $this->getComponent().Line::colonWithSpace.$this->value;
     }
 
     /**
@@ -95,6 +95,6 @@ final class EntryWithValue
 
     public function getStringValue(): string
     {
-        return (string)$this->getValue();
+        return (string)$this->value;
     }
 }

@@ -156,15 +156,13 @@ final class EntryWithValueTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function testGetStringValue():void
+    public function testGetStringValue(): void
     {
         $entry = EntryWithValue::fromBuilder(ComponentBuilder::from('testkey'));
-        self::assertSame('',$entry->getStringValue());
-        $entry = EntryWithValue::fromBuilder(ComponentBuilder::from('testkey'),null);
-        self::assertSame('',$entry->getStringValue());
-        $entry = EntryWithValue::fromBuilder(ComponentBuilder::from('testkey'),'');
-        self::assertSame('',$entry->getStringValue());
-        $entry = EntryWithValue::fromBuilder(ComponentBuilder::from('testkey'),1);
-        self::assertSame('1',$entry->getStringValue());
+        self::assertSame('', $entry->getStringValue());
+        $entry = EntryWithValue::fromBuilder(ComponentBuilder::from('testkey'), '');
+        self::assertSame('', $entry->getStringValue());
+        $entry = EntryWithValue::fromBuilder(ComponentBuilder::from('testkey'), 1);
+        self::assertSame('1', $entry->getStringValue());
     }
 }

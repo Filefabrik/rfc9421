@@ -27,7 +27,7 @@ use Stringable;
 /**
  * new variant to make from separate initialContentsParameters a component fieldName
  */
-final class ComponentBuilder implements Stringable
+final readonly class ComponentBuilder implements Stringable
 {
     public const string semicolon = ';';
 
@@ -37,9 +37,9 @@ final class ComponentBuilder implements Stringable
      * Component-Name without quotas
      *
      */
-    private(set) readonly string|DerivedComponentEnum $fieldName;
+    public private(set) string|DerivedComponentEnum $fieldName;
 
-    private readonly InitialContentsParameters $initialContentsParameters;
+    private InitialContentsParameters $initialContentsParameters;
 
     /**
      *
@@ -137,7 +137,7 @@ final class ComponentBuilder implements Stringable
         return $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName;
     }
 
-    private function renderParameters()
+    private function renderParameters(): array
     {
         return new RenderInitialContents(
             initialContentsParameters: $this->initialContentsParameters,
