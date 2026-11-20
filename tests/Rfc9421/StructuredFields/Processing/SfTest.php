@@ -14,7 +14,8 @@ namespace Filefabrik\Rfc9421Test\StructuredFields\Processing;
 use Bakame\Http\StructuredFields\Dictionary;
 use Filefabrik\Rfc9421\Exceptions\MethodException;
 use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Sf;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
@@ -25,9 +26,10 @@ use PHPUnit\Framework\TestCase;
 final class SfTest extends TestCase
 {
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandle(): void
     {
@@ -38,17 +40,22 @@ final class SfTest extends TestCase
         $structuredFields->add('Example-Dict', 'dictionary');
 
         $sfInstance = new Sf($mMapper, structuredFields: $structuredFields);
-        $entry      = new Entry('example-dict', '  a=1, b=2;x=1;y=2, c=(a   b    c), d ');
+        $entry      = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('example-dict'),
+            '  a=1, b=2;x=1;y=2, c=(a   b    c), d ',
+        );
 
         $res = $sfInstance->handle($entry);
         self::assertSame('a=1, b=2;x=1;y=2, c=(a b c), d', $res->value);
-        self::assertSame('"example-dict";sf',$res->parseComponentName());
+        self::assertSame('"example-dict";sf', $res->getComponent());
         self::assertSame('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $res->parseComponentNameAndValue());
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandleThrowsNotNiceProceeded(): void
     {
@@ -63,14 +70,19 @@ final class SfTest extends TestCase
         $structuredFields->add('Example-Dict', 'dictionary');
 
         $sfInstance = new Sf($mMapper, structuredFields: $structuredFields);
-        $entry      = new Entry('example-dict', '  a=1, b=2;x=1;y=2, c=(a   b    c), d ');
+        $entry      = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('example-dict'),
+            '  a=1, b=2;x=1;y=2, c=(a   b    c), d ',
+        );
 
         $sfInstance->handle($entry);
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandleThrowsMissingMethod(): void
     {
@@ -82,14 +94,19 @@ final class SfTest extends TestCase
         $structuredFields->add('Example-Dict', 'dictionary');
 
         $sfInstance = new Sf($mMapper, structuredFields: $structuredFields);
-        $entry      = new Entry('example-dict', 'a=1, b=2;x=1;y=2, c=(a   b    c), d ');
+        $entry      = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('example-dict'),
+            '  a=1, b=2;x=1;y=2, c=(a   b    c), d ',
+        );
 
         $sfInstance->handle($entry);
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandleThrowsNotMapped(): void
     {
@@ -99,8 +116,10 @@ final class SfTest extends TestCase
         $mMapper          = new MethodsMapper();
         $structuredFields = new StructuredFields();
         $sfInstance       = new Sf($mMapper, structuredFields: $structuredFields);
-        $entry            = new Entry('example-dict', 'a=1, b=2;x=1;y=2, c=(a   b    c), d ');
-
+        $entry            = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('example-dict'),
+            '  a=1, b=2;x=1;y=2, c=(a   b    c), d ',
+        );
         $sfInstance->handle($entry);
     }
 }

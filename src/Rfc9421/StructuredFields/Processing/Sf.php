@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
 use Bakame\Http\StructuredFields\{Dictionary, InnerList, Item, OuterList, Parameters};
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use Filefabrik\Rfc9421\StructuredFields\StructuredFields;
 
@@ -33,14 +33,24 @@ final readonly class Sf
 
     /**
      *
+     *
+     * @param \Filefabrik\Rfc9421\StructuredFields\EntryWithValue $entry
+     *
+     * @return \Filefabrik\Rfc9421\StructuredFields\EntryWithValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function handle(Entry $entry): Entry
+    public function handle(EntryWithValue $entry): EntryWithValue
     {
         $value = $this->processValue($entry);
 
-        return new Entry($entry->key, $value, InitialContentsEnum::sf);
+        return EntryWithValue::fromBuilder(
+            builder: ComponentBuilder::from($entry->getFieldName())
+                                     ->withSf(),
+            value  : $value,
+        );
     }
 
     /**
@@ -48,13 +58,13 @@ final readonly class Sf
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      */
-    private function processValue(Entry $entry): string
+    private function processValue(EntryWithValue $entry): string
     {
         /**
          * Make sure the Header-Key is mapped in structured FieldTypes.
          * That tells, how we extract/process the value
          */
-        $type = $this->structuredFields->getOrThrow($entry->key);
+        $type = $this->structuredFields->getOrThrow($entry->getFieldName());
 
         /**
          * Calling/executing the field
@@ -62,7 +72,7 @@ final readonly class Sf
         $field = $this->methodsMapper->callMethod($type, [$entry->value]);
 
         if (null === $field) {
-            throw StructuredFieldException::unknownStructuredFieldType($entry->key);
+            throw StructuredFieldException::unknownStructuredFieldType($entry->getFieldName());
         }
 
         /*
