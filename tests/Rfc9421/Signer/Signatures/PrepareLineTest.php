@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\Signer\Signatures;
 
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\PrepareLine;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -38,7 +38,7 @@ final class PrepareLineTest extends TestCase
         $request  = new Request('GET', 'my', ['test' => 'testValue']);
         $instance = new PrepareLine(
             signingConfiguration: new SigningConfiguration(),
-            componentItemDto    : ComponentName::fromString('test'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('test'),
             message             : $request,
         );
         $line     = $instance->handle();
@@ -61,7 +61,7 @@ final class PrepareLineTest extends TestCase
 
         $instance = new PrepareLine(
             signingConfiguration: new SigningConfiguration(),
-            componentItemDto    : ComponentName::fromString('"test";bs'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"test";bs'),
             message             : $request,
         );
         $line     = $instance->handle();
@@ -97,7 +97,7 @@ final class PrepareLineTest extends TestCase
 
         $instance = new PrepareLine(
             signingConfiguration: $config,
-            componentItemDto    : ComponentName::fromString('"test";sf'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"test";sf'),
             message             : $request,
         );
         $line     = $instance->handle();
@@ -132,7 +132,7 @@ final class PrepareLineTest extends TestCase
         );
         $instance = new PrepareLine(
             signingConfiguration: new SigningConfiguration(),
-            componentItemDto    : ComponentName::fromString('"@query-param";name="var"'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"@query-param";name="var"'),
             message             : $request,
         );
         $line     = $instance->handle();

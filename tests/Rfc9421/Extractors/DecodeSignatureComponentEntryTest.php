@@ -214,7 +214,12 @@ final class DecodeSignatureComponentEntryTest extends TestCase
     }
 
     /**
+     * @param string                                  $line
+     * @param \Bakame\Http\StructuredFields\Item|null $expectedItem
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     #[DataProvider('componentDtoProvider')]
     public function testToComponentItemDto(string $line, ?Item $expectedItem): void
@@ -226,7 +231,9 @@ final class DecodeSignatureComponentEntryTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testToLine(): void
     {

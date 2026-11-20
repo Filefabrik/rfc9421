@@ -135,7 +135,8 @@ final class ComponentBuilder implements Stringable
      *
      */
     public function __toString(): string
-    { /*
+    {
+        /*
          * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3
          * todo bs allowed with some byte sequences (base_encode64)
          * Example-Header: value, with, lots

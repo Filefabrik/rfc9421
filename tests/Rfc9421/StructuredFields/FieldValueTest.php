@@ -15,7 +15,6 @@ use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
-use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
@@ -43,7 +42,8 @@ final class FieldValueTest extends TestCase
             messageInterface         : $request,
             signingConfiguration     : new SigningConfiguration(),
             headerItemsDto           : HeaderItemsDto::fromMessageInterface($request),
-            componentItemDto         : ComponentName::fromString('test'),
+            componentItemDto         : ComponentBuilder::from('test')
+                                                       ->toComponentItemDto(),
             initialContentsParameters: new InitialContentsParameters([]),
         );
 
@@ -67,7 +67,8 @@ final class FieldValueTest extends TestCase
             messageInterface         : $request,
             signingConfiguration     : new SigningConfiguration(),
             headerItemsDto           : HeaderItemsDto::fromMessageInterface($request),
-            componentItemDto         : ComponentName::fromString('test'),
+            componentItemDto         : ComponentBuilder::from('test')
+                                                       ->toComponentItemDto(),
             initialContentsParameters: new InitialContentsParameters([]),
         );
 
@@ -95,11 +96,13 @@ final class FieldValueTest extends TestCase
             messageInterface         : $request,
             signingConfiguration     : $config,
             headerItemsDto           : HeaderItemsDto::fromMessageInterface($request),
-            componentItemDto         : ComponentName::fromString('"test";sf'),
+            componentItemDto         : ComponentBuilder::from('"test"')
+                                                       ->withSf()
+                                                       ->toComponentItemDto(),
             initialContentsParameters: new InitialContentsParameters(),
         );
         $handled     = $instance->getFieldValue();
-        $targetEntry=EntryWithValue::fromBuilder(ComponentBuilder::from('test'), 'testValue');
+        $targetEntry = EntryWithValue::fromBuilder(ComponentBuilder::from('test'), 'testValue');
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -126,16 +129,25 @@ final class FieldValueTest extends TestCase
             messageInterface         : $request,
             signingConfiguration     : $config,
             headerItemsDto           : HeaderItemsDto::fromMessageInterface($request),
-            componentItemDto         : ComponentName::fromString('"@query-param";name="baz"'),
+            componentItemDto         : ComponentBuilder::from('"@query-param"')
+                                                       ->withName('baz')
+                                                       ->toComponentItemDto(),
             initialContentsParameters: new InitialContentsParameters()->setParameter(
                 InitialContentsEnum::name,
                 'baz',
             ),
         );
         $handled     = $instance->getFieldValue();
-        $targetEntry=   EntryWithValue::fromBuilder(ComponentBuilder::from('@query-param')->withName('baz'), 'bat-man');
+        $targetEntry = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('@query-param')
+                            ->withName('baz'),
+            'bat-man',
+        );
 
-        self::assertEquals([$targetEntry->getComponent(), $targetEntry->value], [$handled->getComponent(), $handled->value]);
+        self::assertEquals(
+            [$targetEntry->getComponent(), $targetEntry->value],
+            [$handled->getComponent(), $handled->value],
+        );
     }
 
     /**
@@ -158,7 +170,8 @@ final class FieldValueTest extends TestCase
             messageInterface         : $request,
             signingConfiguration     : new SigningConfiguration(),
             headerItemsDto           : HeaderItemsDto::fromMessageInterface($request),
-            componentItemDto         : ComponentName::fromString('play'),
+            componentItemDto         : ComponentBuilder::from('play')
+                                                       ->toComponentItemDto(),
             initialContentsParameters: new InitialContentsParameters([]),
         );
 

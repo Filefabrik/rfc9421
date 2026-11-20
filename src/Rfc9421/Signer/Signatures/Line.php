@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Signer\Signatures;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 
 /**
  * Signature line, the si
@@ -44,7 +44,7 @@ final readonly class Line
      */
     public function getComponentItemDto(): ComponentItemDto
     {
-        return ComponentName::fromString($this->signatureComponent);
+        return ComponentExtractor::extractToComponentItemDto($this->signatureComponent);
     }
 
 }

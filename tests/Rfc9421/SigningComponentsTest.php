@@ -16,7 +16,7 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 use Filefabrik\Rfc9421\SigningComponents;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -45,9 +45,10 @@ final class SigningComponentsTest extends TestCase
 
         $i = new SigningComponents();
         $i->signHeader(
-            new ComponentBuilder('@authority')->withBs()->toComponentItemDto()
-                         ->getItem()
-                         ->toHttpValue(),
+            new ComponentBuilder('@authority')->withBs()
+                                              ->toComponentItemDto()
+                                              ->getItem()
+                                              ->toHttpValue(),
         );
 
         self::assertEquals(
@@ -120,9 +121,9 @@ final class SigningComponentsTest extends TestCase
 
         self::assertEquals(
             [
-                ComponentName::fromString('foo'),
-                ComponentName::fromString('bar'),
-                ComponentName::fromString('"new";name="testname"'),
+                ComponentExtractor::extractToComponentItemDto('foo'),
+                ComponentExtractor::extractToComponentItemDto('bar'),
+                ComponentExtractor::extractToComponentItemDto('"new";name="testname"'),
             ],
             $i->getComponents(),
         );
@@ -261,7 +262,7 @@ final class SigningComponentsTest extends TestCase
         ;
 
         self::assertEquals([
-            ComponentName::fromString('test'),
+            ComponentExtractor::extractToComponentItemDto('test'),
             ComponentItemDto::fromComponentBuilder(new ComponentBuilder('test2')->withReq()),
 
         ], $t->getComponents());
@@ -293,8 +294,10 @@ final class SigningComponentsTest extends TestCase
         $t              = new SigningComponents()->sign('test')
                                                  ->sign('test', true)
         ;
-        $current        = ComponentName::withComponent('test', true)
-                                       ->getHttpValue()
+        $current        = ComponentBuilder::from('test')
+                                          ->withReq()
+                                          ->toComponentItemDto()
+                                          ->getHttpValue()
         ;
         $foundComponent = $t->findComponentByName($current);
         self::assertEquals(
@@ -316,7 +319,11 @@ final class SigningComponentsTest extends TestCase
         ;
 
         self::assertNull(
-            $t->findComponentByName(ComponentName::withComponent('test4', true)->fieldName),
+            $t->findComponentByName(
+                ComponentBuilder::from('test4')
+                                ->withReq()
+                                ->toComponentItemDto()->fieldName,
+            ),
         );
     }
 }

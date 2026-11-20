@@ -14,7 +14,7 @@ namespace Filefabrik\Rfc9421\Extractors;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
@@ -24,7 +24,10 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
 final class DecodeSignatureComponentEntry
 {
     /**
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function toLine(string $line): Line
     {
@@ -57,6 +60,7 @@ final class DecodeSignatureComponentEntry
     public static function extract(string $line): array
     {
         // must be 4
+        // todo use the ComponentName Extractor
         preg_match('#"(.*?)"(.*?): (.*?)$#', $line, $matches);
 
         // empty array is error
@@ -64,7 +68,10 @@ final class DecodeSignatureComponentEntry
     }
 
     /**
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function toComponentDto(string $line): ComponentItemDto
     {
@@ -72,6 +79,6 @@ final class DecodeSignatureComponentEntry
         $quoted    = UnquoteHelper::quote($extracted[1]);
         $string    = $quoted.$extracted[2];
 
-        return ComponentName::fromString($string);
+        return ComponentExtractor::extractToComponentItemDto($string);
     }
 }

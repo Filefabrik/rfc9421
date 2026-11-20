@@ -15,7 +15,7 @@ use Bakame\Http\StructuredFields\Item;
 use Exception;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -44,7 +44,7 @@ final class ComponentItemDtoTest extends TestCase
         $i = ComponentItemDto::fromFieldItem(Item::fromHttpValue('"test";sf'));
 
         self::assertEquals(
-            ComponentName::fromString('"test";sf'),
+            ComponentExtractor::extractToComponentItemDto('"test";sf'),
             $i,
         );
     }
@@ -56,11 +56,11 @@ final class ComponentItemDtoTest extends TestCase
      */
     public function testGetItem(): void
     {
-        $i = ComponentName::fromString('"test";sf')
-                          ->getItem()
+        $i = ComponentExtractor::extractToComponentItemDto('"test";sf')
+                               ->getItem()
         ;
         self::assertEquals(
-            ComponentName::fromString('"test";sf')
+            ComponentExtractor::extractToComponentItemDto('"test";sf')
                          ->getItem(),
             $i,
         );

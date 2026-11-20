@@ -22,22 +22,36 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  * Single component with InitialContentsEnum or without InitialContentsEnum
  * or with structured fields
  *
- * @deprecated use ComponentBuilder
  */
-final class ComponentName
+final class ComponentExtractor
 {
     /**
+     * Can be a full string which has to be extracted
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function fromString(string|DerivedComponentEnum $name): ComponentItemDto
+    public static function extractToComponentItemDto(string|DerivedComponentEnum $name): ComponentItemDto
     {
         $componentBuilder = $name instanceof DerivedComponentEnum ?
             new ComponentBuilder($name) :
-            self::extractor($name);
+            self::extractToBuilder($name);
 
         return $componentBuilder->toComponentItemDto();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public static function extractToBuilder(string|DerivedComponentEnum $name): ComponentBuilder
+    {
+        return $name instanceof DerivedComponentEnum ?
+
+            new ComponentBuilder($name) :
+            self::extractor($name);
     }
 
     /**
@@ -47,7 +61,7 @@ final class ComponentName
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function extractor(string $segment): ComponentBuilder
+    private static function extractor(string $segment): ComponentBuilder
     {
         $pattern = '^"(.*?)"(.*?)$';
         preg_match('#'.$pattern.'#', $segment, $matches);
@@ -65,7 +79,7 @@ final class ComponentName
 
         // this is the fieldName
         $componentBuilder = new ComponentBuilder($matches[1]);
-        if ($matches[2]) {
+        if ('' !== $matches[2]) {
             $componentBuilder = self::handleSemicolons($matches[2], $componentBuilder);
         }
 
@@ -105,82 +119,5 @@ final class ComponentName
         }
 
         return $componentBuilder;
-    }
-
-    /**
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     */
-    public static function withSf(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
-    {
-        return new ComponentBuilder($name)->withSf()
-                                          ->setReq($asReq)
-                                          ->toComponentItemDto()
-        ;
-    }
-
-    /**
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     */
-    public static function withBs(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
-    {
-        return new ComponentBuilder($name)->withBs()
-                                          ->setReq($asReq)
-                                          ->toComponentItemDto()
-        ;
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @example with "COMPONENT-NAME";fieldName="VALUE"
-     * @example with "COMPONENT-NAME";req;fieldName="VALUE"
-     */
-    public static function withName(
-        string|DerivedComponentEnum $name,
-        string $nameValue,
-        bool $asReq = false,
-    ): ComponentItemDto {
-        return new ComponentBuilder($name)->withName($nameValue)
-                                          ->setReq($asReq)
-                                          ->toComponentItemDto()
-        ;
-    }
-
-    /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @example with "COMPONENT-NAME";req;key="VALUE"
-     * @example with "COMPONENT-NAME";key="VALUE"
-     */
-    public static function withKey(
-        string|DerivedComponentEnum $name,
-        string $keyValue,
-        bool $asReq = false,
-    ): ComponentItemDto {
-        return new ComponentBuilder($name)->withKey($keyValue)
-                                          ->setReq($asReq)
-                                          ->toComponentItemDto()
-        ;
-    }
-
-    /**
-     * Only the component key perhaps the ';req'
-     *
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     */
-    public static function withComponent(string|DerivedComponentEnum $name, bool $asReq = false): ComponentItemDto
-    {
-        return ComponentItemDto::fromComponentBuilder(new ComponentBuilder($name)->setReq($asReq));
     }
 }

@@ -12,7 +12,7 @@ namespace Filefabrik\Rfc9421\Extractors;
 
 use Exception;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
@@ -46,7 +46,7 @@ final class Components
         $parts      = explode(' ', $this->componentsString);
         foreach ($parts as $item) {
             try {
-                $item = ComponentName::fromString($item);
+                $item = ComponentExtractor::extractToComponentItemDto($item);
             } catch (Exception) {
                 throw new SignatureExtractionException(sprintf('Segment has unknown format "%s"', $item));
             }

@@ -51,7 +51,7 @@ final readonly class ContentDigest
     }
 
     /**
-     * todo ...ugly extractor
+     * todo ...ugly extractToBuilder
      *
      * @return array<string>
      */

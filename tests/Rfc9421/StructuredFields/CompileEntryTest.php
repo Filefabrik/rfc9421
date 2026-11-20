@@ -13,7 +13,7 @@ namespace Filefabrik\Rfc9421Test\StructuredFields;
 
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
 use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
@@ -39,7 +39,7 @@ final class CompileEntryTest extends TestCase
         $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: new SigningConfiguration(),
-            componentItemDto    : ComponentName::fromString('test'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('test'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled  = $instance->handle();
@@ -62,7 +62,7 @@ final class CompileEntryTest extends TestCase
         $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: new SigningConfiguration(),
-            componentItemDto    : ComponentName::fromString('@method'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('@method'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled  = $instance->handle();
@@ -85,7 +85,7 @@ final class CompileEntryTest extends TestCase
         $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: new SigningConfiguration(),
-            componentItemDto    : ComponentName::fromString('"test";bs'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"test";bs'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled  = $instance->handle();
@@ -119,7 +119,7 @@ final class CompileEntryTest extends TestCase
         $instance    = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
-            componentItemDto    : ComponentName::fromString('"test";sf'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"test";sf'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
@@ -153,7 +153,7 @@ final class CompileEntryTest extends TestCase
         $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
-            componentItemDto    : ComponentName::fromString('"test";key="a"'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"test";key="a"'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled  = $instance->handle();
@@ -191,7 +191,7 @@ final class CompileEntryTest extends TestCase
         $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
-            componentItemDto    : ComponentName::fromString('"@query-param";name="baz"'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"@query-param";name="baz"'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled  = $instance->handle();
@@ -232,7 +232,7 @@ final class CompileEntryTest extends TestCase
         $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
-            componentItemDto    : ComponentName::fromString('"@query-param";name="qux"'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"@query-param";name="qux"'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled  = $instance->handle();
@@ -273,7 +273,7 @@ final class CompileEntryTest extends TestCase
         $instance    = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
-            componentItemDto    : ComponentName::fromString('"@query-param";name="var"'),
+            componentItemDto    : ComponentExtractor::extractToComponentItemDto('"@query-param";name="var"'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();

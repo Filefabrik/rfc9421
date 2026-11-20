@@ -16,7 +16,7 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 
 /**
  * Helper-Stack which components must be signed
@@ -67,7 +67,7 @@ final class SigningComponents
             $this->set(ComponentItemDto::fromComponentBuilder($fieldName));
         } else {
             // can be everything
-            $this->set(ComponentName::fromString($fieldName));
+            $this->set(ComponentExtractor::extractToComponentItemDto($fieldName));
         }
 
         return $this;

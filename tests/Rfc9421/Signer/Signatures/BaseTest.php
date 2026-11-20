@@ -15,7 +15,7 @@ use DateTime;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
-use Filefabrik\Rfc9421\Signature\ComponentName;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
@@ -77,7 +77,8 @@ final class BaseTest extends TestCase
         $sc = new SigningConfiguration(
             signingComponents: new SigningComponents()
                 ->signHeader(
-                    ComponentName::withComponent('@method', true),
+                    ComponentBuilder::from('@method')
+                                    ->withReq(),
                 )
                 ->sign('not-ExistinG'),
         );
@@ -134,7 +135,8 @@ final class BaseTest extends TestCase
         $sc = new SigningConfiguration(
             signingComponents: new SigningComponents()
                 ->signHeader(
-                    ComponentName::withComponent('@method', true),
+                    ComponentBuilder::from('@method')
+                                    ->withReq(),
                 )
                 ->sign('not-ExistinG'),
         );
