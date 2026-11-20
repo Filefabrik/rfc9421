@@ -76,45 +76,44 @@ try {
             * as string without quotas
             */
 
-        ->sign(headerKey: 'content-type')
+        ->sign(fieldName: 'content-type')
         /*
          * as string with quotas
          */
-        ->sign(headerKey: '"content-length"')
+        ->sign(fieldName: '"content-length"')
         /*
         * as Enum
         */
-        ->sign(headerKey: DerivedComponentEnum::query)
-        ->sign(headerKey: DerivedComponentEnum::method)
-        ->sign(headerKey: DerivedComponentEnum::authority)
+        ->sign(fieldName: DerivedComponentEnum::query)
+        ->sign(fieldName: DerivedComponentEnum::method)
+        ->sign(fieldName: DerivedComponentEnum::authority)
         /*
-        * with the name
+        * with the fieldName
         */
-        ->signWithName(headerKey: '@query-param', nameValue: 'baz')
+        ->signWithName(fieldName: '@query-param', nameValue: 'baz')
         /*
        * programmatically add
        * '"example-dict";sf'
        */
-        ->signWithSF(headerKey: 'example-dict')
-        ->signWithKey(headerKey: 'example-dict', keyValue: 'a')
+        ->signWithSF(fieldName: 'example-dict')
+        ->signWithKey(fieldName: 'example-dict', keyValue: 'a')
         /*
     * '"example-dict";key="c"'
     */
-        ->signWithKey(headerKey: 'example-dict', keyValue: 'c')
+        ->signWithKey(fieldName: 'example-dict', keyValue: 'c')
         /*
       * '"example-dict";key="d"'
       */
-        ->signWithKey(headerKey: 'example-dict', keyValue: 'd')
+        ->signWithKey(fieldName: 'example-dict', keyValue: 'd')
         ->sign('x-Origin-host')
         ->sign('test-header')
         ->sign('example-dict')
     ;
-} catch (AlreadySetException|SignatureExtractionException $e) {
+} catch (AlreadySetException|SignatureExtractionException|EnumTypeException|UnexpectedValue $e) {
     echo $e->getMessage();
 
     return;
 }
-
 try {
     $signingConfiguration = new SigningConfiguration()
         /*
@@ -132,7 +131,7 @@ try {
         /*
          * tell the signing process that content-type has to be signed
          */
-        //->signHeader('"@query-param";name="baz"')
+        //->signHeader('"@query-param";fieldName="baz"')
         ->withContentDigest(contentDigestAlgo: 'sha256')
         ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
         ->setCreated(created: $currentDateTime)
@@ -334,15 +333,15 @@ $response         = new Response(headers: [], body: $responseBodyJson);
 try {
     $responseComponents = new SigningComponents()
         // singing the status as relevant information for the requester Alice, to ensure the status
-        ->sign(headerKey: DerivedComponentEnum::status)
+        ->sign(fieldName: DerivedComponentEnum::status)
         /*
          * Later in Processing Put in the "content-digest";req" so Alice see a wanted back-signing
          */
-        ->sign(headerKey: HeaderKeysEnum::content_digest->keyName(), asReq: true)
+        ->sign(fieldName: HeaderKeysEnum::content_digest->keyName(), asReq: true)
         // Content-Length has a default method to calculate the length of the body
-        ->sign(headerKey: 'content-length')
+        ->sign(fieldName: 'content-length')
     ;
-} catch (AlreadySetException|SignatureExtractionException $e) {
+} catch (AlreadySetException|SignatureExtractionException|EnumTypeException|UnexpectedValue $e) {
     echo $e->getMessage();
 
     return;

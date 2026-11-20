@@ -32,17 +32,17 @@ final class SigningComponents
      * Signing header Parameter
      * todo documentation
      *
-     * @param array<int, ComponentItemDto|DerivedComponentEnum|ComponentBuilder|string> $headerKeys
+     * @param array<int, ComponentItemDto|DerivedComponentEnum|ComponentBuilder|string> $fieldNames
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function signHeaders(array $headerKeys): self
+    public function signHeaders(array $fieldNames): self
     {
-        foreach ($headerKeys as $headerKey) {
-            $this->signHeader($headerKey);
+        foreach ($fieldNames as $fieldName) {
+            $this->signHeader($fieldName);
         }
 
         return $this;
@@ -59,14 +59,15 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function signHeader(DerivedComponentEnum|string|ComponentItemDto|ComponentBuilder $headerKey): self
+    public function signHeader(DerivedComponentEnum|string|ComponentItemDto|ComponentBuilder $fieldName): self
     {
-        if ($headerKey instanceof ComponentItemDto) {
-            $this->set($headerKey);
-        } elseif ($headerKey instanceof ComponentBuilder) {
-            $this->set(ComponentItemDto::fromComponentBuilder($headerKey));
+        if ($fieldName instanceof ComponentItemDto) {
+            $this->set($fieldName);
+        } elseif ($fieldName instanceof ComponentBuilder) {
+            $this->set(ComponentItemDto::fromComponentBuilder($fieldName));
         } else {
-            $this->set(ComponentName::fromString($headerKey));
+            // can be everything
+            $this->set(ComponentName::fromString($fieldName));
         }
 
         return $this;
@@ -98,8 +99,8 @@ final class SigningComponents
     }
 
     /**
-     * Signing "$headerKey";bs
-     * Signing "$headerKey";req;bs
+     * Signing "$fieldName";bs
+     * Signing "$fieldName";req;bs
      *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -107,14 +108,19 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function signWithBS(DerivedComponentEnum|string $headerKey, bool $asReq = false): self
+    public function signWithBS(DerivedComponentEnum|string $fieldName, bool $asReq = false): self
     {
-        return $this->set(ComponentName::withBs(name: $headerKey, asReq: $asReq));
+        return $this->set(
+            ComponentBuilder::from($fieldName)
+                            ->withBs()
+                            ->setReq($asReq)
+                            ->toComponentItemDto(),
+        );
     }
 
     /**
-     * Signing "$headerKey";sf
-     * Signing "$headerKey";req;sf
+     * Signing "$fieldName";sf
+     * Signing "$fieldName";req;sf
      *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -122,14 +128,19 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function signWithSF(DerivedComponentEnum|string $headerKey, bool $asReq = false): self
+    public function signWithSF(DerivedComponentEnum|string $fieldName, bool $asReq = false): self
     {
-        return $this->set(ComponentName::withSf(name: $headerKey, asReq: $asReq));
+        return $this->set(
+            ComponentBuilder::from($fieldName)
+                            ->withSf()
+                            ->setReq($asReq)
+                            ->toComponentItemDto(),
+        );
     }
 
     /**
-     * Signing "$headerKey";key="$keyValue"
-     * Signing "$headerKey";req;key="$keyValue"
+     * Signing "$fieldName";key="$keyValue"
+     * Signing "$fieldName";req;key="$keyValue"
      *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -138,24 +149,23 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function signWithKey(
-        DerivedComponentEnum|string $headerKey,
+        DerivedComponentEnum|string $fieldName,
         string $keyValue,
         bool $asReq = false,
     ): self {
         $this->set(
-            ComponentName::withKey(
-                name    : $headerKey,
-                keyValue: $keyValue,
-                asReq   : $asReq,
-            ),
+            ComponentBuilder::from($fieldName)
+                            ->withKey($keyValue)
+                            ->setReq($asReq)
+                            ->toComponentItemDto(),
         );
 
         return $this;
     }
 
     /**
-     * Signing "$headerKey";name="$nameValue"
-     * Signing "$headerKey";req;name="$nameValue"
+     * Signing "$fieldName";fieldName="$nameValue"
+     * Signing "$fieldName";req;fieldName="$nameValue"
      *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -164,23 +174,22 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function signWithName(
-        DerivedComponentEnum|string $headerKey,
+        DerivedComponentEnum|string $fieldName,
         string $nameValue,
         bool $asReq = false,
     ): self {
         $this->set(
-            ComponentName::withName(
-                name     : $headerKey,
-                nameValue: $nameValue,
-                asReq    : $asReq,
-            ),
+            ComponentBuilder::from($fieldName)
+                            ->withName($nameValue)
+                            ->setReq($asReq)
+                            ->toComponentItemDto(),
         );
 
         return $this;
     }
 
     /**
-     * Only the "component-name"
+     * Only the "component-fieldName"
      *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -188,13 +197,12 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function sign(string|DerivedComponentEnum $headerKey, bool $asReq = false): self
+    public function sign(string|DerivedComponentEnum $fieldName, bool $asReq = false): self
     {
         return $this->set(
-            ComponentName::withComponent(
-                name : $headerKey,
-                asReq: $asReq,
-            ),
+            ComponentBuilder::from($fieldName)
+                            ->setReq($asReq)
+                            ->toComponentItemDto(),
         );
     }
 

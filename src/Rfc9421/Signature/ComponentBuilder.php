@@ -18,25 +18,28 @@ use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\NotSet;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
+use Stringable;
 
 /**
- * new variant to make from separate initialContentsParameters a component name
+ * new variant to make from separate initialContentsParameters a component fieldName
  */
-final class ComponentBuilder implements \Stringable
+final class ComponentBuilder implements Stringable
 {
+    public const string semicolon = ';';
+
+    public const string equals = '=';
+
     /**
      * Component-Name without quotas
      *
      */
-    private readonly string|DerivedComponentEnum $name;
+    private(set) readonly string|DerivedComponentEnum $fieldName;
 
     private readonly InitialContentsParameters $initialContentsParameters;
-
     /**
-     * They need a value later in name="expect_value" key="expect_value"
+     * They need a value later in fieldName="expect_value" key="expect_value"
      *
      */
     private array $withValues = [InitialContentsEnum::key, InitialContentsEnum::name];
@@ -48,7 +51,7 @@ final class ComponentBuilder implements \Stringable
      */
     public function __construct(string|DerivedComponentEnum $name)
     {
-        $this->name                      =
+        $this->fieldName                 =
             $name instanceof DerivedComponentEnum
                 ? $name :
                 $this->setValidatedName($name);
@@ -78,6 +81,25 @@ final class ComponentBuilder implements \Stringable
     }
 
     /**
+     * Simply from a string without InitialContentsEnums or DerivedComponentEnum
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public static function from(string|DerivedComponentEnum $name): self
+    {
+        return new self($name);
+    }
+
+    /**
+     * DerivedComponent value or string value without Quotas
+     */
+    public function getFieldNameString(): string
+    {
+        return $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName;
+    }
+
+    /**
      * Helper if req should be set by flag
      */
     public function setReq(bool|null $flag = null): self
@@ -94,8 +116,10 @@ final class ComponentBuilder implements \Stringable
         return $this->setPair(InitialContentsEnum::req, new NotSet());
     }
 
-    private function setPair(InitialContentsEnum $initialContentsEnum, \Filefabrik\Rfc9421\Support\NotSet|string $value): self
-    {
+    private function setPair(
+        InitialContentsEnum $initialContentsEnum,
+        NotSet|string $value,
+    ): self {
         if ($value instanceof NotSet) {
             $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum);
         } else {
@@ -131,23 +155,39 @@ final class ComponentBuilder implements \Stringable
         $flagsArray = $this->renderFlags();
 
         if (0 < count($flagsArray)) {
-            $parts[] = Entry::semicolon;
-            $parts[] = implode(Entry::semicolon, $flagsArray);
+            $parts[] = self::semicolon;
+            $parts[] = implode(self::semicolon, $flagsArray);
         }
 
         return implode('', $parts);
     }
 
     /**
-     * From pure name content-length to "content-length"
+     * From pure fieldName content-length to "content-length"
      */
     private function getQuotedName(): string
     {
-        return UnquoteHelper::quote($this->name instanceof DerivedComponentEnum ? $this->name->value : $this->name);
+        return UnquoteHelper::quote(
+            $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName,
+        );
     }
 
     private function renderFlags(): array
     {
+        /*
+         * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3
+         * todo bs allowed with some byte sequences (base_encode64)
+         * Example-Header: value, with, lots
+         * Example-Header: of, commas
+         * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
+         */
+        /*
+         * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.1-8
+         * "However, if the sf parameter is added, the value is reserialized as follows:"
+         * "example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c)
+         * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHMsIG9mLCBjb21tYXM=:
+         */
+
         $parts = [];
         foreach ($this->initialContentsParameters->parameters as $key => $value) {
             /** @var InitialContentsEnum $enum */
@@ -163,14 +203,14 @@ final class ComponentBuilder implements \Stringable
     }
 
     /**
-     * Special Method which is adding the `name="$this->nameOrKeyValue"` or `key="$this->nameOrKeyValue"`
+     * Special Method which is adding the `fieldName="$this->nameOrKeyValue"` or `key="$this->nameOrKeyValue"`
      *
      *
      * @return string[]
      */
     private function handleKeyOrName(InitialContentsEnum $initialContentsEnum, string $keyOrValue): array
     {
-        return [$initialContentsEnum->name, Entry::equals, UnquoteHelper::quote($keyOrValue)];
+        return [$initialContentsEnum->name, self::equals, UnquoteHelper::quote($keyOrValue)];
     }
 
     /**

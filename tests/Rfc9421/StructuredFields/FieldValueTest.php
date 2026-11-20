@@ -14,10 +14,11 @@ namespace Filefabrik\Rfc9421Test\StructuredFields;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\StructuredFields\FieldValue;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -32,6 +33,7 @@ final class FieldValueTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetFieldValue(): void
     {
@@ -47,7 +49,7 @@ final class FieldValueTest extends TestCase
 
         $handled = $fw->getFieldValue();
 
-        self::assertEquals(new Entry('test', 'testValue'), $handled);
+        self::assertEquals(EntryWithValue::fromBuilder(ComponentBuilder::from('test'), 'testValue'), $handled);
     }
 
     /**
@@ -55,6 +57,7 @@ final class FieldValueTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testGetFieldValueResponse(): void
     {
@@ -70,7 +73,7 @@ final class FieldValueTest extends TestCase
 
         $handled = $fw->getFieldValue();
 
-        self::assertEquals(new Entry('test', 'testValue'), $handled);
+        self::assertEquals(EntryWithValue::fromBuilder(ComponentBuilder::from('test'), 'testValue'), $handled);
     }
 
     /**
@@ -78,6 +81,7 @@ final class FieldValueTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandleSF(): void
     {
@@ -95,7 +99,7 @@ final class FieldValueTest extends TestCase
             initialContentsParameters: new InitialContentsParameters(),
         );
         $handled     = $instance->getFieldValue();
-        $targetEntry = new Entry('test', 'testValue');
+        $targetEntry=EntryWithValue::fromBuilder(ComponentBuilder::from('test'), 'testValue');
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -104,13 +108,14 @@ final class FieldValueTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandleName(): void
     {
         $config = new SigningConfiguration();
 
         /**
-         * todo doc name works atm only with the @query-param
+         * todo doc fieldName works atm only with the @query-param
          */
         $request     = new Request(
             'GET',
@@ -128,8 +133,9 @@ final class FieldValueTest extends TestCase
             ),
         );
         $handled     = $instance->getFieldValue();
-        $targetEntry = new Entry('@query-param', 'bat-man', InitialContentsEnum::name, 'baz');
-        self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
+        $targetEntry=   EntryWithValue::fromBuilder(ComponentBuilder::from('@query-param')->withName('baz'), 'bat-man');
+
+        self::assertEquals([$targetEntry->getComponent(), $targetEntry->value], [$handled->getComponent(), $handled->value]);
     }
 
     /**
@@ -137,6 +143,7 @@ final class FieldValueTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testInvalidHeaderKeyException(): void
     {

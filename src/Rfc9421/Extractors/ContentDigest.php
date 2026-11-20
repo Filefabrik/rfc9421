@@ -29,13 +29,13 @@ final readonly class ContentDigest
     }
 
     /**
-     * Hashes are in lowercase, but have a `-` in their name.
+     * Hashes are in lowercase, but have a `-` in their fieldName.
      * This is not what hash_algos() expects.
      * $digestAlgorithm = str_replace( search: "-", replace: "", subject: $digestData[0] );
      *
      *
      * @return string sha256
-     * @todo check the algorithm name has to be replaced
+     * @todo check the algorithm fieldName has to be replaced
      */
     public function getPhpAlgorithm(): string
     {

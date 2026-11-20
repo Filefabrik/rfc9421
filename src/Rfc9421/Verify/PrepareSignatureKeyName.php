@@ -48,7 +48,7 @@ final readonly class PrepareSignatureKeyName
 
             /*
              * extracted signature key from the "signature" which is the key for extracting the "components" and the "metadata"
-             * todo maybe decide we are using an signature key name if there are more then one signatures
+             * todo maybe decide we are using an signature key fieldName if there are more then one signatures
              * */
             $this->signingConfiguration
                 ->setSignatureKeyName(signatureKey: $signatureKeyName)

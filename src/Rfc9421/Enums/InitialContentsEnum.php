@@ -51,7 +51,7 @@ enum InitialContentsEnum
      */
     case req;
     /**
-     * name
+     * fieldName
      * Single named query parameter
      * Section 2.2.8 of RFC 9421
      */

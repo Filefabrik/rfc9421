@@ -35,7 +35,7 @@ final class Components
 
     /**
      * Many components separated by empty/space
-     * Try to read the component name into safe usable ComponentItemDto
+     * Try to read the component fieldName into safe usable ComponentItemDto
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException

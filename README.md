@@ -285,9 +285,9 @@ $signingComponents = new SigningComponents()
      // Signing "$headerKey";req;key="$keyValue"
      //->signHeader('"example-dict";key="d"') or better way like:
      ->signWithKey('example-dict', 'd')
-     // Signing "$headerKey";name="$nameValue"
-     // Signing "$headerKey";req;name="$nameValue"
-     //->signHeader('"@query-param";name="baz"') or better way like:
+     // Signing "$headerKey";$fieldName="$nameValue"
+     // Signing "$headerKey";req;$fieldName="$nameValue"
+     //->signHeader('"@query-param";$fieldName="baz"') or better way like:
      ->signWithName(DerivedComponentEnum::queryParam, 'baz')
      //.. other signings
 $signingConfiguration = new SigningConfiguration();   

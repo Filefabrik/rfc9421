@@ -13,17 +13,18 @@ namespace Filefabrik\Rfc9421\Signer\Signatures;
 
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Signature\ComponentName;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
 
 /**
  * Signature line, the si
  */
 final readonly class Line
 {
+    public const string colonWithSpace = ': ';
+
     /**
-     * todo make sure it started with an Quoute otherwise it is buggy !!!
+     * todo make sure it started with an Quote otherwise it is buggy !!!
      *
-     * @param string $signatureComponent the component name "@method"
+     * @param string $signatureComponent the component fieldName "@method"
      *
      * @param string|int $valueToSign the extracted value representation "@method": POST. The valueToSign is parsed as signable value
      */
@@ -33,11 +34,13 @@ final readonly class Line
 
     public function toLineString(): string
     {
-        return $this->signatureComponent.Entry::colonWithSpace.$this->valueToSign;
+        return $this->signatureComponent.self::colonWithSpace.$this->valueToSign;
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function getComponentItemDto(): ComponentItemDto
     {

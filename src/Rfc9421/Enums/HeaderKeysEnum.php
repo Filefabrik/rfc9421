@@ -29,7 +29,7 @@ enum HeaderKeysEnum: string
     case signature = 'signature';
 
     /**
-     * @return string return the value which is HTTP Header Key and also sigining components name part "content-digest";req
+     * @return string return the value which is HTTP Header Key and also sigining components fieldName part "content-digest";req
      */
     public function keyName(): string
     {

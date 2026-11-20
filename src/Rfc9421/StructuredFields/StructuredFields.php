@@ -97,7 +97,7 @@ final class StructuredFields
     private(set) array $fields = [];
 
     /**
-     * @param array<string,string>|array{} $fields lower-case header name, method
+     * @param array<string,string>|array{} $fields lower-case header fieldName, method
      */
     public function __construct(array $fields = [])
     {

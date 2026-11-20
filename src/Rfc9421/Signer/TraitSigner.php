@@ -16,10 +16,11 @@ use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -120,11 +121,15 @@ trait TraitSigner
         $this->signatureBase = $base->makeSignatureInput();
 
         // now set the signature-params ONLY into the signature-base line NOT into the HTTP-Header.
-        $signatureParamsEntry = new Entry(DerivedComponentEnum::signatureParams->value, $this->signatureBase);
+        $signatureParamsEntry = EntryWithValue::fromBuilder(
+            builder: ComponentBuilder::from(DerivedComponentEnum::signatureParams),
+            value  : $this->signatureBase,
+        );
+
         $this->signingLines->add(
             new Line(
                 // important to quote
-                signatureComponent: UnquoteHelper::quote($signatureParamsEntry->key),
+                signatureComponent: $signatureParamsEntry->getComponent(),
                 valueToSign       : $signatureParamsEntry->value,
             ),
         );
@@ -140,7 +145,9 @@ trait TraitSigner
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     private function updateHeadersBeforePrepare(): void
     {

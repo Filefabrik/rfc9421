@@ -14,6 +14,7 @@ namespace Filefabrik\Rfc9421\StructuredFields;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Psr\Http\Message\RequestInterface;
@@ -39,26 +40,29 @@ final readonly class FieldValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function getFieldValue(): Entry
+    public function getFieldValue(): EntryWithValue
     {
         return $this->handleRequestInterface();
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private function handleRequestInterface(): Entry
+    private function handleRequestInterface(): EntryWithValue
     {
         // first test the method is in the configuration stack
         // todo log later if there is no method. No Method is ok but maybe an configuration error
         $signingMethods = $this->signingConfiguration->getSigningMethodsWithDefaults();
         if ($signingMethods->hasMethod($this->componentItemDto->fieldName)) {
             return $signingMethods->callWith(
-                key   : $this->componentItemDto->fieldName,
+                fieldName: $this->componentItemDto->fieldName,
                 // todo more bootable parameters
-                params: [
+                params   : [
                     $this->messageInterface,
                     $this->initialContentsParameters,
                 ],
@@ -69,16 +73,20 @@ final readonly class FieldValue
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private function getDefaultEntry(): Entry
+    private function getDefaultEntry(): EntryWithValue
     {
         // todo header field not found
         // todo check why no parameter was set
 
         $fieldName = $this->componentItemDto->fieldName;
         if ($this->headerItemsDto->hasHeader(headerName: $fieldName)) {
-            return new Entry(key: $fieldName, value: $this->headerItemsDto->getTrimmedHeaderValue($fieldName));
+            return EntryWithValue::fromBuilder(new ComponentBuilder($fieldName))
+                                 ->setValue($this->headerItemsDto->getTrimmedHeaderValue($fieldName))
+            ;
         }
 
         throw InvalidHeaderKeyException::headerNotExists($fieldName);

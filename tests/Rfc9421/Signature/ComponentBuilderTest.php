@@ -29,7 +29,6 @@ final class ComponentBuilderTest extends TestCase
     /*    public function testErrors(): void
         {
         }*/
-
     public static function detects(): array
     {
         return [
@@ -44,6 +43,51 @@ final class ComponentBuilderTest extends TestCase
     public static function empties(): array
     {
         return [[null], ['']];
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testGetFieldNameString(): void
+    {
+        self::assertSame(
+            'test-play',
+            new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::key, 'key.va')
+                                             ->getFieldNameString(),
+        );
+        self::assertSame(
+            '@status',
+            new ComponentBuilder(DerivedComponentEnum::status)->setWithValue(InitialContentsEnum::key, 'key.va')
+                                                              ->getFieldNameString(),
+        );
+        self::assertSame(
+            '@status',
+            new ComponentBuilder(DerivedComponentEnum::status)->setWithValue(InitialContentsEnum::key, 'key.va')
+                                                              ->getFieldNameString(),
+        );
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public function testFrom()
+    {
+        self::assertSame(
+            'test-play',
+            ComponentBuilder::from('test-play')
+                            ->getFieldNameString(),
+        );
+        self::assertSame(
+            '@status',
+            ComponentBuilder::from('@status')
+                            ->getFieldNameString(),
+        );
+        self::assertSame(
+            '@status',
+            ComponentBuilder::from(DerivedComponentEnum::status)
+                            ->getFieldNameString(),
+        );
     }
 
     public function test__construct(): void

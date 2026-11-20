@@ -20,8 +20,9 @@ use Filefabrik\Rfc9421\Methods\MessageQueryParams;
 use Filefabrik\Rfc9421\Methods\MessageScheme;
 use Filefabrik\Rfc9421\Methods\MessageTargetUri;
 use Filefabrik\Rfc9421\Methods\MesssageRequestTarget;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\InitialContentsParameters;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -46,52 +47,66 @@ trait DefaultPrepareComponentMethodsTrait
              *
              * @see 2.2.1. Method
              */
-            DerivedComponentEnum::method->value        => fn (RequestInterface $messageInterface): Entry => new Entry(
-                key  : DerivedComponentEnum::method->value,
-                value: strtoupper($messageInterface->getMethod()),
+            DerivedComponentEnum::method->value        => fn (
+                RequestInterface $messageInterface,
+            ): EntryWithValue => EntryWithValue::fromBuilder(
+                builder: ComponentBuilder::from(DerivedComponentEnum::method),
+                value  : strtoupper($messageInterface->getMethod()),
             ),
-            DerivedComponentEnum::targetUri->value     => fn (RequestInterface $messageInterface): Entry => new Entry(
-                key  : DerivedComponentEnum::targetUri->value,
-                value: MessageTargetUri::handle($messageInterface),
+            DerivedComponentEnum::targetUri->value     => fn (
+                RequestInterface $messageInterface,
+            ): EntryWithValue => EntryWithValue::fromBuilder(
+                ComponentBuilder::from(DerivedComponentEnum::targetUri),
+                MessageTargetUri::handle($messageInterface),
             ),
 
             /*
              * @see 2.2.3. Authority
              */
-            DerivedComponentEnum::authority->value     => fn (RequestInterface $messageInterface): Entry => new Entry(
-                DerivedComponentEnum::authority->value,
-                MessageAuthority::handle($messageInterface),
+            DerivedComponentEnum::authority->value     => fn (
+                RequestInterface $messageInterface,
+            ): EntryWithValue => EntryWithValue::fromBuilder(
+                builder: ComponentBuilder::from(DerivedComponentEnum::authority),
+                value  : MessageAuthority::handle($messageInterface),
             ),
 
             /*
              * @see 2.2.4. Scheme
              */
-            DerivedComponentEnum::scheme->value        => fn (RequestInterface $messageInterface): Entry => new Entry(
-                key  : DerivedComponentEnum::scheme->value,
-                value: MessageScheme::handle($messageInterface),
+            DerivedComponentEnum::scheme->value        => fn (
+                RequestInterface $messageInterface,
+            ): EntryWithValue => EntryWithValue::fromBuilder(
+                builder: ComponentBuilder::from(DerivedComponentEnum::scheme),
+                value  : MessageScheme::handle($messageInterface),
             ),
             /*
              * 2.2.5. Request Target
              */
-            DerivedComponentEnum::requestTarget->value => fn (RequestInterface $messageInterface): Entry => new Entry(
-                key  : DerivedComponentEnum::requestTarget->value,
-                value: MesssageRequestTarget::handle($messageInterface),
+            DerivedComponentEnum::requestTarget->value => fn (
+                RequestInterface $messageInterface,
+            ): EntryWithValue => EntryWithValue::fromBuilder(
+                builder: ComponentBuilder::from(DerivedComponentEnum::requestTarget),
+                value  : MesssageRequestTarget::handle($messageInterface),
             ),
 
             /*
              * @see 2.2.6. Path
              */
-            DerivedComponentEnum::path->value          => fn (RequestInterface $messageInterface): Entry => new Entry(
-                key  : DerivedComponentEnum::path->value,
-                value: MessagePath::handle($messageInterface),
+            DerivedComponentEnum::path->value          => fn (
+                RequestInterface $messageInterface,
+            ): EntryWithValue => EntryWithValue::fromBuilder(
+                builder: ComponentBuilder::from(DerivedComponentEnum::path),
+                value  : MessagePath::handle($messageInterface),
             ),
 
             /*
              * @see 2.2.9. Status Code
              */
-            DerivedComponentEnum::status->value        => fn (ResponseInterface $response): Entry => new Entry(
-                DerivedComponentEnum::status->value,
-                (string)$response->getStatusCode(),
+            DerivedComponentEnum::status->value        => fn (
+                ResponseInterface $response,
+            ): EntryWithValue => EntryWithValue::fromBuilder(
+                builder: ComponentBuilder::from(DerivedComponentEnum::status),
+                value  : (string)$response->getStatusCode(),
             ),
 
             /*
@@ -101,7 +116,7 @@ trait DefaultPrepareComponentMethodsTrait
                 fn (
                     MessageInterface $messageInterface,
                     InitialContentsParameters $parameters,
-                ): Entry => MessageQueryParams::handle(
+                ): EntryWithValue => MessageQueryParams::handle(
                     message  : $messageInterface,
                     fieldName: $parameters->getValueOrThrow(InitialContentsEnum::name),
                 ),
@@ -110,16 +125,16 @@ trait DefaultPrepareComponentMethodsTrait
              * @see 2.2.7. Query
              */
             DerivedComponentEnum::query->value         =>
-                fn (RequestInterface $messageInterface): Entry => new Entry(
-                    key  : DerivedComponentEnum::query->value,
-                    value: $messageInterface->getUri()
-                                            ->getQuery(),
+                fn (RequestInterface $messageInterface): EntryWithValue => EntryWithValue::fromBuilder(
+                    builder: ComponentBuilder::from(DerivedComponentEnum::query),
+                    value  : $messageInterface->getUri()
+                                              ->getQuery(),
                 ),
 
             'content-length'                             =>
-                fn (RequestInterface|ResponseInterface $message): Entry => new Entry(
-                    key  : 'content-length',
-                    value: strlen((string)$message->getBody()),
+                fn (RequestInterface|ResponseInterface $message): EntryWithValue => EntryWithValue::fromBuilder(
+                    builder: ComponentBuilder::from('content-length'),
+                    value  : strlen((string)$message->getBody()),
                 ),
 
             /*

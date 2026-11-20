@@ -15,7 +15,6 @@ use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
@@ -23,7 +22,7 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
  * Single component with InitialContentsEnum or without InitialContentsEnum
  * or with structured fields
  *
- * @deprecated use ComponentEncoder
+ * @deprecated use ComponentBuilder
  */
 final class ComponentName
 {
@@ -34,11 +33,11 @@ final class ComponentName
      */
     public static function fromString(string|DerivedComponentEnum $name): ComponentItemDto
     {
-        $componentEncoder = $name instanceof DerivedComponentEnum ?
+        $componentBuilder = $name instanceof DerivedComponentEnum ?
             new ComponentBuilder($name) :
             self::extractor($name);
 
-        return $componentEncoder->toComponentItemDto();
+        return $componentBuilder->toComponentItemDto();
     }
 
     /**
@@ -53,24 +52,24 @@ final class ComponentName
         $pattern = '^"(.*?)"(.*?)$';
         preg_match('#'.$pattern.'#', $segment, $matches);
 
-        // only the name without quotas
-        // todo with more testing against the name
+        // only the fieldName without quotas
+        // todo with more testing against the fieldName
         if (0 === count($matches)) {
             if (str_contains($segment, '"') || str_contains($segment, ';')) {
                 throw  SignatureExtractionException::invalidLine($segment);
             }
 
-            // this is the name
+            // this is the fieldName
             return new ComponentBuilder($segment);
         }
 
-        // this is the name
-        $componentEncoder = new ComponentBuilder($matches[1]);
+        // this is the fieldName
+        $componentBuilder = new ComponentBuilder($matches[1]);
         if ($matches[2]) {
-            $componentEncoder = self::handleSemicolons($matches[2], $componentEncoder);
+            $componentBuilder = self::handleSemicolons($matches[2], $componentBuilder);
         }
 
-        return $componentEncoder;
+        return $componentBuilder;
     }
 
     /**
@@ -78,26 +77,26 @@ final class ComponentName
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private static function handleSemicolons(string $subSegment, ComponentBuilder $componentEncoder): ComponentBuilder
+    private static function handleSemicolons(string $subSegment, ComponentBuilder $componentBuilder): ComponentBuilder
     {
-        if (!str_starts_with($subSegment, Entry::semicolon)) {
+        if (!str_starts_with($subSegment, ComponentBuilder::semicolon)) {
             throw SignatureExtractionException::invalidParameter($subSegment);
         }
 
-        $ltrimmed = ltrim($subSegment, Entry::semicolon);
+        $ltrimmed = ltrim($subSegment, ComponentBuilder::semicolon);
         // todo more intensive testing
-        foreach (explode(Entry::semicolon, $ltrimmed) as $item) {
-            // check we have a key="" or name=""
-            $kvPair       = explode(Entry::equals, $item);
+        foreach (explode(ComponentBuilder::semicolon, $ltrimmed) as $item) {
+            // check we have a key="" or fieldName=""
+            $kvPair       = explode(ComponentBuilder::equals, $item);
             $cnt          = count($kvPair);
             $contentsEnum = InitialContentsEnum::isOwnTypeOrThrow($kvPair[0]);
             if (1 === $cnt) {
                 // detect and set flagless
-                $componentEncoder->setValueless($contentsEnum);
+                $componentBuilder->setValueless($contentsEnum);
             } elseif (2 === $cnt) {
                 // detect and set with value
                 $unquoted = UnquoteHelper::unquote($kvPair[1]);
-                $componentEncoder->setWithValue($contentsEnum, $unquoted);
+                $componentBuilder->setWithValue($contentsEnum, $unquoted);
             } else {
                 // @codeCoverageIgnoreStart
                 throw SignatureExtractionException::invalidParameter($subSegment);
@@ -105,7 +104,7 @@ final class ComponentName
             }
         }
 
-        return $componentEncoder;
+        return $componentBuilder;
     }
 
     /**
@@ -140,18 +139,17 @@ final class ComponentName
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
-     * @example with "COMPONENT-NAME";name="VALUE"
-     * @example with "COMPONENT-NAME";req;name="VALUE"
+     * @example with "COMPONENT-NAME";fieldName="VALUE"
+     * @example with "COMPONENT-NAME";req;fieldName="VALUE"
      */
     public static function withName(
         string|DerivedComponentEnum $name,
-        ?string $nameValue = null,
+        string $nameValue,
         bool $asReq = false,
     ): ComponentItemDto {
-        return
-            new ComponentBuilder($name)->withName($nameValue)
-                                       ->setReq($asReq)
-                                       ->toComponentItemDto()
+        return new ComponentBuilder($name)->withName($nameValue)
+                                          ->setReq($asReq)
+                                          ->toComponentItemDto()
         ;
     }
 
@@ -164,13 +162,12 @@ final class ComponentName
      */
     public static function withKey(
         string|DerivedComponentEnum $name,
-        ?string $keyValue = null,
+        string $keyValue,
         bool $asReq = false,
     ): ComponentItemDto {
-        return
-            new ComponentBuilder($name)->withKey($keyValue)
-                                       ->setReq($asReq)
-                                       ->toComponentItemDto()
+        return new ComponentBuilder($name)->withKey($keyValue)
+                                          ->setReq($asReq)
+                                          ->toComponentItemDto()
         ;
     }
 

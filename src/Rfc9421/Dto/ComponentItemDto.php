@@ -40,10 +40,10 @@ final readonly class ComponentItemDto
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function fromComponentBuilder(ComponentBuilder $componentEncoder): self
+    public static function fromComponentBuilder(ComponentBuilder $componentBuilder): self
     {
         try {
-            $item = Item::fromHttpValue((string)$componentEncoder);
+            $item = Item::fromHttpValue((string)$componentBuilder);
             // @codeCoverageIgnoreStart
         } catch (Exception $exception) {
             throw new SignatureExtractionException($exception->getMessage(), $exception->getCode(), $exception);
