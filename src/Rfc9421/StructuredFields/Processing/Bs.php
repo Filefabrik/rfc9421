@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -10,8 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -24,26 +24,30 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class Bs
 {
-    public function handle(Entry $entry, ResponseInterface|RequestInterface $messageInterface): Entry
-    {
-        $values = $messageInterface->getHeader($entry->key);
+    public function handle(
+        EntryWithValue $entry,
+        ResponseInterface|RequestInterface $messageInterface,
+    ): EntryWithValue {
+        $values = $messageInterface->getHeader($entry->getFieldName());
+
+        $entry->getBuilder()
+              ->withBs()
+        ;
+
         // nothing to handle so return empty
         // todo check if it is an error that no http-header value found and whats happened with the zero value
-        if (0 === count($values)) {
-            return $entry->setInitialContents(InitialContentsEnum::bs);
+        if (0 < count($values)) {
+            $valuesSegments = [];
+            foreach ($values as $value) {
+                $valuesSegments [] = ':'.base64_encode(trim($value)).':';
+            }
+
+            // all in a line
+            $resultValue = implode(', ', $valuesSegments);
+            $entry->setValue($resultValue);
         }
 
-        $valuesSegments = [];
-        foreach ($values as $value) {
-            $valuesSegments [] = ':'.base64_encode(trim($value)).':';
-        }
-
-        // all in a line
-        $resultValue = implode(', ', $valuesSegments);
-
-        return $entry->setInitialContents(InitialContentsEnum::bs)
-                     ->setValue($resultValue)
-        ;
+        return $entry;
     }
 
 }
