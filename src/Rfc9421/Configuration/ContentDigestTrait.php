@@ -31,7 +31,7 @@ trait ContentDigestTrait
      */
     public function withContentDigest(string|DigestAlgorithmsEnum $contentDigestAlgo): self
     {
-        $this->setcontentDigestAlgo(contentDigestAlgo: $contentDigestAlgo);
+        $this->setContentDigestAlgo(contentDigestAlgo: $contentDigestAlgo);
 
         $this->mustGenerateContentDigest = true;
 

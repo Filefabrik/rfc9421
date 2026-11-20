@@ -32,7 +32,7 @@ final class BsTest extends TestCase
         $entry       = EntryWithValue::fromBuilder(ComponentBuilder::from('example-header'));
         $bs          = new Bs();
         $returnEntry = $bs->handle($entry, $request);
-        self::assertNull($returnEntry->value);
+        self::assertNull($returnEntry->getValue());
         self::assertSame('"example-header";bs', $returnEntry->getComponent());
         self::assertSame('"example-header";bs: ', $returnEntry->parseComponentNameAndValue());
     }
@@ -49,7 +49,7 @@ final class BsTest extends TestCase
         $entry       = EntryWithValue::fromBuilder(ComponentBuilder::from('example-header'));
         $bs          = new Bs();
         $returnEntry = $bs->handle($entry, $request);
-        self::assertSame(':bXkgdGVzdCB2YWx1ZSBmaXJzdA==:', $returnEntry->value);
+        self::assertSame(':bXkgdGVzdCB2YWx1ZSBmaXJzdA==:', $returnEntry->getValue());
         self::assertSame('"example-header";bs', $returnEntry->getComponent());
         self::assertSame(
             '"example-header";bs: :bXkgdGVzdCB2YWx1ZSBmaXJzdA==:',
@@ -72,7 +72,7 @@ final class BsTest extends TestCase
         $returnEntry = $bs->handle($entry, $request);
         self::assertSame(
             ':bXkgdGVzdCB2YWx1ZSBmaXJzdA==:, :dGhlIHNlY29uZCwgdGVzdCB2YWx1ZSBmaXJzdA==:',
-            $returnEntry->value,
+            $returnEntry->getValue(),
         );
         self::assertSame(
             '"example-header";bs',

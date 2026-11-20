@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Signer;
 
 use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
+use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
@@ -21,7 +22,6 @@ use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
-use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -130,7 +130,7 @@ trait TraitSigner
             new Line(
                 // important to quote
                 signatureComponent: $signatureParamsEntry->getComponent(),
-                valueToSign       : $signatureParamsEntry->value,
+                valueToSign       : $signatureParamsEntry->getValue(),
             ),
         );
 
@@ -154,7 +154,7 @@ trait TraitSigner
         if ($this->signingConfiguration->isMustGenerateContentDigest()) {
             $siCo = $this->signingConfiguration->getSigningComponents();
 
-            if (!$siCo->findComponentByName(HeaderKeysEnum::content_digest->value)) {
+            if (!$siCo->findComponentByName(HeaderKeysEnum::content_digest->value) instanceof ComponentItemDto) {
                 $siCo->sign(HeaderKeysEnum::content_digest->value);
             }
 

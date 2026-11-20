@@ -1,12 +1,10 @@
-<?php
-
-/*
+<?php /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
  * mastodon: filefabrik@phpc.social
  * License: proprietary
  * State: under development
- */
+ */ /** @noinspection PhpMultipleClassDeclarationsInspection */
 
 declare(strict_types=1);
 
@@ -52,10 +50,9 @@ final class ComponentBuilder implements Stringable
      */
     public function __construct(string|DerivedComponentEnum $name)
     {
-        $this->fieldName                 =
-            $name instanceof DerivedComponentEnum
-                ? $name :
-                $this->setValidatedName($name);
+        $this->fieldName                 = $name instanceof DerivedComponentEnum ?
+            $name :
+            $this->setValidatedName($name);
         $this->initialContentsParameters = new InitialContentsParameters();
     }
 
@@ -93,19 +90,11 @@ final class ComponentBuilder implements Stringable
     }
 
     /**
-     * DerivedComponent value or string value without Quotas
-     */
-    public function getFieldNameString(): string
-    {
-        return $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName;
-    }
-
-    /**
      * Helper if req should be set by flag
      */
     public function setReq(bool|null $flag = null): self
     {
-        if ($flag) {
+        if (true === $flag) {
             $this->withReq();
         }
 
@@ -169,9 +158,15 @@ final class ComponentBuilder implements Stringable
      */
     private function getQuotedName(): string
     {
-        return UnquoteHelper::quote(
-            $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName,
-        );
+        return UnquoteHelper::quote($this->getFieldNameString());
+    }
+
+    /**
+     * DerivedComponent value or string value without Quotas
+     */
+    public function getFieldNameString(): string
+    {
+        return $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName;
     }
 
     private function renderFlags(): array

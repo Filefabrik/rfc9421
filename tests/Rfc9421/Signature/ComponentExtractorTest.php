@@ -130,7 +130,7 @@ final class ComponentExtractorTest extends TestCase
             ),
         );
         ComponentExtractor::extractToComponentItemDto('"test55')
-                     ->getHttpValue()
+                     ->getComponent()
         ;
     }
 
@@ -152,7 +152,7 @@ final class ComponentExtractorTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    public function testExtractor()
+    public function testExtractToBuilder(): void
     {
         $res = ComponentExtractor::extractToBuilder('"caramba"');
         self::assertSame('"caramba"', (string)$res);
@@ -165,6 +165,9 @@ final class ComponentExtractorTest extends TestCase
 
         $res = ComponentExtractor::extractToBuilder('"caramba";name="player";req');
         self::assertSame('"caramba";name="player";req', (string)$res);
+
+        $res = ComponentExtractor::extractToBuilder(DerivedComponentEnum::status);
+        self::assertSame('"@status"', (string)$res);
     }
 
     /**

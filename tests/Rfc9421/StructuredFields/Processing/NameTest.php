@@ -42,7 +42,7 @@ final class NameTest extends TestCase
             actual  : $handledEntry,
         );
         self::assertSame('"query-param";name="thats-the-key"', $handledEntry->getComponent());
-        self::assertSame('no-value', $handledEntry->value);
+        self::assertSame('no-value', $handledEntry->getValue());
         self::assertSame('"query-param";name="thats-the-key": no-value', $handledEntry->parseComponentNameAndValue());
     }
 }

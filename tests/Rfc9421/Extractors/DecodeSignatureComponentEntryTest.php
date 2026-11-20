@@ -193,6 +193,8 @@ final class DecodeSignatureComponentEntryTest extends TestCase
     #[DataProvider('stringProvider')]
     public function testExtract(string $line, array $expected): void
     {
+
+
         $matches = DecodeSignatureComponentEntry::extract($line);
 
         self::assertSame($expected, $matches);
@@ -214,19 +216,17 @@ final class DecodeSignatureComponentEntryTest extends TestCase
     }
 
     /**
-     * @param string                                  $line
-     * @param \Bakame\Http\StructuredFields\Item|null $expectedItem
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     #[DataProvider('componentDtoProvider')]
-    public function testToComponentItemDto(string $line, ?Item $expectedItem): void
+    public function testToBuilder(string $line, ?Item $expectedItem): void
     {
-        $item    = DecodeSignatureComponentEntry::toComponentDto($line);
+        $item    = DecodeSignatureComponentEntry::toBuilder($line)->toComponentItemDto();
         $exValue = $expectedItem->value();
-        $decoded = $item->getHttpValue();
+        $decoded = $item->getComponent();
         self::assertEquals($exValue, $decoded);
     }
 

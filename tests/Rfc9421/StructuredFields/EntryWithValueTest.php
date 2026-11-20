@@ -78,7 +78,7 @@ final class EntryWithValueTest extends TestCase
             value  : 'myValue',
         );
         self::assertSame('"testkey";req', $entry->getComponent());
-        self::assertSame('myValue', $entry->value);
+        self::assertSame('myValue', $entry->getValue());
         self::assertSame('"testkey";req: myValue', $entry->parseComponentNameAndValue());
     }
 
@@ -91,12 +91,12 @@ final class EntryWithValueTest extends TestCase
         $entry = EntryWithValue::fromBuilder(ComponentBuilder::from('testkey'));
 
         self::assertSame('"testkey"', $entry->getComponent());
-        self::assertNull($entry->value);
+        self::assertNull($entry->getValue());
 
         self::assertSame('"testkey": ', $entry->parseComponentNameAndValue());
 
         $newEntry = $entry->setValue('myValue');
-        self::assertSame('myValue', $newEntry->value);
+        self::assertSame('myValue', $newEntry->getValue());
         self::assertSame('"testkey": myValue', $newEntry->parseComponentNameAndValue());
     }
 

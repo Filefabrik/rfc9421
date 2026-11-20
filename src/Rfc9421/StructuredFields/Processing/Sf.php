@@ -55,6 +55,7 @@ final readonly class Sf
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     private function processValue(EntryWithValue $entry): string
     {
@@ -67,7 +68,7 @@ final readonly class Sf
         /**
          * Calling/executing the field
          */
-        $field = $this->methodsMapper->callMethod($type, [$entry->value]);
+        $field = $this->methodsMapper->callMethod($type, [$entry->getValue()]);
 
         if (null === $field) {
             throw StructuredFieldException::unknownStructuredFieldType($entry->getFieldName());

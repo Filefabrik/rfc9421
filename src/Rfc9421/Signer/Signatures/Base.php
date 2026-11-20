@@ -116,7 +116,7 @@ final readonly class Base
         return $this->findAndFix(
             requestLines    : $this->readLines,
             searchInRequest : $signatureComponent->httpValueWithoutReq(),
-            requestLineValue: $signatureComponent->getHttpValue(),
+            requestLineValue: $signatureComponent->getComponent(),
         );
     }
 

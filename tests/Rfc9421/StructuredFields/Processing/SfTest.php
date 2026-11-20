@@ -46,7 +46,7 @@ final class SfTest extends TestCase
         );
 
         $res = $sfInstance->handle($entry);
-        self::assertSame('a=1, b=2;x=1;y=2, c=(a b c), d', $res->value);
+        self::assertSame('a=1, b=2;x=1;y=2, c=(a b c), d', $res->getValue());
         self::assertSame('"example-dict";sf', $res->getComponent());
         self::assertSame('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $res->parseComponentNameAndValue());
     }

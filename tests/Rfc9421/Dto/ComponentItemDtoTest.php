@@ -31,7 +31,7 @@ final class ComponentItemDtoTest extends TestCase
 
         self::assertSame(
             '"test";sf',
-            $i->getHttpValue(),
+            $i->getComponent(),
         );
     }
 
@@ -76,7 +76,7 @@ final class ComponentItemDtoTest extends TestCase
         self::assertSame(
             '"test"',
             $i->withoutInitialContentsReq()
-              ->getHttpValue(),
+              ->getComponent(),
         );
     }
 

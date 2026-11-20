@@ -91,14 +91,14 @@ final readonly class ComponentItemDto
     public function httpValueWithoutReq(): string
     {
         return $this->withoutInitialContentsReq()
-                    ->getHttpValue()
+                    ->getComponent()
         ;
     }
 
     /**
      * HTTP Value is the key without the value after before the colon ":"
      */
-    public function getHttpValue(): string
+    public function getComponent(): string
     {
         return $this->httpValue;
     }

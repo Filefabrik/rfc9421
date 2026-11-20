@@ -205,8 +205,8 @@ final class CompileEntryTest extends TestCase
         $parsed = $targetEntry->parseComponentNameAndValue();
         self::assertSame('"@query-param";name="baz": bat-man', $parsed);
         self::assertEquals(
-            [$targetEntry->getFieldName(), $targetEntry->value],
-            [$handled->getFieldName(), $handled->value]
+            [$targetEntry->getFieldName(), $targetEntry->getValue()],
+            [$handled->getFieldName(), $handled->getValue()]
         );
     }
 
@@ -245,8 +245,8 @@ final class CompileEntryTest extends TestCase
         );
 
         self::assertEquals(
-            [$targetEntry->getFieldName(), $targetEntry->value],
-            [$handled->getFieldName(), $handled->value]
+            [$targetEntry->getFieldName(), $targetEntry->getValue()],
+            [$handled->getFieldName(), $handled->getValue()]
         );
     }
 
@@ -284,8 +284,8 @@ final class CompileEntryTest extends TestCase
         );
 
         self::assertEquals(
-            [$targetEntry->getFieldName(), $targetEntry->getComponent(), $targetEntry->value],
-            [$handled->getFieldName(), $handled->getComponent(), $handled->value]
+            [$targetEntry->getFieldName(), $targetEntry->getComponent(), $targetEntry->getValue()],
+            [$handled->getFieldName(), $handled->getComponent(), $handled->getValue()]
         );
     }
 

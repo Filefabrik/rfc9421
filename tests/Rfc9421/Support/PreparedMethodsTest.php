@@ -156,7 +156,7 @@ final class PreparedMethodsTest extends TestCase
             ],
         );
         $calledEntry = $prepareMethods->callWith('content-length', [$r]);
-        self::assertSame(62, $calledEntry->value);
+        self::assertSame(62, $calledEntry->getValue());
         self::assertSame('content-length', $calledEntry->getFieldName());
     }
 
@@ -185,7 +185,7 @@ final class PreparedMethodsTest extends TestCase
             ],
         );
         $calledEntry = $prepareMethods->callWith('content-length', [$r]);
-        self::assertSame(62, $calledEntry->value);
+        self::assertSame(62, $calledEntry->getValue());
         self::assertSame('content-length', $calledEntry->getFieldName());
     }
 

@@ -49,7 +49,6 @@ final class ComponentExtractor
     public static function extractToBuilder(string|DerivedComponentEnum $name): ComponentBuilder
     {
         return $name instanceof DerivedComponentEnum ?
-
             new ComponentBuilder($name) :
             self::extractor($name);
     }

@@ -1,6 +1,7 @@
 <?php
+
 /*
- * Copyright (c) 2026.  
+ * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
  * mastodon: filefabrik@phpc.social
  * License: proprietary
@@ -13,5 +14,4 @@ namespace Filefabrik\Rfc9421\Support;
 
 final class NotSet
 {
-
 }

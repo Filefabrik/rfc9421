@@ -145,8 +145,8 @@ final class FieldValueTest extends TestCase
         );
 
         self::assertEquals(
-            [$targetEntry->getComponent(), $targetEntry->value],
-            [$handled->getComponent(), $handled->value],
+            [$targetEntry->getComponent(), $targetEntry->getValue()],
+            [$handled->getComponent(), $handled->getValue()],
         );
     }
 

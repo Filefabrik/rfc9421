@@ -39,7 +39,7 @@ final class LineTest extends TestCase
         self::assertSame(
             '"one"',
             $i->getComponentItemDto()
-              ->getHttpValue(),
+              ->getComponent(),
         );
     }
 

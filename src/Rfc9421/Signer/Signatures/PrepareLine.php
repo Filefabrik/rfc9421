@@ -51,8 +51,8 @@ final readonly class PrepareLine
         $entry    = $destruct->handle();
 
         return new Line(
-            signatureComponent: $this->componentItemDto->getHttpValue(),
-            valueToSign       : $entry->value,
+            signatureComponent: $this->componentItemDto->getComponent(),
+            valueToSign       : $entry->getValue(),
         );
     }
 

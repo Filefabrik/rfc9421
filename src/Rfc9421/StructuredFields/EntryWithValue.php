@@ -42,7 +42,7 @@ use Filefabrik\Rfc9421\Signer\Signatures\Line;
  */
 final class EntryWithValue
 {
-    private function __construct(private readonly ComponentBuilder $builder, private(set) null|string|int $value = null)
+    private function __construct(private readonly ComponentBuilder $builder, private null|string|int $value = null)
     {
     }
 
@@ -66,7 +66,7 @@ final class EntryWithValue
         return $this->builder;
     }
 
-    public function setValue(string|null|int $value): self
+    public function setValue(string|int $value): self
     {
         $this->value = $value;
 
@@ -75,7 +75,7 @@ final class EntryWithValue
 
     public function parseComponentNameAndValue(): string
     {
-        return $this->getComponent().Line::colonWithSpace.$this->value;
+        return $this->getComponent().Line::colonWithSpace.$this->getValue();
     }
 
     /**
@@ -87,4 +87,10 @@ final class EntryWithValue
     {
         return (string)$this->builder;
     }
+
+    public function getValue(): null|int|string
+    {
+        return $this->value;
+    }
+
 }

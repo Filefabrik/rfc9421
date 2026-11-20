@@ -72,7 +72,7 @@ final class PrepareLineTest extends TestCase
                 ComponentBuilder::from('test')
                                 ->withBs(),
                 ':dGVzdFZhbHVl:',
-            )->value,
+            )->getValue(),
         );
         self::assertEquals($targetEntry, $line);
     }
@@ -108,7 +108,7 @@ final class PrepareLineTest extends TestCase
                 ComponentBuilder::from('test')
                                 ->withSf(),
                 'testValue',
-            )->value);
+            )->getValue());
         self::assertEquals($targetEntry, $line);
     }
 

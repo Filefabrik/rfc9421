@@ -34,7 +34,7 @@ final readonly class Key
     public function handle(EntryWithValue $entry, string $keyName): EntryWithValue
     {
         // todo check fieldValue cast because only strings allowed
-        $entryValue = (string)$entry->value;
+        $entryValue = (string)$entry->getValue();
         $value      = $this->applySingleKeyValue(name: $entry->getFieldName(), key: $keyName, fieldValue: $entryValue);
 
         return EntryWithValue::fromBuilder(new ComponentBuilder($entry->getFieldName())->withKey($keyName))

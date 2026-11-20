@@ -143,13 +143,13 @@ final class SigningComponentsTest extends TestCase
         );
         $i->sign('foo');
 
-        $c = $i->getComponents()[0]->getHttpValue();
+        $c = $i->getComponents()[0]->getComponent();
         self::assertEquals('"foo"', $c);
 
         $i->sign('foo-with-req', true);
         self::assertEquals(
             '"foo-with-req";req',
-            $i->getComponents()[1]->getHttpValue(),
+            $i->getComponents()[1]->getComponent(),
         );
     }
 
@@ -167,13 +167,13 @@ final class SigningComponentsTest extends TestCase
         );
         $i->signWithSF('foo');
 
-        $c = $i->getComponents()[0]->getHttpValue();
+        $c = $i->getComponents()[0]->getComponent();
         self::assertEquals('"foo";sf', $c);
 
         $i->signWithSF('foo-with-req', true);
         self::assertEquals(
             '"foo-with-req";sf;req',
-            $i->getComponents()[1]->getHttpValue(),
+            $i->getComponents()[1]->getComponent(),
         );
     }
 
@@ -191,13 +191,13 @@ final class SigningComponentsTest extends TestCase
         );
         $i->signWithBS('foo');
 
-        $c = $i->getComponents()[0]->getHttpValue();
+        $c = $i->getComponents()[0]->getComponent();
         self::assertEquals('"foo";bs', $c);
 
         $i->signWithBS('foo-with-req', true);
         self::assertEquals(
             '"foo-with-req";bs;req',
-            $i->getComponents()[1]->getHttpValue(),
+            $i->getComponents()[1]->getComponent(),
         );
     }
 
@@ -215,13 +215,13 @@ final class SigningComponentsTest extends TestCase
         );
         $i->signWithKey('foo', 'the-key');
 
-        $c = $i->getComponents()[0]->getHttpValue();
+        $c = $i->getComponents()[0]->getComponent();
         self::assertEquals('"foo";key="the-key"', $c);
 
         $i->signWithKey('foo-with-req', 'the-key', true);
         self::assertEquals(
             '"foo-with-req";key="the-key";req',
-            $i->getComponents()[1]->getHttpValue(),
+            $i->getComponents()[1]->getComponent(),
         );
     }
 
@@ -239,13 +239,13 @@ final class SigningComponentsTest extends TestCase
         );
         $i->signWithName('foo', 'the-key');
 
-        $c = $i->getComponents()[0]->getHttpValue();
+        $c = $i->getComponents()[0]->getComponent();
         self::assertEquals('"foo";name="the-key"', $c);
 
         $i->signWithName('foo-with-req', 'the-key', true);
         self::assertEquals(
             '"foo-with-req";name="the-key";req',
-            $i->getComponents()[1]->getHttpValue(),
+            $i->getComponents()[1]->getComponent(),
         );
     }
 
@@ -297,12 +297,12 @@ final class SigningComponentsTest extends TestCase
         $current        = ComponentBuilder::from('test')
                                           ->withReq()
                                           ->toComponentItemDto()
-                                          ->getHttpValue()
+                                          ->getComponent()
         ;
         $foundComponent = $t->findComponentByName($current);
         self::assertEquals(
             '"test";req',
-            $foundComponent->getHttpValue(),
+            $foundComponent->getComponent(),
         );
     }
 

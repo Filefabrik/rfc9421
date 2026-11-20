@@ -12,14 +12,16 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Extractors;
 
-use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
  * Helper to Handle a signature line
+ *
+ * @example splits "content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=: into the ComponentBuilder and the Value
  */
 final class DecodeSignatureComponentEntry
 {
@@ -31,16 +33,37 @@ final class DecodeSignatureComponentEntry
      */
     public static function toLine(string $line): Line
     {
-        $extracted = self::extractOrThrow($line);
+        $builderValue = self::extractToBuilderAndValue($line);
+        $component    = $builderValue['builder']
+            ->toComponentItemDto()
+            ->getComponent()
+        ;
 
-        $componentItemDto = self::toComponentDto($line);
-
-        $key = $componentItemDto->getHttpValue();
-
-        return new Line(signatureComponent: $key, valueToSign: $extracted[3]);
+        return new Line(
+            signatureComponent: $component,
+            valueToSign       : $builderValue['value'],
+        );
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @return array{builder:ComponentBuilder,value:string}
+     */
+    private static function extractToBuilderAndValue(string $line): array
+    {
+        $extracted = self::extractOrThrow($line);
+
+        $quoted = UnquoteHelper::quote($extracted[1]);
+        $string = $quoted.$extracted[2];
+
+        return ['builder' => ComponentExtractor::extractToBuilder($string), 'value' => $extracted[3]];
+    }
+
+    /**
+     * todo make private
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @return array{0:string,1:string,2:string,3:string}
      */
@@ -53,6 +76,7 @@ final class DecodeSignatureComponentEntry
 
     /**
      * Extracting a single line with signature-input-format
+     * todo make private
      *
      * @return array{0:string,1:string,2:string,3:string}|array{}
      * @see \Filefabrik\Rfc9421Test\Extractors\DecodeSignatureComponentEntryTest::testExtract()
@@ -68,17 +92,13 @@ final class DecodeSignatureComponentEntry
     }
 
     /**
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function toComponentDto(string $line): ComponentItemDto
+    public static function toBuilder(string $line): ComponentBuilder
     {
-        $extracted = self::extractOrThrow($line);
-        $quoted    = UnquoteHelper::quote($extracted[1]);
-        $string    = $quoted.$extracted[2];
-
-        return ComponentExtractor::extractToComponentItemDto($string);
+        return self::extractToBuilderAndValue($line)['builder'];
     }
+
 }

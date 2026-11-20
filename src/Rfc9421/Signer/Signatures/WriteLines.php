@@ -26,7 +26,9 @@ final class WriteLines extends AbstractLines
     /**
      * Todo format Converters
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @example from a full signature params line '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:',
      */
     public function fromSignatureLine(string $line): self

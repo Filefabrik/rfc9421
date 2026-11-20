@@ -48,7 +48,7 @@ final class SignatureExtractionExceptionTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
-    public function testInvalidParameter()
+    public function testInvalidParameter(): void
     {
         $this->expectExceptionObject(
             new SignatureExtractionException(

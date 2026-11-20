@@ -43,7 +43,7 @@ final class PrepareComponentsTest extends TestCase
         $prepareInstance = new PrepareComponents(new Request('post', 'https://Test.com'));
         $prepareInstance->addMappingValues($arr);
 
-        self::assertSame('PosB', $prepareInstance->processValue('@method')->value);
+        self::assertSame('PosB', $prepareInstance->processValue('@method')->getValue());
     }
 
     /**
@@ -61,7 +61,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->addMappingValues($arr);
-        self::assertSame('Post', $prepareInstance->processValue('@method')->value);
+        self::assertSame('Post', $prepareInstance->processValue('@method')->getValue());
     }
 
     public function testSetPreparedMethods(): void
@@ -134,7 +134,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('https://test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri')->value);
+        self::assertSame('https://test.com/var/pathy/?qer=var', $prepareInstance->processValue('@target-uri')->getValue());
     }
 
     /**
@@ -161,7 +161,7 @@ final class PrepareComponentsTest extends TestCase
     {
         $r               = new Request('post', 'https://Test.com/var/pathy/?qer=var');
         $prepareInstance = new PrepareComponents($r, signingConfiguration: new SigningConfiguration());
-        self::assertSame('POST', $prepareInstance->processValue('@method')->value);
+        self::assertSame('POST', $prepareInstance->processValue('@method')->getValue());
     }
 
     /**
@@ -175,11 +175,11 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('test.com', $prepareInstance->processValue('@authority')->value);
+        self::assertSame('test.com', $prepareInstance->processValue('@authority')->getValue());
 
         $r = new Request('post', 'https://www.Test.com/var/pathy/?qer=var');
 
-        self::assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority')->value);
+        self::assertSame('www.test.com', new PrepareComponents($r)->processValue('@authority')->getValue());
     }
 
     /**
@@ -193,12 +193,12 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame('https', $prepareInstance->processValue('@scheme')->value);
+        self::assertSame('https', $prepareInstance->processValue('@scheme')->getValue());
 
         /** @noinspection HttpUrlsUsage */
         $r = new Request('post', 'http://www.Test.com/var/pathy/?qer=var');
 
-        self::assertSame('http', new PrepareComponents($r)->processValue('@scheme')->value);
+        self::assertSame('http', new PrepareComponents($r)->processValue('@scheme')->getValue());
     }
 
     /**
@@ -260,7 +260,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->addMappingValues($arr);
-        self::assertSame('Post', $prepareInstance->processValue('methodsss')->value);
+        self::assertSame('Post', $prepareInstance->processValue('methodsss')->getValue());
     }
 
     /**
@@ -278,7 +278,7 @@ final class PrepareComponentsTest extends TestCase
 
         $prepareInstance = new PrepareComponents($r);
 
-        self::assertSame(62, $prepareInstance->processValue('content-length')->value);
+        self::assertSame(62, $prepareInstance->processValue('content-length')->getValue());
     }
 
     /**

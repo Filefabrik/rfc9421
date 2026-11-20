@@ -71,7 +71,7 @@ final class ComponentBuilderTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public function testFrom()
+    public function testFrom(): void
     {
         self::assertSame(
             'test-play',
@@ -140,7 +140,7 @@ final class ComponentBuilderTest extends TestCase
     {
         self::assertSame('"test-play";req', (string)new ComponentBuilder('test-play')->setReq(true));
         self::assertSame('"test-play"', (string)new ComponentBuilder('test-play')->setReq(false));
-        self::assertSame('"test-play"', (string)new ComponentBuilder('test-play')->setReq(null));
+        self::assertSame('"test-play"', (string)new ComponentBuilder('test-play')->setReq());
         self::assertSame('"test-play"', (string)new ComponentBuilder('test-play')->setReq());
     }
 
@@ -184,17 +184,17 @@ final class ComponentBuilderTest extends TestCase
     public function testSetWithValueThrowsWrongEnum(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('"bs" can not be set with an value'));
-        (string)new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::bs, 'key.va');
+        new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::bs, 'key.va');
     }
 
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     #[DataProvider('empties')]
-    public function testSetWithValueThrowsCanNotBeEmpty($v): void
+    public function testSetWithValueThrowsCanNotBeEmpty(?string $v): void
     {
         $this->expectExceptionObject(new UnexpectedValue('Value can not be empty'));
-        (string)new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::name, $v);
+        new ComponentBuilder('test-play')->setWithValue(InitialContentsEnum::name, $v);
     }
 
     /**
@@ -203,14 +203,14 @@ final class ComponentBuilderTest extends TestCase
     public function testSetValuelessThrows(): void
     {
         $this->expectExceptionObject(new UnexpectedValue('"key" is not part of valueless'));
-        (string)new ComponentBuilder('test-play')->setValueless(InitialContentsEnum::key);
+        new ComponentBuilder('test-play')->setValueless(InitialContentsEnum::key);
     }
 
     /**
      * @throws Exception
      */
     #[DataProvider('detects')]
-    public function testSetDetect(InitialContentsEnum $contentsEnum, $value = null, $expected = null): void
+    public function testSetDetect(InitialContentsEnum $contentsEnum, ?string $value = null, ?string $expected = null): void
     {
         self::assertSame($expected, (string)new ComponentBuilder('test-fieldname')->setDetect($contentsEnum, $value));
     }

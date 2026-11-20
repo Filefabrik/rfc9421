@@ -30,7 +30,7 @@ final readonly class Name
         return EntryWithValue::fromBuilder(
             builder: ComponentBuilder::from($entry->getFieldName())
                                      ->withName($keyName),
-            value  : $entry->value,
+            value  : $entry->getValue(),
         );
     }
 
