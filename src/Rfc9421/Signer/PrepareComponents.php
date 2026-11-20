@@ -13,7 +13,7 @@ namespace Filefabrik\Rfc9421\Signer;
 
 use Closure;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\Support\DefaultPrepareComponentMethodsTrait;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use Psr\Http\Message\RequestInterface;
@@ -79,9 +79,12 @@ final class PrepareComponents
     }
 
     /**
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function processValue(string $key): Entry
+    public function processValue(string $key): EntryWithValue
     {
         return $this->getMethodStack()
                     ->callWith($key, [$this->message])

@@ -25,7 +25,9 @@ use Psr\Http\Message\RequestInterface;
 final class PrepareComponentsTest extends TestCase
 {
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSetDefaultDerivedStack(): void
     {
@@ -45,7 +47,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSetDerivedMapper(): void
     {
@@ -75,6 +79,7 @@ final class PrepareComponentsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessValue(): void
     {
@@ -119,7 +124,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessTargetUri(): void
     {
@@ -131,7 +138,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessingThrow(): void
     {
@@ -144,7 +153,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessAtMethod(): void
     {
@@ -154,7 +165,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessAuthority(): void
     {
@@ -170,7 +183,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessScheme(): void
     {
@@ -190,6 +205,7 @@ final class PrepareComponentsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessPath(): void
     {
@@ -214,7 +230,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessValueNotCallable(): void
     {
@@ -228,23 +246,27 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testSetMappingValues(): void
     {
         $arr = [
-            '@methodsss' => fn (RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
+            'methodsss' => fn (RequestInterface $message): string => ucfirst(strtolower($message->getMethod())),
         ];
 
         $r = new Request('post', 'https://Test.com');
 
         $prepareInstance = new PrepareComponents($r);
         $prepareInstance->addMappingValues($arr);
-        self::assertSame('Post', $prepareInstance->processValue('@methodsss')->value);
+        self::assertSame('Post', $prepareInstance->processValue('methodsss')->value);
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testProcessContentLength(): void
     {
@@ -260,7 +282,9 @@ final class PrepareComponentsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testPrepareMethodsException(): void
     {
