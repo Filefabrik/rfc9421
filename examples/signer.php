@@ -71,6 +71,9 @@ $extraParser = ['example-dict' => 'dictionary'];
  * Use ist as you need
  */
 try {
+    /**
+     * todo sign with builder
+     */
     $signRequestComponents = new SigningComponents()
         /*
             * as string without quotas
@@ -414,12 +417,11 @@ try {
 $wl = new WriteLines();
 try {
     $wl->fromSignatureLine(line: '"content-digest": sha-256=:qvoLOe+II0NxvDyMNg80z+xDv6aD9IkT9w8a340Q1Oo=:');
-} catch (SignatureExtractionException $signatureExtractionException) {
+} catch (SignatureExtractionException|EnumTypeException|UnexpectedValue $signatureExtractionException) {
     echo $signatureExtractionException->getMessage(), PHP_EOL;
 
     return;
 }
-
 $resRL                           = new ReadLines(lines: $wl);
 $signedResponseVerifyPreparation = new VerifyResponsePrepare(
     message             : $signedResponse,
