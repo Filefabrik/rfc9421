@@ -38,6 +38,7 @@ final class ComponentBuilder implements Stringable
     private(set) readonly string|DerivedComponentEnum $fieldName;
 
     private readonly InitialContentsParameters $initialContentsParameters;
+
     /**
      * They need a value later in fieldName="expect_value" key="expect_value"
      *

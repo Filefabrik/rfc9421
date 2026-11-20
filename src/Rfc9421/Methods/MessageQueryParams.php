@@ -68,8 +68,7 @@ final class MessageQueryParams
                                      ->withName(value: $fieldName),
             value  : $value,
         );
-
-     //   return new Entry(DerivedComponentEnum::queryParam->value, $value, InitialContentsEnum::name, $fieldName);
+        //   return new Entry(DerivedComponentEnum::queryParam->value, $value, InitialContentsEnum::name, $fieldName);
     }
 
     /**
@@ -110,9 +109,7 @@ final class MessageQueryParams
                 throw QueryParamsException::keyException($key);
             }
 
-            /** @noinspection UnnecessaryCastingInspection */
-            /** @noinspection PhpCastIsUnnecessaryInspection */
-            $ValueDecoded = urldecode((string)$value);
+            $ValueDecoded = urldecode($value);
             /* $ValueReEncoded = urlencode($ValueDecoded);
 
              if ($ValueReEncoded !== $value) {

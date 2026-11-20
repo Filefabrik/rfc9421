@@ -67,7 +67,7 @@ final class MethodsMapper
             'parameters' => fn (string $fieldValue): Parameters => Parameters::fromHttpValue($fieldValue),
             'dictionary' => fn (string $fieldValue): Dictionary => Dictionary::fromHttpValue($fieldValue),
             'item'       => fn (string $fieldValue): Item => Item::fromHttpValue($fieldValue),
-            'etag'       => fn (string $fieldValue): string => StructuredFieldEtag::handle($fieldValue),
+            'etag'       => StructuredFieldEtag::handle(...),
             'url'        => fn (string $fieldValue): string => '"'.$fieldValue.'"',
             'date'       => fn (string $fieldValue): string => '@'.strtotime($fieldValue),
         ];

@@ -34,9 +34,7 @@ final readonly class Sf
     /**
      *
      *
-     * @param \Filefabrik\Rfc9421\StructuredFields\EntryWithValue $entry
      *
-     * @return \Filefabrik\Rfc9421\StructuredFields\EntryWithValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
