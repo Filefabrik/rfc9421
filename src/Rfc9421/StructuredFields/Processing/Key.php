@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\StructuredFields\Processing;
 
+use Bakame\Http\StructuredFields\Bytes;
+use Bakame\Http\StructuredFields\DisplayString;
+use Bakame\Http\StructuredFields\Token;
+use DateTimeImmutable;
 use Filefabrik\Rfc9421\Bakame\Dictionary;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
@@ -31,7 +35,7 @@ final readonly class Key
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function handle(EntryWithValue $entry, string $keyName): EntryWithValue
+    public function handle(EntryWithValue $entry, Bytes|DisplayString|Token|bool|DateTimeImmutable|float|int|string|null $keyName): EntryWithValue
     {
         // todo check fieldValue cast because only strings allowed
         $entryValue = (string)$entry->getValue();

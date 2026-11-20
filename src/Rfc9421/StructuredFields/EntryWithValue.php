@@ -93,4 +93,8 @@ final class EntryWithValue
         return $this->value;
     }
 
+    public function getStringValue(): string
+    {
+        return (string)$this->getValue();
+    }
 }

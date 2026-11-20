@@ -96,9 +96,9 @@ final class ComponentExtractor
             throw SignatureExtractionException::invalidParameter($subSegment);
         }
 
-        $ltrimmed = ltrim($subSegment, ComponentBuilder::semicolon);
+        $lTrimmed = ltrim($subSegment, ComponentBuilder::semicolon);
         // todo more intensive testing
-        foreach (explode(ComponentBuilder::semicolon, $ltrimmed) as $item) {
+        foreach (explode(ComponentBuilder::semicolon, $lTrimmed) as $item) {
             // check we have a key="" or fieldName=""
             $kvPair       = explode(ComponentBuilder::equals, $item);
             $cnt          = count($kvPair);

@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Methods;
 
+use Bakame\Http\StructuredFields\Bytes;
+use Bakame\Http\StructuredFields\DisplayString;
+use Bakame\Http\StructuredFields\Token;
+use DateTimeImmutable;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\QueryParamsException;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
@@ -31,7 +35,7 @@ final class MessageQueryParams
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function handle(MessageInterface $message, string $fieldName): EntryWithValue
+    public static function handle(MessageInterface $message, Bytes|DisplayString|Token|bool|DateTimeImmutable|float|int|string|null $fieldName): EntryWithValue
     {
         $queryString = MessageInterfaceHelper::hasGetUri($message)
                                              ->getQuery()

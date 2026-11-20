@@ -1,10 +1,14 @@
-<?php /*
+<?php
+
+/*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
  * mastodon: filefabrik@phpc.social
  * License: proprietary
  * State: under development
- */ /** @noinspection PhpMultipleClassDeclarationsInspection */
+ */
+
+/* @noinspection PhpMultipleClassDeclarationsInspection */
 
 declare(strict_types=1);
 
@@ -36,12 +40,6 @@ final class ComponentBuilder implements Stringable
     private(set) readonly string|DerivedComponentEnum $fieldName;
 
     private readonly InitialContentsParameters $initialContentsParameters;
-
-    /**
-     * They need a value later in fieldName="expect_value" key="expect_value"
-     *
-     */
-    private array $withValues = [InitialContentsEnum::key, InitialContentsEnum::name];
 
     /**
      *
@@ -90,36 +88,6 @@ final class ComponentBuilder implements Stringable
     }
 
     /**
-     * Helper if req should be set by flag
-     */
-    public function setReq(bool|null $flag = null): self
-    {
-        if (true === $flag) {
-            $this->withReq();
-        }
-
-        return $this;
-    }
-
-    public function withReq(): self
-    {
-        return $this->setPair(InitialContentsEnum::req, new NotSet());
-    }
-
-    private function setPair(
-        InitialContentsEnum $initialContentsEnum,
-        NotSet|string $value,
-    ): self {
-        if ($value instanceof NotSet) {
-            $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum);
-        } else {
-            $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum, $value);
-        }
-
-        return $this;
-    }
-
-    /**
      * Without the colon
      *
      */
@@ -143,11 +111,11 @@ final class ComponentBuilder implements Stringable
         // the key quoted
         $parts[] = $this->getQuotedName();
 
-        $flagsArray = $this->renderFlags();
+        $parametersArray = $this->renderParameters();
 
-        if (0 < count($flagsArray)) {
+        if (0 < count($parametersArray)) {
             $parts[] = self::semicolon;
-            $parts[] = implode(self::semicolon, $flagsArray);
+            $parts[] = implode(self::semicolon, $parametersArray);
         }
 
         return implode('', $parts);
@@ -169,45 +137,11 @@ final class ComponentBuilder implements Stringable
         return $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName;
     }
 
-    private function renderFlags(): array
+    private function renderParameters()
     {
-        /*
-         * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.3
-         * todo bs allowed with some byte sequences (base_encode64)
-         * Example-Header: value, with, lots
-         * Example-Header: of, commas
-         * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
-         */
-        /*
-         * @see https://www.rfc-editor.org/info/rfc9421/#section-2.1.1-8
-         * "However, if the sf parameter is added, the value is reserialized as follows:"
-         * "example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c)
-         * "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHMsIG9mLCBjb21tYXM=:
-         */
-
-        $parts = [];
-        foreach ($this->initialContentsParameters->parameters as $key => $value) {
-            /** @var InitialContentsEnum $enum */
-            $enum = InitialContentsEnum::isOwnTypeOrNull($key);
-            if (in_array($enum, $this->withValues, true)) {
-                $parts[] = implode('', $this->handleKeyOrName($enum, $value));
-            } else {
-                $parts[] = $enum->name;
-            }
-        }
-
-        return $parts;
-    }
-
-    /**
-     * Special Method which is adding the `fieldName="$this->nameOrKeyValue"` or `key="$this->nameOrKeyValue"`
-     *
-     *
-     * @return string[]
-     */
-    private function handleKeyOrName(InitialContentsEnum $initialContentsEnum, string $keyOrValue): array
-    {
-        return [$initialContentsEnum->name, self::equals, UnquoteHelper::quote($keyOrValue)];
+        return new RenderInitialContents(
+            initialContentsParameters: $this->initialContentsParameters,
+        )->toArray();
     }
 
     /**
@@ -253,6 +187,19 @@ final class ComponentBuilder implements Stringable
         return $this->setPair(InitialContentsEnum::key, $value);
     }
 
+    private function setPair(
+        InitialContentsEnum $initialContentsEnum,
+        NotSet|string $value,
+    ): self {
+        if ($value instanceof NotSet) {
+            $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum);
+        } else {
+            $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum, $value);
+        }
+
+        return $this;
+    }
+
     public function withName(string $value): self
     {
         return $this->setPair(InitialContentsEnum::name, $value);
@@ -285,6 +232,11 @@ final class ComponentBuilder implements Stringable
         return $this->setPair(InitialContentsEnum::sf, new NotSet());
     }
 
+    public function withReq(): self
+    {
+        return $this->setPair(InitialContentsEnum::req, new NotSet());
+    }
+
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
@@ -294,4 +246,15 @@ final class ComponentBuilder implements Stringable
         return ComponentItemDto::fromComponentBuilder($this);
     }
 
+    /**
+     * Helper if req should be set by flag
+     */
+    public function setReq(bool|null $flag = null): self
+    {
+        if (true === $flag) {
+            $this->withReq();
+        }
+
+        return $this;
+    }
 }

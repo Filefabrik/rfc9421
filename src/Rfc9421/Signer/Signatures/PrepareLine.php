@@ -52,7 +52,7 @@ final readonly class PrepareLine
 
         return new Line(
             signatureComponent: $this->componentItemDto->getComponent(),
-            valueToSign       : $entry->getValue(),
+            valueToSign       : $entry->getStringValue(),
         );
     }
 
