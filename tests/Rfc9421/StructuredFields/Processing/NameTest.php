@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\StructuredFields\Processing;
 
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\StructuredFields\Processing\Name;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -22,26 +22,26 @@ use PHPUnit\Framework\TestCase;
 final class NameTest extends TestCase
 {
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandle(): void
     {
-        $firstEntry = new Entry('query-param', 'no-value');
+        $firstEntry = EntryWithValue::fromBuilder(ComponentBuilder::from('query-param'), 'no-value');
         // stupid never existing example
         self::assertSame('"query-param": no-value', $firstEntry->parseComponentNameAndValue());
-        self::assertSame('"query-param"', $firstEntry->parseComponentName());
+        self::assertSame('"query-param"', $firstEntry->getComponent());
         $handledEntry = new Name()->handle($firstEntry, 'thats-the-key');
+
         self::assertEquals(
-            new Entry(
-                key            : 'query-param',
-                value          : 'no-value',
-                initialContents: InitialContentsEnum::name,
-                nameOrKeyValue : 'thats-the-key',
+            expected: EntryWithValue::fromBuilder(
+                builder: ComponentBuilder::from('query-param')
+                                         ->withName('thats-the-key'),
+                value  : 'no-value',
             ),
-            $handledEntry,
+            actual  : $handledEntry,
         );
-        self::assertSame('"query-param";name="thats-the-key"', $handledEntry->parseComponentName());
+        self::assertSame('"query-param";name="thats-the-key"', $handledEntry->getComponent());
         self::assertSame('no-value', $handledEntry->value);
         self::assertSame('"query-param";name="thats-the-key": no-value', $handledEntry->parseComponentNameAndValue());
     }
