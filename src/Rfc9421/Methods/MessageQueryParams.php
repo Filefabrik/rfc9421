@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Methods;
 
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\QueryParamsException;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\Support\MessageInterfaceHelper;
 use Psr\Http\Message\MessageInterface;
 
@@ -23,12 +23,15 @@ final class MessageQueryParams
     /**
      * Todo comment
      *
-     * Find one query parameter by name (which must be supplied as parameters in the covered field list).
+     * Find one query parameter by fieldName (which must be supplied as parameters in the covered field list).
      *
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function handle(MessageInterface $message, string $fieldName): Entry
+    public static function handle(MessageInterface $message, string $fieldName): EntryWithValue
     {
         $queryString = MessageInterfaceHelper::hasGetUri($message)
                                              ->getQuery()
@@ -49,34 +52,40 @@ final class MessageQueryParams
 
         /*
          * Make "qux" trailing space will be added during compile with Entry->parse()
-         * "@query-param";name="baz": batman
-         * "@query-param";name="qux":
-         * "@query-param";name="param": value
+         * "@query-param";fieldName="baz": batman
+         * "@query-param";fieldName="qux":
+         * "@query-param";fieldName="param": value
          */
         //DerivedComponentEnum::queryParam->value
         /*
          * todo with key method is potentially wrong in 'macgirvin/http-message-signer' no underscores needed
          */
 
-        // InitialContentsEnum::name, $fieldName
-        // can be pure because the Name-Class fix the InitialContentsEnum::name, $fieldName
-        return new Entry(DerivedComponentEnum::queryParam->value, $value, InitialContentsEnum::name, $fieldName);
+        // InitialContentsEnum::fieldName, $fieldName
+        // can be pure because the Name-Class fix the InitialContentsEnum::fieldName, $fieldName
+        return EntryWithValue::fromBuilder(
+            builder: ComponentBuilder::from(name: DerivedComponentEnum::queryParam)
+                                     ->withName(value: $fieldName),
+            value  : $value,
+        );
+
+     //   return new Entry(DerivedComponentEnum::queryParam->value, $value, InitialContentsEnum::name, $fieldName);
     }
 
     /**
      * Todo extremely buggy
      * todo comment
      * todo user should use an own security parser. Make documentation of MessageQueryParams override
-     * The value of the name parameter and the component value of a single named parameter are calculated via the following process:
+     * The value of the fieldName parameter and the component value of a single named parameter are calculated via the following process:
      *
      * Parse the nameString or valueString of the named query parameter defined by Section 5.1 ("application/x-www-form-urlencoded parsing") of [HTMLURL]; this is the value after percent-encoded octets are decoded.
      * Encode the nameString or valueString using the "percent-encode after encoding" process defined by Section 5.2 ("application/x-www-form-urlencoded serializing") of [HTMLURL]; this results in an ASCII string [ASCII].
      * Output the ASCII string.
      * GET /parameters?var=this%20is%20a%20big%0Amultiline%20value&\
      * bar=with+plus+whitespace&fa%C3%A7ade%22%3A%20=something HTTP/1.1
-     * "@query-param";name="var": this%20is%20a%20big%0Amultiline%20value
-     * "@query-param";name="bar": with%20plus%20whitespace
-     * "@query-param";name="fa%C3%A7ade%22%3A%20": something
+     * "@query-param";fieldName="var": this%20is%20a%20big%0Amultiline%20value
+     * "@query-param";fieldName="bar": with%20plus%20whitespace
+     * "@query-param";fieldName="fa%C3%A7ade%22%3A%20": something
      *
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException

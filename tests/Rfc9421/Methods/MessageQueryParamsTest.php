@@ -24,7 +24,7 @@ final class MessageQueryParamsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandle(): void
     {
@@ -38,7 +38,7 @@ final class MessageQueryParamsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandleQux(): void
     {
@@ -52,7 +52,7 @@ final class MessageQueryParamsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
-     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testMultiline(): void
     {
@@ -67,8 +67,10 @@ final class MessageQueryParamsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testHandleEmpty(): void
     {
