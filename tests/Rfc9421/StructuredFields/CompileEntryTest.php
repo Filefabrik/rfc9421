@@ -12,11 +12,11 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421Test\StructuredFields;
 
 use Filefabrik\Rfc9421\Dto\HeaderItemsDto;
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\StructuredFields\CompileEntry;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +44,7 @@ final class CompileEntryTest extends TestCase
         );
         $handled  = $instance->handle();
 
-        self::assertEquals(new Entry('test', 'testValue'), $handled);
+        self::assertEquals(EntryWithValue::fromBuilder(ComponentBuilder::from('test'), 'testValue'), $handled);
     }
 
     /**
@@ -67,7 +67,7 @@ final class CompileEntryTest extends TestCase
         );
         $handled  = $instance->handle();
 
-        self::assertEquals(new Entry('@method', 'GET'), $handled);
+        self::assertEquals(EntryWithValue::fromBuilder(ComponentBuilder::from('@method'), 'GET'), $handled);
     }
 
     /**
@@ -81,15 +81,21 @@ final class CompileEntryTest extends TestCase
      */
     public function testHandleBS(): void
     {
-        $request     = new Request('GET', 'my', ['test' => 'testValue']);
-        $instance    = new CompileEntry(
+        $request  = new Request('GET', 'my', ['test' => 'testValue']);
+        $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: new SigningConfiguration(),
             componentItemDto    : ComponentName::fromString('"test";bs'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
-        $handled     = $instance->handle();
-        $targetEntry = new Entry(key: 'test', value: ':dGVzdFZhbHVl:', initialContents: InitialContentsEnum::bs);
+        $handled  = $instance->handle();
+
+        $targetEntry = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('test')
+                            ->withBs(),
+            ':dGVzdFZhbHVl:',
+        );
+        //  new Entry(key: 'test', value: ':dGVzdFZhbHVl:', initialContents: InitialContentsEnum::bs);
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -117,11 +123,12 @@ final class CompileEntryTest extends TestCase
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
-        $targetEntry = new Entry(
-            key            : 'test',
-            value          : 'testValue',
-            initialContents: InitialContentsEnum::sf,
+        $targetEntry = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('test')
+                            ->withSf(),
+            'testValue',
         );
+
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -142,20 +149,21 @@ final class CompileEntryTest extends TestCase
         $config->getStructuredFields()
                ->add('test', 'list')
         ;
-        $request     = new Request('GET', 'my', ['test' => '  a=1,    b=2;x=1;y=2,   d ']);
-        $instance    = new CompileEntry(
+        $request  = new Request('GET', 'my', ['test' => '  a=1,    b=2;x=1;y=2,   d ']);
+        $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
             componentItemDto    : ComponentName::fromString('"test";key="a"'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
-        $handled     = $instance->handle();
-        $targetEntry = new Entry(
-            key            : 'test',
-            value          : '1',
-            initialContents: InitialContentsEnum::key,
-            nameOrKeyValue : 'a',
+        $handled  = $instance->handle();
+
+        $targetEntry = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('test')
+                            ->withKey('a'),
+            '1',
         );
+
         self::assertEquals($targetEntry, $handled);
     }
 
@@ -173,29 +181,33 @@ final class CompileEntryTest extends TestCase
         $config = new SigningConfiguration();
 
         /**
-         * todo doc name works atm only with the @query-param
+         * todo doc fieldName works atm only with the @query-param
          */
-        $request     = new Request(
+        $request  = new Request(
             'GET',
             'http://localhost:8001/path?param=value&foo=bar&baz=bat%2Dman&qux=',
             ['test' => '  a=1,    b=2;x=1;y=2,   d '],
         );
-        $instance    = new CompileEntry(
+        $instance = new CompileEntry(
             messageInterface    : $request,
             signingConfiguration: $config,
             componentItemDto    : ComponentName::fromString('"@query-param";name="baz"'),
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
-        $handled     = $instance->handle();
-        $targetEntry = new Entry(
-            key            : '@query-param',
-            value          : 'bat-man',
-            initialContents: InitialContentsEnum::name,
-            nameOrKeyValue : 'baz',
+        $handled  = $instance->handle();
+
+        $targetEntry = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('@query-param')
+                            ->withName('baz'),
+            'bat-man',
         );
-        $parsed      = $targetEntry->parseComponentNameAndValue();
+
+        $parsed = $targetEntry->parseComponentNameAndValue();
         self::assertSame('"@query-param";name="baz": bat-man', $parsed);
-        self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
+        self::assertEquals(
+            [$targetEntry->getFieldName(), $targetEntry->value],
+            [$handled->getFieldName(), $handled->value]
+        );
     }
 
     /**
@@ -225,13 +237,17 @@ final class CompileEntryTest extends TestCase
         );
         $handled  = $instance->handle();
         // note: empty value will be later parsed with space
-        $targetEntry = new Entry(
-            key            : '@query-param',
-            value          : '',
-            initialContents: InitialContentsEnum::name,
-            nameOrKeyValue : 'qux',
+
+        $targetEntry = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('@query-param')
+                            ->withName('qux'),
+            '',
         );
-        self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
+
+        self::assertEquals(
+            [$targetEntry->getFieldName(), $targetEntry->value],
+            [$handled->getFieldName(), $handled->value]
+        );
     }
 
     /**
@@ -261,13 +277,16 @@ final class CompileEntryTest extends TestCase
             headerItemsDto      : HeaderItemsDto::fromMessageInterface($request),
         );
         $handled     = $instance->handle();
-        $targetEntry = new Entry(
-            key            : '@query-param',
-            value          : 'this%20is%20a%20big%0Amultiline%20value',
-            initialContents: InitialContentsEnum::name,
-            nameOrKeyValue : 'var',
+        $targetEntry = EntryWithValue::fromBuilder(
+            ComponentBuilder::from('@query-param')
+                            ->withName('var'),
+            'this%20is%20a%20big%0Amultiline%20value',
         );
-        self::assertEquals([$targetEntry->key, $targetEntry->value], [$handled->key, $handled->value]);
+
+        self::assertEquals(
+            [$targetEntry->getFieldName(), $targetEntry->getComponent(), $targetEntry->value],
+            [$handled->getFieldName(), $handled->getComponent(), $handled->value]
+        );
     }
 
 }

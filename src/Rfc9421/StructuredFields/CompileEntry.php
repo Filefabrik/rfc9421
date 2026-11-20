@@ -51,7 +51,7 @@ final readonly class CompileEntry
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function handle(): Entry
+    public function handle(): EntryWithValue
     {
         $parameters = $this->extractParameters($this->componentItemDto->getItem());
 
