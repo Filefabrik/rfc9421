@@ -11,12 +11,12 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Signer\Signatures;
 
-use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentName;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
 use Filefabrik\Rfc9421\Signer\Signatures\PrepareLine;
 use Filefabrik\Rfc9421\SigningConfiguration;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -66,7 +66,14 @@ final class PrepareLineTest extends TestCase
         );
         $line     = $instance->handle();
 
-        $targetEntry = new Line('"test";bs', new Entry('test', ':dGVzdFZhbHVl:', InitialContentsEnum::bs)->value);
+        $targetEntry = new Line(
+            '"test";bs',
+            EntryWithValue::fromBuilder(
+                ComponentBuilder::from('test')
+                                ->withBs(),
+                ':dGVzdFZhbHVl:',
+            )->value,
+        );
         self::assertEquals($targetEntry, $line);
     }
 
@@ -95,7 +102,13 @@ final class PrepareLineTest extends TestCase
         );
         $line     = $instance->handle();
 
-        $targetEntry = new Line('"test";sf', new Entry('test', 'testValue', InitialContentsEnum::sf)->value);
+        $targetEntry = new Line(
+            '"test";sf',
+            EntryWithValue::fromBuilder(
+                ComponentBuilder::from('test')
+                                ->withSf(),
+                'testValue',
+            )->value);
         self::assertEquals($targetEntry, $line);
     }
 
