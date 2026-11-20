@@ -13,7 +13,8 @@ namespace Filefabrik\Rfc9421Test\Support;
 
 use Closure;
 use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Filefabrik\Rfc9421\Support\PreparedMethods;
 use GuzzleHttp\Psr7\Request;
 use InvalidArgumentException;
@@ -58,7 +59,9 @@ final class PreparedMethodsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testCallWithThrowMessag(): void
     {
@@ -132,7 +135,9 @@ final class PreparedMethodsTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testCallWith(): void
     {
@@ -152,11 +157,13 @@ final class PreparedMethodsTest extends TestCase
         );
         $calledEntry = $prepareMethods->callWith('content-length', [$r]);
         self::assertSame(62, $calledEntry->value);
-        self::assertSame('content-length', $calledEntry->key);
+        self::assertSame('content-length', $calledEntry->getFieldName());
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public function testCallWithReturnEntry(): void
     {
@@ -169,15 +176,17 @@ final class PreparedMethodsTest extends TestCase
         $prepareMethods = new PreparedMethods();
         $prepareMethods->adds(
             [
-                'content-length' => fn (MessageInterface $messageInterface): Entry => new Entry(
-                    'content-length',
+                'content-length' => fn (
+                    MessageInterface $messageInterface,
+                ): EntryWithValue => EntryWithValue::fromBuilder(
+                    ComponentBuilder::from('content-length'),
                     strlen((string)$messageInterface->getBody()),
                 ),
             ],
         );
         $calledEntry = $prepareMethods->callWith('content-length', [$r]);
         self::assertSame(62, $calledEntry->value);
-        self::assertSame('content-length', $calledEntry->key);
+        self::assertSame('content-length', $calledEntry->getFieldName());
     }
 
 }

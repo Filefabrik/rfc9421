@@ -14,7 +14,8 @@ namespace Filefabrik\Rfc9421\Support;
 use Closure;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\PrepareMethodsException;
-use Filefabrik\Rfc9421\StructuredFields\Entry;
+use Filefabrik\Rfc9421\Signature\ComponentBuilder;
+use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Throwable;
 
 /**
@@ -33,21 +34,22 @@ final class PreparedMethods
      */
     public function adds(array $methods): self
     {
-        foreach ($methods as $nr => $method) {
-            $this->add(key: $nr, closure: $method);
+        foreach ($methods as $fieldName => $method) {
+            $this->add(fieldName: $fieldName, closure: $method);
         }
 
         return $this;
     }
 
-    public function add(string|DerivedComponentEnum $key, Closure $closure): self
+    public function add(string|DerivedComponentEnum $fieldName, Closure $closure): self
     {
-        $this->methods[$this->normalizeKey($key)] = $closure;
+        $this->methods[$this->normalizeFieldName($fieldName)] = $closure;
 
         return $this;
     }
 
-    private function normalizeKey(string|DerivedComponentEnum $key): string
+    // without flags
+    private function normalizeFieldName(string|DerivedComponentEnum $key): string
     {
         return $key instanceof DerivedComponentEnum ? $key->value : $this->lowerKey($key);
     }
@@ -62,23 +64,27 @@ final class PreparedMethods
      *
      * @param array<int,mixed> $params
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function callWith(string|DerivedComponentEnum $key, array $params = []): Entry
+    public function callWith(string|DerivedComponentEnum $fieldName, array $params = []): EntryWithValue
     {
-        $nKey = $this->normalizeKey($key);
+        $normalizedFieldName = $this->normalizeFieldName($fieldName);
         // todo cover error exception
-        $closureMethod = $this->getMethod($nKey);
+        $closureMethod = $this->getMethod($normalizedFieldName);
 
         try {
             $result = $closureMethod(...$params);
         } catch (Throwable$throwable) {
             // binding throwable
-            throw PrepareMethodsException::errorFromCalling($nKey, $throwable);
+            throw PrepareMethodsException::errorFromCalling($normalizedFieldName, $throwable);
         }
 
-        if (!$result instanceof Entry) {
-            return new Entry($nKey, $result);
+        if (!$result instanceof EntryWithValue) {
+            return EntryWithValue::fromBuilder(builder: new ComponentBuilder($normalizedFieldName))
+                                 ->setValue($result)
+            ;
         }
 
         return $result;
@@ -89,13 +95,13 @@ final class PreparedMethods
      */
     public function getMethod(string|DerivedComponentEnum $key): Closure
     {
-        $key = $this->normalizeKey($key);
+        $key = $this->normalizeFieldName($key);
 
         return $this->methods[$key] ?? throw PrepareMethodsException::methodNotRegistered($key);
     }
 
     public function hasMethod(string|DerivedComponentEnum $key): bool
     {
-        return array_key_exists($this->normalizeKey($key), $this->methods);
+        return array_key_exists($this->normalizeFieldName($key), $this->methods);
     }
 }
