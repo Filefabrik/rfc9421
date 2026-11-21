@@ -18,12 +18,12 @@ use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
- * Extracting a "component" into the class Builder and later into ComponentItemDto
+ * Extracting a "component" from "@query-param";fieldName="baz" into the class ComponentBuilder and later into ComponentItemDto
  */
 final class ComponentExtractor
 {
     /**
-     * Can be a full string which has to be extracted
+     * Extract "@query-param";fieldName="baz" via ComponentBuilder into ComponentItemDto
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
@@ -39,6 +39,8 @@ final class ComponentExtractor
     }
 
     /**
+     * "@query-param";fieldName="baz" into ComponentBuilder
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
@@ -51,7 +53,7 @@ final class ComponentExtractor
     }
 
     /**
-     * new approach
+     * "@query-param";fieldName="baz" into ComponentBuilder
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
@@ -76,18 +78,20 @@ final class ComponentExtractor
         // this is the fieldName
         $componentBuilder = new ComponentBuilder($matches[1]);
         if ('' !== $matches[2]) {
-            $componentBuilder = self::handleSemicolons($matches[2], $componentBuilder);
+            $componentBuilder = self::handleParameters($matches[2], $componentBuilder);
         }
 
         return $componentBuilder;
     }
 
     /**
+     * todo make more better
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    private static function handleSemicolons(string $subSegment, ComponentBuilder $componentBuilder): ComponentBuilder
+    private static function handleParameters(string $subSegment, ComponentBuilder $componentBuilder): ComponentBuilder
     {
         if (!str_starts_with($subSegment, ComponentBuilder::semicolon)) {
             throw SignatureExtractionException::invalidParameter($subSegment);
