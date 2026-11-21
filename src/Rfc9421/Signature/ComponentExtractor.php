@@ -18,10 +18,7 @@ use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 /**
- * This method is only used to prepare internal setting during the setHeader
- * Single component with InitialContentsEnum or without InitialContentsEnum
- * or with structured fields
- *
+ * Extracting a "component" into the class Builder and later into ComponentItemDto
  */
 final class ComponentExtractor
 {
