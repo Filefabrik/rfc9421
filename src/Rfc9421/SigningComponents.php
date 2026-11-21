@@ -59,15 +59,15 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function signHeader(DerivedComponentEnum|string|ComponentItemDto|ComponentBuilder $fieldName): self
+    public function signHeader(DerivedComponentEnum|string|ComponentItemDto|ComponentBuilder $component): self
     {
-        if ($fieldName instanceof ComponentItemDto) {
-            $this->set($fieldName);
-        } elseif ($fieldName instanceof ComponentBuilder) {
-            $this->set(ComponentItemDto::fromComponentBuilder($fieldName));
+        if ($component instanceof ComponentItemDto) {
+            $this->set($component);
+        } elseif ($component instanceof ComponentBuilder) {
+            $this->set(ComponentItemDto::fromComponentBuilder($component));
         } else {
             // can be everything
-            $this->set(ComponentExtractor::extractToComponentItemDto($fieldName));
+            $this->set(ComponentExtractor::extractToComponentItemDto($component));
         }
 
         return $this;

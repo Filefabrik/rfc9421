@@ -108,9 +108,9 @@ try {
       * '"example-dict";key="d"'
       */
         ->signWithKey(fieldName: 'example-dict', keyValue: 'd')
-        ->sign('x-Origin-host')
-        ->sign('test-header')
-        ->sign('example-dict')
+        ->sign(fieldName: 'x-Origin-host')
+        ->sign(fieldName: 'test-header')
+        ->sign(fieldName: 'example-dict')
     ;
 } catch (AlreadySetException|SignatureExtractionException|EnumTypeException|UnexpectedValue $e) {
     echo $e->getMessage();

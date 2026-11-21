@@ -32,11 +32,11 @@ final class ComponentExtractor
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function extractToComponentItemDto(string|DerivedComponentEnum $name): ComponentItemDto
+    public static function extractToComponentItemDto(string|DerivedComponentEnum $component): ComponentItemDto
     {
-        $componentBuilder = $name instanceof DerivedComponentEnum ?
-            new ComponentBuilder($name) :
-            self::extractToBuilder($name);
+        $componentBuilder = $component instanceof DerivedComponentEnum ?
+            new ComponentBuilder($component) :
+            self::extractToBuilder($component);
 
         return $componentBuilder->toComponentItemDto();
     }
@@ -46,11 +46,11 @@ final class ComponentExtractor
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public static function extractToBuilder(string|DerivedComponentEnum $name): ComponentBuilder
+    public static function extractToBuilder(string|DerivedComponentEnum $component): ComponentBuilder
     {
-        return $name instanceof DerivedComponentEnum ?
-            new ComponentBuilder($name) :
-            self::extractor($name);
+        return $component instanceof DerivedComponentEnum ?
+            new ComponentBuilder($component) :
+            self::extractor($component);
     }
 
     /**
