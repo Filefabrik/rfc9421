@@ -289,7 +289,7 @@ $signingComponents = new SigningComponents()
      // Signing "$headerKey";req;$fieldName="$nameValue"
      //->signHeader('"@query-param";$fieldName="baz"') or better way like:
      ->signWithName(DerivedComponentEnum::queryParam, 'baz')
-     //.. other signings
+     //..other signings
 $signingConfiguration = new SigningConfiguration();   
 // push the signingComponents into the SigningConfiguration
 $signingConfiguration->setSigningComponents($signingComponents)
@@ -316,11 +316,11 @@ $signingConfiguration->setSigningComponents($signingComponents)
 Note:
 
 * Use for the Derived Components the Derived Component Enum `DerivedComponentEnum`
-* if you know your exactly component, make precise and specify the the component with:
+* if you know your exactly component, make precise and specify the component with:
   * `->sign('x-Origin-host')`
   * `->signWithBS('example-dict')`
   * `->signWithSF('example-dict')`
-  * ` ->signWithKey('example-dict', 'd')` 
+  * `->signWithKey('example-dict', 'd')` 
   * `->signWithName(DerivedComponentEnum::queryParam, 'baz')`
 
 instead of the `->setHeader()` or `->setHeaders()` method
@@ -431,10 +431,6 @@ Note: receiver can ignore it
 $signingConfiguration->setTag('fediverse');
 ?>
 ```
-
-
-
-
 
 ## Customization
 

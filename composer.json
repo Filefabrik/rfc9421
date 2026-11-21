@@ -30,6 +30,7 @@
     "psr-4": {
       "Filefabrik\\Rfc9421Test\\": "tests/Rfc9421",
       "Filefabrik\\Rfc9421Test\\Tools\\": "tests/Tools",
+      "Filefabrik\\Rfc9421Test\\Prepared\\": "tests/Prepared",
       "Filefabrik\\Rfc9421Test\\Examples\\": "examples/"
     }
   },
