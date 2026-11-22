@@ -31,7 +31,7 @@ enum HeaderKeysEnum: string
     /**
      * @return string return the value which is HTTP Header Key and also sigining components fieldName part "content-digest";req
      */
-    public function keyName(): string
+    public function fieldName(): string
     {
         return $this->value;
     }

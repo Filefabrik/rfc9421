@@ -24,10 +24,10 @@ final class HeaderKeysEnumTest extends TestCase
         self::assertCount(3, HeaderKeysEnum::cases());
     }
 
-    public function testKeyName(): void
+    public function testFieldName(): void
     {
-        self::assertSame('content-digest', HeaderKeysEnum::content_digest->keyName());
-        self::assertSame('signature', HeaderKeysEnum::signature->keyName());
-        self::assertSame('signature-input', HeaderKeysEnum::signature_input->keyName());
+        self::assertSame('content-digest', HeaderKeysEnum::content_digest->fieldName());
+        self::assertSame('signature', HeaderKeysEnum::signature->fieldName());
+        self::assertSame('signature-input', HeaderKeysEnum::signature_input->fieldName());
     }
 }

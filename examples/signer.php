@@ -12,18 +12,10 @@ declare(strict_types=1);
 use Filefabrik\Rfc9421\Enums\{DerivedComponentEnum, HeaderKeysEnum, SigningEnum};
 use Filefabrik\Rfc9421\Exceptions\{AbstractRfc9421Exception,
     AlreadySetException,
-    ContentDigestException,
-    EmptyException,
     EnumTypeException,
-    InvalidHeaderKeyException,
-    MethodException,
-    PrepareMethodsException,
     ProcessingException,
-    SignatureException,
     SignatureExtractionException,
-    StructuredFieldException,
-    UnexpectedValue,
-    VerifyHeaderSignatureException};
+    UnexpectedValue};
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\ResponseSigner;
 use Filefabrik\Rfc9421\Signer\{Signatures\ReadLines, Signatures\WriteLines};
@@ -340,7 +332,7 @@ try {
         /*
          * Later in Processing Put in the "content-digest";req" so Alice see a wanted back-signing
          */
-        ->sign(fieldName: HeaderKeysEnum::content_digest->keyName(), asReq: true)
+        ->sign(fieldName: HeaderKeysEnum::content_digest->fieldName(), asReq: true)
         // Content-Length has a default method to calculate the length of the body
         ->sign(fieldName: 'content-length')
     ;
@@ -446,8 +438,8 @@ $signedResponseVerify = new VerifyResponse(preparedVerify: $signedResponseVerify
 
 try {
     $verifySignedResponseResult = $signedResponseVerify->verifying();
-} catch (ContentDigestException|VerifyHeaderSignatureException|UnexpectedValue|StructuredFieldException|SignatureExtractionException|SignatureException|ProcessingException|PrepareMethodsException|MethodException|InvalidHeaderKeyException|EnumTypeException|EmptyException $e) {
-    echo 'bug during the signed response verify process:', PHP_EOL, $e->getMessage();
+} catch (AbstractRfc9421Exception $rfc9421Exception) {
+    echo 'bug during the signed response verify process:', PHP_EOL, $rfc9421Exception->getMessage();
 
     return;
 }
