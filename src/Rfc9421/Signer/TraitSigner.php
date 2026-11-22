@@ -18,8 +18,8 @@ use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
-use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
+use Filefabrik\Rfc9421\Signer\Signatures\LinesCompiler;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\StructuredFields\EntryWithValue;
 use Psr\Http\Message\RequestInterface;
@@ -98,7 +98,7 @@ trait TraitSigner
 
         $this->updateHeadersBeforePrepare();
 
-        $base = new Base(
+        $base = new LinesCompiler(
             message      : $this->message,
             configuration: $this->signingConfiguration,
             /*
@@ -136,7 +136,7 @@ trait TraitSigner
 
         // makes the array of signingLines to a string. The string kann be base64EncodedValue
         // keep the $this->signingParametersString public readable. maybe for testing and other stuff
-        $this->signingParametersString = Base::compileSignatureInputToString($this->signingLines);
+        $this->signingParametersString = LinesCompiler::compileSignatureInputToString($this->signingLines);
     }
 
     /**

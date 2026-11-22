@@ -16,8 +16,8 @@ use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
-use Filefabrik\Rfc9421\Signer\Signatures\Base;
 use Filefabrik\Rfc9421\Signer\Signatures\Line;
+use Filefabrik\Rfc9421\Signer\Signatures\LinesCompiler;
 use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\Signer\Signatures\WriteLines;
 use Filefabrik\Rfc9421\SigningComponents;
@@ -28,8 +28,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\MessageInterface;
 
-#[CoversClass(Base::class)]
-final class BaseTest extends TestCase
+#[CoversClass(LinesCompiler::class)]
+final class LinesCompilerTest extends TestCase
 {
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -52,7 +52,7 @@ final class BaseTest extends TestCase
                ->add('not-existing', 'etag')
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
-        $i = new Base($r, $config);
+        $i = new LinesCompiler($r, $config);
 
         $arr = $i->createSignatureLines()
                  ->toLineString()
@@ -100,7 +100,7 @@ final class BaseTest extends TestCase
 
         $r = new Response(headers: ['noT-exIsting' => 'hm']);
 
-        $i = new Base(message: $r, configuration: $sc, readLines: $rl);
+        $i = new LinesCompiler(message: $r, configuration: $sc, readLines: $rl);
         $i->createSignatureLines();
 
         $arr = $i->createSignatureLines()
@@ -158,7 +158,7 @@ final class BaseTest extends TestCase
 
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
 
-        $i = new Base(message: $r, configuration: $sc, readLines: $rl);
+        $i = new LinesCompiler(message: $r, configuration: $sc, readLines: $rl);
         $i->createSignatureLines();
 
         $arr = $i->createSignatureLines()
@@ -196,7 +196,7 @@ final class BaseTest extends TestCase
         );
 
         $response = new Response();
-        $i        = new Base($response, $sc);
+        $i        = new LinesCompiler($response, $sc);
         $i->createSignatureLines();
     }
 
@@ -221,7 +221,7 @@ final class BaseTest extends TestCase
         );
 
         $response = new Response();
-        $i        = new Base(message: $response, configuration: $sc, readLines: new ReadLines(new WriteLines()));
+        $i        = new LinesCompiler(message: $response, configuration: $sc, readLines: new ReadLines(new WriteLines()));
         $i->createSignatureLines();
     }
 
@@ -246,7 +246,7 @@ final class BaseTest extends TestCase
         );
 
         $response = new Response();
-        $i        = new Base($response, $sc);
+        $i        = new LinesCompiler($response, $sc);
         $i->createSignatureLines();
     }
 
@@ -272,7 +272,7 @@ final class BaseTest extends TestCase
         $sc->withContentDigest('sha256');
 
         $r     = new Request('post', '', ['noT-exIsting' => 'hm', 'content-digest' => 'an value']);
-        $i     = new Base($r, $sc);
+        $i     = new LinesCompiler($r, $sc);
         $lines = $i->createSignatureLines();
         self::assertEquals(
             new Line('"not-existing"', 'hm'),
@@ -311,7 +311,7 @@ final class BaseTest extends TestCase
         );
         ;
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
-        $i = new Base($r, $sc);
+        $i = new LinesCompiler($r, $sc);
         $i->createSignatureLines();
     }
 
@@ -339,7 +339,7 @@ final class BaseTest extends TestCase
         );
 
         $r = new Request('POST', '', ['x-wrong-name' => 'hm']);
-        $i = new Base($r, $sc);
+        $i = new LinesCompiler($r, $sc);
         $i->createSignatureLines();
     }
 
@@ -361,7 +361,7 @@ final class BaseTest extends TestCase
            ->setSignatureKeyName('')
         ;
         $r   = new Request('POST', '', ['stupid-header' => 'hm']);
-        $i   = new Base($r, $sc);
+        $i   = new LinesCompiler($r, $sc);
         $res = $i->makeSignatureInput();
         self::assertEquals(
             '("stupid-header" "@method");created='.$created.';alg="'.SigningEnum::rsa_v_1_5_sha_256->getValue().'"',
@@ -388,7 +388,7 @@ final class BaseTest extends TestCase
            ->setSignatureKeyName('playground=')
         ;
         $r   = new Request('POST', '', ['stupid-header' => 'hm']);
-        $i   = new Base($r, $sc);
+        $i   = new LinesCompiler($r, $sc);
         $res = $i->makeSignatureInput();
         self::assertEquals(
             'playground=("stupid-header" "@method");created='.$created.';alg="'.SigningEnum::rsa_v_1_5_sha_256->getValue().'"',
@@ -400,7 +400,7 @@ final class BaseTest extends TestCase
     {
         $sls = new WriteLines()->addEntry('"header-key"', 'the-value');
 
-        $res = Base::compileSignatureInputToString($sls);
+        $res = LinesCompiler::compileSignatureInputToString($sls);
 
         self::assertEquals('"header-key": the-value', $res);
     }
@@ -432,7 +432,7 @@ final class BaseTest extends TestCase
             closure      : fn (MessageInterface $message): string => 'game',
         );
         $r = new Request('post', '', ['noT-exIsting' => 'hm']);
-        $i = new Base($r, $sc);
+        $i = new LinesCompiler($r, $sc);
 
         $arr          = $i->createSignatureLines()
                           ->getLines()

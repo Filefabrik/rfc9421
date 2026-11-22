@@ -24,7 +24,7 @@ use Psr\Http\Message\ResponseInterface;
  * The given Signing Components via setHeader('@method') will be prepared into "@method: POST" Lines.
  * This Lines will be used as signing-parameters
  */
-final readonly class Base
+final readonly class LinesCompiler
 {
     public function __construct(
         private(set) RequestInterface|ResponseInterface $message,

@@ -114,7 +114,7 @@ final class ResponseSignerTest extends TestCase
      * todo missing tests
      * todo with asReq
      * todo empty @query-params
-     *
+     * todo Better Error Message
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
@@ -148,22 +148,22 @@ final class ResponseSignerTest extends TestCase
         //... now sign the response
         $signingComponents            = new SigningComponents()
             // singing the status as relevant information for the requester Alice, to ensure the status
-            ->signHeader(DerivedComponentEnum::status)
+            ->signHeader(component: DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-            ->signHeader('content-length')
-            ->signHeader(DerivedComponentEnum::query)
+            ->signHeader(component: 'content-length')
+            ->signHeader(component: DerivedComponentEnum::query)
         ;
         $responseSigningConfiguration = new SigningConfiguration(signingComponents: $signingComponents)
 
             // make sure the receiver Alice expects the following response Key
-            ->setSignatureKeyName('responseSig=')
+            ->setSignatureKeyName(signatureKey: 'responseSig=')
 
             // the sender of the request expects an algo that Bob can check while receive this signed response
-            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
             // set alice private pem to encrypt the response
-            ->setPrivatePem($certInstance->getPrivatPemContent())
+            ->setPrivatePem(privatePem: $certInstance->getPrivatPemContent())
             // singing the response body
-            ->withContentDigest('sha256')
+            ->withContentDigest(contentDigestAlgo: 'sha256')
         ;
 
         $responseSigner = new ResponseSigner(message: $response, signingConfiguration: $responseSigningConfiguration);
@@ -221,7 +221,6 @@ final class ResponseSignerTest extends TestCase
         ;
 
         // simulate a request
-
         $expectedLines = new ReadLines([
             DecodeSignatureComponentEntry::toLine(
                 '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
