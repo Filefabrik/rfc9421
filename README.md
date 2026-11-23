@@ -395,6 +395,7 @@ processing your request.
 
 ```php
 <?php 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->withNonce(rand(1,100).'something unique from your server');
 ?>
 ```
@@ -406,6 +407,7 @@ Note: receiver can ignore it
 
 ```php
 <?php 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setCreated( new DateTime()->getTimestamp());
 ?>
 ```
@@ -417,6 +419,7 @@ Note: receiver can ignore it
 
 ```php
 <?php 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setExpires( new DateTime()->getTimestamp() + 3600);
 ?>
 ```
@@ -428,15 +431,57 @@ Note: receiver can ignore it
 
 ```php
 <?php 
+/** @var \Filefabrik\Rfc9421\SigningConfiguration $signingConfiguration */
 $signingConfiguration->setTag('fediverse');
 ?>
 ```
 
 ## Customization
 
+### derived component generation
+
 You can customize the package for your needs
 
 [custom-derived-component-generation.md](docs/custom-derived-component-generation.md)
+
+
+### Custom Header fieldNames Enums
+
+In many use cases, field names for components and HTTP headers are reused.
+To avoid typos, it's a good idea to create an enum, add all your field names to it, and then work with the enums instead of using string values.
+```php
+<?php
+
+
+declare(strict_types=1);
+
+namespace Filefabrik\Rfc9421Test\Examples\Tools;
+
+use Filefabrik\Rfc9421\Enums\Support\HeaderKeysTrait;use Filefabrik\Rfc9421\Interfaces\HeaderKeysEnumInterface;
+
+/**
+ * example how to use often use header fieldName
+ */
+enum MyHeaderFieldEnumEnum: string implements HeaderKeysEnumInterface
+{
+    use HeaderKeysTrait;
+
+    case my_repeated_header = 'my-repeatet-header';
+    //...other headers as you need
+}
+
+?>
+```
+Then use it while signing Components as Enum
+
+```php
+<?php 
+/** @var \Filefabrik\Rfc9421\SigningComponents $signingComponents */
+use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
+$signingComponents->sign(MyHeaderFieldEnumEnum::my_repeated_header)
+?>
+```
+
 
 @todo how to configure/modify crypto-libraries for the package
 

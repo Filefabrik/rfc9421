@@ -25,6 +25,7 @@ use Filefabrik\Rfc9421\VerifyRequest;
 use Filefabrik\Rfc9421\VerifyRequestPrepare;
 use Filefabrik\Rfc9421\VerifyResponse;
 use Filefabrik\Rfc9421\VerifyResponsePrepare;
+use Filefabrik\Rfc9421Test\Examples\Tools\HeaderFieldEnum;
 use Filefabrik\Rfc9421Test\Examples\Tools\JsonToString;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
 use GuzzleHttp\Psr7\Request;
@@ -333,9 +334,9 @@ try {
         /*
          * Later in Processing Put in the "content-digest";req" so Alice see a wanted back-signing
          */
-        ->sign(fieldName: HeaderKeysEnum::content_digest->fieldName(), asReq: true)
+        ->sign(fieldName: HeaderKeysEnum::content_digest, asReq: true)
         // Content-Length has a default method to calculate the length of the body
-        ->sign(fieldName: 'content-length')
+        ->sign(fieldName: HeaderFieldEnum::content_length)
     ;
 } catch (AlreadySetException|SignatureExtractionException|EnumTypeException|UnexpectedValue $e) {
     echo $e->getMessage();

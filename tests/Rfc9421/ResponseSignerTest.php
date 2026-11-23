@@ -69,7 +69,8 @@ final class ResponseSignerTest extends TestCase
             // singing the status as relevant information for the requester Alice, to ensure the status
             ->sign(DerivedComponentEnum::status)
             // content-length is covered by a $this->addSigningMethod()
-            ->sign('content-length')
+            // With custom Enum Test
+            ->sign(Prepared\HeaderFieldEnum::content_length)
         ;
         $responseSigningConfiguration = new SigningConfiguration()
             ->setSigningComponents($signatureComponents)
@@ -115,6 +116,7 @@ final class ResponseSignerTest extends TestCase
      * todo with asReq
      * todo empty @query-params
      * todo Better Error Message
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
