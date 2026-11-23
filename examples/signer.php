@@ -168,10 +168,10 @@ $prepareMethods = [
  * don't forget to use thís prepared component in the verifier
  */
 $signingConfiguration->addSigningMethods(methods: $prepareMethods);
+
 /*
  * Prepare the Request
  */
-
 $bodyJson = JsonToString::toString(data: ['recipient' => 'Alex', 'add' => 90.09, 'currency' => 'EUR']);
 
 $request = new Request(
@@ -318,7 +318,8 @@ try {
 }
 
 /*
- * Let us start a signed response
+ * Bob's Side
+ * Let us start Signing a signed response
  */
 
 // after processing give back a signed response, that the sender can be sure the response is valid
@@ -351,13 +352,10 @@ try {
         // content digest which must be response to the requester that the requester can check, the response body was not tempered
         ->withContentDigest(contentDigestAlgo: 'sha256')
         // the sender of the request expects an algo that Bob can check while receive this signed response
-        // todo use different signing for response
+        // signing the response message can have another algo then Alice
         ->setSigningAlgorithm(algorithm: SigningEnum::rsa_v_1_5_sha_512)
         // set alice private pem to encrypt the response
         ->setPrivatePem(privatePem: $signerCertInstance->getPrivatPemContent())
-        // singing the response body
-        // todo use different signing for response
-        //->setContentDigestAlgo(contentDigestAlgo: 'sha256')
     ;
 } catch (AbstractRfc9421Exception $rfc9421Exception) {
     echo 'response signing configuration error: '.$rfc9421Exception->getMessage();
@@ -366,6 +364,7 @@ try {
 }
 
 /*
+ * Bob's Side
  * Signing the Response if need signed response
  */
 try {
