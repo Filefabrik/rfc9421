@@ -173,7 +173,9 @@ final class RequestSignerTest extends TestCase
      * Helper for testSign
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     private function signingComponents(): SigningComponents
     {
@@ -469,6 +471,135 @@ final class RequestSignerTest extends TestCase
     }
 
     /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testWithEmptyQuery()
+    {
+        $certInstance    = new CertHelper('rsa');
+        $currentDateTime = new DateTime()->getTimestamp();
+        $expireDateTime  = $currentDateTime + 7200;
+
+        /**
+         * Prepare the Request
+         */
+        $request = new Request(
+            method : 'POST',
+            uri    : 'http://localhost:8001/mastodon',
+            headers: [
+                'x-origin-host' => 'mytest.com',
+                'Example-Dict'  => '  a=1,    b=2;x=1;y=2,   c=(a   b   c), d ',
+                'content-type'  => 'application/json',
+            ],
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
+        );
+
+        $request = $request->withAddedHeader('example-header', 'value, with, lots')
+                           ->withAddedHeader('example-header', 'of, commas')
+        ;
+
+        $signingConfiguration = new SigningConfiguration(
+            signingComponents: new SigningComponents()->sign('content-type')
+                                                      ->sign('@method')
+                                                      ->sign('x-Origin-host')
+                                                      ->signWithSF('"example-dict"')
+                                                      ->signWithKey('example-dict', 'd')
+                                                      ->signWithBS('example-header'),
+        )
+            /*
+             * todo documentation for addSigningMethod for content-type
+             */
+            ->addSigningMethod(
+                componentName: 'content-type',
+                closure      : fn (
+                    RequestInterface $request,
+                ): string => $request->getHeaderLine('content-type'),
+            )
+            ->withContentDigest('sha512')
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($expireDateTime)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->withNonce('nonce-now')
+
+            // content digest signer key
+            ->setSignatureKeyName('testValue=')
+            // for signing needs private
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+        ;
+        $signingConfiguration->getSigningComponents()
+                             ->sign(DerivedComponentEnum::query)
+        ;
+
+        $signingConfiguration->getStructuredFields()
+                             ->add('example-dict', 'dictionary')
+        ;
+
+        $signer        = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
+        $signedRequest = $signer->sign();
+
+        self::assertTrue($signedRequest->hasHeader('content-digest'));
+
+        $signingLinesValues = $signer->getSignedLines()
+                                     ->toLineString()
+        ;
+        $signingLinesKeys   = $signer->getSignedLines()
+                                     ->keys()
+        ;
+
+        self::assertContains('"@query": ?', $signingLinesValues);
+
+        self::assertContains('"@method"', $signingLinesKeys);
+        self::assertContains('"@method": POST', $signingLinesValues);
+
+        self::assertContains('"x-origin-host"', $signingLinesKeys);
+        self::assertContains('"x-origin-host": mytest.com', $signingLinesValues);
+
+        self::assertContains('"example-dict";sf', $signingLinesKeys);
+        self::assertContains('"example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d', $signingLinesValues);
+
+        self::assertContains('"example-dict";key="d"', $signingLinesKeys);
+        self::assertContains('"example-dict";key="d": ?1', $signingLinesValues);
+
+        self::assertContains('"content-digest"', $signingLinesKeys);
+        self::assertContains(
+            '"content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:',
+            $signingLinesValues,
+        );
+        /*
+         * BS Test with two fields
+         */
+        self::assertContains(
+            '"example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:',
+            $signingLinesValues,
+        );
+        self::assertContains('"content-type": application/json', $signingLinesValues);
+        $signatureLines = <<<TEXT
+            "content-type": application/json
+            "@method": POST
+            "x-origin-host": mytest.com
+            "example-dict";sf: a=1, b=2;x=1;y=2, c=(a b c), d
+            "example-dict";key="d": ?1
+            "example-header";bs: :dmFsdWUsIHdpdGgsIGxvdHM=:, :b2YsIGNvbW1hcw==:
+            "@query": ?
+            "content-digest": sha-512=:ky7+tHa2jKBwuLnRdgxC418SwYUSuSk4NXiGsAYA6aKby9eVl2PTRsVjwEn1EjPQ93BxKbqzkCh58NqE1nL67A==:
+            "@signature-params": testValue=("content-type" "@method" "x-origin-host" "example-dict";sf "example-dict";key="d" "example-header";bs "@query" "content-digest");created=$currentDateTime;expires=$expireDateTime;nonce="nonce-now";keyid="http://127.0.0.1:8001/actor#main-key";alg="rsa-v1-5-sha512";tag="mastodon"
+            TEXT;
+        self::assertSame($signatureLines, $signer->signingParametersString);
+    }
+
+    /**
      * Throws if it has ;asReq Flag
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
@@ -534,7 +665,7 @@ final class RequestSignerTest extends TestCase
          */
         $request = $this->getSignableRequest();
 
-        $signer  = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
+        $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->sign();
     }
 }

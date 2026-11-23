@@ -16,6 +16,7 @@ use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Methods\MessageAuthority;
 use Filefabrik\Rfc9421\Methods\MessagePath;
+use Filefabrik\Rfc9421\Methods\MessageQuery;
 use Filefabrik\Rfc9421\Methods\MessageQueryParams;
 use Filefabrik\Rfc9421\Methods\MessageScheme;
 use Filefabrik\Rfc9421\Methods\MessageTargetUri;
@@ -127,8 +128,7 @@ trait DefaultPrepareComponentMethodsTrait
             DerivedComponentEnum::query->value         =>
                 fn (RequestInterface $messageInterface): EntryWithValue => EntryWithValue::fromBuilder(
                     builder: ComponentBuilder::from(DerivedComponentEnum::query),
-                    value  : $messageInterface->getUri()
-                                              ->getQuery(),
+                    value  :MessageQuery::handle($messageInterface),
                 ),
 
             'content-length'                             =>
