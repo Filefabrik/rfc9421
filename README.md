@@ -597,25 +597,21 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
     * documentation for signing the response without processing `content-length` during generation and other RFC header
       variables they will be injected into request|response after Filefabrik/Rfc9421 signing
 * multiple signatures
+* TR Field not implemented yet
 * prepareComponents
-    * 2.2.5. Request Target
-    * 2.2.7. Query
-    * 2.4. Signing Request Components in a Response Message
-* check https://github.com/bakame-php/http-structured-fields
+    * ~~2.2.5. Request Target~~ // implemented and tested
+    * ~~2.2.7. Query~~ // implemented and tested
+    * ~~2.4. Signing Request Components in a Response Message~~
+* ~~check https://github.com/bakame-php/http-structured-fields~~  // implemented and tested
     * [structured-fields.md](docs/structured-fields.md)
 * for symfony composer require symfony/psr-http-message-bridge
-    * `"symfony/http-foundation": "^v8.1.8",
-      "symfony/psr-http-message-bridge": "^v8.1.0",
-      "nyholm/psr7": "^1.8"`
+  * "symfony/http-foundation": "^v8.1.8",
+  * "symfony/psr-http-message-bridge": "^v8.1.0",
+  * "nyholm/psr7": "^1.8"
 * todo diagnose/testmethods to implement faster a new requester/vendor to check there stuff and also explain detailed
   what happens during your or there processing
-* doc structured field types and mappers need for "Key" "Sf"
+* ~~doc structured field types and mappers need for "Key" "Sf"~~ // fixed methods for easier handling
 * doc "./Methods" default handling and how to change
-* query param and key handler is really buggy.  
-  can also not work at `macgirvin/http-message-signer`
-* todo more strict header enums for singing components with an extra validator "I expect the following signed parameters"
-```php
-<?php 
-use Filefabrik\Rfc9421\Methods\MessageQueryParams;MessageQueryParams::handle()
-?>
-```
+* ~~query param and key handler is really buggy.~~   // implemented and tested `rawurlencode/rawurldecode` for #RFC3986
+* ~~todo more strict header enums for singing components~~ with an extra validator "I expect the following signed parameters"
+
