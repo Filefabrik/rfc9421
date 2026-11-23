@@ -21,13 +21,12 @@ use Filefabrik\Rfc9421\Support\UnquoteHelper;
 
 final readonly class RenderInitialContents
 {
-
     /**
      * @param array<InitialContentsEnum> $withValues They need a value later in fieldName="expect_value" key="expect_value"
      */
     public function __construct(
         private InitialContentsParameters $initialContentsParameters,
-        private array  $withValues=[InitialContentsEnum::key, InitialContentsEnum::name],
+        private array  $withValues = [InitialContentsEnum::key, InitialContentsEnum::name],
     ) {
     }
 

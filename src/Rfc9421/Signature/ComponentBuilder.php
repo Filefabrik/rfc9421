@@ -20,7 +20,6 @@ use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
-use Filefabrik\Rfc9421\Support\NotSet;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use Stringable;
 
@@ -37,7 +36,7 @@ final readonly class ComponentBuilder implements Stringable
      * Component-Name without quotas
      *
      */
-    public private(set) string|DerivedComponentEnum $fieldName;
+    private(set) string|DerivedComponentEnum $fieldName;
 
     private InitialContentsParameters $initialContentsParameters;
 
@@ -184,25 +183,19 @@ final readonly class ComponentBuilder implements Stringable
 
     public function withKey(string $value): self
     {
-        return $this->setPair(InitialContentsEnum::key, $value);
+        return $this->internalSetWithValue(InitialContentsEnum::key, $value);
     }
 
-    private function setPair(
-        InitialContentsEnum $initialContentsEnum,
-        NotSet|string $value,
-    ): self {
-        if ($value instanceof NotSet) {
-            $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum);
-        } else {
-            $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum, $value);
-        }
+    private function internalSetWithValue(InitialContentsEnum $initialContentsEnum, string $value): self
+    {
+        $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum, $value);
 
         return $this;
     }
 
     public function withName(string $value): self
     {
-        return $this->setPair(InitialContentsEnum::name, $value);
+        return $this->internalSetWithValue(InitialContentsEnum::name, $value);
     }
 
     /**
@@ -224,17 +217,24 @@ final readonly class ComponentBuilder implements Stringable
 
     public function withBs(): self
     {
-        return $this->setPair(InitialContentsEnum::bs, new NotSet());
+        return $this->setWithoutValue(InitialContentsEnum::bs);
+    }
+
+    private function setWithoutValue(InitialContentsEnum $initialContentsEnum): self
+    {
+        $this->initialContentsParameters->setInitialContentsEnum($initialContentsEnum);
+
+        return $this;
     }
 
     public function withSf(): self
     {
-        return $this->setPair(InitialContentsEnum::sf, new NotSet());
+        return $this->setWithoutValue(InitialContentsEnum::sf);
     }
 
     public function withReq(): self
     {
-        return $this->setPair(InitialContentsEnum::req, new NotSet());
+        return $this->setWithoutValue(InitialContentsEnum::req);
     }
 
     /**
@@ -257,4 +257,5 @@ final readonly class ComponentBuilder implements Stringable
 
         return $this;
     }
+
 }

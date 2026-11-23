@@ -32,9 +32,6 @@ final readonly class Sf
     }
 
     /**
-     *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
