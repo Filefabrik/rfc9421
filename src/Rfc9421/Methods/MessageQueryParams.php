@@ -29,14 +29,17 @@ final class MessageQueryParams
      *
      * Find one query parameter by fieldName (which must be supplied as parameters in the covered field list).
      *
+     * RFC 3986 php equivalent is rawurlencode
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function handle(MessageInterface $message, Bytes|DisplayString|Token|bool|DateTimeImmutable|float|int|string|null $fieldName): EntryWithValue
-    {
+    public static function handle(
+        MessageInterface $message,
+        Bytes|DisplayString|Token|bool|DateTimeImmutable|float|int|string|null $fieldName,
+    ): EntryWithValue {
         $queryString = MessageInterfaceHelper::hasGetUri($message)
                                              ->getQuery()
         ;
@@ -72,15 +75,12 @@ final class MessageQueryParams
                                      ->withName(value: $fieldName),
             value  : $value,
         );
-        //   return new Entry(DerivedComponentEnum::queryParam->value, $value, InitialContentsEnum::name, $fieldName);
     }
 
     /**
-     * Todo extremely buggy
-     * todo comment
-     * todo user should use an own security parser. Make documentation of MessageQueryParams override
-     * The value of the fieldName parameter and the component value of a single named parameter are calculated via the following process:
      *
+     * The value of the fieldName parameter and the component value of a single named parameter are calculated via the following process:
+     * todo user should use an own security parser. Make documentation of MessageQueryParams override
      * Parse the nameString or valueString of the named query parameter defined by Section 5.1 ("application/x-www-form-urlencoded parsing") of [HTMLURL]; this is the value after percent-encoded octets are decoded.
      * Encode the nameString or valueString using the "percent-encode after encoding" process defined by Section 5.2 ("application/x-www-form-urlencoded serializing") of [HTMLURL]; this results in an ASCII string [ASCII].
      * Output the ASCII string.
@@ -91,12 +91,9 @@ final class MessageQueryParams
      * "@query-param";fieldName="fa%C3%A7ade%22%3A%20": something
      *
      *
+     *
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @return non-empty-array<string, string>
-     *
-     * Should not use PHP's parse_str function here, as it has some issues with
-     * spaces and dots in parameter names. The following function treats them as
-     * opaque strings rather than as variable names.
      */
     public static function parseQueryString(string $query): array
     {
@@ -113,12 +110,7 @@ final class MessageQueryParams
                 throw QueryParamsException::keyException($key);
             }
 
-            $ValueDecoded = urldecode($value);
-            /* $ValueReEncoded = urlencode($ValueDecoded);
-
-             if ($ValueReEncoded !== $value) {
-               //  throw QueryParamsException::valueException($value);
-             }*/
+            $ValueDecoded = rawurldecode($value);
 
             // fa%C3%A7ade%22%3A%20
             $result[$KeyReEncoded] = $ValueDecoded;

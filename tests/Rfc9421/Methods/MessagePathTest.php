@@ -35,4 +35,20 @@ final class MessagePathTest extends TestCase
             MessagePath::handle(new Request('GET', 'https://example.com/testing/something/')),
         );
     }
+
+    /**
+     * @see https://url.spec.whatwg.org/#example-5434421b
+     */
+    public function testRfc()
+    {
+        self::assertSame(
+            '/%F0%9F%92%A9',
+            MessagePath::handle(new Request('GET', 'https://example.org/💩')),
+        );
+
+        self::assertSame(
+            '/%F0%9F%8D%A3%F0%9F%8D%BA',
+            MessagePath::handle(new Request('GET', 'https://url.spec.whatwg.org/🍣🍺')),
+        );
+    }
 }

@@ -21,12 +21,14 @@ use Psr\Http\Message\RequestInterface;
  * ?
  * resulting in the following signature base line:
  * "@query": ?
+ *
+ * @see https://www.rfc-editor.org/info/rfc3986/
  */
 final class MessageQuery
 {
-    public static function handle(RequestInterface $messageInterface): string
+    public static function handle(RequestInterface $requestInterface): string
     {
-        $query = $messageInterface->getUri()
+        $query = $requestInterface->getUri()
                                   ->getQuery()
         ;
 

@@ -32,4 +32,18 @@ final class MessageQueryTest extends TestCase
             MessageQuery::handle(new Request('GET', 'https://example.com/testing/something?testing=green')),
         );
     }
+
+    /**
+     * @see https://url.spec.whatwg.org/#example-5434421b
+     * @see https://url.spec.whatwg.org/#example-constructing-urlsearchparams
+     */
+    public function testRFC()
+    {
+        $request = new Request('POST', 'https://example.org/?a=b ~');
+
+        $parsed = MessageQuery::handle($request);
+        self::assertSame('?a=b%20~', $parsed);
+
+        self::assertSame('?a=~&b=%7E', MessageQuery::handle(new Request('POST', 'https://example.com/?a=~&b=%7E')));
+    }
 }

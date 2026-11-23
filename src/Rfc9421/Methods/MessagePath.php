@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -16,6 +17,8 @@ use Psr\Http\Message\RequestInterface;
  * todo check trailing slash
  * https://example.com/testing/something/
  * https://example.com/testing/something
+ *
+ * @see https://url.spec.whatwg.org/#example-5434421b
  */
 final class MessagePath
 {

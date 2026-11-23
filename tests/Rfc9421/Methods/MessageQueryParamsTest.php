@@ -63,7 +63,10 @@ final class MessageQueryParamsTest extends TestCase
         );
         $returnEntry = MessageQueryParams::handle($request, 'var');
 
-        self::assertSame('"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value', $returnEntry->parseComponentNameAndValue());
+        self::assertSame(
+            '"@query-param";name="var": this%20is%20a%20big%0Amultiline%20value',
+            $returnEntry->parseComponentNameAndValue(),
+        );
     }
 
     /**
@@ -123,4 +126,6 @@ final class MessageQueryParamsTest extends TestCase
         $parsed = MessageQueryParams::parseQueryString($s);
         self::assertSame(['var' => ''], $parsed);
     }
+
+
 }
