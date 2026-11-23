@@ -15,6 +15,7 @@ use Filefabrik\Rfc9421\Cryptography\SignatureRegistry;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
+use Filefabrik\Rfc9421\Enums\InternalHeaderKeyEnums;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
@@ -69,8 +70,8 @@ trait TraitSigner
         $cryptedBaseSigString = $this->crypt(signingParametersString: $this->getSigningParametersStringOrThrow());
 
         // setting the signature header into the request
-        $this->updateHeader(HeaderKeysEnum::signature_input->value, $this->signatureBase)
-             ->updateHeader(HeaderKeysEnum::signature->value, $cryptedBaseSigString)
+        $this->updateHeader(InternalHeaderKeyEnums::signature_input->value, $this->signatureBase)
+             ->updateHeader(InternalHeaderKeyEnums::signature->value, $cryptedBaseSigString)
         ;
 
         return $this->message;
@@ -154,8 +155,8 @@ trait TraitSigner
         if ($this->signingConfiguration->isMustGenerateContentDigest()) {
             $siCo = $this->signingConfiguration->getSigningComponents();
 
-            if (!$siCo->findComponentByName(HeaderKeysEnum::content_digest->value) instanceof ComponentItemDto) {
-                $siCo->sign(HeaderKeysEnum::content_digest->value);
+            if (!$siCo->findComponentByName(HeaderKeysEnum::content_digest->fieldName()) instanceof ComponentItemDto) {
+                $siCo->sign(HeaderKeysEnum::content_digest);
             }
 
             $contentDigestHeader = new ContentDigestHeader(

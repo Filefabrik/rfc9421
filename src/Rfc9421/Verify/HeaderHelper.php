@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -11,6 +12,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Verify;
 
 use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
+use Filefabrik\Rfc9421\Enums\InternalHeaderKeyEnums;
 use Psr\Http\Message\MessageInterface;
 
 /**
@@ -29,12 +31,12 @@ final readonly class HeaderHelper
      */
     public function getSignatureLine(): string
     {
-        return $this->message->getHeaderLine(HeaderKeysEnum::signature->value);
+        return $this->message->getHeaderLine(InternalHeaderKeyEnums::signature->fieldName());
     }
 
     public function hasSignatureLine(): bool
     {
-        return $this->message->hasHeader(HeaderKeysEnum::signature->value);
+        return $this->message->hasHeader(InternalHeaderKeyEnums::signature->fieldName());
     }
 
     /**
@@ -43,22 +45,22 @@ final readonly class HeaderHelper
      */
     public function getSignatureInputLine(): string
     {
-        return $this->message->getHeaderLine(HeaderKeysEnum::signature_input->value);
+        return $this->message->getHeaderLine(InternalHeaderKeyEnums::signature_input->fieldName());
     }
 
     public function hasSignatureInputLine(): bool
     {
-        return $this->message->hasHeader(HeaderKeysEnum::signature_input->value);
+        return $this->message->hasHeader(InternalHeaderKeyEnums::signature_input->fieldName());
     }
 
     public function getContentDigestLine(): string
     {
-        return $this->message->getHeaderLine(HeaderKeysEnum::content_digest->value);
+        return $this->message->getHeaderLine(HeaderKeysEnum::content_digest->fieldName());
     }
 
     public function hasContentDigestLine(): bool
     {
-        return $this->message->hasHeader(HeaderKeysEnum::content_digest->value);
+        return $this->message->hasHeader(HeaderKeysEnum::content_digest->fieldName());
     }
 
 }

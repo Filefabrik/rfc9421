@@ -20,6 +20,7 @@ use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
+use Filefabrik\Rfc9421\Interfaces\HeaderKeysEnumInterface;
 use Filefabrik\Rfc9421\Support\UnquoteHelper;
 use Stringable;
 
@@ -36,7 +37,7 @@ final readonly class ComponentBuilder implements Stringable
      * Component-Name without quotas
      *
      */
-    private(set) string|DerivedComponentEnum $fieldName;
+    private(set) string|DerivedComponentEnum|HeaderKeysEnumInterface $fieldName;
 
     private InitialContentsParameters $initialContentsParameters;
 
@@ -45,11 +46,12 @@ final readonly class ComponentBuilder implements Stringable
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function __construct(string|DerivedComponentEnum $name)
+    public function __construct(string|DerivedComponentEnum|HeaderKeysEnumInterface $name)
     {
-        $this->fieldName                 = $name instanceof DerivedComponentEnum ?
-            $name :
-            $this->setValidatedName($name);
+        $this->fieldName                 =
+            $name instanceof DerivedComponentEnum || $name instanceof HeaderKeysEnumInterface ?
+                $name :
+                $this->setValidatedName($name);
         $this->initialContentsParameters = new InitialContentsParameters();
     }
 
@@ -81,7 +83,7 @@ final readonly class ComponentBuilder implements Stringable
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
-    public static function from(string|DerivedComponentEnum $name): self
+    public static function from(string|DerivedComponentEnum|HeaderKeysEnumInterface $name): self
     {
         return new self($name);
     }
@@ -133,7 +135,8 @@ final readonly class ComponentBuilder implements Stringable
      */
     public function getFieldNameString(): string
     {
-        return $this->fieldName instanceof DerivedComponentEnum ? $this->fieldName->value : $this->fieldName;
+        return $this->fieldName instanceof DerivedComponentEnum || $this->fieldName instanceof HeaderKeysEnumInterface ?
+            $this->fieldName->value : $this->fieldName;
     }
 
     private function renderParameters(): array

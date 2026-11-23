@@ -11,28 +11,19 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Enums;
 
+use Filefabrik\Rfc9421\Enums\Support\HeaderKeysTrait;
+use Filefabrik\Rfc9421\Interfaces\HeaderKeysEnumInterface;
+
 /**
  * Static Values to prevent from typo errors
  */
-enum HeaderKeysEnum: string
+enum HeaderKeysEnum: string implements HeaderKeysEnumInterface
 {
+    use HeaderKeysTrait;
+
     /*
      * Content-Digest is for the Body
      */
     case content_digest = 'content-digest';
 
-    /*
-     * fixed values
-     */
-    case signature_input = 'signature-input';
-
-    case signature = 'signature';
-
-    /**
-     * @return string return the value which is HTTP Header Key and also sigining components fieldName part "content-digest";req
-     */
-    public function fieldName(): string
-    {
-        return $this->value;
-    }
 }

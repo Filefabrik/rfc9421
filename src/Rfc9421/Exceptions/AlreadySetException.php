@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Filefabrik\Rfc9421\Exceptions;
 
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
-use Filefabrik\Rfc9421\Enums\HeaderKeysEnum;
+use Filefabrik\Rfc9421\Enums\InternalHeaderKeyEnums;
 
 final class AlreadySetException extends AbstractRfc9421Exception
 {
@@ -20,7 +20,7 @@ final class AlreadySetException extends AbstractRfc9421Exception
         return new self(
             sprintf(
                 '%s parameter "%s" was set before and can not be set again.',
-                HeaderKeysEnum::signature_input->value,
+                InternalHeaderKeyEnums::signature_input->value,
                 $var,
             ),
         );

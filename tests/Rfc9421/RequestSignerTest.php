@@ -484,7 +484,7 @@ final class RequestSignerTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
-    public function testWithEmptyQuery()
+    public function testWithEmptyQuery(): void
     {
         $certInstance    = new CertHelper('rsa');
         $currentDateTime = new DateTime()->getTimestamp();
@@ -508,14 +508,15 @@ final class RequestSignerTest extends TestCase
                            ->withAddedHeader('example-header', 'of, commas')
         ;
 
-        $signingConfiguration = new SigningConfiguration(
-            signingComponents: new SigningComponents()->sign('content-type')
-                                                      ->sign('@method')
-                                                      ->sign('x-Origin-host')
-                                                      ->signWithSF('"example-dict"')
-                                                      ->signWithKey('example-dict', 'd')
-                                                      ->signWithBS('example-header'),
-        )
+        $signingConfiguration = new SigningConfiguration()
+            ->setSigningComponents(
+                new SigningComponents()->sign('content-type')
+                                       ->sign(DerivedComponentEnum::method)
+                                       ->sign('x-Origin-host')
+                                       ->signWithSF('"example-dict"')
+                                       ->signWithKey('example-dict', 'd')
+                                       ->signWithBS('example-header'),
+            )
             /*
              * todo documentation for addSigningMethod for content-type
              */

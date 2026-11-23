@@ -15,6 +15,7 @@ namespace Filefabrik\Rfc9421;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Exceptions\AlreadySetException;
+use Filefabrik\Rfc9421\Interfaces\HeaderKeysEnumInterface;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use Filefabrik\Rfc9421\Signature\ComponentExtractor;
 
@@ -197,7 +198,7 @@ final class SigningComponents
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function sign(string|DerivedComponentEnum $fieldName, bool $asReq = false): self
+    public function sign(string|DerivedComponentEnum|HeaderKeysEnumInterface $fieldName, bool $asReq = false): self
     {
         return $this->set(
             ComponentBuilder::from($fieldName)
