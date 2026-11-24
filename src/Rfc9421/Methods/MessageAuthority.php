@@ -24,7 +24,7 @@ final class MessageAuthority
     {
         $uri = $requestInterface->getUri();
 
-        $authority = strtolower($uri->getAuthority());
+        $authority = $uri->getAuthority();
         $authority = explode(':', $authority);
 
         return $authority[0];

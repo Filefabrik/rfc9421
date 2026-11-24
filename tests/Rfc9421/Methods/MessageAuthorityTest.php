@@ -24,5 +24,9 @@ final class MessageAuthorityTest extends TestCase
         $request = new Request('POST', 'https://example.com/message');
         $res     = MessageAuthority::handle($request);
         self::assertSame('example.com', $res);
+
+        $request = new Request('POST', 'https://EXAMPLE.com/message');
+        $res     = MessageAuthority::handle($request);
+        self::assertSame('example.com', $res);
     }
 }

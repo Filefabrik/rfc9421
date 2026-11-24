@@ -54,6 +54,20 @@ final class MessageQueryParamsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
+    public function testHandleQuxNotEmpty(): void
+    {
+        $request     = new Request('GET', 'http://localhost:8001/path?param=value&foo=bar&baz=batman&qux=not-empty');
+        $returnEntry = MessageQueryParams::handle($request, 'qux');
+
+        self::assertSame('"@query-param";name="qux": not-empty', $returnEntry->parseComponentNameAndValue());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public function testMultiline(): void
     {
         $request     = new Request(
@@ -109,7 +123,7 @@ final class MessageQueryParamsTest extends TestCase
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      */
-    public function testParseQueryStringFasch(): void
+    public function testParseQueryStringFalsy(): void
     {
         $s = 'fa%C3%A7ade%22%3A%20=something';
 
@@ -127,5 +141,15 @@ final class MessageQueryParamsTest extends TestCase
         self::assertSame(['var' => ''], $parsed);
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
+     */
+    public function testParseQueryStringDoubleEqualSign(): void
+    {
+        $s = 'var=bla=test';
+
+        $parsed = MessageQueryParams::parseQueryString($s);
+        self::assertSame(['var' => 'bla=test'], $parsed);
+    }
 
 }

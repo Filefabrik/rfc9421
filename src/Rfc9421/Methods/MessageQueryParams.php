@@ -51,7 +51,8 @@ final class MessageQueryParams
 
         // todo, wenn not exists $queryParams[$fieldNameDto], check what is expected
         $value = '';
-        if (array_key_exists($fieldName, $queryParams) && '' !== $queryParams[$fieldName]) {
+
+        if (!empty($queryParams[$fieldName])) {
             $fValue = $queryParams[$fieldName];
             // multiline or problematic chars
             $value = rawurlencode($fValue);
@@ -92,31 +93,39 @@ final class MessageQueryParams
      *
      *
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      * @return non-empty-array<string, string>
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
      */
     public static function parseQueryString(string $query): array
     {
         $result      = [];
         $queryParams = explode('&', $query);
         foreach ($queryParams as $param) {
-            // The '=' character is not required and indicates a boolean true value if unset.
-            [$key, $value] = explode('=', $param, 2);
-
-            $KeyDecoded   = rawurldecode($key);
-            $KeyReEncoded = rawurlencode($KeyDecoded);
-
-            if ($KeyReEncoded !== $key) {
-                throw QueryParamsException::keyException($key);
-            }
-
-            $ValueDecoded = rawurldecode($value);
-
-            // fa%C3%A7ade%22%3A%20
-            $result[$KeyReEncoded] = $ValueDecoded;
-            // $result[rawurldecode($element[0])] = isset($element[1]) ? urldecode($element[1]) : '';
+            $result = [...$result, ...self::singleEntry($param)];;
         }
 
         return $result;
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\QueryParamsException
+     */
+    private static function singleEntry(string $param): array
+    {
+        [$key, $value] = explode('=', $param,2);
+
+        $KeyDecoded   = rawurldecode($key);
+        $KeyReEncoded = rawurlencode($KeyDecoded);
+
+        if ($KeyReEncoded !== $key) {
+            throw QueryParamsException::keyException($key);
+        }
+
+        $ValueDecoded = rawurldecode($value);
+
+        // fa%C3%A7ade%22%3A%20
+
+        // $result[rawurldecode($element[0])] = isset($element[1]) ? urldecode($element[1]) : '';
+        return [$KeyReEncoded => $ValueDecoded];
     }
 }

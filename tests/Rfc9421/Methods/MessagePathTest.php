@@ -25,7 +25,10 @@ final class MessagePathTest extends TestCase
             '/',
             MessagePath::handle(new Request('GET', 'https://example.com')),
         );
-
+        self::assertSame(
+            '/',
+            MessagePath::handle(new Request('GET', 'https://example.com/')),
+        );
         self::assertSame(
             '/testing/something',
             MessagePath::handle(new Request('GET', 'https://example.com/testing/something')),
@@ -34,6 +37,7 @@ final class MessagePathTest extends TestCase
             '/testing/something/',
             MessagePath::handle(new Request('GET', 'https://example.com/testing/something/')),
         );
+
     }
 
     /**

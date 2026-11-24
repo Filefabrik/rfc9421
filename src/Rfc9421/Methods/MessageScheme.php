@@ -22,9 +22,9 @@ final class MessageScheme
      */
     public static function handle(MessageInterface $message): string
     {
-        return strtolower(
+        return
             MessageInterfaceHelper::hasGetUri($message)
-                                  ->getScheme(),
-        );
+                                  ->getScheme();
+
     }
 }

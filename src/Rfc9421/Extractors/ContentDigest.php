@@ -66,7 +66,7 @@ final readonly class ContentDigest
      */
     public function validateExtraction(): bool
     {
-        return (2 === count($this->getDigestArray()));
+        return 2 === count($this->getDigestArray());
     }
 
     /**

@@ -22,6 +22,7 @@ use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 final class HeaderSignature
 {
     private static string $pattern = '#^(.*?):(.*?):$#';
+
     /**
      * @var array{non-falsy-string,string,string}|non-empty-array<string>|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException|null
      */
@@ -85,8 +86,8 @@ final class HeaderSignature
      * checks we have the :base64EncodedValue-code: ...between the double colons
      *
      *
-     * @return array{0:non-falsy-string,1:string,2:string}|non-empty-array<string> SignatureExtractionException on format missmatch
      * @throws SignatureExtractionException
+     * @return array{0:non-falsy-string,1:string,2:string}|non-empty-array<string> SignatureExtractionException on format missmatch
      */
     private function getValidatedSignatureParts(): array
     {

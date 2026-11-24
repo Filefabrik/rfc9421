@@ -28,6 +28,6 @@ final class MessagePath
                               ->getPath()
         ;
 
-        return (!str_starts_with($p, '/')) ? '/'.$p : $p;
+        return !str_starts_with($p, '/') ? '/' : $p;
     }
 }
