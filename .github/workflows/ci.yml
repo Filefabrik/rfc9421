@@ -12,6 +12,7 @@ jobs:
 
      - name: Install composer and dependencies
        uses: php-actions/composer@v6
+             
 
      - name: PHPUnit Tests
        uses: php-actions/phpunit@v3
@@ -20,7 +21,7 @@ jobs:
        with:
          bootstrap: vendor/autoload.php
          configuration: phpunit.xml
-         php_extensions: xdebug
+         php_extensions: xdebug ext-gmp
          args: tests --coverage-clover ./coverage.xml
 
      - name: Upload to Codecov
