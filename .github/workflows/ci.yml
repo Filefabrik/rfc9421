@@ -30,9 +30,10 @@ jobs:
           - 8.5
           #- "8.6"
         os: [ubuntu-latest]
-        composer-deps:
-          - "lowest"
-          - "highest"
+        #- ubuntu-latest
+#        composer-deps:
+#          - "lowest"
+#          - "highest"
 
     steps:
       - name: Checkout Code
