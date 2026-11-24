@@ -5,28 +5,34 @@ permissions:
   contents: read
 
 jobs:
-  php-versions:
-    name: Lookup PHP versions
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.versions.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v7
-      - uses: antfroger/php-version-action@v1
-        id: versions
-        with:
-          unstable: true # set to false (or remove the param) to exclude unreleased versions
-          unsupported: false # set to true (or remove the param) to include unsupported versions
+#  php-versions:
+#    name: Lookup PHP versions
+#    runs-on: ubuntu-latest
+#    outputs:
+#      matrix: ${{ steps.versions.outputs.matrix }}
+#    steps:
+#      - uses: actions/checkout@v7
+#      - uses: antfroger/php-version-action@v1
+#        id: versions
+#        with:
+#          unstable: true # set to false (or remove the param) to exclude unreleased versions
+#          unsupported: false # set to true (or remove the param) to include unsupported versions
 
   test:
-    name: Test PHP ${{ matrix.php-version }} on ${{ matrix.os }}
+    name: Test PHP ${{ matrix.php }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    needs: php-versions
+    #needs: php-versions
 
     strategy:
       matrix:
-        os: [ubuntu-latest] # add more os
-        php-version: ${{ fromJSON(needs.php-versions.outputs.matrix) }}
+        php:
+          - 8.4
+          - 8.5
+          #- "8.6"
+        os: [ubuntu-latest]
+        composer-deps:
+          - "lowest"
+          - "highest"
 
     steps:
       - name: Checkout Code
@@ -35,7 +41,7 @@ jobs:
       - name: Install composer and dependencies
         uses: php-actions/composer@v6
         with:
-          php_version: ${{ matrix.php-version }}
+          php_version: ${{ matrix.php }}
           php_extensions: xdebug mbstring gmp
 
       - name: PHPUnit Tests
@@ -46,7 +52,7 @@ jobs:
           bootstrap: vendor/autoload.php
           configuration: phpunit.xml
           args: tests --coverage-clover ./coverage.xml
-          php_version: ${{ matrix.php-version }}
+          php_version: ${{ matrix.php }}
           php_extensions: xdebug mbstring
           memory_limit: -1
           testsuite: Rfc9421
