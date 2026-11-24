@@ -26,7 +26,7 @@ jobs:
          bootstrap: vendor/autoload.php
          configuration: phpunit.xml
          args: tests --coverage-clover ./coverage.xml
-         php_extensions: "mbstring xdebug"
+         php_extensions: xdebug mbstring
          memory_limit: -1
          testsuite: default
 
