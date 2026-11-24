@@ -28,6 +28,7 @@ jobs:
          args: tests --coverage-clover ./coverage.xml
          php_extensions: "mbstring xdebug"
          memory_limit: -1
+         testsuite: default
 
 
      - name: Upload to Codecov
