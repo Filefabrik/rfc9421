@@ -23,6 +23,7 @@ jobs:
          bootstrap: vendor/autoload.php
          configuration: phpunit.xml
          args: tests --coverage-clover ./coverage.xml
+         php_extensions: mbstring
 
      - name: Upload to Codecov
        uses: codecov/codecov-action@v7
