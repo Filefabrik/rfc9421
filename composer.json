@@ -4,7 +4,6 @@
   "description": "Create and validate RFC 9421 HTTP Signatures for ActivityPub.",
   "homepage": "https://filefabrik.com/rfc9421-http-signatures-activity-pub",
   "license": "proprietary",
-  "version": "v1.10.9",
   "keywords": [
     "activity pub",
     "ActivityPub",
@@ -63,5 +62,22 @@
   "support": {},
   "config": {
     "allow-plugins": {}
+  },
+  "scripts": {
+    "analyze": "vendor/bin/phpstan analyze --ansi -v --memory-limit=1G",
+
+    "coverage-ci": "XDEBUG_MODE=coverage phpunit --colors=always --testdox --coverage-text --coverage-clover build/coverage/clover.xml",
+    "fix": [
+      "@composer normalize",
+      "vendor/bin/phpcbf --cache=build/cache/phpcs.cache"
+    ],
+    "lint": [
+      "@composer validate --strict",
+      "@composer normalize --dry-run",
+      "vendor/bin/phpcs --colors --cache=build/cache/phpcs.cache",
+      "@analyze"
+    ],
+    "mutation": "XDEBUG_MODE=coverage vendor/bin/infection --show-mutations=0",
+    "test": "vendor/bin/phpunit --colors=always"
   }
 }

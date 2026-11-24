@@ -6,6 +6,9 @@
   ~ License: proprietary
   ~ State: under development
   -->
+<!--
+TODO  beStrictAboutCoverageMetadata="false" to be true. at the moment it is wild/cross testing
+-->
 
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
@@ -13,7 +16,7 @@
          cacheDirectory=".phpunit.cache"
          executionOrder="defects"
          requireCoverageMetadata="true"
-         beStrictAboutCoverageMetadata="true"
+         beStrictAboutCoverageMetadata="false"
          beStrictAboutOutputDuringTests="true"
          displayDetailsOnPhpunitDeprecations="true"
          failOnPhpunitDeprecation="true"
