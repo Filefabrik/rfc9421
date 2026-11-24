@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -57,7 +58,9 @@ final readonly class ContentDigest
      */
     public function getDigestArray(): array
     {
-        return explode(separator: '=', string: $this->contentDigest, limit: 2);
+        preg_match('#^(.*?)=:(.*?):$#', $this->contentDigest, $matches);
+
+        return [$matches[1] ?? null, $matches[2] ?? null];
     }
 
     /**
@@ -66,7 +69,9 @@ final readonly class ContentDigest
      */
     public function validateExtraction(): bool
     {
-        return 2 === count($this->getDigestArray());
+        [$key, $value] = $this->getDigestArray();
+
+        return $key && $value;
     }
 
     /**

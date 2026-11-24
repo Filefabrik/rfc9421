@@ -22,6 +22,7 @@ use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421Test\Prepared\SignedAndVerifiedRequest;
 use Filefabrik\Rfc9421Test\Tools\CertHelper;
+use Filefabrik\Rfc9421Test\Tools\SigningLoader;
 use GuzzleHttp\Psr7\Response;
 use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -36,7 +37,8 @@ final class ResponseSignerTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        require_once dirname(__DIR__, 2).'/src/register-openssl-signing-verify.php';
+
+        \Filefabrik\Rfc9421Test\Tools\SigningLoader::ensureHasValues();
     }
 
     /**

@@ -78,7 +78,7 @@ final class VerifyRequestPrepareTest extends TestCase
      */
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerify(string|SigningEnum $signingAlgo, string $cert): void
-    {
+    {   require_once dirname(__DIR__, 2).'/src/register-openssl-signing-verify.php';
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName  = 'testing=';

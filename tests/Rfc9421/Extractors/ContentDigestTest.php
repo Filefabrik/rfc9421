@@ -34,7 +34,7 @@ final class ContentDigestTest extends TestCase
     public function testGetHash(): void
     {
         $hash = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getExplodedHash();
-        self::assertEquals(':tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:', $hash);
+        self::assertEquals('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=', $hash);
     }
 
     public function testGetPhpAlgorithm(): void
@@ -52,7 +52,7 @@ final class ContentDigestTest extends TestCase
     public function testGetDigestArray(): void
     {
         $digestArray = new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->getDigestArray();
-        self::assertEquals(['sha-256', ':tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:'], $digestArray);
+        self::assertEquals(['sha-256', 'tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc='], $digestArray);
     }
 
     public function testValidateExtraction(): void

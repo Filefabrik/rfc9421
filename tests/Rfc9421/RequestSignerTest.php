@@ -33,7 +33,7 @@ final class RequestSignerTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        require_once dirname(__DIR__, 2).'/src/register-openssl-signing-verify.php';
+        \Filefabrik\Rfc9421Test\Tools\SigningLoader::ensureHasValues();
     }
 
     /**
@@ -429,7 +429,7 @@ final class RequestSignerTest extends TestCase
     public function testSignThrowsEmptyQueryParam(): void
     {
         $this->expectExceptionObject(
-            // todo more descriptive error message
+        // todo more descriptive error message
             new PrepareMethodsException(
                 'Error during calling the method with key: "@query-param": Initial contents enum: "name" was not set before.',
             ),

@@ -69,7 +69,7 @@
   "scripts": {
     "analyze": "vendor/bin/phpstan analyze --ansi -v --memory-limit=1G",
 
-    "coverage-ci": "XDEBUG_MODE=coverage phpunit --colors=always --testdox --coverage-text --coverage-clover ./build/coverage/clover.xml",
+    "coverage-ci": "XDEBUG_MODE=coverage phpunit --colors=always --testdox --coverage-text --coverage-clover ./.coverage/clover.xml",
     "mutation": "XDEBUG_MODE=coverage vendor/bin/infection --show-mutations=max",
     "test": "vendor/bin/phpunit --colors=always"
   }
