@@ -8,12 +8,12 @@ jobs:
    steps:
      - name: Checkout Code
        uses: actions/checkout@v2
-          
+
      - name: Install composer and dependencies
        uses: php-actions/composer@v6
        with:
          php_version: "8.4.28"
-         extensions: gmp, ext-gmp
+         php_extensions: ext-gmp
 
      - name: PHPUnit Tests
        uses: php-actions/phpunit@v3
