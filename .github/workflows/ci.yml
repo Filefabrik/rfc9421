@@ -22,7 +22,7 @@ jobs:
        with:
          bootstrap: vendor/autoload.php
          configuration: phpunit.xml
-         php_extensions: xdebug ext-gmp
+         php_extensions: xdebug
          args: tests --coverage-clover ./coverage.xml
 
      - name: Upload to Codecov
