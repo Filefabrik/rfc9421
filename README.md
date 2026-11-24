@@ -1,5 +1,7 @@
 # HTTP Message Signer and Verify (RFC 9421)
 
+![packagist](https://img.shields.io/packagist/v/filefabrik/rfc9421)
+
 PHP RFC9421 HTTP Message Signing and Verify
 
 ## Features
@@ -27,25 +29,13 @@ PHP RFC9421 HTTP Message Signing and Verify
     PSR-7 "psr/http-message"
     RFC9561 and RFC8941 bakame/http-structured-fields
 
-## Release
-
-The package is still on the developer instance while the final touches are being made before its first release. Would
-you like to take a look at the code in advance? If so, please write a ticket.
-
-## Diagnostic Tools
-
-Fresh implementation of message singing and verifying can be hard.
-So we have some Tools to check step by step the signing/verifiying process
-
-* [diagnostics.md](docs/diagnostics.md)
-
 ## Need professional Support?
 
-Es kann sehr aufwendig sein einen Message-Signing und Verification Prozess ein neues oder bestehendes System zu
-implementieren.
-Möchten Sie die Lernkurve bei der Implementierung mit dem RFC9421 Standard auf einem kostengünstigen Niveau halten?
-Wünschen Sie eine Prüfung Ihres implementierten Prozesses?
-Wir Ihnen unsere Unterstützung an. Zögern Sie nicht uns zu kontaktieren.
+Implementing a message signing and verification process in a new or existing system can be very time-consuming.
+
+Would you like to keep the learning curve for implementing the RFC 9421 standard at a reasonable level?
+Would you like to have your implemented process reviewed?
+We’re here to help. Please don’t hesitate to contact us.
 
 ## Documentation Details
 
@@ -585,7 +575,7 @@ Under docs the CSV's for
 
 https://www.iana.org/assignments/http-message-signature
 
-Testing http signatures: https://httpsig.org/ // will not work. js errors in website
+Testing http signatures: https://httpsig.org/
 
 To create Certs have a look into ./tests/generators/ there are some generators you can modify as you need if you need
 
@@ -615,3 +605,8 @@ or via a tool: https://toolv.com/en/app/rsa-key-generator  or simply with local 
 * ~~query param and key handler is really buggy.~~   // implemented and tested `rawurlencode/rawurldecode` for #RFC3986
 * ~~todo more strict header enums for singing components~~ with an extra validator "I expect the following signed parameters"
 
+* Diagnostic Tools
+
+* Fresh implementation of message singing and verifying can be hard.
+* So we have some Tools to check step by step the signing/verifiying process
+* [diagnostics.md](docs/diagnostics.md)
