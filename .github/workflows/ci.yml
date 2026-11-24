@@ -8,6 +8,7 @@ jobs:
    steps:
      - name: Checkout Code
        uses: actions/checkout@v2
+       
      - name: "Install PHP"
         uses: "shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962" # 2.40.0
         with:
