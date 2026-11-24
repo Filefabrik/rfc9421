@@ -3,3 +3,4 @@ tests export-ignore
 examples export-ignore
 docs export-ignore
 src/Rfc9421/Stuff export-ignore
+./.github export-ignore
