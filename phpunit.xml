@@ -21,8 +21,8 @@
          failOnWarning="true"
          warnWhenPhpIsNotConfiguredForDevelopment="true">
     <testsuites>
-        <testsuite name="default">
-            <directory>tests/Rfc9421Test</directory>
+        <testsuite name="Rfc9421">
+            <directory>tests/Rfc9421</directory>
         </testsuite>
     </testsuites>
 
