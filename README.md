@@ -1,6 +1,6 @@
 # HTTP Message Signer and Verify (RFC 9421)
 
-![packagist](https://img.shields.io/packagist/v/filefabrik/rfc9421)
+![packagist](https://img.shields.io/packagist/v/filefabrik/rfc9421) [![CI](https://github.com/Filefabrik/rfc9421/actions/workflows/ci.yml/badge.svg)](https://github.com/Filefabrik/rfc9421/actions/workflows/ci.yml)
 
 PHP RFC9421 HTTP Message Signing and Verify
 
