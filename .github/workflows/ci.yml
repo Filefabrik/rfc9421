@@ -13,7 +13,7 @@ jobs:
        uses: php-actions/composer@v6
        with:
          php_version: "8.4.28"
-         php_extensions: gmp xdebug
+         php_extensions: gmp xdebug mbstring
 
      - name: PHPUnit Tests
        uses: php-actions/phpunit@v4
