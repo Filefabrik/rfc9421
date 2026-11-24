@@ -4,7 +4,7 @@
   "description": "Create and validate RFC 9421 HTTP Signatures for ActivityPub.",
   "homepage": "https://filefabrik.com/rfc9421-http-signatures-activity-pub",
   "license": "proprietary",
-  "version": "v1.10.5",
+  "version": "v1.10.7",
   "keywords": [
     "activity pub",
     "ActivityPub",
@@ -15,12 +15,12 @@
   "authors": [
     {
       "name": "RT Filefabrik",
-      "email": "hsap@filefabrik.com",
+      "email": "rt@filefabrik.com",
       "homepage": "https://filefabrik.com",
-      "role": "Developer"
+      "role": "Maintainer"
     }
   ],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "type": "library",
   "autoload": {
     "psr-4": {
@@ -54,7 +54,8 @@
     "rector/rector": "^2.7",
     "symfony/http-foundation": "^v8.1.8",
     "symfony/psr-http-message-bridge": "^v8.1.0",
-    "nyholm/psr7": "^1.8"
+    "nyholm/psr7": "^1.8",
+    "roave/security-advisories": "dev-latest"
   },
   "readme": "",
   "prefer-stable": true,
