@@ -4,7 +4,7 @@
   "description": "Create and validate RFC 9421 HTTP Signatures for ActivityPub.",
   "homepage": "https://filefabrik.com/rfc9421-http-signatures-activity-pub",
   "license": "proprietary",
-  "version": "v1.10.4",
+  "version": "v1.10.5",
   "keywords": [
     "activity pub",
     "ActivityPub",
