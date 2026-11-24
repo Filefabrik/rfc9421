@@ -1,0 +1,12 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "src/Rfc9421"
+        ]
+    },
+    "timeout": 10,
+    "mutators": {
+        "@default": true
+    }
+}
