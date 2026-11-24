@@ -13,7 +13,7 @@ jobs:
        uses: php-actions/composer@v6
        with:
          php_version: "8.4.28"
-         php_extensions: gmp xdebug mbstring
+         php_extensions: xdebug mbstring gmp
 
      - name: PHPUnit Tests
        uses: php-actions/phpunit@v4
@@ -23,8 +23,8 @@ jobs:
          bootstrap: vendor/autoload.php
          configuration: phpunit.xml
          args: tests --coverage-clover ./coverage.xml
-         php_extensions: mbstring xdebug
-         memory_limit: -1
+         php_extensions: xdebug mbstring
+         memory_limit: "-1"
 
      - name: Upload to Codecov
        uses: codecov/codecov-action@v7
