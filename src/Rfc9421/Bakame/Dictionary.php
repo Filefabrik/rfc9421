@@ -10,9 +10,8 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Bakame;
 
-use Bakame\Http\StructuredFields\StructuredFieldError;
 use Exception;
-use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
+
 
 /**
  * Bakame Wrapper for Errors
@@ -26,8 +25,8 @@ final class Dictionary
     {
         try {
             return \Bakame\Http\StructuredFields\Dictionary::fromHttpValue($headerValue);
-        } catch (StructuredFieldError|Exception $e) {
-            throw new StructuredFieldException($e->getMessage(), $e->getCode(), $e);
+        } catch (\Bakame\Http\StructuredFields\StructuredFieldError|Exception $e) {
+            throw new \Filefabrik\Rfc9421\Exceptions\StructuredFieldException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }
