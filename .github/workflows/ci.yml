@@ -1,40 +1,59 @@
-name: CI
+name: Testing matrix
+on: [push, pull_request]
 
-on: [push]
+permissions:
+  contents: read
 
 jobs:
- build-test:
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout Code
-       uses: actions/checkout@v7
+  php-versions:
+    name: Lookup PHP versions
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.versions.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: antfroger/php-version-action@v1
+        id: versions
+        with:
+          unstable: true # set to false (or remove the param) to exclude unreleased versions
+          unsupported: false # set to true (or remove the param) to include unsupported versions
 
+  test:
+    name: Test PHP ${{ matrix.php-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: php-versions
 
+    strategy:
+      matrix:
+        os: [ubuntu-latest] # add more os
+        php-version: ${{ fromJSON(needs.php-versions.outputs.matrix) }}
 
-     - name: Install composer and dependencies
-       uses: php-actions/composer@v6
-       with:
-         php_version: 8.4.28
-         php_extensions: xdebug mbstring gmp
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
 
+      - name: Install composer and dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: ${{ matrix.php-version }}
+          php_extensions: xdebug mbstring gmp
 
-     - name: PHPUnit Tests
-       uses: php-actions/phpunit@v4
-       env:
-         XDEBUG_MODE: coverage
-       with:
-         bootstrap: vendor/autoload.php
-         configuration: phpunit.xml
-         args: tests --coverage-clover ./coverage.xml
-         php_version: 8.4.28
-         php_extensions: xdebug mbstring
-         memory_limit: -1
-         testsuite: Rfc9421
+      - name: PHPUnit Tests
+        uses: php-actions/phpunit@v4
+        env:
+          XDEBUG_MODE: coverage
+        with:
+          bootstrap: vendor/autoload.php
+          configuration: phpunit.xml
+          args: tests --coverage-clover ./coverage.xml
+          php_version: ${{ matrix.php-version }}
+          php_extensions: xdebug mbstring
+          memory_limit: -1
+          testsuite: Rfc9421
 
-
-     - name: Upload to Codecov
-       uses: codecov/codecov-action@v7
-       with:
-         token: ${{ secrets.CODE_COV_TOKEN }}
-         files: ./coverage.xml
-         verbose: true
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODE_COV_TOKEN }}
+          files: ./coverage.xml
+          verbose: true
