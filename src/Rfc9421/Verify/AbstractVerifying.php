@@ -68,11 +68,11 @@ abstract class AbstractVerifying
         $signer = $this->getSigner();
 
         $verified = VerifyRegistry::verifying(
-            signingEnum: $preparedSigningConfiguration->getMetadata()
-                                                      ->getAlgOrThrow(),
-            data       : $signer->getSigningParametersStringOrThrow(),
-            signature  : $this->getBinarySignatureValue(),
-            publicKey  : $preparedSigningConfiguration->getPublicPemOrThrow(),
+            signingEnumInterface: $preparedSigningConfiguration->getMetadata()
+                                                               ->getAlgOrThrow(),
+            data                : $signer->getSigningParametersStringOrThrow(),
+            signature           : $this->getBinarySignatureValue(),
+            publicKey           : $preparedSigningConfiguration->getPublicPemOrThrow(),
         );
 
         if ($verified) {

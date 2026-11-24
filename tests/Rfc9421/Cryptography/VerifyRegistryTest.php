@@ -13,6 +13,8 @@ namespace Filefabrik\Rfc9421Test\Cryptography;
 
 use Filefabrik\Rfc9421\Cryptography\VerifyRegistry;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -57,5 +59,39 @@ final class VerifyRegistryTest extends TestCase
         ]);
         self::assertTrue(VerifyRegistry::verifying(SigningEnum::rsa_pss_sha512, '', '', ''));
         self::assertFalse(VerifyRegistry::verifying(SigningEnum::rsa_v_1_5_sha_256, '', '', ''));
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testVerifyingThrows(): void
+    {
+        $this->expectExceptionObject(
+            new SignatureException('The signature enum "not-known" for signing is not supported.'),
+        );
+        VerifyRegistry::registerMethods([
+            SigningEnum::rsa_pss_sha512->name    =>
+                fn (string $signingDatas, $signature, $publicKeyPem): bool => true,
+            SigningEnum::rsa_v_1_5_sha_256->name => fn (string $signingDatas, $signature, $publicKeyPem): bool => false,
+        ]);
+        VerifyRegistry::verifying('not-known', '', '', '');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testVerifyingNotRegistered(): void
+    {
+        $this->expectExceptionObject(
+            new UnexpectedValue('Verify method for "ecdsa_p_384_sha_384" not registered.'),
+        );
+        VerifyRegistry::registerMethods([
+            SigningEnum::rsa_pss_sha512->name    =>
+                fn (string $signingDatas, $signature, $publicKeyPem): bool => true,
+            SigningEnum::rsa_v_1_5_sha_256->name => fn (string $signingDatas, $signature, $publicKeyPem): bool => false,
+        ]);
+        VerifyRegistry::verifying(SigningEnum::ecdsa_p_384_sha_384->name, '', '', '');
     }
 }

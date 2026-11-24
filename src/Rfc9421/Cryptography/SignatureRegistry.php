@@ -41,12 +41,14 @@ final class SignatureRegistry
     ): string {
         $enum = SigningEnum::isOwnTypeOrThrow($signingEnumInterface);
 
-        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValue(
+        if (array_key_exists($enum->getName(), self::$stack)) {
+            $method = self::$stack[$enum->getName()];
+
+            return $method($signingDatas, $privateKey);
+        }
+        throw new UnexpectedValue(
             sprintf('Signing method for "%s" not registered.', $enum->getName()),
         );
-
-        // closure
-        return $method($signingDatas, $privateKey);
     }
 
 }

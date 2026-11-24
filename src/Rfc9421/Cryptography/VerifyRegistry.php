@@ -43,17 +43,20 @@ final class VerifyRegistry
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
     public static function verifying(
-        string|SigningEnumInterface $signingEnum,
+        string|SigningEnumInterface $signingEnumInterface,
         string $data,
         string $signature,
         string $publicKey,
     ): bool {
-        $enum = SigningEnum::isOwnTypeOrThrow($signingEnum);
+        $enum = SigningEnum::isOwnTypeOrThrow($signingEnumInterface);
 
-        $method = self::$stack[$enum->getName()] ?? throw new UnexpectedValue(
+        if (array_key_exists($enum->getName(), self::$stack)) {
+            $method = self::$stack[$enum->getName()];
+
+            return $method($data, $signature, $publicKey);
+        }
+        throw new UnexpectedValue(
             sprintf('Verify method for "%s" not registered.', $enum->getName()),
         );
-
-        return $method($data, $signature, $publicKey);
     }
 }
