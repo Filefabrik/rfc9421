@@ -14,7 +14,7 @@ jobs:
      - name: Install composer and dependencies
        uses: php-actions/composer@v6
        with:
-         php_version: "8.4.28"
+         php_version: 8.4.28
          php_extensions: xdebug mbstring gmp
 
 
@@ -26,6 +26,7 @@ jobs:
          bootstrap: vendor/autoload.php
          configuration: phpunit.xml
          args: tests --coverage-clover ./coverage.xml
+         php_version: 8.4.28
          php_extensions: xdebug mbstring
          memory_limit: -1
          testsuite: default
