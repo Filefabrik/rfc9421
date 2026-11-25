@@ -2,7 +2,6 @@
   "stryker-config": {
     "reporters": [
       "html",
-      "clear-text",
       "progress",
       "dashboard"
     ]
