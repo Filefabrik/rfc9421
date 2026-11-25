@@ -12,8 +12,6 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 [![codecov](https://codecov.io/github/Filefabrik/rfc9421/graph/badge.svg?token=3ROA47BZ5J)](https://codecov.io/github/Filefabrik/rfc9421) CodeCoverage 100% over 460< Tests and 830< Assertions
 
-[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2FFilefabrik%2Frfc9421%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/Filefabrik/rfc9421/main)
-
 ✅ easy to use.
 
 ✅ integrate the signer and verifier into existing projects
