@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\StructuredFields;
 
+use DateTime;
 use Filefabrik\Rfc9421\Exceptions\MethodException;
 use Filefabrik\Rfc9421\StructuredFields\MethodsMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -30,7 +31,10 @@ final class MethodsMapperTest extends TestCase
     {
         $mapper = new MethodsMapper();
         $mapper->addMany(
-            ['testMethod' => fn (): string => 'testMethodResult', 'testMethod2' => fn (): string => 'testMethod2Result'],
+            [
+                'testMethod'  => fn (): string => 'testMethodResult',
+                'testMethod2' => fn (): string => 'testMethod2Result',
+            ],
         );
         self::assertCount(2, $mapper->methods);
         self::assertSame('testMethod', $mapper->methods['testMethod']->method);
@@ -67,5 +71,26 @@ final class MethodsMapperTest extends TestCase
     public function testGetDefaultMapper(): void
     {
         self::assertCount(8, MethodsMapper::getDefaultMapper()->methods);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
+    public function testHandleDefaultDate(): void
+    {
+        $mapper          = MethodsMapper::getDefaultMapper();
+        $currentDateTime = new DateTime()->format('Y-m-d H:i:s');
+        $ex              = '@'.strtotime($currentDateTime);
+        self::assertSame($ex, $mapper->callMethod('date', [$currentDateTime]));
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     */
+    public function testHandleDefaultUrl(): void
+    {
+        $mapper = MethodsMapper::getDefaultMapper();
+
+        self::assertSame('"stupid"', $mapper->callMethod('url', ['stupid']));
     }
 }

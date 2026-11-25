@@ -16,7 +16,8 @@ use Filefabrik\Rfc9421\Configuration\{ContentDigestTrait,
     PrivatePemTrait,
     PublicPemTrait,
     SignatureKeyNameTrait,
-    SigningMethodsTrait};
+    SigningMethodsTrait
+};
 use Filefabrik\Rfc9421\Exceptions\SignatureException;
 use Filefabrik\Rfc9421\Interfaces\SigningEnumInterface;
 use Filefabrik\Rfc9421\Signer\Metadata;
@@ -56,12 +57,20 @@ final class SigningConfiguration
 
     public function getStructuredFields(): StructuredFields
     {
-        return $this->structuredFields ??= StructuredFields::fromDefaultList();
+        if (null === $this->structuredFields) {
+            $this->structuredFields = StructuredFields::fromDefaultList();
+        }
+
+        return $this->structuredFields;
     }
 
     public function getMethodsMapper(): MethodsMapper
     {
-        return $this->methodsMapper ??= MethodsMapper::getDefaultMapper();
+        if (null === $this->methodsMapper) {
+            $this->methodsMapper = MethodsMapper::getDefaultMapper();
+        }
+
+        return $this->methodsMapper;
     }
 
     /**
