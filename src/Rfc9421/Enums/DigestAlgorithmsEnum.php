@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -31,10 +32,6 @@ enum DigestAlgorithmsEnum: string
      */
     public static function isOwnTypeOrThrow(self|string|null $key): self
     {
-        if ($key instanceof self) {
-            return $key;
-        }
-
         if (($res = self::isOwnType($key)) instanceof self) {
             return $res;
         }
