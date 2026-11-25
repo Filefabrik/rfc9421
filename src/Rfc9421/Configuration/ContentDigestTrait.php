@@ -31,6 +31,7 @@ trait ContentDigestTrait
      */
     public function withContentDigest(string|DigestAlgorithmsEnum $contentDigestAlgo): self
     {
+        // @infection-ignore MethodCallRemoval
         $this->setContentDigestAlgo(contentDigestAlgo: $contentDigestAlgo);
 
         $this->mustGenerateContentDigest = true;
