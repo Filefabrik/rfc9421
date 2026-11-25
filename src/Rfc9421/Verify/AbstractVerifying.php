@@ -54,8 +54,8 @@ abstract class AbstractVerifying
         $preparedSigningConfiguration = $this->getVerifySigningConfiguration();
         $preparedSigningConfiguration->setSigningComponents(
             components: $this->preparedVerify
-                             ->getSignatureInputInstance()
-                             ->getExtractedComponents(),
+                ->getSignatureInputInstance()
+                ->getExtractedComponents(),
         );
 
         $contentDigestResult = $this->verifyContentDigestIfNeed($preparedSigningConfiguration);
@@ -100,21 +100,18 @@ abstract class AbstractVerifying
         // Validates the Content digest if needed from signature-line sig1=("content-digest")
         if ($signingConfiguration->hasContentDigestHashAlgo()) {
             if (!$this->validateContentDigest()) {
-                $this->hasSignedBody = false;
-
                 // todo logging the error that validate content digest is wrong
-                return false;
+                return $this->hasSignedBody = false;
             }
 
             // was signed and is valid
             $this->hasSignedBody = true;
         }
 
-        if(null===$this->hasSignedBody){
+        if (null === $this->hasSignedBody) {
             // content-digest was not part of the signing process
             $this->hasSignedBody = false;
         }
-
 
         // return true so tell we have no validation error
         return true;
@@ -128,8 +125,8 @@ abstract class AbstractVerifying
     private function validateContentDigest(): bool
     {
         $contentDigestLine = $this->preparedVerify
-                                  ->getHeaderHelper()
-                                  ->getContentDigestLine()
+            ->getHeaderHelper()
+            ->getContentDigestLine()
         ;
 
         $verifyInstance = new VerifyContentDigest(
@@ -149,8 +146,8 @@ abstract class AbstractVerifying
     private function getBinarySignatureValue(): string
     {
         return $this->preparedVerify
-                    ->getHeaderSignatureExtractor()
-                    ->getBinarySignatureValue()
+            ->getHeaderSignatureExtractor()
+            ->getBinarySignatureValue()
         ;
     }
 
