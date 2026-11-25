@@ -127,7 +127,7 @@ abstract class AbstractVerifyPrepare
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
-    protected function getSignaturInputInstance(): HeaderSignatureInput
+    private function getSignaturInputInstance(): HeaderSignatureInput
     {
         $headerSignatureInstance = new HeaderSignatureInput(
             headerSignatureInputValue: $this->headerHelper
