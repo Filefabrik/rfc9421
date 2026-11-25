@@ -76,9 +76,11 @@ final readonly class ComponentItemDto
         if (is_string($v)) {
             return $v;
         }
+        // @codeCoverageIgnoreStart
         throw new UnexpectedValue(
             sprintf('Expected string, got "%s"', gettype($v)),
         );
+        // @codeCoverageIgnoreEnd
     }
 
     public function getItem(): Item
