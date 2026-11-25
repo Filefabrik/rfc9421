@@ -218,4 +218,22 @@ final class MetadataTest extends TestCase
         $md->set('created', 'string');
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    #[DataProvider('dataProviderToArray')]
+    public function testBindMetadata(...$datas): void
+    {
+        $inputMeta = Metadata::fromArray($datas)
+                             ->toArray()
+        ;
+        $bondage   = Metadata::bindMetadata(new Metadata(), $inputMeta);
+        self::assertSame(
+            $datas,
+            $bondage->toArray(),
+
+        );
+    }
+
 }
