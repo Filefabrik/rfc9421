@@ -113,11 +113,13 @@ abstract class AbstractVerifyPrepare
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
-    protected function getExtractedMetadataArray(): array
+    private function getExtractedMetadataArray(): array
     {
-        return $this->getSignaturInputInstance()->extractedMetadata?->toArray() ?? throw new UnexpectedValue(
-            'No Metadata Found',
-        );
+        $toArray = $this->getSignaturInputInstance()->extractedMetadata?->toArray();
+        if (is_array($toArray)) {
+            return $toArray;
+        }
+        throw new UnexpectedValue('No Metadata Found');
     }
 
     /**

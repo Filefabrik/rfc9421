@@ -57,6 +57,14 @@ final class InitialContentsEnumTest extends TestCase
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
+    public function testIsOwnTypeOrNullOrThrowNull(): void
+    {
+        self::assertNull(InitialContentsEnum::isOwnTypeOrNullOrThrow(null));
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
     public function testIsOwnTypeOrThrow(): void
     {
         self::assertSame(InitialContentsEnum::key, InitialContentsEnum::isOwnTypeOrThrow('key'));
