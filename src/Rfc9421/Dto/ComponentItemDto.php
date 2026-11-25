@@ -73,7 +73,10 @@ final readonly class ComponentItemDto
     private static function ensureStringValue(
         Bytes|Token|DisplayString|DateTimeImmutable|string|int|float|bool $v,
     ): string {
-        return is_string($v) ? $v : throw new UnexpectedValue(
+        if (is_string($v)) {
+            return $v;
+        }
+        throw new UnexpectedValue(
             sprintf('Expected string, got "%s"', gettype($v)),
         );
     }
