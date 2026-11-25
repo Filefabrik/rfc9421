@@ -45,3 +45,12 @@ jobs:
         uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Run Stryker.NET
+        uses: lyndychivs/dotnet-stryker-action@v2.1
+        env:
+          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
+        with:
+          configFile: "stryker-config.json"
+          strykerArgs: >-
+            --reporter progress --reporter dashboard --reporter json
+            --version ${{ github.ref_name }}
