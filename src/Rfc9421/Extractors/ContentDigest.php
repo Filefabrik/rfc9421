@@ -13,11 +13,11 @@ namespace Filefabrik\Rfc9421\Extractors;
 
 /**
  * Content digest extract the header request parameter "content-digest"
- *
- * @todo verify emptyness
  */
-final readonly class ContentDigest
+final  class ContentDigest
 {
+    private string $regex = '#^(.*?)=:(.*?):$#';
+
     /*
      *  "content-digest": sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:
      * //  The format is content-digest => <algorithm>=:<base64 encoded hash>:
@@ -25,7 +25,7 @@ final readonly class ContentDigest
      * //  The Base64 encoding may have multiple `=` at the end. So split this at the first `=`.
      * $digestData = explode( separator: "=", string: $digestString, limit: 2 );
      */
-    public function __construct(private(set) string $contentDigest)
+    public function __construct(private(set) readonly string $contentDigest)
     {
     }
 
@@ -52,26 +52,28 @@ final readonly class ContentDigest
     }
 
     /**
-     * todo ...ugly extractToBuilder
-     *
-     * @return array<string>
+     * @return array<string|null>
      */
     public function getDigestArray(): array
     {
-        preg_match('#^(.*?)=:(.*?):$#', $this->contentDigest, $matches);
+        preg_match($this->regex, $this->contentDigest, $matches);
 
         return [$matches[1] ?? null, $matches[2] ?? null];
     }
 
     /**
      * check we have 2 initialContentsParameters after splitting
-     * todo more clever validatedSignatureParts check
      */
     public function validateExtraction(): bool
     {
         [$key, $value] = $this->getDigestArray();
 
-        return $key && $value;
+        return $this->hasValue($key) && $this->hasValue($value);
+    }
+
+    private function hasValue(?string $value): bool
+    {
+        return null !== $value && '' !== $value;
     }
 
     /**
@@ -79,14 +81,14 @@ final readonly class ContentDigest
      * $digestHash = str_replace( search: ":", replace: "", subject: $digestData[1] );
      * :tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:
      *
-     * @return string tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc= without the colons on start and the ending
+     * @return string|null tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc= without the colons on start and the ending
      */
-    public function getRealBase64EncodedValue(): string
+    public function getRealBase64EncodedValue(): ?string
     {
-        return str_replace(search: ':', replace: '', subject: $this->getExplodedHash());
+        return $this->getExplodedHash();
     }
 
-    public function getExplodedHash(): string
+    public function getExplodedHash(): null|string
     {
         return $this->getDigestArray()[1];
     }

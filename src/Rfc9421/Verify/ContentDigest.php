@@ -21,7 +21,7 @@ final readonly class ContentDigest
     public function __construct(
         private(set) string $body,
         private(set) string $phpAlgorithm,
-        private(set) string $base64EncodedValue,
+        private(set) ?string $base64EncodedValue,
     ) {
     }
 

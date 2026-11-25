@@ -20,9 +20,15 @@ use PHPUnit\Framework\TestCase;
 #[CoversMethod(ContentDigest::class, 'validateExtraction')]
 final class ContentDigestTest extends TestCase
 {
-    public function testvalidateExtractionFalse(): void
+    public function testValidateExtractionFalse(): void
     {
         self::assertFalse(new ContentDigest('bullshit')->validateExtraction());
+        $validation = new ContentDigest('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc:')->validateExtraction();
+        self::assertFalse($validation);
+
+        $digestArray = new ContentDigest('sha-256=')->validateExtraction();
+        self::assertFalse($digestArray);
+
     }
 
     public function testGetAlgorithm(): void
@@ -57,7 +63,7 @@ final class ContentDigestTest extends TestCase
 
     public function testValidateExtraction(): void
     {
-        $validation = new ContentDigest('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc:')->validateExtraction();
-        self::assertFalse($validation);
+
+        self::assertTrue( new ContentDigest('sha-256=:tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc=:')->validateExtraction());
     }
 }
