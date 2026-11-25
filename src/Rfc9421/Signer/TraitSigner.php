@@ -201,7 +201,11 @@ trait TraitSigner
      */
     public function getSigningParametersStringOrThrow(): string
     {
-        return $this->signingParametersString ?? throw ProcessingException::signingParametersString();
+        if (is_string($this->signingParametersString)) {
+            return $this->signingParametersString;
+        }
+
+        return throw ProcessingException::signingParametersString();
     }
 
     /**

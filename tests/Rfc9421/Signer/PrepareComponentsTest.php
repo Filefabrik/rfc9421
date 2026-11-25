@@ -211,6 +211,23 @@ final class PrepareComponentsTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
+    public function testProcessSignatureParamsThrow(): void
+    {
+        $this->expectExceptionObject(
+            new PrepareMethodsException(
+                'Error during calling the method with key: "@signature-params": remove before processing signatureParams',
+            ),
+        );
+        $r = new Request('post', 'https://www.Test.com/var/pathy/?qer=var', ['']);
+
+        new PrepareComponents($r)->processValue('@signature-params');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
     public function testProcessScheme(): void
     {
         $r = new Request('post', 'https://Test.com/var/pathy/?qer=var');
