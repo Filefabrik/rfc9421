@@ -28,11 +28,13 @@ TODO  beStrictAboutCoverageMetadata="false" to be true. at the moment it is wild
             <directory>./tests/Rfc9421</directory>
         </testsuite>
     </testsuites>
-<!-- Disabled for debugging and running    <coverage includeUncoveredFiles="true">
+<!-- Disabled for debugging and running
+<coverage includeUncoveredFiles="true">
         <report>
             <clover outputFile="./.coverage/clover.xml"/>
         </report>
-    </coverage>-->
+    </coverage>
+    -->
     <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
         <include>
             <directory>./src/Rfc9421</directory>

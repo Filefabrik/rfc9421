@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Exceptions;
 
+use Exception;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 
 final class StructuredFieldException extends AbstractRfc9421Exception
@@ -34,5 +35,11 @@ final class StructuredFieldException extends AbstractRfc9421Exception
     public static function unknownStructuredFieldType(string $fieldType): self
     {
         return new self(sprintf('Unknown or unregistered structured field type for "%s".', $fieldType));
+    }
+
+    public static function structuredFieldExceptionBakame(
+        \Bakame\Http\StructuredFields\StructuredFieldError|Exception $exception,
+    ): self {
+        return new self($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
     }
 }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Exceptions;
 
+use Exception;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
 use Filefabrik\Rfc9421\Exceptions\StructuredFieldException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -65,5 +66,21 @@ final class StructuredFieldExceptionTest extends TestCase
             ),
         );
         throw StructuredFieldException::unknownStructuredFieldType('example-dict');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
+    public function testStructuredFieldExceptionBakame()
+    {
+        $ex = new Exception('my', 500, null);
+        $this->expectExceptionObject(
+            new StructuredFieldException(
+                'my',
+                500,
+                null,
+            ),
+        );
+        throw StructuredFieldException::structuredFieldExceptionBakame($ex);
     }
 }
