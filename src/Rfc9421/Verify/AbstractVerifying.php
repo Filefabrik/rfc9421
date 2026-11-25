@@ -156,7 +156,10 @@ abstract class AbstractVerifying
      */
     public function getSignedHeaderLines(): ReadLines
     {
-        return $this->signedHeaderLines ?? throw ProcessingException::SignedHeaderLines();
+        if ($this->signedHeaderLines instanceof ReadLines) {
+            return $this->signedHeaderLines;
+        }
+        throw ProcessingException::SignedHeaderLines();
     }
 
     abstract public function getMessage(): MessageInterface;

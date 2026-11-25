@@ -17,6 +17,7 @@ use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\ProcessingException;
 use Filefabrik\Rfc9421\RequestSigner;
+use Filefabrik\Rfc9421\Signer\Signatures\ReadLines;
 use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
 use Filefabrik\Rfc9421\VerifyRequest;
@@ -117,6 +118,7 @@ final class VerifyRequestTest extends TestCase
         self::assertEquals(1, $verifier->verifying());
         // must be true because body(content-digest) was part of the signing process
         self::assertTrue($verifier->hasSignedBody());
+        self::assertInstanceOf(ReadLines::class,$verifier->getSignedHeaderLines());
     }
 
     /**
