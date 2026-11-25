@@ -1,6 +1,6 @@
 # HTTP Message Signer and Verify (RFC 9421)
 
-![packagist](https://img.shields.io/packagist/v/filefabrik/rfc9421) [![CI](https://github.com/Filefabrik/rfc9421/actions/workflows/ci.yml/badge.svg)](https://github.com/Filefabrik/rfc9421/actions/workflows/ci.yml)
+![packagist](https://img.shields.io/packagist/v/filefabrik/rfc9421) 
 
 PHP RFC9421 HTTP Message Signing and Verify
 
@@ -8,7 +8,7 @@ PHP RFC9421 HTTP Message Signing and Verify
 
 ✅ RFC 9421 Signing and Verification for Requests and Responses
 
-✅ PHP-8.4|PHP-8.5
+✅ [![CI](https://github.com/Filefabrik/rfc9421/actions/workflows/ci.yml/badge.svg)](https://github.com/Filefabrik/rfc9421/actions/workflows/ci.yml) **PHP-8.4|PHP-8.5**
 
 ✅ CodeCoverage 100% over 460< Tests and 830< Assertions
 
