@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -146,7 +147,10 @@ final class StructuredFields
      */
     public function getOrThrow(string $key): string
     {
-        return $this->getOrNull($key) ?? throw StructuredFieldException::notMapped($key);
+        if (null !== ($value = $this->getOrNull($key))) {
+            return $value;
+        }
+        throw StructuredFieldException::notMapped($key);
     }
 
     public function getOrNull(string $key): ?string

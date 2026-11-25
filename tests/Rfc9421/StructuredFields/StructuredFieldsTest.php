@@ -64,4 +64,13 @@ final class StructuredFieldsTest extends TestCase
         $instance = StructuredFields::fromDefaultList();
         self::assertNull($instance->getOrThrow('some'));
     }
+
+    public function testNormalizeKey(): void
+    {
+        $instance = StructuredFields::fromDefaultList();
+        self::assertSame('list', $instance->getOrNull('x-xss-protection'));
+        self::assertSame('list', $instance->getOrNull(' x-xss-protection '));
+
+        self::assertSame('list', $instance->getOrNull(' x-XSS-protection '));
+    }
 }
