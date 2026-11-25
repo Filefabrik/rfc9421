@@ -54,4 +54,4 @@ jobs:
         env:
           STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
         with:
-          configFile: "stryker-config.json"
+          configFile: "stryker.config.json"
