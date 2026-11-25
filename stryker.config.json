@@ -1,6 +1,5 @@
 {
   "stryker-config": {
-    "_comment": "This config was generated using 'stryker init'",
     "reporters": [
       "html",
       "clear-text",
