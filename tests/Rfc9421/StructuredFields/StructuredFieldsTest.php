@@ -72,8 +72,9 @@ final class StructuredFieldsTest extends TestCase
         $this->expectExceptionObject(
             new StructuredFieldException('The field "some" is not mapped into StructuredFields.'),
         );
-        $instance = StructuredFields::fromDefaultList();
-        self::assertNull($instance->getOrThrow('some'));
+        StructuredFields::fromDefaultList()
+                        ->getOrThrow('some')
+        ;
     }
 
     public function testNormalizeKey(): void
