@@ -39,7 +39,7 @@ final class Bs
         if (0 < count($values)) {
             $valuesSegments = [];
             foreach ($values as $value) {
-                $valuesSegments [] = ':'.base64_encode(trim($value)).':';
+                $valuesSegments [] = ':'.base64_encode($value).':';
             }
 
             // all in a line

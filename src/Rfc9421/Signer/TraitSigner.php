@@ -170,13 +170,11 @@ trait TraitSigner
     /**
      * Generate the base signature
      *
-     *
-     *
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function crypt(string $signingParametersString): string
+    private function crypt(string $signingParametersString): string
     {
         $signature = SignatureRegistry::signing(
             signingEnumInterface: SigningEnum::isOwnTypeOrThrow($this->signingConfiguration->getMetadata()->alg),
@@ -193,7 +191,7 @@ trait TraitSigner
      * @return string $signatureKeyName:$signature:
      *
      */
-    public function makeSignatureString(string $signature): string
+    private function makeSignatureString(string $signature): string
     {
         return sprintf($this->signingConfiguration->getSignatureKeyName().':%s:', $signature);
     }
@@ -203,7 +201,11 @@ trait TraitSigner
      */
     public function getSigningParametersStringOrThrow(): string
     {
-        return $this->signingParametersString ?? throw ProcessingException::signingParametersString();
+        if (is_string($this->signingParametersString)) {
+            return $this->signingParametersString;
+        }
+
+        return throw ProcessingException::signingParametersString();
     }
 
     /**

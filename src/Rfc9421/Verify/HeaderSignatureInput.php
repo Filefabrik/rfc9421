@@ -42,7 +42,7 @@ final class HeaderSignatureInput
          * if the signatureNameKey not set/null, then detect it during the extract
          *
          */
-        private(set) readonly string $signatureNameKey
+        private(set) readonly string $signatureNameKey,
     ) {
     }
 
@@ -103,7 +103,11 @@ final class HeaderSignatureInput
      */
     public function getExtractedComponents(): SigningComponents
     {
-        return $this->extractedComponents ?? throw SignatureExtractionException::notProceeded();
+        if ($this->extractedComponents instanceof SigningComponents) {
+            return $this->extractedComponents;
+        }
+
+        throw SignatureExtractionException::notProceeded();
     }
 
 }

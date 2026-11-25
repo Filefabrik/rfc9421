@@ -36,9 +36,12 @@ final class PreparedMethodsTest extends TestCase
             [
                 'texst'  => fn (MessageInterface $message): string => $message->getMethod(),
                 'poster' => fn (MessageInterface $message): string => $message->getMethod(),
+                'UpperCase' => fn (MessageInterface $message): string => $message->getMethod(),
             ],
         );
         self::assertInstanceOf(Closure::class, $i->getMethod('poster'));
+        self::assertInstanceOf(Closure::class, $i->getMethod('uppercase'));
+        self::assertInstanceOf(Closure::class, $i->getMethod('UpperCase'));
     }
 
     /**

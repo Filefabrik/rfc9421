@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Verify;
 
-use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\ContentDigest;
 use Filefabrik\Rfc9421\Extractors\HeaderSignature;
@@ -79,7 +78,7 @@ abstract class AbstractVerifyPrepare
          */
         Metadata::bindMetadata(
             instance: $this->signingConfiguration->getMetadata(),
-            metadata: $this->getExtractedMetadataArray(),
+            metadata: $this->getSignaturInputInstance()->extractedMetadata->toArray(),
         );
 
         /*
@@ -104,30 +103,13 @@ abstract class AbstractVerifyPrepare
     }
 
     /**
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
-     */
-    protected function getExtractedMetadataArray(): array
-    {
-        return $this->getSignaturInputInstance()->extractedMetadata?->toArray() ?? throw new UnexpectedValue(
-            'No Metadata Found',
-        );
-    }
-
-    /**
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      */
-    protected function getSignaturInputInstance(): HeaderSignatureInput
+    private function getSignaturInputInstance(): HeaderSignatureInput
     {
         $headerSignatureInstance = new HeaderSignatureInput(
             headerSignatureInputValue: $this->headerHelper

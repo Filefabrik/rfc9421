@@ -669,4 +669,46 @@ final class RequestSignerTest extends TestCase
         $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
         $signer->sign();
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    public function testHasNoSigningParametersString(): void
+    {
+        $this->expectExceptionObject(ProcessingException::signingParametersString());
+
+        $targetUrl            = 'http://localhost:8001/mastodon?param=value&foo=bar&baz=bat%2Dman';
+        $certInstance         = new CertHelper('rsa');
+        $currentDateTime      = new DateTime()->getTimestamp();
+        $expiredDate          = $currentDateTime + 7200;
+        $signingConfiguration = new SigningConfiguration()
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_512)
+            ->setCreated($currentDateTime)
+            ->setExpires($expiredDate)
+            ->setTag('mastodon')
+            ->setKeyid('http://127.0.0.1:8001/actor#main-key')
+            ->withNonce('nonce-now')
+
+            // content digest signer key
+            ->setSignatureKeyName('testValue=')
+            // for signing needs private
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+        ;
+
+        /**
+         * Prepare the Request
+         */
+        $request = new Request(
+            method : 'POST',
+            uri    : $targetUrl,
+            headers: ['x-origin-host' => 'mytest.com'],
+            body   : '{"recipient":"Alex","amount":900000000,"text":"fdawsfs"}',
+        );
+
+        $signer = new RequestSigner(message: $request, signingConfiguration: $signingConfiguration);
+
+        $signer->getSigningParametersStringOrThrow();
+    }
 }

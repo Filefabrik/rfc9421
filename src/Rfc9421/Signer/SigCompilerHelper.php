@@ -52,7 +52,7 @@ final readonly class SigCompilerHelper
     /**
      * simple helper
      */
-    public static function wrapBraces(string $string): string
+    private static function wrapBraces(string $string): string
     {
         return sprintf('(%s)', $string);
     }
@@ -61,7 +61,7 @@ final readonly class SigCompilerHelper
      * todo that is wrong, must use the component-parser
      *
      */
-    public static function compileFromArrayComponent(SigningComponents $components): string
+    private static function compileFromArrayComponent(SigningComponents $components): string
     {
         $parts = [];
 

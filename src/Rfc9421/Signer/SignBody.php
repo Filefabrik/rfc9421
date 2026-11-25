@@ -64,7 +64,7 @@ final readonly class SignBody
     /**
      * Create the hash
      */
-    public function hash(): string
+    private function hash(): string
     {
         return hash(
             algo  : $this->algorithm

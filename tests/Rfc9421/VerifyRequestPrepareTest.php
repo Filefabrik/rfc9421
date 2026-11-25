@@ -16,6 +16,7 @@ use DateTime;
 use Filefabrik\Rfc9421\Enums\DigestAlgorithmsEnum;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
+use Filefabrik\Rfc9421\Extractors\HeaderSignature;
 use Filefabrik\Rfc9421\RequestSigner;
 use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\SigningConfiguration;
@@ -78,13 +79,13 @@ final class VerifyRequestPrepareTest extends TestCase
      */
     #[DataProvider('withSigningMethods')]
     public function testPrepareVerify(string|SigningEnum $signingAlgo, string $cert): void
-    {   require_once dirname(__DIR__, 2).'/src/register-openssl-signing-verify.php';
+    {
+        require_once dirname(__DIR__, 2).'/src/register-openssl-signing-verify.php';
         $certInstance = new CertHelper($cert);
 
         $signatureKeyName  = 'testing=';
         $signingComponents = new SigningComponents()->sign('@method')
                                                     ->sign('@authority')
-
         ;
         /**
          * Prepare signingConfiguration
@@ -167,8 +168,6 @@ final class VerifyRequestPrepareTest extends TestCase
         $signatureKeyName    = 'testing=';
         $signatureComponents = new SigningComponents()->sign('@method')
                                                       ->sign('@authority')
-
-
         ;
         /**
          * Prepare signingConfiguration
@@ -176,15 +175,15 @@ final class VerifyRequestPrepareTest extends TestCase
         $currentDateTime = new DateTime()->getTimestamp();
         $configuration   = new SigningConfiguration(signingComponents: $signatureComponents);
         $configuration
-                      ->setSigningAlgorithm($signingAlgo)
-                      ->setCreated($currentDateTime)
-                      ->setExpires($currentDateTime + 7200)
-                      ->setTag('mastodon')
-                      ->withNonce('nonce-now')
-                      ->setSignatureKeyName($signatureKeyName)
-                      ->withContentDigest(DigestAlgorithmsEnum::sha512)
+            ->setSigningAlgorithm($signingAlgo)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->withNonce('nonce-now')
+            ->setSignatureKeyName($signatureKeyName)
+            ->withContentDigest(DigestAlgorithmsEnum::sha512)
             // for signing needs private
-                      ->setPrivatePem($certInstance->getPrivatPemContent())
+            ->setPrivatePem($certInstance->getPrivatPemContent())
         ;
 
         /**
@@ -221,6 +220,10 @@ final class VerifyRequestPrepareTest extends TestCase
          * now prepare the verify process
          */
         self::assertTrue($prepareVerifierInstance->prepareVerification());
+        self::assertSame(
+            DigestAlgorithmsEnum::sha512,
+            $prepareVerifierInstance->signingConfiguration->contentDigestAlgo,
+        );
     }
 
     /**
@@ -250,6 +253,74 @@ final class VerifyRequestPrepareTest extends TestCase
          * now prepare the verify process
          */
         self::assertTrue($prepareVerifierInstance->prepareVerification());
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws JsonException
+     */
+    public function testValidateThrowMissingSignatureLines(): void
+    {
+        $this->expectExceptionObject(new VerifyHeaderSignatureException('Missing signature'));
+        $signingAlgo  = SigningEnum::rsa_v_1_5_sha_512->name;
+        $cert         = 'rsa';
+        $certInstance = new CertHelper($cert);
+
+        $signatureKeyName    = 'testing=';
+        $signatureComponents = new SigningComponents()->sign('@method')
+                                                      ->sign('@authority')
+        ;
+        /**
+         * Prepare signingConfiguration
+         */
+        $currentDateTime = new DateTime()->getTimestamp();
+        $configuration   = new SigningConfiguration(signingComponents: $signatureComponents);
+        $configuration
+            ->setSigningAlgorithm($signingAlgo)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->withNonce('nonce-now')
+            ->setSignatureKeyName($signatureKeyName)
+            ->withContentDigest(DigestAlgorithmsEnum::sha512)
+            // for signing needs private
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+        ;
+
+        /**
+         * Prepare the Request
+         */
+        $bodyParams = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];
+        $bodyJson   = json_encode($bodyParams, JSON_THROW_ON_ERROR);
+        $request    = new Request(
+            method : 'POST',
+            uri    : 'https://target-host.com',
+            headers: ['x-origin-host' => 'target-host.com'],
+            body   : $bodyJson,
+        );
+
+        $signer        = new RequestSigner($request, $configuration);
+        $signedRequest = $signer->sign();
+
+        // Kills signature to provocate error
+        $signedRequest = $signedRequest->withoutHeader('signature');
+
+        $prepareVerifierInstance = new VerifyRequestPrepare(
+            message             : $signedRequest,
+            signingConfiguration: new SigningConfiguration(),
+        )->prepareVerification();
     }
 
     /**
@@ -323,8 +394,7 @@ final class VerifyRequestPrepareTest extends TestCase
         $certInstance = new CertHelper('rsa');
 
         $signatureComponents = new SigningComponents()->sign('@method')
-                                                      ->sign('@authority')
-            /*
+                                                      ->sign('@authority')/*
              * todo check duplicate content-digest
              * ->withHeader('content-digest')
              */
@@ -363,6 +433,8 @@ final class VerifyRequestPrepareTest extends TestCase
         self::assertInstanceOf(HeaderSignatureInput::class, $prepareVerifierInstance->getSignatureInputInstance());
     }
 
+
+
     public function testGetHeaderHelper(): void
     {
         $prepareVerifierInstance = new VerifyRequestPrepare(
@@ -372,4 +444,64 @@ final class VerifyRequestPrepareTest extends TestCase
         self::assertInstanceOf(HeaderHelper::class, $prepareVerifierInstance->getHeaderHelper());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\MethodException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ProcessingException
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     * @throws \Filefabrik\Rfc9421\Exceptions\InvalidHeaderKeyException
+     * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
+     * @throws JsonException
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testGetHeaderSignatureExtractor(): void
+    {
+        $certInstance = new CertHelper('rsa');
+
+        $signatureComponents = new SigningComponents()->sign('@method')
+                                                      ->sign('@authority')/*
+             * todo check duplicate content-digest
+             * ->withHeader('content-digest')
+             */
+
+        ;
+        $signatureKeyName    = 'testing=';
+        $bodyParams          = ['recipient' => 'Alex', 'amount' => 900, 'currency' => 'EUR'];
+        $bodyJson            = json_encode($bodyParams, JSON_THROW_ON_ERROR);
+        $request             = new Request(
+            method : 'POST',
+            uri    : 'https://target-host.com',
+            headers: ['x-origin-host' => 'target-host.com'],
+            body   : $bodyJson,
+        );
+        $currentDateTime     = new DateTime()->getTimestamp();
+        $configuration       = new SigningConfiguration(signingComponents: $signatureComponents);
+        $configuration
+            ->setSigningAlgorithm(SigningEnum::rsa_v_1_5_sha_256)
+            ->setCreated($currentDateTime)
+            ->setExpires($currentDateTime + 7200)
+            ->setTag('mastodon')
+            ->withNonce('nonce-now')
+            ->setSignatureKeyName($signatureKeyName)
+            ->setContentDigestAlgo(DigestAlgorithmsEnum::sha512)
+            // for signing needs private
+            ->setPrivatePem($certInstance->getPrivatPemContent())
+        ;
+
+        $signer                  = new RequestSigner($request, $configuration);
+        $signedRequest           = $signer->sign();
+        $prepareVerifierInstance = new VerifyRequestPrepare(
+            message             : $signedRequest,
+            signingConfiguration: new SigningConfiguration(),
+        );
+        $prepareVerifierInstance->prepareVerification();
+        $hs = $prepareVerifierInstance->getHeaderSignatureExtractor();
+        self::assertTrue($hs instanceof HeaderSignature);
+    }
 }

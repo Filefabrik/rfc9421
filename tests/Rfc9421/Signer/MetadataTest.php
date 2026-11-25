@@ -14,6 +14,8 @@ namespace Filefabrik\Rfc9421Test\Signer;
 use BadMethodCallException;
 use DateTime;
 use Filefabrik\Rfc9421\Enums\SigningEnum;
+use Filefabrik\Rfc9421\Exceptions\SignatureException;
+use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signer\Metadata;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -128,7 +130,11 @@ final class MetadataTest extends TestCase
     {
         $ts = new DateTime()->getTimestamp();
 
-        self::assertEquals($ts, new Metadata()->setCreated($ts)->getCreated());
+        self::assertEquals(
+            $ts,
+            new Metadata()->setCreated($ts)
+                          ->getCreated(),
+        );
     }
 
     /**
@@ -157,4 +163,77 @@ final class MetadataTest extends TestCase
         );
         self::assertFalse(new Metadata()->hasTag());
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testSetStringOrNullThrow(): void
+    {
+        $this->expectExceptionObject(new UnexpectedValue('$value must be string|null'));
+        $md = new Metadata();
+        $md->set('keyid', 1);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testsetStringOrSigningEnumThrow(): void
+    {
+        $this->expectExceptionObject(
+            new SignatureException('The signature algorithm must be a string|SigningEnumInterface.'),
+        );
+        $md = new Metadata();
+        $md->set('alg', 1);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testSetStringOrSigningEnumValid(): void
+    {
+        $md = new Metadata();
+        $md->set('alg', SigningEnum::rsa_v_1_5_sha_256);
+        self::assertSame($md->alg, SigningEnum::rsa_v_1_5_sha_256);
+
+        $md = new Metadata();
+        $md->set('alg', SigningEnum::rsa_v_1_5_sha_256->value);
+        self::assertSame($md->alg, SigningEnum::rsa_v_1_5_sha_256);
+
+        $md = new Metadata();
+        $md->set('alg', SigningEnum::rsa_v_1_5_sha_256->name);
+        self::assertSame($md->alg, SigningEnum::rsa_v_1_5_sha_256);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     */
+    public function testSetIntOrNullThrow(): void
+    {
+        $this->expectExceptionObject(new UnexpectedValue('$value must be int|null'));
+        $md = new Metadata();
+        $md->set('created', 'string');
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     */
+    #[DataProvider('dataProviderToArray')]
+    public function testBindMetadata(...$datas): void
+    {
+        $inputMeta = Metadata::fromArray($datas)
+                             ->toArray()
+        ;
+        $bondage   = Metadata::bindMetadata(new Metadata(), $inputMeta);
+        self::assertSame(
+            $datas,
+            $bondage->toArray(),
+
+        );
+    }
+
 }
