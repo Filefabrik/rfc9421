@@ -58,7 +58,7 @@ final readonly class ComponentItemDto
      *
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public static function validFieldName(Item $item): string
+    private static function validFieldName(Item $item): string
     {
         $v = $item->value(validate: fn ($value): bool => is_string($value));
 

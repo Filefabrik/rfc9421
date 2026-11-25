@@ -42,7 +42,7 @@ final readonly class HeaderItemsDto
         return self::fromHeaderItems(HeaderItems::fromArray($headerItems));
     }
 
-    public static function fromHeaderItems(HeaderItems $headerItems): self
+    private static function fromHeaderItems(HeaderItems $headerItems): self
     {
         return new self(headerItems: $headerItems);
     }
