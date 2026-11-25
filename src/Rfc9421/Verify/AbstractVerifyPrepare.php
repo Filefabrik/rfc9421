@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421\Verify;
 
-use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\Extractors\ContentDigest;
 use Filefabrik\Rfc9421\Extractors\HeaderSignature;
@@ -79,7 +78,7 @@ abstract class AbstractVerifyPrepare
          */
         Metadata::bindMetadata(
             instance: $this->signingConfiguration->getMetadata(),
-            metadata: $this->getExtractedMetadataArray(),
+            metadata: $this->getSignaturInputInstance()->extractedMetadata->toArray(),
         );
 
         /*
@@ -101,25 +100,6 @@ abstract class AbstractVerifyPrepare
         }
 
         return $this->headerSignatureExtractor;
-    }
-
-    /**
-     *
-     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
-     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
-     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
-     */
-    private function getExtractedMetadataArray(): array
-    {
-        $toArray = $this->getSignaturInputInstance()->extractedMetadata?->toArray();
-        if (is_array($toArray)) {
-            return $toArray;
-        }
-        throw new UnexpectedValue('No Metadata Found');
     }
 
     /**

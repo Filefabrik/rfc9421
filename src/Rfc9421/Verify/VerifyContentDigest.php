@@ -27,8 +27,8 @@ final class VerifyContentDigest
     }
 
     /**
-     * @return bool true if valid
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
+     * @return bool true if valid
      */
     public function verify(): bool
     {
@@ -40,7 +40,7 @@ final class VerifyContentDigest
     /**
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
-    public function getContentDigestVerifier(): ContentDigest
+    private function getContentDigestVerifier(): ContentDigest
     {
         if (null === $this->contentDigestVerifier) {
             $this->contentDigestVerifier = $this->prepare();

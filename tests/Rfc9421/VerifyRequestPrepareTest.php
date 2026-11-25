@@ -269,7 +269,7 @@ final class VerifyRequestPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function testValidateThrowMissingSignatureLines(): void
     {
@@ -433,6 +433,8 @@ final class VerifyRequestPrepareTest extends TestCase
         self::assertInstanceOf(HeaderSignatureInput::class, $prepareVerifierInstance->getSignatureInputInstance());
     }
 
+
+
     public function testGetHeaderHelper(): void
     {
         $prepareVerifierInstance = new VerifyRequestPrepare(
@@ -453,12 +455,12 @@ final class VerifyRequestPrepareTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\PrepareMethodsException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\EmptyException
-     * @throws \JsonException
+     * @throws JsonException
      * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      */
-    public function testGetHeaderSignatureExtractor()
+    public function testGetHeaderSignatureExtractor(): void
     {
         $certInstance = new CertHelper('rsa');
 
