@@ -97,6 +97,10 @@ final class ComponentBuilderTest extends TestCase
         self::assertSame('"@authority"', (string)new ComponentBuilder('@authority'));
         self::assertSame('"@authority";req', (string)new ComponentBuilder('@authority')->withReq());
 
+        self::assertSame('"@authority"', (string)new ComponentBuilder('"@AUTHORITY"'));
+
+        self::assertSame('"@authority"', (string)new ComponentBuilder('"@AUTHORITY" '));
+
         self::assertSame('"@authority"', (string)new ComponentBuilder('"@authority"'));
         self::assertSame('"@authority";req', (string)new ComponentBuilder('"@authority"')->withReq());
 
