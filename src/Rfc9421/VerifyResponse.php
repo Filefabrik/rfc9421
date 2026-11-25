@@ -45,7 +45,7 @@ final class VerifyResponse extends AbstractVerifying
     protected function getSigner(): ResponseSigner
     {
         $signer = new ResponseSigner(
-            message             : clone $this->preparedVerify->message,
+            message             : $this->preparedVerify->message,
             signingConfiguration: $this->getVerifySigningConfiguration(),
             expectedSignedLines : $this->preparedVerify->getExpectedSigners(),
         );

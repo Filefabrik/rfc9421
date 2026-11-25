@@ -44,7 +44,7 @@ final class VerifyRequest extends AbstractVerifying
     protected function getSigner(): RequestSigner
     {
         $signer = new RequestSigner(
-            message             : clone $this->preparedVerify->message,
+            message             : $this->preparedVerify->message,
             signingConfiguration: $this->getVerifySigningConfiguration(),
         );
 
