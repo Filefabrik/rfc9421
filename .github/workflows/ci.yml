@@ -47,7 +47,6 @@ jobs:
         with:
           fetch-depth: 2
 
-
       - name: Set up Node for codecov
         uses: actions/setup-node@v4
 
