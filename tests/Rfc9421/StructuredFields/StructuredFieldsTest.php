@@ -35,6 +35,9 @@ final class StructuredFieldsTest extends TestCase
     {
         $instance = StructuredFields::fromDefaultList();
         self::assertNull($instance->getOrNull('some'));
+
+        self::assertSame('list', $instance->getOrNull(' x-XSS-protection '));
+
     }
 
     public function testAdd(): void

@@ -67,11 +67,16 @@ final readonly class ComponentBuilder implements Stringable
         // todo fine-style this setter
 
         if (str_starts_with($lower, '@')) {
-            return DerivedComponentEnum::isOwnValueOrNull($lower) ??
-                throw EnumTypeException::TypeError(
-                    $lower,
-                    DerivedComponentEnum::class,
-                );
+
+            $derived = DerivedComponentEnum::isOwnValueOrNull($lower);
+            if ($derived instanceof DerivedComponentEnum) {
+                return $derived;
+            }
+
+            throw EnumTypeException::TypeError(
+                $lower,
+                DerivedComponentEnum::class,
+            );
         }
 
         return UnquoteHelper::isQuoted($lower) ? UnquoteHelper::unquote($lower) : $lower;
