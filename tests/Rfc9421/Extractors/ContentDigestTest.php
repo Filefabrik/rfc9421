@@ -26,7 +26,8 @@ final class ContentDigestTest extends TestCase
         $validation = new ContentDigest('tFdB/ENGczHMlZMDb66pXoUi2d0OqH2iBHdnN/WV1mc:')->validateExtraction();
         self::assertFalse($validation);
 
-        $digestArray = new ContentDigest('sha-256=')->validateExtraction();
+        // empty inside the expected
+        $digestArray = new ContentDigest('sha-256=::')->validateExtraction();
         self::assertFalse($digestArray);
 
     }
