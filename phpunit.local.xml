@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026.
+  ~ e-mail: rt@filefabrik.com
+  ~ mastodon: filefabrik@phpc.social
+  ~ License: proprietary
+  ~ State: under development
+  -->
+<!--
+TODO  beStrictAboutCoverageMetadata="false" to be true. at the moment it is wild/cross testing
+-->
+
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="defects"
+         requireCoverageMetadata="true"
+         beStrictAboutCoverageMetadata="false"
+         beStrictAboutOutputDuringTests="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         failOnPhpunitDeprecation="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         warnWhenPhpIsNotConfiguredForDevelopment="true">
+    <testsuites>
+        <testsuite name="Rfc9421">
+            <directory>./tests/Rfc9421</directory>
+        </testsuite>
+    </testsuites>
+    <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
+        <include>
+            <directory>./src/Rfc9421</directory>
+        </include>
+    </source>
+</phpunit>
