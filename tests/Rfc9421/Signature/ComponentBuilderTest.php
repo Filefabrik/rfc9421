@@ -17,6 +17,7 @@ use Exception;
 use Filefabrik\Rfc9421\Dto\ComponentItemDto;
 use Filefabrik\Rfc9421\Enums\DerivedComponentEnum;
 use Filefabrik\Rfc9421\Enums\InitialContentsEnum;
+use Filefabrik\Rfc9421\Exceptions\EnumTypeException;
 use Filefabrik\Rfc9421\Exceptions\UnexpectedValue;
 use Filefabrik\Rfc9421\Signature\ComponentBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -214,8 +215,11 @@ final class ComponentBuilderTest extends TestCase
      * @throws Exception
      */
     #[DataProvider('detects')]
-    public function testSetDetect(InitialContentsEnum $contentsEnum, ?string $value = null, ?string $expected = null): void
-    {
+    public function testSetDetect(
+        InitialContentsEnum $contentsEnum,
+        ?string $value = null,
+        ?string $expected = null,
+    ): void {
         self::assertSame($expected, (string)new ComponentBuilder('test-fieldname')->setDetect($contentsEnum, $value));
     }
 
@@ -229,5 +233,16 @@ final class ComponentBuilderTest extends TestCase
             ComponentItemDto::fromFieldItem(Item::fromString('test-fieldname')),
             new ComponentBuilder('test-fieldname')->toComponentItemDto(),
         );
+    }
+
+    public function testSetValidatedNameThrowsException(): void
+    {
+        $this->expectExceptionObject(
+            EnumTypeException::TypeError(
+                '@bullshit',
+                DerivedComponentEnum::class,
+            ),
+        );
+        (string)new ComponentBuilder('@bullshit');
     }
 }
