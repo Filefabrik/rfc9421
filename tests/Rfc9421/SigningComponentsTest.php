@@ -326,4 +326,23 @@ final class SigningComponentsTest extends TestCase
             ),
         );
     }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
+     */
+    public function testSetSigningComponent(): void
+    {
+        $i = new SigningComponents();
+        $i->set(
+            new ComponentBuilder('@authority')
+                ->toComponentItemDto(),
+        );
+        self::assertEquals(
+            '"@authority"',
+            $i->getComponents()[0]->getComponent(),
+        );
+    }
 }
