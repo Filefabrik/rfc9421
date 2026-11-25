@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.10.11 2026-11-25
+
+Mutation testing is now up to 98%
+
 ## v1.10.10 2026-11-25
 ## v1.10.9 2026-11-25
 

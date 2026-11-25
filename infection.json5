@@ -17,8 +17,8 @@
     }
   },
   "tmpDir": "build/cache/infection",
-  "minMsi": 95,
-  "minCoveredMsi": 95,
+  "minMsi": 97,
+  "minCoveredMsi": 97,
   "mutators": {
     "@default": true,
   },

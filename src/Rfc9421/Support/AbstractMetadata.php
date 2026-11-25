@@ -77,7 +77,7 @@ abstract class AbstractMetadata
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      */
-    public function set(string $key, int|string|null $value): static
+    public function set(string $key, int|string|null|SigningEnumInterface $value): static
     {
         $methodName = 'set'.ucfirst($key);
 
@@ -122,6 +122,7 @@ abstract class AbstractMetadata
      */
     private function setStringOrNull(mixed $value): ?string
     {
+        // todo signature exception or metadata exception
         return null === $value || is_string($value) ? $value :
             throw new UnexpectedValue('$value must be string|null');
     }
@@ -148,8 +149,10 @@ abstract class AbstractMetadata
      */
     private function setStringOrSigningEnum(mixed $value): string|SigningEnumInterface
     {
-        return is_string($value) || $value instanceof SigningEnumInterface ? $value :
-            throw SignatureException::wrongFormat();
+        if (is_string($value) || $value instanceof SigningEnumInterface) {
+            return $value;
+        }
+        throw SignatureException::wrongFormat();
     }
 
     public function setTag(?string $tag): static
