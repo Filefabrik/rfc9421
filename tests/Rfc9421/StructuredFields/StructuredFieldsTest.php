@@ -37,7 +37,6 @@ final class StructuredFieldsTest extends TestCase
         self::assertNull($instance->getOrNull('some'));
 
         self::assertSame('list', $instance->getOrNull(' x-XSS-protection '));
-
     }
 
     public function testAdd(): void
@@ -54,6 +53,15 @@ final class StructuredFieldsTest extends TestCase
     {
         $instance = new StructuredFields()->addMany(['Test' => 'me', 'neGGst' => 'some']);
         self::assertSame(['test' => 'me', 'neggst' => 'some'], $instance->fields);
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\StructuredFieldException
+     */
+    public function testGetOrThrowExits(): void
+    {
+        $instance = StructuredFields::fromDefaultList();
+        self::assertSame('list', $instance->getOrThrow(' x-XSS-protection '));
     }
 
     /**
