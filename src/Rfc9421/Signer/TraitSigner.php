@@ -129,7 +129,7 @@ trait TraitSigner
 
         $this->signingLines->add(
             new Line(
-            // important to quote
+                // important to quote
                 signatureComponent: $signatureParamsEntry->getComponent(),
                 valueToSign       : $signatureParamsEntry->getValue(),
             ),
