@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Filefabrik\Rfc9421Test\Verify;
 
+use Filefabrik\Rfc9421\Exceptions\SignatureExtractionException;
 use Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException;
 use Filefabrik\Rfc9421\SigningComponents;
 use Filefabrik\Rfc9421\Verify\HeaderSignatureInput;
@@ -27,6 +28,7 @@ final class HeaderSignatureInputTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
     public function testExtract(): void
     {
@@ -55,6 +57,7 @@ final class HeaderSignatureInputTest extends TestCase
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\EnumTypeException
      */
     public function testExtractWithoutKey(): void
     {
@@ -135,5 +138,19 @@ final class HeaderSignatureInputTest extends TestCase
         $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
 
         $headerSignatureInput->extract();
+    }
+
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
+    public function testGetExtractedComponents(): void
+    {
+        $this->expectExceptionObject(SignatureExtractionException::notProceeded());
+        $expectedComponents = new SigningComponents();
+
+        $sig                  = 'someSig=()';
+        $headerSignatureInput = new HeaderSignatureInput($sig, 'someSig=');
+
+        self::assertEquals($expectedComponents, $headerSignatureInput->getExtractedComponents());
     }
 }
