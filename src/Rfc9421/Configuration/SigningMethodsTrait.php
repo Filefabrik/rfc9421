@@ -34,7 +34,11 @@ trait SigningMethodsTrait
 
     public function getSigningMethodsWithDefaults(): PreparedMethods
     {
-        return $this->signingMethods ??= PrepareComponents::defaultMapperClosure();
+        if (null === $this->signingMethods) {
+            $this->signingMethods = PrepareComponents::defaultMapperClosure();
+        }
+
+        return $this->signingMethods;
     }
 
     /**

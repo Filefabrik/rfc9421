@@ -93,20 +93,24 @@ abstract class AbstractVerifyPrepare
 
     public function getHeaderSignatureExtractor(): HeaderSignature
     {
-        return $this->headerSignatureExtractor ??= new HeaderSignature(
-            signatureString: $this->headerHelper
-                ->getSignatureLine(),
-        );
+        if (null === $this->headerSignatureExtractor) {
+            $this->headerSignatureExtractor = new HeaderSignature(
+                signatureString: $this->headerHelper
+                    ->getSignatureLine(),
+            );
+        }
+
+        return $this->headerSignatureExtractor;
     }
 
     /**
      *
-     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\AlreadySetException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureException
      * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @throws \Filefabrik\Rfc9421\Exceptions\UnexpectedValue
+     * @throws \Filefabrik\Rfc9421\Exceptions\VerifyHeaderSignatureException
      * @return array{}|array{created?: int, expires?: int, nonce?: string, keyid?: string, alg?: string, tag?: string}
      */
     protected function getExtractedMetadataArray(): array
@@ -146,12 +150,12 @@ abstract class AbstractVerifyPrepare
         ;
         if ($hasContentDigestLine) {
             $this->signingConfiguration
-                 ->setContentDigestAlgo(
-                     contentDigestAlgo: new ContentDigest(
-                         contentDigest: $this->headerHelper
-                             ->getContentDigestLine(),
-                     )->getAlgorithm(),
-                 )
+                ->setContentDigestAlgo(
+                    contentDigestAlgo: new ContentDigest(
+                        contentDigest: $this->headerHelper
+                            ->getContentDigestLine(),
+                    )->getAlgorithm(),
+                )
             ;
         }
     }

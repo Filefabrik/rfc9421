@@ -59,7 +59,11 @@ final class PrepareComponents
      */
     private function getMethodStack(): PreparedMethods
     {
-        return $this->preparedMethods ??= self::defaultMapperClosure();
+        if (null === $this->preparedMethods) {
+            $this->preparedMethods = self::defaultMapperClosure();
+        }
+
+        return $this->preparedMethods;
     }
 
     /**

@@ -19,6 +19,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(HeaderSignature::class)]
 final class HeaderSignatureTest extends TestCase
 {
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testExtractSignatureName(): void
     {
         $headerKey               = 'testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
@@ -26,6 +29,9 @@ final class HeaderSignatureTest extends TestCase
         self::assertSame('testValue=', $headerSignatureInstance->extractSignatureNameKey());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testExtractSignatureNameEmpty(): void
     {
         $headerKey               = ':Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
@@ -33,6 +39,9 @@ final class HeaderSignatureTest extends TestCase
         self::assertSame('', $headerSignatureInstance->extractSignatureNameKey());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testExtractSignatureNameNotFound(): void
     {
         $this->expectExceptionObject(
@@ -42,6 +51,9 @@ final class HeaderSignatureTest extends TestCase
         new HeaderSignature($headerKey)->extractSignatureNameKey();
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testGetSignatureValue(): void
     {
         $headerKey               = 'testValue=:Gemgf5YIl0pbTUuU5gqaI+U4Br6SRCuODMwPFpHN08gPVqFQ67m0hBFmZu81s:';
@@ -52,6 +64,9 @@ final class HeaderSignatureTest extends TestCase
         );
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testGetSignatureValueEmpty(): void
     {
         $headerKey               = 'testValue=::';
@@ -59,6 +74,9 @@ final class HeaderSignatureTest extends TestCase
         self::assertSame('', $headerSignatureInstance->getSignatureValue());
     }
 
+    /**
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
+     */
     public function testGetSignatureValueThrow(): void
     {
         $this->expectExceptionObject(

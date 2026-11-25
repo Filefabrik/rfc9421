@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2026.
  * e-mail: rt@filefabrik.com
@@ -26,8 +27,8 @@ final class VerifyContentDigest
     }
 
     /**
-     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      * @return bool true if valid
+     * @throws \Filefabrik\Rfc9421\Exceptions\ContentDigestException
      */
     public function verify(): bool
     {
@@ -41,7 +42,11 @@ final class VerifyContentDigest
      */
     public function getContentDigestVerifier(): ContentDigest
     {
-        return $this->contentDigestVerifier ??= $this->prepare();
+        if (null === $this->contentDigestVerifier) {
+            $this->contentDigestVerifier = $this->prepare();
+        }
+
+        return $this->contentDigestVerifier;
     }
 
     /**

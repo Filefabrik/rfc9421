@@ -110,8 +110,11 @@ abstract class AbstractVerifying
             $this->hasSignedBody = true;
         }
 
-        // content-digest was not part of the signing process
-        $this->hasSignedBody ??= false;
+        if(null===$this->hasSignedBody){
+            // content-digest was not part of the signing process
+            $this->hasSignedBody = false;
+        }
+
 
         // return true so tell we have no validation error
         return true;

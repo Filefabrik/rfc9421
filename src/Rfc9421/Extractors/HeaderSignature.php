@@ -24,14 +24,9 @@ final class HeaderSignature
     private static string $pattern = '#^(.*?):(.*?):$#';
 
     /**
-     * @var array{non-falsy-string,string,string}|non-empty-array<string>|\Filefabrik\Rfc9421\Exceptions\SignatureExtractionException|null
+     * @var array{non-falsy-string,string,string}|non-empty-array<string>|null
      */
-    private(set) array|null|SignatureExtractionException $validatedSignatureParts = null {
-        /**
-         * @throws SignatureExtractionException
-         */
-        get => $this->validatedSignatureParts ??= $this->getValidatedSignatureParts();
-    }
+    private(set) array|null $validatedSignatureParts = null;
 
     public function __construct(private(set) readonly string $signatureString)
     {
@@ -40,21 +35,50 @@ final class HeaderSignature
     /**
      * todo check, it is possible without signature
      *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      * @return string null on error
      */
     public function extractSignatureNameKey(): string
     {
         // todo validate against null value
-        return $this->getValidExtraction()[1] ?? '';
+        return $this->getValidatedSignatureParts()[1] ?? '';
     }
 
     /**
-     * @return array{non-falsy-string,string,string}|non-empty-array<string>|null
+     * checks we have the :base64EncodedValue-code: ...between the double colons
+     *
+     *
+     * @throws SignatureExtractionException
+     * @return array{0:non-falsy-string,1:string,2:string}|non-empty-array<string> SignatureExtractionException on format missmatch
      */
-    private function getValidExtraction(): null|array
+    private function getValidatedSignatureParts(): array
     {
-        return $this->validatedSignatureParts instanceof SignatureExtractionException ? null :
-            $this->validatedSignatureParts;
+        if (null !== $this->validatedSignatureParts) {
+            return $this->validatedSignatureParts;
+        }
+
+        $extracted = $this->extractSignatureString();
+        $cnt       = count($extracted);
+        //  extracted initialContentsParameters can be also have empty strings
+        if (3 === $cnt) {
+            return $this->validatedSignatureParts = $extracted;
+        }
+
+        throw new SignatureExtractionException(
+            sprintf('Can not extract signature parts. Needs 3 segments but has %s', $cnt),
+        );
+    }
+
+    /**
+     * @return array{non-falsy-string,string,string}|string[]
+     */
+    public function extractSignatureString(): array
+    {
+        $matches = [];
+        // todo modify regex for strict format validation
+        preg_match(self::$pattern, $this->signatureString, $matches);
+
+        return $matches;
     }
 
     /**
@@ -76,42 +100,12 @@ final class HeaderSignature
 
     /**
      *  todo check empty ore null or exception
+     *
+     * @throws \Filefabrik\Rfc9421\Exceptions\SignatureExtractionException
      */
     public function getSignatureValue(): string
     {
-        return $this->getValidExtraction()[2] ?? '';
+        return $this->getValidatedSignatureParts()[2] ?? '';
     }
 
-    /**
-     * checks we have the :base64EncodedValue-code: ...between the double colons
-     *
-     *
-     * @throws SignatureExtractionException
-     * @return array{0:non-falsy-string,1:string,2:string}|non-empty-array<string> SignatureExtractionException on format missmatch
-     */
-    private function getValidatedSignatureParts(): array
-    {
-        $extracted = $this->extractSignatureString();
-        $cnt       = count($extracted);
-        //  extracted initialContentsParameters can be also have empty strings
-        if (3 === $cnt) {
-            return $extracted;
-        }
-
-        throw new SignatureExtractionException(
-            sprintf('Can not extract signature parts. Needs 3 segments but has %s', $cnt),
-        );
-    }
-
-    /**
-     * @return array{non-falsy-string,string,string}|string[]
-     */
-    public function extractSignatureString(): array
-    {
-        $matches = [];
-        // todo modify regex for strict format validation
-        preg_match(self::$pattern, $this->signatureString, $matches);
-
-        return $matches;
-    }
 }
