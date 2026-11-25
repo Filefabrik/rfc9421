@@ -1,15 +1,11 @@
 {
-  "_comment": "This config was generated using 'stryker init'",
-  "packageManager": "npm",
-  "reporters": [
-    "html",
-    "clear-text",
-    "progress",
-    "dashboard"
-  ],
-  "testRunner": "jest",
-  "coverageAnalysis": "perTest",
-  "testRunnerNodeArgs": [
-    "--experimental-vm-modules"
-  ]
+  "stryker-config": {
+    "_comment": "This config was generated using 'stryker init'",
+    "reporters": [
+      "html",
+      "clear-text",
+      "progress",
+      "dashboard"
+    ]
+  }
 }
