@@ -14,7 +14,7 @@
     "html": "build/logs/infection.html",
   },
   "tmpDir": "build/cache/infection",
-  "minMsi": 90,
+  "minMsi": 95,
   "minCoveredMsi": 95,
   "mutators": {
     "@default": true,
