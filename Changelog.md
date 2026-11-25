@@ -2,7 +2,8 @@
 
 ## v1.10.9 2026-11-25
 
-Mutations-Tests with 95% Github Action CI
+Mutations-Tests with 95% Github Action CI 
+updating branche rules
 
 ## v1.10.8 2026-11-24
 
