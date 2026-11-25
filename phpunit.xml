@@ -30,7 +30,7 @@ TODO  beStrictAboutCoverageMetadata="false" to be true. at the moment it is wild
     </testsuites>
     <coverage includeUncoveredFiles="true">
         <report>
-            <clover outputFile="./.coverage/clover.xml"/>
+            <clover outputFile="./clover.xml"/>
         </report>
     </coverage>
     <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
