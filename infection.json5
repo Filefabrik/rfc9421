@@ -12,6 +12,9 @@
     "summary": "build/logs/infection-summary.log",
     "json": "build/logs/infection.json",
     "html": "build/logs/infection.html",
+    "stryker": {
+      "badge": "main"
+    }
   },
   "tmpDir": "build/cache/infection",
   "minMsi": 95,
