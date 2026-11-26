@@ -45,19 +45,10 @@ jobs:
         uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - name: Run Checkout for Infection
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Fetch comparison history
-        run: |
-          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
-            git fetch --no-tags --unshallow origin "$PR_HEAD_SHA" "$PR_BASE_SHA"
-          else
-            git fetch --no-tags origin "$PR_HEAD_SHA" "$PR_BASE_SHA"
-          fi
-
       # Existing PHP, Composer, dependency installation and coverage-driver setup steps go here.
       - name: Run Infection
         run: infection --show-mutations=max
+      #- name: Upload Infactions to stryker
+      #  uses: sozo-design/curl@v1.0.2
+      #  with:
+      #    args: --upload-file build/logs/infection.json https://transfer.sh/main-workflow.yml
