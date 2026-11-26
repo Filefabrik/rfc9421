@@ -25,7 +25,8 @@ jobs:
         with:
           php_version: ${{ matrix.php }}
           php_extensions: xdebug mbstring gmp
-
+      - name: "Run mutation tests"
+        run: "composer mutation"
       - name: PHPUnit Tests
         uses: php-actions/phpunit@v4
         env:
@@ -42,30 +43,3 @@ jobs:
         uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      # Existing PHP, Composer, dependency installation and coverage-driver setup steps go here.
-      #- name: Run Infection
-      #  run: infection --show-mutations=max
-      #- name: Upload Infactions to stryker
-      #  uses: sozo-design/curl@v1.0.2
-      #  with:
-      #    args: --upload-file build/logs/infection.json https://transfer.sh/main-workflow.yml
-  mutation:
-    name: "Mutation tests"
-    runs-on: "ubuntu-24.04"
-
-    steps:
-      - name: "Checkout repository"
-        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
-
-      - name: "Install PHP"
-        uses: "shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962" # 2.40.0
-        with:
-          php-version: "8.5"
-          coverage: "xdebug"
-          ini-values: "memory_limit=-1"
-
-      - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
-
-      - name: "Run mutation tests"
-        run: "composer mutation"
