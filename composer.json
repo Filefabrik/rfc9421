@@ -2,7 +2,7 @@
   "$schema": "https://getcomposer.org/schema.json",
   "name": "filefabrik/rfc9421",
   "description": "Create and validate RFC 9421 HTTP Signatures for ActivityPub.",
-  "homepage": "https://filefabrik.com/rfc9421-http-signatures-activity-pub",
+  "homepage": "https://github.com/Filefabrik/rfc9421",
   "license": "proprietary",
   "keywords": [
     "activity pub",

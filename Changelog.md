@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.11.0 2026-11-26
+
+* SemVer correction
+
 ## v1.10.12 2026-11-25
 
 Mutation testing is now up to 99%
@@ -12,12 +16,12 @@ Mutation testing is now up to 98%
 ## v1.10.9 2026-11-25
 
 Coverage 100%
-Mutations-Tests with 95% Github Action CI 
+Mutations-Tests with 95% GitHub Action CI 
 updating branche rules
 
 ## v1.10.8 2026-11-24
 
-Github Action CI codecoverage
+GitHub Action CI code coverage
 
 ## v1.10.7 2026-11-24
 

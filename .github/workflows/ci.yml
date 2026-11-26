@@ -5,12 +5,9 @@ permissions:
   contents: read
 
 jobs:
-
   test:
     name: Test PHP ${{ matrix.php }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    #needs: php-versions
-
     strategy:
       matrix:
         php:
