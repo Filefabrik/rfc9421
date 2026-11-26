@@ -45,7 +45,8 @@ jobs:
         uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Run Checkout for Infection
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -58,6 +59,5 @@ jobs:
           fi
 
       # Existing PHP, Composer, dependency installation and coverage-driver setup steps go here.
-
       - name: Run Infection
-        run: infection --git-diff-lines
+        run: infection --show-mutations=max
