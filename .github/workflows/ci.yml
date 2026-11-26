@@ -5,7 +5,7 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  testing:
     name: Test PHP ${{ matrix.php }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -45,7 +45,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   mutation:
     name: "Mutation tests"
-    needs: [ "lint" ]
+    needs: [ "testing" ]
     runs-on: "ubuntu-24.04"
 
     steps:
