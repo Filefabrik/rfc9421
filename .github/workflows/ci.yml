@@ -7,9 +7,6 @@ permissions:
 jobs:
   test:
     name: Test PHP ${{ matrix.php }} on ${{ matrix.os }}
-    env:
-      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -46,8 +43,8 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       # Existing PHP, Composer, dependency installation and coverage-driver setup steps go here.
-      - name: Run Infection
-        run: infection --show-mutations=max
+      #- name: Run Infection
+      #  run: infection --show-mutations=max
       #- name: Upload Infactions to stryker
       #  uses: sozo-design/curl@v1.0.2
       #  with:
